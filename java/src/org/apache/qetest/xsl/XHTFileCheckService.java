@@ -199,6 +199,12 @@ public class XHTFileCheckService implements CheckService
             attrs.put("reference", referenceFile.toString());
             attrs.put("reportedBy", "XHTFileCheckService");
             String elementBody = msg + "(" + id + ") \n" + sw.toString();
+            // HACK: escapeString(elementBody) so that it's legal XML
+            //  for cases where we have XML output.  This isn't 
+            //  necessarily a 'hack', I'm just not sure what the 
+            //  cleanest place to put this is (here or some sort 
+            //  of intelligent logic in XMLFileLogger)
+            elementBody = XMLFileLogger.escapeString(elementBody);
             logger.logElement(Logger.STATUSMSG, "fileCheck", attrs, elementBody);
             logger.checkFail(msg, id);
             return Logger.FAIL_RESULT;

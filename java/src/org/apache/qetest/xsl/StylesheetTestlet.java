@@ -231,9 +231,8 @@ public class StylesheetTestlet extends TestletImpl
                 attrs.put("outputName", datalet.outputName);
                 attrs.put("goldName", datalet.goldName);
                 logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance test file references");
-                // Then log the failure reason
-                logger.logArbitrary(Logger.STATUSMSG, (new File(datalet.inputName)).getName() 
-                                    + " failure reason: " + fileChecker.getExtendedInfo());
+                // No longer need to log failure reason, this kind 
+                //  of functionality should be kept in checkServices
             }
         }
         // Note that this class can only validate positive test 
