@@ -1,7 +1,0 @@
-<?xml version="1.1"?>
-<indoc xmlns:p1="http://example.org/p1&#xB11;"
-	   xmlns:p2="http://example.org/p2">
-  <ch1>
-    <ch2></ch2>
-  </ch1>
-</indoc>
