@@ -12,6 +12,7 @@
        test also causes problems with ConsoleLogger, so we may 
        want to change the test somewhat -->
   <!-- ExpectedException: Could not find function: &#58490;&#57332; -->
+  <!-- ExpectedException: Could not find function: --><!-- Provide minimal detection: should be reviewed -sc -->
 
 <xsl:template match="/">
   <out>
