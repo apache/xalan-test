@@ -1569,6 +1569,10 @@ public class Reporter implements Logger
         Hashtable resultsHash = createResultsStatusHash();
         resultsHash.put("desc", testComment);
         resultsHash.put("testName", testName);
+        //@todo the actual path in the property below may not necessarily 
+        //  either exist or be the correct location vis-a-vis the file
+        //  that we're writing out - but it should be close
+        resultsHash.put(OPT_LOGFILE, reporterProps.getProperty(OPT_LOGFILE));
 
         String elementName = "teststatus";
         String overallResult = resultToString(getCurrentFileResult());
@@ -1598,7 +1602,7 @@ public class Reporter implements Logger
             logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, "ResultsSummary.xml"))).getAbsolutePath();
         }
         logFileBase = (new File(logFileBase)).getParent();
-        File[] summaryFiles = 
+        final File[] summaryFiles = 
         {
             // Note array is ordered; should be re-designed so this doesn't matter
             // Coordinate PASS name with results.marker in build.xml
