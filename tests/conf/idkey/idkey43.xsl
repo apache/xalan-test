@@ -6,11 +6,10 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 5.2 -->
   <!-- Creator: David Marston -->
-  <!-- Purpose: Use variables in match pattern in id() argument and predicate. -->
+  <!-- Purpose: Use variables in predicate of match pattern that also has id() -->
 
 <xsl:strip-space elements="a b c"/>
 
-<xsl:variable name="pick" select="'id2'"/>
 <xsl:variable name="major" select="'b'"/>
 
 <xsl:template match="/">
@@ -20,12 +19,12 @@
   </out>
 </xsl:template>
 
-<xsl:template match="id($pick)/*[name()=$major]/text()" priority="2">
+<xsl:template match="id('id2')/*[name()=$major]/text()" priority="2">
   <xsl:text>&#10;</xsl:text>
   <bee><xsl:value-of select="../@id"/></bee>
 </xsl:template>
 
-<xsl:template match="id($pick)//text()">
+<xsl:template match="id('id2')//text()">
   <xsl:text>&#10;</xsl:text>
   <x><xsl:value-of select="../@id"/></x>
 </xsl:template>
