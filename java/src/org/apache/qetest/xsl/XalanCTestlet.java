@@ -59,6 +59,7 @@ package org.apache.qetest.xsl;
 
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
+import java.io.File;
 
 /**
  * Testlet for conformance testing of xsl stylesheet files using 
@@ -85,6 +86,55 @@ public class XalanCTestlet extends CmdlineTestlet
     {
         return "XalanCTestlet";
     }
+
+    /**
+     * Default Actual name of external program to call.  
+     * @return Xalan, the Xalan-C command line.
+     */
+    public String getDefaultProgName()
+    {
+        return "Xalan";
+    }
+
+    /**
+     * Worker method to get list of arguments specific to this program.  
+     * 
+     * <p>Must be overridden for different processors, obviously.  
+     * This implementation returns the args for Xalan-C TestXSLT</p>
+     * 
+     * @param program path\name of program to Runtime.exec()
+     * @param defaultArgs any additional arguments to pass
+     * @return String array of arguments suitable to pass to 
+     * Runtime.exec()
+     */
+    public String[] getProgramArguments(StylesheetDatalet datalet, String[] defaultArgs)
+    {
+        final int NUMARGS = 5;
+        String[] args = new String[defaultArgs.length + NUMARGS];
+        String progName = datalet.options.getProperty(OPT_PROGNAME, getDefaultProgName());
+        String progPath = datalet.options.getProperty(OPT_PROGPATH);
+        if ((null != progPath) && (progPath.length() > 0))
+        {
+            args[0] = progPath + File.separator + progName;
+        }
+        else
+        {
+            // Pesume the program is on the PATH already...
+            args[0] = progName;
+        }
+    
+        // Default args for Xalan-C TestXSLT
+        args[1] = "-o";
+        args[2] = datalet.outputName;
+        args[3] = datalet.xmlName;
+        args[4] = datalet.inputName;
+
+        if (defaultArgs.length > 0)
+            System.arraycopy(defaultArgs, 0, args, NUMARGS, defaultArgs.length);
+
+        return args;
+    }
+
 
 }  // end of class XalanCTestlet
 
