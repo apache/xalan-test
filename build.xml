@@ -76,6 +76,7 @@
 
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
+    <property name="xml-apis.jar" value="${xalan.build.dir}/xml-apis.jar"/>
     <property name="parserjar" value="${xalan.bin.dir}/xerces.jar"/>
     <property name="bsf.jar" value="${xalan.bin.dir}/bsf.jar"/>
     <!-- The js.jar is for Javascript extensions tests; you must 
@@ -96,6 +97,7 @@
         <pathelement location="${stylebook.jar}" />
         <pathelement location="${doclet.jar}" />
         <pathelement location="${xalan.jar}" />
+        <pathelement location="${xml-apis.jar}" />
         <pathelement path="${java.class.path}" />
     </path>
 
@@ -120,6 +122,7 @@
     <path id="compiletest.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
+        <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
     </path>
 
@@ -127,6 +130,7 @@
     <path id="api.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
+        <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${testxsl.jar}" />
     </path>
@@ -135,6 +139,7 @@
     <path id="conf.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
+        <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${testxsl.jar}" />
     </path>
@@ -820,7 +825,7 @@
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
-        <pathelement location="${xalan.jar}" />
+        <pathelement location="${xml-apis.jar}" />
     </path>
     <!-- xsltc-folk: are these the correct classpaths needed? -->
     <path id="xsltc.compile.class.path">
@@ -832,7 +837,7 @@
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
-        <pathelement location="${xalan.jar}" />
+        <pathelement location="${xml-apis.jar}" />
         <!-- Note addition of . to the classpath to enable loading 
              of translets; this needs more work and coordination 
              with tests and translet output dirs.
