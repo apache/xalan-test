@@ -7,12 +7,12 @@ There are 7 Namespace Nodes.
 <ext>http://somebody.elses.extension</ext>,
 <jad>http://administrator.com</jad>,
 <java>http://xml.apache.org/xslt/java</java>,
-<OK1>http://ped.lotus.com</OK1>,
-<OK2>http://bdd.lotus.com</OK2>,
+<ok1>http://ped.lotus.com</ok1>,
+<ok2>http://bdd.lotus.com</ok2>,
 <ped>http://tester.com</ped>,
 
-<OK1>http://ped.lotus.com</OK1>
-<OK2>http://bdd.lotus.com</OK2>
+<ok1>http://ped.lotus.com</ok1>
+<ok2>http://bdd.lotus.com</ok2>
   
 
 There are 0 Namespace Nodes.

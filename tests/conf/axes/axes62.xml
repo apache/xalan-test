@@ -6,7 +6,7 @@
     xmlns:ped="http://tester.com"
     xmlns:bdd="http://buster.com"
     xmlns:jad="http://administrator.com"
-    xmlns:OK1="http://ped.lotus.com"
-    xmlns:OK2="http://bdd.lotus.com"/>
+    xmlns:ok1="http://ped.lotus.com"
+    xmlns:ok2="http://bdd.lotus.com"/>
   <doc/>
 </docs>
