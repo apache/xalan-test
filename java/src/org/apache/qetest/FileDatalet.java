@@ -168,8 +168,19 @@ public class FileDatalet implements Datalet
      */
     protected Properties options = null;
 
-    /** Accessor method for optional properties.  */
-    public Properties getOptions() { return options; }
+    /** 
+     * Accessor method for optional properties.  
+     * 
+     * Should never return null; if it has no options then 
+     * it will create a blank Properties block to return. 
+     */
+    public Properties getOptions() 
+    { 
+        if (null == options)
+            options = new Properties();
+
+        return options;
+    }
 
     /** Accessor method for optional properties; settable.  */
     public void setOptions(Properties p) { options = p; }
