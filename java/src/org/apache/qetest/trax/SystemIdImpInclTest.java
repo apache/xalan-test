@@ -71,15 +71,28 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 // Needed SAX, DOM, JAXP classes
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.ext.DeclHandler;
+import org.xml.sax.ext.LexicalHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+import org.w3c.dom.Node;
 
 // java classes
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Properties;
 
 //-------------------------------------------------------------------------
@@ -89,6 +102,9 @@ import java.util.Properties;
  * <b>Note:</b> This test is directory-dependent, so if there are 
  * any fails, check the code to see what the test file is expecting 
  * the path/directory/etc. to be.
+ * //@todo More variations on kinds of systemIds: file: id's that 
+ * are absolute, etc.; any/all other forms of id's like http:
+ * (which will require network resources available).
  *
  * @author shane_curcuru@lotus.com
  * @version $Id$
@@ -121,6 +137,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
     /** Gold filename for level2, i.e. a directory below the testfile.  */
     protected String goldFileLevel2 = "SystemIdImpInclLevel2.out";
 
+    /** Gold filename for http, i.e. a from a webserver.  */
+    protected String goldFileHttp = "SystemIdImpInclHttp.out";
+
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_SUBDIR = "trax";
 
@@ -130,7 +149,7 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public SystemIdImpInclTest()
     {
-        numTestCases = 2;  // REPLACE_num
+        numTestCases = 4;  // REPLACE_num
         testName = "SystemIdImpInclTest";
         testComment = "Test behavior of imports/includes with various setSystemId sources";
     }
@@ -170,6 +189,7 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
         goldFileLevel0 = goldBasePath + goldFileLevel0; // just prepend path
         goldFileLevel1 = goldBasePath + goldFileLevel1; // just prepend path
         goldFileLevel2 = goldBasePath + goldFileLevel2; // just prepend path
+        goldFileHttp = goldBasePath + goldFileHttp; // just prepend path
 
         // Cache user.dir property
         savedUserDir = System.getProperty("user.dir");
@@ -355,21 +375,455 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
     }
 
     /**
-     * Test setting various forms of systemIds to see what happens.
+     * Verify simple SAXSources with systemIds.
      *
      * @return false if we should abort the test; true otherwise
      */
     public boolean testCase2()
     {
-        reporter.testCaseInit("Test setting various forms of systemId to see what happens");
+        reporter.testCaseInit("Verify simple SAXSources with systemIds");
 
-        // This will have imports/includes on various levels, and then 
-        //  set the systemId of a Source to hopefully pull in the 
-        //  different imports/includes
-        reporter.checkPass("//@todo implement this testcase");
+        TransformerFactory factory = null;
+        SAXTransformerFactory saxFactory = null;
+        InputSource xslInpSrc = null;
+        Source xslSource = null;
+        Source xmlSource = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            saxFactory = (SAXTransformerFactory)factory;
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem creating factory; can't continue testcase");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem creating factory; can't continue testcase");
+            return true;
+        }
+        try
+        {
+            // Verify basic transforms with with various systemId
+            //  and a SAXSource(InputSource(String))
+            // level0: one level up
+/********************************
+// SAXSource(impSrc(str)) level0, level2
+// Note: these cases may not be valid to test, since the setSystemId
+//  call will effectively overwrite the underlying InputSource's 
+//  real systemId, and thus the stylesheet can't be built
+//  Answer: write a custom test case that parses the stylesheet
+//  and builds it, but doesn't get imports/includes until later 
+//  when we have setSystemId
+            xslInpSrc = new InputSource(testFileInfo.inputName);
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel0,
+                                    "SAXSource(inpSrc(str)).systemId(level0: one up)");
+********************************/
+            // level1: same systemId as actual file
+            xslInpSrc = new InputSource(testFileInfo.inputName);
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+                                    xmlSource, goldFileLevel1,
+                                    "SAXSource(inpSrc(str)).systemId(level1: same level)");
+
+            // level2: one level down
+/********************************
+// SAXSource(impSrc(str)) level0, level2
+// Note: these cases may not be valid to test, since the setSystemId
+//  call will effectively overwrite the underlying InputSource's 
+//  real systemId, and thus the stylesheet can't be built
+//  Answer: write a custom test case that parses the stylesheet
+//  and builds it, but doesn't get imports/includes until later 
+//  when we have setSystemId
+            xslInpSrc = new InputSource(testFileInfo.inputName);
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel2,
+                                    "SAXSource(inpSrc(str)).systemId(level2: one down)");
+********************************/
+            reporter.logTraceMsg("@todo: add test for SAXSource with reset systemId (see code comments)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with SAXSources(1)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with SAXSources(1)");
+        }
+        try
+        {
+            // Verify basic transforms with with various systemId
+            //  and a SAXSource(InputSource(InputStream))
+            // level0: one level up
+            xslInpSrc = new InputSource(new FileInputStream(testFileInfo.inputName));
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel0,
+                                    "SAXSource(inpSrc(byteS)).systemId(level0: one up)");
+
+            // level1: same systemId as actual file
+            xslInpSrc = new InputSource(new FileInputStream(testFileInfo.inputName));
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+                                    xmlSource, goldFileLevel1,
+                                    "SAXSource(inpSrc(byteS)).systemId(level1: same level)");
+
+            // level2: one level down
+            xslInpSrc = new InputSource(new FileInputStream(testFileInfo.inputName));
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel2,
+                                    "SAXSource(inpSrc(byteS)).systemId(level2: one down)");
+
+            // Verify basic transforms with with various systemId
+            //  and a SAXSource(InputSource(Reader))
+            // level0: one level up
+            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel0,
+                                    "SAXSource(inpSrc(charS)).systemId(level0: one up)");
+
+            // level1: same systemId as actual file
+            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+                                    xmlSource, goldFileLevel1,
+                                    "SAXSource(inpSrc(charS)).systemId(level1: same level)");
+
+            // level2: one level down
+            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslSource = new SAXSource(xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel2,
+                                    "SAXSource(inpSrc(charS)).systemId(level2: one down)");
+
+            // Verify basic transforms with with various systemId
+            //  and a SAXSource(XMLReader, InputSource(various))
+    	    XMLReader reader = XMLReaderFactory.createXMLReader();
+            // level0: one level up, with a character stream
+            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslSource = new SAXSource(reader, xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel0,
+                                    "SAXSource(reader, inpSrc(charS)).systemId(level0: one up)");
+
+            // level1: same systemId as actual file, with a systemId
+    	    reader = XMLReaderFactory.createXMLReader();
+            xslInpSrc = new InputSource(testFileInfo.inputName);
+            xslSource = new SAXSource(reader, xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+                                    xmlSource, goldFileLevel1,
+                                    "SAXSource(reader, inpSrc(str)).systemId(level1: same level)");
+
+            // level2: one level down, with a byte stream
+    	    reader = XMLReaderFactory.createXMLReader();
+            xslInpSrc = new InputSource(new FileInputStream(testFileInfo.inputName));
+            xslSource = new SAXSource(reader, xslInpSrc);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel2,
+                                    "SAXSource(reader, inpSrc(byteS)).systemId(level2: one down)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with SAXSources(2)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with SAXSources(2)");
+        }
 
         reporter.testCaseClose();
         return true;
+    }
+
+    /**
+     * Verify simple DOMSources with systemIds.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("Verify simple DOMSources with systemIds");
+        TransformerFactory factory = null;
+        DocumentBuilderFactory dfactory = null;
+        DocumentBuilder docBuilder = null;
+        Node xslNode = null;
+        Source xslSource = null;
+        Source xmlSource = null;
+
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            dfactory = DocumentBuilderFactory.newInstance();
+            dfactory.setNamespaceAware(true);
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem creating factory; can't continue testcase");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem creating factory; can't continue testcase");
+            return true;
+        }
+        try
+        {
+            docBuilder = dfactory.newDocumentBuilder();
+
+            // Verify basic transforms with with various systemId
+            //  and a DOMSource(InputSource(String))
+            // level0: one level up
+            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            xslSource = new DOMSource(xslNode);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel0,
+                                    "DOMSource(inpSrc(str)).systemId(level0: one up)");
+
+            // level1: same systemId as actual file
+            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            xslSource = new DOMSource(xslNode);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+                                    xmlSource, goldFileLevel1,
+                                    "DOMSource(inpSrc(str)).systemId(level1: same level)");
+
+            // level2: one level down
+            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            xslSource = new DOMSource(xslNode);
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel2,
+                                    "DOMSource(inpSrc(str)).systemId(level2: one down)");
+
+            // Sample extra test: DOMSource that had systemId set 
+            //  differently in the constructor - tests that you can 
+            //  later call setSystemId and have it work
+            // level0: one level up
+            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            // Set the original systemId to itself, or level1
+            xslSource = new DOMSource(xslNode, filenameToURL(testFileInfo.inputName));
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            // Test it with a level0, or one level up systemId
+            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+                                    xmlSource, goldFileLevel0,
+                                    "DOMSource(inpSrc(str),sysId-level1).systemId(level0: one up)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with DOMSources(1)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with DOMSources(1)");
+        }
+
+
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Verify various simple Sources with http: systemIds.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Verify various simple Sources with http: systemIds");
+
+        // This is the name of a directory on the apache server 
+        //  that has impincl\SystemIdInclude.xsl and 
+        //  impincl\SystemIdImport.xsl files on it - obviously, 
+        //  your JVM must have access to this server to successfully
+        //  run this portion of the test!
+        String httpSystemIdBase = "http://xml.apache.org/xalan-j/test";
+
+        // Verify http connectivity
+        //  If your JVM environment can't connect to the http: 
+        //  server, then we can't complete the test
+        // This could happen due to various network problems, 
+        //  not being connected, firewalls, etc.
+        try
+        {
+            reporter.logInfoMsg("verifing http connectivity before continuing testCase");
+            // Note hard-coded path to one of the two files we'll be relying on
+            URL testURL = new URL(httpSystemIdBase + "/impincl/SystemIdInclude.xsl");
+            URLConnection urlConnection = testURL.openConnection();
+            // Ensure we don't get a cached copy
+            urlConnection.setUseCaches(false);
+            // Ensure we don't get asked interactive questions
+            urlConnection.setAllowUserInteraction(false);
+            // Actually connect to the document; will throw 
+            //  IOException if anything goes wrong
+            urlConnection.connect();
+            // Convenience: log out when the doc was last modified
+            reporter.logStatusMsg(testURL.toString() + " last modified: " 
+                                  + urlConnection.getLastModified());
+        }
+        catch (IOException ioe)
+        {
+            reporter.logErrorMsg("Can't connect to: " + httpSystemIdBase 
+                                 + "/impincl/SystemIdInclude.xsl, skipping testcase");
+            reporter.checkPass("FAKE PASS RECORD; testCase was skipped");
+            // Skip the rest of the testcase
+            reporter.testCaseClose();
+            return true;
+        }
+
+
+        TransformerFactory factory = null;
+        Source xslSource = null;
+        Source xmlSource = null;
+
+        try
+        {
+            factory = TransformerFactory.newInstance();
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem creating factory; can't continue testcase");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem creating factory; can't continue testcase");
+            return true;
+        }
+        try
+        {
+            // Verify StreamSource from local disk with a 
+            //  http: systemId for imports/includes
+            xslSource = new StreamSource(new FileInputStream(testFileInfo.inputName));
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            // Note that the systemId set (the second argument below)
+            //  must be the path to the proper 'directory' level
+            //  on the webserver: setting it to just ".../test"
+            //  will fail, since it be considered a file of that 
+            //  name, not the directory
+            checkSourceWithSystemId(xslSource, httpSystemIdBase + "/", 
+                                    xmlSource, goldFileHttp,
+                                    "StreamSource().systemId(http:)");
+
+            xslSource = new StreamSource(new FileInputStream(testFileInfo.inputName));
+
+            xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
+            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+
+            checkSourceWithSystemId(xslSource, httpSystemIdBase + "/" + knownGoodBaseName + ".xsl", 
+                                    xmlSource, goldFileHttp,
+                                    "StreamSource().systemId(http:)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with http systemIds(1)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with http systemIds(1)");
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Worker method to test setting SystemId and doing transform.
+     * Simply does:<pre>
+     * xslSrc.setSystemId(systemId);
+     * templates = factory.newTemplates(xslSrc);
+     * transformer = templates.newTransformer();
+     * transformer.transform(xmlSrc, StreamResult(...));
+     * fileChecker.check(... goldFileName, desc)
+     * </pre>
+     * Also catches any exceptions and logs them as fails.
+     *
+     * @param xslSrc Source to use for stylesheet
+     * @param systemId systemId to set on the stylesheet
+     * @param xmlSrc Source to use for XML input data
+     * @param goldFileName name of expected file to compare with
+     * @param desc description of this test
+     */
+    public void checkSourceWithSystemId(Source xslSrc, String systemId, 
+                                        Source xmlSrc, String goldFileName,
+                                        String desc)
+    {
+        reporter.logTraceMsg(desc + " (" + systemId + ")");
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            xslSrc.setSystemId(systemId);
+
+            // Use the next available output name for result
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result outputResult = new StreamResult(fos);
+
+            Templates templates = factory.newTemplates(xslSrc);
+            Transformer transformer = templates.newTransformer();
+            transformer.transform(xmlSrc, outputResult);
+            int result = fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(goldFileName), 
+                              desc + " (" + systemId + ") into: " + outNames.currentName());
+            if (result == reporter.FAIL_RESULT)
+                reporter.logInfoMsg(desc + "... failure reason:" + fileChecker.getExtendedInfo());
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail(desc + " threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, desc + " threw");
+        }
     }
 
 
