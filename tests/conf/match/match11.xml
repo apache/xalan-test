@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE doc [
   <!ELEMENT doc (a*)>
-  <!ELEMENT a EMPTY>
+  <!ELEMENT a (#PCDATA)>
   <!ATTLIST a  id ID #REQUIRED>
 ]>
 <doc>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE tee [
-  <!ELEMENT tee (a*)>
+  <!ELEMENT tee (s*)>
   <!ELEMENT s (r)>
   <!ELEMENT r EMPTY>
   <!ATTLIST s id ID #REQUIRED>
