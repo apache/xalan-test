@@ -40,6 +40,10 @@ if [ "$XML_APIS_JAR" = "" ]; then
     XML_APIS_JAR=../java/bin/xml-apis.jar
 fi
 
+if [ "$SERIALIZER_JAR" = "" ]; then
+    SERIALIZER_JAR=../java/bin/serializer.jar
+fi
+
 if [ "$ANT_HOME" = "" ] ; then
   # try to find ANT
   if [ -d /opt/ant ] ; then 
@@ -86,7 +90,7 @@ if [ "$JARDIR" != "" ] ; then
         fi
     done
 else
-    CLASSPATH=${CLASSPATH}${CLS_PATH_SEP}${_ANT_CP}${CLS_PATH_SEP}${PARSER_JAR}${CLS_PATH_SEP}${XML_APIS_JAR}
+    CLASSPATH=${CLASSPATH}${CLS_PATH_SEP}${_ANT_CP}${CLS_PATH_SEP}${PARSER_JAR}${CLS_PATH_SEP}${XML_APIS_JAR}${CLS_PATH_SEP}${SERIALIZER_JAR}
 fi
 
 if [ "$JAVA_HOME" != "" ] ; then

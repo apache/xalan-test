@@ -34,8 +34,8 @@ if [ "$1" = "-h" ] ; then
     exit 1
 fi
 
-# Default to xerces.jar
-PARSER_JAR=xerces.jar
+# Default to xercesImpl.jar
+PARSER_JAR=xercesImpl.jar
 
 # Check if we should use crimson.jar instead
 if [ "$1" = "-crimson" ] ; then
@@ -46,7 +46,7 @@ fi
 
 # Set classpath for our use based on JARDIR
 # prepend JARDIR-referenced jars to classpath
-TEST_CP="$JARDIR/$PARSER_JAR:$JARDIR/xalan.jar:$CLASSPATH"
+TEST_CP="$JARDIR/$PARSER_JAR:$JARDIR/xalan.jar:$JARDIR/serializer.jar:$CLASSPATH"
 
 RIN=$1
 shift
