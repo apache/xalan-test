@@ -217,6 +217,12 @@
                 <include name="**/*.properties" />
             </fileset>
         </copy>
+        <!-- Also copy over precompiled Ant class (why do we suddenly need this? -sc) -->
+        <copy todir="${test.build.dir}/${test.root}/xsl" >
+            <fileset dir="${test.dir}xsl">
+                <include name="**/*.class" />
+            </fileset>
+        </copy>
     </target>
          
     <target name="init.docs" depends="init.build"
@@ -794,11 +800,16 @@
                classpathref="compiletest.class.path" />
     </target>
 
+    <!-- Note: this target must not depend on XSLTC!
+         Obviously now that we're writing XSLTC-specific API tests, 
+         we'll need a target for those separately. -sc
+    -->
     <target name="compile" depends="compile.trax">
         <echo message="Compile Xalan-J 2.x specific tests" />
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xalanj2/*.java,${test.root}dtm/*.java"
+               excludes="${test.root}dtm/xsltcDocCode.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
     </target>
@@ -1039,7 +1050,7 @@
         description="Compile Xsltc*Wrapper xslwrappers only">
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java,${test.root}xslwrapper/Xsltc*Wrapper.java"
+               includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java,${test.root}xslwrapper/Xsltc*Wrapper.java,${test.root}dtm/xsltcDocCode.java"
                debug="${debug}">
             <classpath refid="xsltc.compile.class.path" />
         </javac>               
