@@ -659,7 +659,7 @@ dependencies - users must manually 'build jar' first.
     </target>
     <target name="smoketest.xsltc-pass" if="smoketest.xsltc-passed">
         <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />
-        <echo message=" [minitest] Details are in ${smoketest.conf.logFile}, ${smoketest.accept.logFile}" />
+        <echo message=" [minitest] Details are in ${smoketest.xsltc.conf.logFile}, ${smoketest.xsltc.accept.logFile}" />
     </target>
 
     <target name="smoketest-results-dist" depends="init.test">
