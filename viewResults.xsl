@@ -267,6 +267,11 @@
     <xsl:apply-templates select="hashitem"/>
   </TABLE>
 </xsl:template>
+<xsl:template match="hashtable[parent::testcase]">
+  <TR><TD><xsl:text>---begin---</xsl:text></TD><TD><xsl:text>[Hashtable logged] </xsl:text><xsl:value-of select="@desc"/></TD></TR>
+  <xsl:apply-templates select="hashitem"/>
+  <TR><TD><xsl:text>----end----</xsl:text></TD><TD><xsl:text>[Hashtable logged] </xsl:text><xsl:value-of select="@desc"/></TD></TR>
+</xsl:template>
 
 <xsl:template match="hashitem">
   <TR><TD><xsl:value-of select="@key"/></TD><TD><xsl:value-of select="."/></TD></TR>
