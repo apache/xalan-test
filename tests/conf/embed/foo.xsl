@@ -5,8 +5,7 @@
 <!-- Document: http://www.w3.org/TR/xslt -->
 <!-- DocVersion: 19991116 -->
 <!-- Section: 2.7 -->
-<!-- Purpose: General test of embedded stylesheet using Processing Instruction
-              xsl:stylesheet.  -->
+<!-- Purpose: Referenced by embed02 and embed08 in their xml-stylesheet PIs.  -->
 
 <xsl:template match="/">
   <out>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="#style1"?>
 <!DOCTYPE doc [
 <!ELEMENT doc (xsl:transform | body)*>
@@ -20,7 +20,8 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.7 Embedding Stylesheets. -->
-  <!-- Purpose: General test of embedded transform using fragment identifier -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: General test of embedded "transform" using fragment identifier -->
 
 <xsl:key name="test" match="para" use="@id"/>
 

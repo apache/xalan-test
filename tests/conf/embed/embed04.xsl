@@ -6,7 +6,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.3 LRE as Stylesheet -->
-  <!-- Purpose: Output should be identical to embed03. -->
+  <!-- Purpose: From the spec: reference version, non-embedded, for comparison. -->
 
 <xsl:template match="/">
 <html>

@@ -2,11 +2,12 @@
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       lang="en">
 
-  <!-- FileName: Embed06 -->
+  <!-- FileName: embed06 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.3 LRE as Stylesheet -->
-  <!-- Purpose: Do everything inside an HTML element. Note first item in this file. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Do everything inside an HTML element, including for-each and if structures. -->
 
 <head>
   <title>Sales Results By Division</title>
