@@ -63,16 +63,13 @@
 package org.apache.qetest.xslwrapper;
 
 import java.util.Vector;
-
+import java.lang.reflect.Field;
 import java.io.PrintWriter;
 
 // The LotusXSL implementation
 import com.lotus.xsl.XSLProcessor;
 import com.lotus.xsl.XSLTInputSource;
 import com.lotus.xsl.XSLTResultTarget;
-
-// For the versioning string from Xalan
-import org.apache.xalan.xslt.XSLProcessorVersion;
 
 /**
  * Implementation of a ProcessorWrapper for LotusXSL.
@@ -87,6 +84,18 @@ public class LotusXSLWrapper extends ProcessorWrapper
 
     /** Reference to current processor - LotusXSL flavor - convenience method. */
     protected com.lotus.xsl.XSLProcessor processor = null;
+
+    /** FQCN of Xalan-J 1.x's version file.   */
+    public static final String XALAN1_VERSION_CLASS = "org.apache.xalan.xslt.XSLProcessorVersion";
+
+    /** FQCN of Xalan-J 2.x's version file, when using the compatibility layer.   */
+    public static final String XALAN2_VERSION_CLASS = "org.apache.xalan.processor.XSLProcessorVersion";
+
+    /** Marker string added to getDescription, when using the compatibility layer.   */
+    public static final String XALAN2_MARKER = "-compat1";
+
+    /** FQCN of Xerces-J 1.x's version file, for convenience.   */
+    public static final String XERCES1_VERSION_CLASS = "org.apache.xerces.framework.Version";
 
     /**
      * NEEDSDOC Method getLotusXSLProcessor 
@@ -147,17 +156,72 @@ public class LotusXSLWrapper extends ProcessorWrapper
         }
         else
         {
+            StringBuffer buf = new StringBuffer("No Xalan version info found");
+            String parserVersion = new String("no-parser-info-avail");
+            Class clazz = null;
+            Field f = null;
 
-            // StringBuffer buf = new StringBuffer(XSLProcessorVersion.PRODUCT);
-            StringBuffer buf = new StringBuffer("LotusXSL");  // Note that LotusXSL does not override the PRODUCT field
+            // As a convenience, see if we can find the version 
+            //  of the parser we're using as well
+            try
+            {
+                // Currently, only check for Xerces versions
+                clazz = Class.forName(XERCES1_VERSION_CLASS);
+                // Found 1.x, grab it's version fields
+                f = clazz.getField("fVersion");
+                parserVersion = (String)f.get(null);
+            }
+            catch (Exception e2)
+            {
+                // no-op, leave value as-is
+            }
 
-            buf.append(";");
-            buf.append(XSLProcessorVersion.LANGUAGE);
-            buf.append(";");
-            buf.append(XSLProcessorVersion.S_VERSION);
-            buf.append(";");
-            buf.append(processor.getXMLProcessorLiaison());
-
+            // Check for either 1.x or 2.x compatibility layer
+            try
+            {
+                clazz = Class.forName(XALAN1_VERSION_CLASS);
+                // Found 1.x, grab it's version fields
+                buf = new StringBuffer();
+                f = clazz.getField("PRODUCT");
+                buf.append(f.get(null));
+                buf.append(";");
+                f = clazz.getField("LANGUAGE");
+                buf.append(f.get(null));
+                buf.append(";");
+                f = clazz.getField("S_VERSION");
+                buf.append(f.get(null));
+                buf.append(";");
+                buf.append(processor.getXMLProcessorLiaison());
+                buf.append(";");
+                buf.append(parserVersion);
+            }
+            catch (Exception e1)
+            {
+                // Can't find 1.x, look for 2.x compat layer
+                try
+                {
+                    clazz = Class.forName(XALAN2_VERSION_CLASS);
+                    // Found 2.x, grab it's version fields
+                    buf = new StringBuffer();
+                    f = clazz.getField("PRODUCT");
+                    buf.append(f.get(null));
+                    buf.append(XALAN2_MARKER);  // so user knows we're doing compatibility layer
+                    buf.append(";");
+                    f = clazz.getField("LANGUAGE");
+                    buf.append(f.get(null));
+                    buf.append(";");
+                    f = clazz.getField("S_VERSION");
+                    buf.append(f.get(null));
+                    buf.append(";");
+                    // Liaison info not applicable
+                    buf.append(";");
+                    buf.append(parserVersion);
+                }
+                catch (Exception e2)
+                {
+                    // Can't find 2.x either, just bail
+                }
+            }
             return buf.toString();
         }
     }
@@ -350,7 +414,11 @@ public class LotusXSLWrapper extends ProcessorWrapper
             throw new java.lang.IllegalStateException(
                 "You must call createNewProcessor first!");
 
-        processor.getXMLProcessorLiaison().setIndent(i);
+        // HACK: functionality not present in 2.x compat, 
+        //  just comment out for now: we should really try 
+        //  to dynamically load this for 1.x and/or replace the 
+        //  functionality for 2.x later on
+        //processor.getXMLProcessorLiaison().setIndent(i);
     }
 
     /**
