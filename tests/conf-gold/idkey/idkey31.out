@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<out><docs/>
-  <doc><ext>N5</ext></doc>
-    <section><foo>N8</foo><ext>N5</ext></section>
-      <inner><foo>N8</foo><ext>N5</ext><whiz>NB</whiz></inner>
-    
-  
-</out>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<out>A(att):N3;T:N4,P(a-pi):N5;T:N6,C:N7,T:N8,
-  E(inner):N9 has A(blat):NA;T:NB,C:NC,T:ND,
-  E(sub):NE has T:NF,
-T:N10,
-T:N11,</out>
