@@ -467,21 +467,26 @@
     <!-- This section will be updated as xsltc integrates more with xalan   -->
     <!-- ================================================================== -->
     <path id="xsltc.class.path">
-        <pathelement path="${xalan.build.dir}/xsltc.jar" />
-        <pathelement path="${xalan.bin.dir}/BCEL.jar" />
-        <pathelement path="${xalan.bin.dir}/JLex.jar" />
-        <pathelement path="${xalan.bin.dir}/java_cup.jar" />
-        <pathelement path="${xalan.bin.dir}/runtime.jar" />
-        <pathelement path="${xalan.bin.dir}/xml.jar" />
+        <pathelement location="${xalan.build.dir}/xsltc.jar" />
+        <pathelement location="${xalan.bin.dir}/BCEL.jar" />
+        <pathelement location="${xalan.bin.dir}/JLex.jar" />
+        <pathelement location="${xalan.bin.dir}/java_cup.jar" />
+        <pathelement location="${xalan.bin.dir}/runtime.jar" />
+        <pathelement location="${testxsl.jar}" />
         <pathelement path="${java.class.path}" />
+        <pathelement location="${xerces.jar}" />
+        <pathelement location="${xalan.jar}" />
+        <!-- Note addition of . to the classpath to enable loading of translets -->
+        <pathelement location="." />
     </path>
     <target name="compile.xsltc.xslwrappers" depends="compile.xsl"
         description="Compile Xsltc*Wrapper xslwrappers only">
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
                includes="${test.root}xslwrapper/Xsltc*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
-               debug="${debug}"
-               classpathref="xsltc.class.path" />
+               debug="${debug}">
+            <classpath refid="xsltc.class.path" />
+        </javac>               
     </target>
 
     <target name="compile.xsltc" depends="compile.xsltc.xslwrappers"
@@ -489,8 +494,9 @@
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
                includes="${test.root}xsltc/*.java"
-               debug="${debug}"
-               classpathref="xsltc.class.path" />
+               debug="${debug}">
+            <classpath refid="xsltc.class.path" />
+        </javac>               
     </target>
 
     <target name="jar.xsltc" depends="compile.xsltc"
@@ -498,6 +504,22 @@
         <jar jarfile="${build.dir}/${testxsl.jar.name}" 
              basedir="${build.dir}" 
              includes="**/*.class,**/*.properties" />
+    </target>
+
+    <target name="conf.xsltc" description="Run TestletDriver over the conf tree using xsltc">
+        <!-- Set the default conformance test driver, user may override -->
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <echo message="Executing Xalan-xsltc conf test: ${testClass}" />
+        <!-- Special: allow explicit test.properties overrides for inputDir, etc for xsltc -->
+        <property name="testType" value="conf.xsltc." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="xsltc.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}">
+            <!-- Explicitly set TransformerFactory property to use xsltc -->
+            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
+        </xalantest>
     </target>
 
 </project>
