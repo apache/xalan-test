@@ -320,6 +320,13 @@ public class ProgrammaticDOMTest extends XSLProcessorTestBase
             transformer.transform(new DOMSource(xslBuiltDocFrag), new StreamResult(outNames.currentName()));
 
             reporter.logCriticalMsg("//@todo Verify that this is even a valid operation!");
+            reporter.logCriticalMsg("Bugzilla#5133 NPE below MOVED to SmoketestOuttakes.java 27-Nov-01 -sc");
+/* @todo Bugzilla#5133 NPE below MOVED to SmoketestOuttakes.java 27-Nov-01 -sc
+// Check that the DOM is actually correct, esp namespace nodes on top level
+// java.lang.NullPointerException
+//	at org.apache.xalan.transformer.TransformerImpl.createResultContentHandler(TransformerImpl.java, Compiled Code)
+
+
             reporter.logInfoMsg("About to newTransformer(xslBuiltDocFrag)");
             transformer = factory.newTransformer(new DOMSource(xslBuiltDocFrag));
             reporter.logInfoMsg("About to transform(xmlDoc, StreamResult(" + outNames.nextName() + "))");
@@ -328,12 +335,21 @@ public class ProgrammaticDOMTest extends XSLProcessorTestBase
                               new File(outNames.currentName()), 
                               new File(testFileInfo.goldName), 
                               "transform(xslBuiltDocFrag,...) into " + outNames.currentName());
+** @todo Bugzilla#5133 NPE above MOVED to SmoketestOuttakes.java 27-Nov-01 -sc */
         }
         catch (Throwable t)
         {
             reporter.checkFail("Problem with various XSL1 elems/documents");
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with various XSL1 elems/documents");
         }
+
+/* @todo Bugzilla#5133 DOM003 Namespace error below MOVED to SmoketestOuttakes.java 27-Nov-01 -sc
+//org.w3c.dom.DOMException: DOM003 Namespace error
+//	at org.apache.xerces.dom.AttrNSImpl.&lt;init&gt;(AttrNSImpl.java:134)
+//	at org.apache.xerces.dom.CoreDocumentImpl.createAttributeNS(CoreDocumentImpl.java:1363)
+//	at org.apache.xerces.dom.ElementImpl.setAttributeNS(ElementImpl.java:596)
+//	at org.apache.qetest.xalanj2.ProgrammaticDOMTest.testCase2(ProgrammaticDOMTest.java:355)
+
         try
         {
             // Startup a factory and docbuilder, create some nodes/DOMs
@@ -374,6 +390,7 @@ public class ProgrammaticDOMTest extends XSLProcessorTestBase
             reporter.checkFail("Problem with various XSL2 elems/documents");
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with various XSL2 elems/documents");
         }
+** @todo Bugzilla#5133 DOM003 Namespace error above MOVED to SmoketestOuttakes.java 27-Nov-01 -sc */
 
         reporter.testCaseClose();
         return true;
@@ -507,7 +524,6 @@ public class ProgrammaticDOMTest extends XSLProcessorTestBase
     }    
 
 
-
     /**
      * Convenience method to print out usage information - update if needed.  
      * @return String denoting usage of this test class
@@ -527,9 +543,7 @@ public class ProgrammaticDOMTest extends XSLProcessorTestBase
      */
     public static void main(String[] args)
     {
-
         ProgrammaticDOMTest app = new ProgrammaticDOMTest();
-
         app.doMain(args);
     }
 }

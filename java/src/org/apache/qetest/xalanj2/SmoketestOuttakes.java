@@ -91,6 +91,9 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.ext.DeclHandler;
 
 // Needed DOM classes
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 // java classes
@@ -130,7 +133,7 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public SmoketestOuttakes()
     {
-        numTestCases = 5;  // REPLACE_num
+        numTestCases = 6;  // REPLACE_num
         testName = "SmoketestOuttakes";
         testComment = "Individual test points taken out of other automation files";
     }
@@ -665,6 +668,185 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
         return true;
     }
 
+
+       public static final String xslNamespace = "http://www.w3.org/1999/XSL/Transform";
+      public static final String nsNamespace = "http://www.w3.org/XML/1998/namespace";
+    /**
+     * From ProgrammaticDOMTest.java testCase2 Bugzilla#5133
+     * Build a stylesheet DOM programmatically and use it.
+     * 
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase6()
+    {
+        reporter.testCaseInit("Build a stylesheet DOM programmatically and use it");
+
+        XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+        testFileInfo.inputName = inputDir + File.separator + "trax" + File.separator + "identity.xsl";
+        testFileInfo.xmlName = inputDir + File.separator + "trax" + File.separator + "identity.xml";
+        testFileInfo.goldName = goldDir + File.separator + "trax" + File.separator + "identity.out";
+        try
+        {
+            // Startup a factory and docbuilder, create some nodes/DOMs
+            DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+            dfactory.setNamespaceAware(true);
+            DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+
+            reporter.logTraceMsg("parsing xml file");
+            Document xmlDoc = docBuilder.parse(new InputSource(testFileInfo.xmlName));
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = null;
+ 
+            // Programmatically build the XSL file into a Document and transform
+            Document xslBuiltDoc = docBuilder.newDocument();
+            appendIdentityDOMXSL(xslBuiltDoc, xslBuiltDoc, true);
+            // For debugging, write the generated stylesheet out
+            //  Note this will not textually exactly match the identity.xsl file
+            reporter.logInfoMsg("Writing out xslBuiltDoc to "+ outNames.nextName());
+            transformer = factory.newTransformer();
+            transformer.transform(new DOMSource(xslBuiltDoc), new StreamResult(outNames.currentName()));
+
+            reporter.logInfoMsg("About to newTransformer(xslBuiltDoc)");
+            transformer = factory.newTransformer(new DOMSource(xslBuiltDoc));
+            reporter.logInfoMsg("About to transform(xmlDoc, StreamResult(" + outNames.nextName() + "))");
+            transformer.transform(new DOMSource(xmlDoc), new StreamResult(outNames.currentName()));
+            fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(testFileInfo.goldName), 
+                              "transform(xslBuiltDoc,...) into " + outNames.currentName());
+
+
+            // Programmatically build the XSL file into a DocFrag and transform
+            xslBuiltDoc = docBuilder.newDocument();
+            DocumentFragment xslBuiltDocFrag = xslBuiltDoc.createDocumentFragment();
+            appendIdentityDOMXSL(xslBuiltDocFrag, xslBuiltDoc, true);
+            // For debugging, write the generated stylesheet out
+            reporter.logInfoMsg("Writing out xslBuiltDocFrag to "+ outNames.nextName());
+            transformer = factory.newTransformer();
+            transformer.transform(new DOMSource(xslBuiltDocFrag), new StreamResult(outNames.currentName()));
+
+            reporter.logCriticalMsg("//@todo Verify that this is even a valid operation!");
+            reporter.logInfoMsg("About to newTransformer(xslBuiltDocFrag)");
+            reporter.logCriticalMsg("Bugzilla#5133: will throw NPE");
+            transformer = factory.newTransformer(new DOMSource(xslBuiltDocFrag));
+            reporter.logInfoMsg("About to transform(xmlDoc, StreamResult(" + outNames.nextName() + "))");
+            transformer.transform(new DOMSource(xmlDoc), new StreamResult(outNames.currentName()));
+            fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(testFileInfo.goldName), 
+                              "transform(xslBuiltDocFrag,...) into " + outNames.currentName());
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with various XSL1 elems/documents");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with various XSL1 elems/documents");
+        }
+        try
+        {
+            // Startup a factory and docbuilder, create some nodes/DOMs
+            DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+            dfactory.setNamespaceAware(true);
+            DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+
+            reporter.logTraceMsg("parsing xml file");
+            Document xmlDoc = docBuilder.parse(new InputSource(testFileInfo.xmlName));
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = null;
+
+            // Programmatically build the XSL file into an Element and transform
+            Document xslBuiltDoc = docBuilder.newDocument();
+            // Note: Here, we implicitly already have the outer list 
+            //  element, so ensure the worker method doesn't add again
+            reporter.logCriticalMsg("Bugzilla#5133: will throw DOM003 exception");
+            Element xslBuiltElem = xslBuiltDoc.createElementNS(xslNamespace, "xsl:stylesheet");
+            xslBuiltElem.setAttributeNS(null, "version", "1.0");
+            xslBuiltElem.setAttributeNS(nsNamespace, "xmlns:xsl", xslNamespace);
+            appendIdentityDOMXSL(xslBuiltElem, xslBuiltDoc, false);
+            // For debugging, write the generated stylesheet out
+            reporter.logInfoMsg("Writing out xslBuiltElem to "+ outNames.nextName());
+            transformer = factory.newTransformer();
+            transformer.transform(new DOMSource(xslBuiltElem), new StreamResult(outNames.currentName()));
+
+            reporter.logCriticalMsg("//@todo Verify that this is even a valid operation!");
+            reporter.logInfoMsg("About to newTransformer(xslBuiltElem)");
+            transformer = factory.newTransformer(new DOMSource(xslBuiltElem));
+            reporter.logInfoMsg("About to transform(xmlDoc, StreamResult(" + outNames.nextName() + "))");
+            transformer.transform(new DOMSource(xmlDoc), new StreamResult(outNames.currentName()));
+            fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(testFileInfo.goldName), 
+                              "transform(xslBuiltElem,...) into " + outNames.currentName());
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with various XSL2 elems/documents");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with various XSL2 elems/documents");
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+    /**
+     * Adds identity.xsl elems to Node passed in.  
+     * Subject to change; hackish for now
+     * @author curcuru
+     * @param n Node to append DOM elems to
+     * @param factory Document providing createElement, etc. services
+     * @param useOuterElem if we should append the top-level <stylesheet> elem
+     */
+    public void appendIdentityDOMXSL(Node n, Document factory, boolean useOuterElem)
+    {
+        try
+        {
+            /// <xsl:template match="@*|node()">
+            Element template = factory.createElementNS(xslNamespace, "xsl:template");
+            template.setAttributeNS(null, "match", "@*|node()");
+
+            /// <xsl:copy>
+            Element copyElem = factory.createElementNS(xslNamespace, "xsl:copy");
+
+            /// <xsl:apply-templates select="@*|node()"/>
+            Element applyTemplatesElem = factory.createElementNS(xslNamespace, "xsl:apply-templates");
+            applyTemplatesElem.setAttributeNS(null, "select", "@*|node()");
+
+            // Stick it all together with faked-up newlines for readability
+            copyElem.appendChild(factory.createTextNode("\n    "));
+            copyElem.appendChild(applyTemplatesElem);
+            copyElem.appendChild(factory.createTextNode("\n  "));
+
+            template.appendChild(factory.createTextNode("\n  "));
+            template.appendChild(copyElem);
+            template.appendChild(factory.createTextNode("\n"));
+
+
+            if (useOuterElem)
+            {
+                // If asked to, create and append top-level <stylesheet> elem
+                /// <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+                Element stylesheetElem = factory.createElementNS(xslNamespace, "xsl:stylesheet");
+                stylesheetElem.setAttributeNS(null, "version", "1.0");
+
+                // Following is not officially needed by the DOM,  but may help 
+                // less-sophisticated DOM readers downstream
+                // Removed due to DOM003 Namespace error
+                // stylesheetElem.setAttributeNS(nsNamespace, "xmlns:xsl", xslNamespace);
+                stylesheetElem.appendChild(template);
+                n.appendChild(stylesheetElem);
+            }
+            else
+            {
+                // Otherwise, just use their Node
+                n.appendChild(template);
+            }
+
+        }
+        catch (Exception e)
+        {
+            reporter.logErrorMsg("appendIdentityDOMXSL threw: " + e.toString());
+            reporter.logThrowable(Logger.ERRORMSG, e, "appendIdentityDOMXSL threw");
+        }
+    }    
 
     /**
      * Worker method to get an XMLReader.
