@@ -107,6 +107,7 @@ public class TestDTMIter extends XSLProcessorTestBase
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String DTM_SUBDIR = "dtm";
+	public static final String ITER_Prefix = "Iter_";
 
 	public static final String defaultSource=
  		"<?xml version=\"1.0\"?>\n"+
@@ -180,7 +181,8 @@ public class TestDTMIter extends XSLProcessorTestBase
         String goldBasePath = goldDir 
                               + File.separator 
                               + DTM_SUBDIR
-                              + File.separator;
+                              + File.separator
+                              + ITER_Prefix;
 
         //testFileInfo.inputName = testBasePath + "REPLACE_xslxml_filename.xsl";
         //testFileInfo.xmlName = testBasePath + "REPLACE_xslxml_filename.xml";
@@ -212,10 +214,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase1.out";
 
-		// Create DTM and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		// Create dtm and generate initial context
+		DTM dtm = generateDTM();
 
 	  	// Get various nodes to use as context nodes.
 	  	int dtmRoot = dtm.getDocument();				// #document
@@ -264,9 +264,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase2.out";
 
 		// Create dtm and generate initial context
-		Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for PARENT:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PARENT);
@@ -292,7 +290,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     }
 
    /**
-    * Create AxisIterator and walk CHILD axis.
+    * Create AxisIterator and walk SELF axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase3()
@@ -303,9 +301,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase3.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for CHILD:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.SELF);
@@ -342,9 +338,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase4.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for NAMESPACE:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.NAMESPACE);
@@ -370,7 +364,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     }
 
    /**
-    * Create AxisIterator and walk CHILD axis.
+    * Create AxisIterator and walk PRECEDING axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase5()
@@ -381,11 +375,9 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase5.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
-		// Get a Iterator for CHILD:: axis.
+		// Get a Iterator for PRECEDING:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PRECEDING);
       	iter.setStartNode(lastNode);
 
@@ -420,9 +412,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase6.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for PRECEDINGSIBLING:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PRECEDINGSIBLING);
@@ -458,9 +448,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase7.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for FOLLOWING:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.FOLLOWING);
@@ -496,9 +484,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase8.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for FOLLOWINGSIBLING:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.FOLLOWINGSIBLING);
@@ -526,7 +512,7 @@ public class TestDTMIter extends XSLProcessorTestBase
 
 
    /**
-    * Create AxisIterator and walk FOLLOWINGSIBLING axis.
+    * Create AxisIterator and walk DESCENDANT axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase9()
@@ -537,9 +523,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase9.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for DESCENDANT:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.DESCENDANT);
@@ -564,7 +548,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     }
 
    /**
-    * Create AxisIterator and walk FOLLOWINGSIBLING axis.
+    * Create AxisIterator and walk DESCENDANTORSELF axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase10()
@@ -575,9 +559,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase10.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for DESCENDANTORSELF:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.DESCENDANTORSELF);
@@ -617,9 +599,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase11.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for ANCESTOR:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.ANCESTOR);
@@ -658,9 +638,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         String gold = testFileInfo.goldName + "testcase12.out";
 
 		// Create dtm and generate initial context
-    	Source source = new StreamSource(new StringReader(defaultSource));
-      	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+		DTM dtm = generateDTM();
 
 		// Get a Iterator for ANCESTORORSELF:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.ANCESTORORSELF);
@@ -701,6 +679,17 @@ FileOutputStream openFileStream(String name)
 	{  reporter.checkFail("Failure opening output file."); }
 
 	return fos;
+}
+
+// This routine generates a new DTM for each testcase
+DTM generateDTM()
+{
+	// Create DTM and generate initial context
+	Source source = new StreamSource(new StringReader(defaultSource));
+	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
+	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+   
+	return dtm;
 }
 
 void writeClose(FileOutputStream fos, StringBuffer buf)
