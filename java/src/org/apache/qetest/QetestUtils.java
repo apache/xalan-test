@@ -66,17 +66,23 @@ import java.io.IOException;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class QetestUtils
+public abstract class QetestUtils
 {
+    // abstract class cannot be instantiated
 
     /**
      * Utility method to translate a String filename to URL.  
+     *
      * Note: This method is not necessarily proven to get the 
      * correct URL for every possible kind of filename; it should 
      * be improved.  It handles the most common cases that we've 
      * encountered when running Conformance tests on Xalan.
      * Also note, this method does not handle other non-file:
      * flavors of URLs at all.
+     *
+     * If the name is null, return null.
+     * If the name starts with file:///, we just return that.
+     * Otherwise we attempt (cheaply) to convert to a file:/// URL.
      * 
      * @param String local path\filename of a file
      * @return a file:/// URL, or null if error
@@ -136,9 +142,11 @@ public class QetestUtils
      * @param String classname FQCN or partially specified classname
      * that you wish to load
      * @param String[] rootPackages a list of packages to search 
-     * for the classname specified in array order
+     * for the classname specified in array order; if null then 
+     * we don't search any additional packages
      * @param String defaultClassname a default known-good FQCN to 
      * return if the classname was not found
+     *
      * @return Class object asked for if one found by combining 
      * clazz with one of the rootPackages; if none, a Class of 
      * defaultClassname; or null if an error occoured
@@ -200,25 +208,19 @@ public class QetestUtils
      * differences in results and timing data from one run of 
      * a test to another.
      *
-     * Current format: MMMdd-hhmm[;baseId]
+     * Current format: MMddHHmm[;baseId]
      * where baseId is not used if null.
      * 
      * @param String Id base to start with
-     * @return String Id to use; normally will include a timestamp
+     * 
+     * @return String Id to use; will include a timestamp
      */
     public static String createRunId(String baseId)
     {
-        java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat ("MMMdd-hhmm");
+        java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat ("MMddHHmm");
         if (null != baseId)
             return formatter.format(new java.util.Date())+ ";" + baseId;
         else
             return formatter.format(new java.util.Date());
     }
-
-
-    /** 
-     * Constructor is private on purpose; this class 
-     * provides static utility methods only. 
-     */
-    private QetestUtils() { /* no-op */ }
 }
