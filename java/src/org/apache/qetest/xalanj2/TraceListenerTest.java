@@ -110,7 +110,7 @@ public class TraceListenerTest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public TraceListenerTest()
     {
-        numTestCases = 2;  // REPLACE_num
+        numTestCases = 4;  // REPLACE_num
         testName = "TraceListenerTest";
         testComment = "Basic functionality testing of TraceListener interface and etc";
     }
@@ -185,8 +185,8 @@ public class TraceListenerTest extends XSLProcessorTestBase
         }
         catch (Throwable t)
         {
-            reporter.checkFail("testCase1a threw: " + t.toString());
             reporter.logThrowable(Logger.ERRORMSG, t, "testCase1a threw: ");
+            reporter.checkFail("testCase1a threw: " + t.toString());
         }
 
         try
@@ -220,8 +220,8 @@ public class TraceListenerTest extends XSLProcessorTestBase
         }
         catch (Throwable t)
         {
-            reporter.checkFail("testCase1b threw: " + t.toString());
             reporter.logThrowable(Logger.ERRORMSG, t, "testCase1b threw: ");
+            reporter.checkFail("testCase1b threw: " + t.toString());
         }
 
         reporter.testCaseClose();
@@ -300,28 +300,194 @@ public class TraceListenerTest extends XSLProcessorTestBase
             reporter.check(tracedEvents3[LoggingTraceListenerEx.TYPE_SELECTED], 3, 
                            "LTLE Correct number of selected events for testfile " + testFileInfo.getDescription());
             
-            // Verify removing some doesn't affect the others  //@todo add separate test
-            traceManager.removeTraceListener((TraceListener)ltl);
-            traceManager.removeTraceListener((TraceListener)ltl3);
-            ltl2.reset();
-            
-            // Verify new Xalan-J 2.x specific property
-            reporter.logInfoMsg("About to run with Source Location Property ON"); 
-            reporter.logInfoMsg("About to create output: " + outNames.nextName()); 
-            ((TransformerImpl)transformer).setProperty(XalanProperties.SOURCE_LOCATION, Boolean.TRUE);
-            transformer.transform(testFileInfo.getXMLSource(),
-                                  new StreamResult(outNames.currentName()));
-            
-            int[] tracedEvents4 = ltl2.getCounters();
-            reporter.logStatusMsg("Last event traced(LPTL):" + ltl2.getLast());
-            reporter.logStatusMsg("Events traced(LPTL):" + tracedEvents4[LoggingPrintTraceListener.TYPE_TRACE]
-                                  + " events generated:" + tracedEvents4[LoggingPrintTraceListener.TYPE_GENERATED]
-                                  + " events selected:" + tracedEvents4[LoggingPrintTraceListener.TYPE_SELECTED]);
         }
         catch (Throwable t)
         {
-            reporter.checkFail("testCase2 threw: " + t.toString());
             reporter.logThrowable(Logger.ERRORMSG, t, "testCase2 threw: ");
+            reporter.checkFail("testCase2 threw: " + t.toString());
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Test adding and removing multiple simultaneous trace listeners.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("Test adding and removing multiple simultaneous trace listeners");
+        reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
+
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = factory.newTransformer(testFileInfo.getXSLSource());
+
+            TraceManager traceManager = ((TransformerImpl)transformer).getTraceManager();
+            reporter.check((null != traceManager), true, "getTraceManager is non-null");
+            reporter.check(traceManager.hasTraceListeners(), false, "traceManager.hasTraceListeners() false before adding");
+
+            LoggingTraceListener ltl = new LoggingTraceListener(reporter);
+            LoggingPrintTraceListener ltl2 = new LoggingPrintTraceListener(reporter);
+            LoggingTraceListenerEx ltl3 = new LoggingTraceListenerEx(reporter);
+            
+            // Add one trace listener
+            reporter.logInfoMsg("Transformer created, addTraceListener(LoggingTraceListener)..."); 
+            traceManager.addTraceListener((TraceListener)ltl);
+            reporter.check(traceManager.hasTraceListeners(), true, "traceManager.hasTraceListeners() true after adding1");
+
+            // Remove one
+            traceManager.removeTraceListener((TraceListener)ltl);
+            reporter.check(traceManager.hasTraceListeners(), false, "traceManager.hasTraceListeners() false after removing1");
+
+            // Add multiple 
+            traceManager.addTraceListener((TraceListener)ltl);
+            reporter.check(traceManager.hasTraceListeners(), true, "traceManager.hasTraceListeners() true after adding1b");
+            
+            traceManager.addTraceListener((TraceListener)ltl2);
+            reporter.check(traceManager.hasTraceListeners(), true, "traceManager.hasTraceListeners() true after adding2");
+
+            traceManager.addTraceListener((TraceListener)ltl3);
+            reporter.check(traceManager.hasTraceListeners(), true, "traceManager.hasTraceListeners() true after adding3");
+            
+            // Remove one
+            traceManager.removeTraceListener((TraceListener)ltl2);
+            reporter.check(traceManager.hasTraceListeners(), true, "traceManager.hasTraceListeners() true after adding3 removing1");
+
+            // Remove all
+            traceManager.removeTraceListener((TraceListener)ltl);
+            traceManager.removeTraceListener((TraceListener)ltl3);
+            reporter.check(traceManager.hasTraceListeners(), false, "traceManager.hasTraceListeners() false after adding3 removing3");
+
+            // Add one back and check transform
+            traceManager.addTraceListener((TraceListener)ltl);
+            reporter.check(traceManager.hasTraceListeners(), true, "traceManager.hasTraceListeners() true after adding1c");
+         
+            // Force trace listener to not bother logging, just capture statistics
+            ltl.setLoggingLevel(100); // HACK - happens to be above 99, which is what we usually set max level tofs
+            reporter.logInfoMsg("About to create output: " + outNames.nextName()); 
+            transformer.transform(testFileInfo.getXMLSource(),
+                                  new StreamResult(outNames.currentName()));
+            reporter.checkPass("Crash test only: returned from transform() call");
+            
+            // Now ask each listener how many events it traced
+            int[] tracedEvents = ltl.getCounters();
+            reporter.logStatusMsg("Last event traced(LTL):" + ltl.getLast());
+            reporter.logStatusMsg("Events traced(LTL):" + tracedEvents[LoggingTraceListener.TYPE_TRACE]
+                                  + " events generated:" + tracedEvents[LoggingTraceListener.TYPE_GENERATED]
+                                  + " events selected:" + tracedEvents[LoggingTraceListener.TYPE_SELECTED]);
+            reporter.check(tracedEvents[LoggingTraceListener.TYPE_SELECTED], 3, 
+                           "LTL Correct number of selected events for testfile " + testFileInfo.getDescription());
+        }
+        catch (Throwable t)
+        {
+            reporter.logThrowable(Logger.ERRORMSG, t, "testCase3-add/remove threw: ");
+            reporter.checkFail("testCase3-add/remove threw: " + t.toString());
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Test TraceListener with XalanProperties.SOURCE_LOCATION.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Test TraceListener with XalanProperties.SOURCE_LOCATION");
+        reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
+
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = factory.newTransformer(testFileInfo.getXSLSource());
+
+            TraceManager traceManager = ((TransformerImpl)transformer).getTraceManager();
+            reporter.logTraceMsg("getTraceManager is:" + traceManager);
+
+            LoggingTraceListener ltl = new LoggingTraceListener(reporter);
+            ltl.setLoggingLevel(Logger.INFOMSG + 1);
+            
+            reporter.logInfoMsg("Transformer created, addTraceListener(LoggingTraceListener)..."); 
+            traceManager.addTraceListener((TraceListener)ltl);
+            
+            // Verify new Xalan-J 2.x specific property as true (non-default value)
+            reporter.logInfoMsg("About to run with Source Location Property ON"); 
+            ((TransformerImpl)transformer).setProperty(XalanProperties.SOURCE_LOCATION, Boolean.TRUE);
+            reporter.logInfoMsg("About to create output: " + outNames.nextName()); 
+            transformer.transform(testFileInfo.getXMLSource(),
+                                  new StreamResult(outNames.currentName()));
+            reporter.logInfoMsg("Done creating output: " + outNames.currentName());
+
+            int[] tracedEvents = ltl.getCounters();
+            reporter.logStatusMsg("Last event traced(LPTL):" + ltl.getLast());
+            reporter.logStatusMsg("Events traced(LPTL):" + tracedEvents[LoggingPrintTraceListener.TYPE_TRACE]
+                                  + " events generated:" + tracedEvents[LoggingPrintTraceListener.TYPE_GENERATED]
+                                  + " events selected:" + tracedEvents[LoggingPrintTraceListener.TYPE_SELECTED]);
+            reporter.checkPass("Crash test: completed transformations with SOURCE_LOCATION just ON");
+        }
+        catch (Throwable t)
+        {
+            reporter.logThrowable(Logger.ERRORMSG, t, "testCase4a-XalanProperties.SOURCE_LOCATION threw: ");
+            reporter.checkFail("testCase4a-XalanProperties.SOURCE_LOCATION threw: " + t.toString());
+        }
+
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = factory.newTransformer(testFileInfo.getXSLSource());
+
+            TraceManager traceManager = ((TransformerImpl)transformer).getTraceManager();
+            reporter.logTraceMsg("getTraceManager is:" + traceManager);
+
+            LoggingTraceListener ltl = new LoggingTraceListener(reporter);
+            ltl.setLoggingLevel(Logger.INFOMSG + 1);
+            
+            reporter.logInfoMsg("Transformer created, addTraceListener(LoggingTraceListener)..."); 
+            traceManager.addTraceListener((TraceListener)ltl);
+            
+            // Verify new Xalan-J 2.x specific property; false then true
+            reporter.logInfoMsg("About to run with Source Location Property OFF"); 
+            ((TransformerImpl)transformer).setProperty(XalanProperties.SOURCE_LOCATION, Boolean.FALSE);
+            reporter.logInfoMsg("About to create output: " + outNames.nextName()); 
+            transformer.transform(testFileInfo.getXMLSource(),
+                                  new StreamResult(outNames.currentName()));
+            reporter.logInfoMsg("Done creating output: " + outNames.currentName());
+
+            int[] tracedEvents1 = ltl.getCounters();
+            reporter.logStatusMsg("Last event traced(LPTL):" + ltl.getLast());
+            reporter.logStatusMsg("Events traced(LPTL):" + tracedEvents1[LoggingPrintTraceListener.TYPE_TRACE]
+                                  + " events generated:" + tracedEvents1[LoggingPrintTraceListener.TYPE_GENERATED]
+                                  + " events selected:" + tracedEvents1[LoggingPrintTraceListener.TYPE_SELECTED]);
+
+            ltl.reset();
+
+            // Verify new Xalan-J 2.x specific property; false then true
+            reporter.logInfoMsg("About to run with Source Location Property ON"); 
+            ((TransformerImpl)transformer).setProperty(XalanProperties.SOURCE_LOCATION, Boolean.TRUE);
+            reporter.logInfoMsg("About to create output: " + outNames.nextName()); 
+            transformer.transform(testFileInfo.getXMLSource(),
+                                  new StreamResult(outNames.currentName()));
+            reporter.logInfoMsg("Done creating output: " + outNames.currentName());
+
+            int[] tracedEvents2 = ltl.getCounters();
+            reporter.logStatusMsg("Last event traced(LPTL):" + ltl.getLast());
+            reporter.logStatusMsg("Events traced(LPTL):" + tracedEvents2[LoggingPrintTraceListener.TYPE_TRACE]
+                                  + " events generated:" + tracedEvents2[LoggingPrintTraceListener.TYPE_GENERATED]
+                                  + " events selected:" + tracedEvents2[LoggingPrintTraceListener.TYPE_SELECTED]);
+            reporter.checkPass("Crash test: completed transformations with SOURCE_LOCATION OFF and ON");
+        }
+        catch (Throwable t)
+        {
+            reporter.logThrowable(Logger.ERRORMSG, t, "testCase4b-XalanProperties.SOURCE_LOCATION threw: ");
+            reporter.checkFail("testCase4b-XalanProperties.SOURCE_LOCATION threw: " + t.toString());
         }
 
         reporter.testCaseClose();
