@@ -80,6 +80,7 @@ import org.w3c.dom.Node;
 
 // java classes
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Properties;
 
 //-------------------------------------------------------------------------
@@ -225,46 +226,158 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
 
         TransformerFactory factory = null;
         Templates templates = null;
-        Transformer transformer = null;
+        Transformer transformerXSL = null;
+        DocumentBuilder docBuilder = null;
         Node xmlNode = null;
         Node xslNode = null;
         try
         {
+            // Startup a factory, create some nodes/DOMs
             factory = TransformerFactory.newInstance();
             DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
             dfactory.setNamespaceAware(true);
-            DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+            docBuilder = dfactory.newDocumentBuilder();
             reporter.logTraceMsg("parsing xml, xsl files");
             xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
             xmlNode = docBuilder.parse(new InputSource(testFileInfo.xmlName));
-            
-            // Try to get templates, transformer from node
-            DOMSource xslDOM = new DOMSource(xslNode);
-            templates = factory.newTemplates(xslDOM);
-            reporter.check((templates != null), true, "factory.newTemplates(DOMSource) is non-null");
-            transformer = factory.newTransformer(xslDOM);
-            reporter.check((transformer != null), true, "factory.newTransformer(DOMSource) is non-null");
-            
-            DOMSource blankDOM = new DOMSource();
-            reporter.logTraceMsg("About to newTemplates(blankDOM)");
-            templates = factory.newTemplates(blankDOM);
-            reporter.check((templates != null), true, "factory.newTemplates(blankDOM) is non-null");
-            reporter.checkAmbiguous("More tests to be added!");            
-            
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem creating factory; can't continue testcase");
-            reporter.logThrowable(reporter.ERRORMSG, t,
-                                  "Problem creating factory; can't continue testcase");
-            return true;
+            reporter.checkErr("Problem with factory; testcase may not work");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with factory; testcase may not work");
         }
+        try
+        {
+            // A blank DOM as an input stylesheet - what should happen?
+            DOMSource blankXSLDOM = new DOMSource();
+            reporter.logTraceMsg("About to newTemplates(blankXSLDOM)");
+            Templates blankTemplates = factory.newTemplates(blankXSLDOM); // SPR SCUU4R5JYZ throws npe
+            reporter.check((blankTemplates != null), true, "factory.newTemplates(blankXSLDOM) is non-null");
+            reporter.checkObject(blankXSLDOM.getNode(), null, "blankXSLDOM is still empty");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with blankXSLDOM(1)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with blankXSLDOM(1)");
+        }
+        try
+        {
+            // A blank DOM as an input stylesheet - what should happen?
+            DOMSource blankXSLDOM = new DOMSource();
+            reporter.logTraceMsg("About to newTransformer(blankXSLDOM)");
+            Transformer blankTransformer = factory.newTransformer(blankXSLDOM); // SPR SCUU4R5JYZ throws npe
+            reporter.check((blankTransformer != null), true, "factory.newTransformer(blankXSLDOM) is non-null");
+            reporter.checkObject(blankXSLDOM.getNode(), null, "blankXSLDOM is still empty");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with blankXSLDOM(2)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with blankXSLDOM(2)");
+        }
+
+        try
+        {
+            // Try to get templates, transformerXSL from node
+            DOMSource xslDOM = new DOMSource(xslNode);
+            templates = factory.newTemplates(xslDOM);
+            reporter.check((templates != null), true, "factory.newTemplates(DOMSource) is non-null");
+            transformerXSL = factory.newTransformer(xslDOM);
+            reporter.check((transformerXSL != null), true, "factory.newTransformer(DOMSource) is non-null");
+            
+            // A simple DOM-DOM-DOM transform
+            DOMSource xmlDOM = new DOMSource(xmlNode);
+            Node outNode = docBuilder.newDocument();
+            DOMResult outDOM = new DOMResult(outNode);
+            transformerXSL.transform(xmlDOM, outDOM);
+            Node gotNode = outDOM.getNode();
+            reporter.check((gotNode != null), true, "transform(xmlDOM, outDOM) has non-null outNode");
+            serializeDOMAndCheck(gotNode, testFileInfo.goldName, "transform(xmlDOM, outDOM)");
+            reporter.logTraceMsg("@todo validate the dom in memory as well");
+
+            // A blank DOM as source doc of the transform - should 
+            //  auto-create a source Document
+            DOMSource blankSource = new DOMSource();
+            Node emptyNode = docBuilder.newDocument();
+            DOMResult emptyNodeDOM = new DOMResult(emptyNode);
+            reporter.logTraceMsg("About to transform(blankSource, emptyNodeDOM)");
+            transformerXSL.transform(blankSource, emptyNodeDOM); // SPR SCUU4R5KLL throws TransformerException
+            Node tmpNode = blankSource.getNode();
+            reporter.check((tmpNode != null), true, "transform(blankSource, emptyNodeDOM) has non-null node");
+            serializeDOMAndCheck(gotNode, testFileInfo.goldName, "transform(blankSource, emptyNodeDOM) HACK: needs new gold file");
+            reporter.checkAmbiguous("validate contents of emptyNodeDOM");            
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with tests(1)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with tests(1)");
+        }
+        try
+        {
+            // A blank DOM as an output of the transform - should 
+            //  auto-create a source Document
+            DOMSource xmlDOM = new DOMSource(xmlNode);
+            DOMResult emptyResult = new DOMResult();
+            reporter.logTraceMsg("About to transform(xmlDOM, emptyResult)");
+            transformerXSL.transform(xmlDOM, emptyResult);
+            Node outNode = emptyResult.getNode();
+            reporter.check((outNode != null), true, "transform(xmlDOM, emptyResult) has non-null node");
+            serializeDOMAndCheck(outNode, testFileInfo.goldName, "transform(xmlDOM, emptyResult)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with tests(2)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with tests(2)");
+        }
+
+        reporter.checkAmbiguous("@todo setSystemId functionality");
 
         reporter.testCaseClose();
         return true;
     }
 
 
+    /**
+     * Worker method to serialize DOM and fileChecker.check().  
+     * @return true if pass, false otherwise
+     */
+    public boolean serializeDOMAndCheck(Node dom, String goldFileName, String comment)
+    {
+        if ((dom == null) || (goldFileName == null))
+        {
+            reporter.logWarningMsg("serializeDOMAndCheck of null dom or goldFileName!");
+            return false;
+        }
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            if (factory.getFeature(StreamResult.FEATURE))
+            {
+                // Use identity transformer to serialize
+                Transformer identityTransformer = factory.newTransformer();
+                StreamResult streamResult = new StreamResult(new FileOutputStream(outNames.nextName()));
+                DOMSource nodeSource = new DOMSource(dom);
+                reporter.logTraceMsg("serializeDOMAndCheck() into " + outNames.currentName());
+                identityTransformer.transform(nodeSource, streamResult);
+                fileChecker.check(reporter, 
+                                  new File(outNames.currentName()), 
+                                  new File(goldFileName), 
+                                  comment + " into " + outNames.currentName());
+                return true;    // Note: should check return from fileChecker.check!
+            }
+            else
+            {   // We should try another method to serialize the data
+                reporter.logWarningMsg("getFeature(StreamResult.FEATURE), can't validate serialized data");
+                return false;
+            }
+            
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("serializeDOMAndCheckFile threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "serializeDOMAndCheckFile threw:");
+            return false;
+        }
+    }
     /**
      * Convenience method to print out usage information - update if needed.  
      * @return String denoting usage of this test class
