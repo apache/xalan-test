@@ -82,7 +82,7 @@ rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files
 rem    in the classpath first from that one dir
 rem Note: Does not yet support xsltc testing! TBD -sc
 rem Note: Does not yet support using crimson from JARDIR (forces xercesImpl.jar)! TBD -sc
-if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xml-apis.jar;%JARDIR%\xercesImpl.jar;%JARDIR%\xalan.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xml-apis.jar;%JARDIR%\xercesImpl.jar;%JARDIR%\xalan.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%JARDIR%\Tidy.jar;%CLASSPATH%
 
 rem Attempt to automatically add system classes to very end of _CLASSPATH
 if exist "%JAVA_HOME%\lib\tools.jar" set _CLASSPATH=%_CLASSPATH%;%JAVA_HOME%\lib\tools.jar
