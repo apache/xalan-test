@@ -102,12 +102,13 @@ public class XHTFileCheckService implements CheckService
      * @param actual (current) Object to check
      * @param reference (gold, or expected) Object to check against
      * @param description of what you're checking
-     * NEEDSDOC @param msg
+     * @param msg comment to log out with this test point
+     * @param id ID tag to log out with this test point
      * @return Reporter.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
     public int check(Reporter reporter, Object actual, Object reference,
-                     String msg)
+                     String msg, String id)
     {
 
         if (!((actual instanceof File) & (reference instanceof File)))
@@ -115,7 +116,7 @@ public class XHTFileCheckService implements CheckService
 
             // Must have File objects to continue
             reporter.checkErr("XHTFileCheckService only takes files, with: "
-                              + msg);
+                              + msg, id);
 
             return reporter.ERRR_RESULT;
         }
@@ -126,7 +127,7 @@ public class XHTFileCheckService implements CheckService
         // Fail if Actual file doesn't exist or is 0 len
         if ((!actualFile.exists()) || (actualFile.length() == 0))
         {
-            reporter.checkFail(msg);
+            reporter.checkFail(msg, id);
 
             return reporter.FAIL_RESULT;
         }
@@ -134,7 +135,7 @@ public class XHTFileCheckService implements CheckService
         // Ambiguous if gold file doesn't exist or is 0 len
         if ((!referenceFile.exists()) || (referenceFile.length() == 0))
         {
-            reporter.checkAmbiguous(msg);
+            reporter.checkAmbiguous(msg, id);
 
             return Reporter.AMBG_RESULT;
         }
@@ -171,7 +172,7 @@ public class XHTFileCheckService implements CheckService
         {
 
             // We fail, obviously!
-            reporter.checkFail(msg);
+            reporter.checkFail(msg, id);
 
             return Reporter.FAIL_RESULT;
         }
@@ -179,16 +180,33 @@ public class XHTFileCheckService implements CheckService
         {
             pw.println("comparator whitespace diff warning!");
             pw.flush();
-            reporter.checkFail(msg);
+            reporter.checkFail(msg, id);
 
             return Reporter.FAIL_RESULT;
         }
         else
         {
-            reporter.checkPass(msg);
+            reporter.checkPass(msg, id);
 
             return Reporter.PASS_RESULT;
         }
+    }
+
+    /**
+     * Compare two objects for equivalence, and return appropriate result.
+     *
+     * @param reporter to dump any output messages to
+     * @param actual (current) File to check
+     * @param reference (gold, or expected) File to check against
+     * @param description of what you're checking
+     * @param msg comment to log out with this test point
+     * @return Reporter.*_RESULT code denoting status; each method may define
+     * it's own meanings for pass, fail, ambiguous, etc.
+     */
+    public int check(Reporter reporter, Object actual, Object reference,
+                     String msg)
+    {
+        return check(reporter, actual, reference, msg, null);
     }
 
     /**

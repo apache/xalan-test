@@ -93,12 +93,13 @@ public class SimpleFileCheckService implements CheckService
      * @param actual (current) File to check
      * @param reference (gold, or expected) File to check against
      * @param description of what you're checking
-     * NEEDSDOC @param msg
+     * @param msg comment to log out with this test point
+     * @param id ID tag to log out with this test point
      * @return Reporter.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
     public int check(Reporter reporter, Object actual, Object reference,
-                     String msg)
+                     String msg, String id)
     {
 
         if (!((actual instanceof File) & (reference instanceof File)))
@@ -106,7 +107,7 @@ public class SimpleFileCheckService implements CheckService
 
             // Must have File objects to continue
             reporter.checkErr(
-                "SimpleFileCheckService only takes files, with: " + msg);
+                "SimpleFileCheckService only takes files, with: " + msg, id);
 
             return reporter.ERRR_RESULT;
         }
@@ -116,7 +117,7 @@ public class SimpleFileCheckService implements CheckService
         // Fail if Actual file doesn't exist
         if (fVal1 == null)
         {
-            reporter.checkFail(msg);
+            reporter.checkFail(msg, id);
 
             return Reporter.FAIL_RESULT;
         }
@@ -126,7 +127,7 @@ public class SimpleFileCheckService implements CheckService
         // Ambiguous if gold or reference file doesn't exist
         if (fVal2 == null)
         {
-            reporter.checkAmbiguous(msg);
+            reporter.checkAmbiguous(msg, id);
 
             return Reporter.AMBG_RESULT;
         }
@@ -134,16 +135,33 @@ public class SimpleFileCheckService implements CheckService
         // Pass if they're equal, fail otherwise        
         if (fVal1.equals(fVal2))
         {
-            reporter.checkPass(msg);
+            reporter.checkPass(msg, id);
 
             return Reporter.PASS_RESULT;
         }
         else
         {
-            reporter.checkFail(msg);
+            reporter.checkFail(msg, id);
 
             return Reporter.FAIL_RESULT;
         }
+    }
+
+    /**
+     * Compare two objects for equivalence, and return appropriate result.
+     *
+     * @param reporter to dump any output messages to
+     * @param actual (current) File to check
+     * @param reference (gold, or expected) File to check against
+     * @param description of what you're checking
+     * @param msg comment to log out with this test point
+     * @return Reporter.*_RESULT code denoting status; each method may define
+     * it's own meanings for pass, fail, ambiguous, etc.
+     */
+    public int check(Reporter reporter, Object actual, Object reference,
+                     String msg)
+    {
+        return check(reporter, actual, reference, msg, null);
     }
 
     /**

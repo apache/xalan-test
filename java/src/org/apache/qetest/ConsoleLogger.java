@@ -451,5 +451,56 @@ public class ConsoleLogger implements Logger
     {
         outStream.println(sIndent + "ERROR  " + comment);
     }
+
+    /* EXPERIMENTAL: have duplicate set of check*() methods 
+       that all output some form of ID as well as comment. 
+       Leave the non-ID taking forms for both simplicity to the 
+       end user who doesn't care about IDs as well as for 
+       backwards compatibility.
+    */
+
+    /**
+     * Writes out a Pass record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the pass record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkPass(String comment, String id)
+    {
+        outStream.println(sIndent + "PASS!  (" + id + ") " + comment);
+    }
+
+    /**
+     * Writes out an ambiguous record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment to log with the ambg record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkAmbiguous(String comment, String id)
+    {
+        outStream.println(sIndent + "AMBG   (" + id + ") " + comment);
+    }
+
+    /**
+     * Writes out a Fail record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the fail record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkFail(String comment, String id)
+    {
+        outStream.println(sIndent + "FAIL!  (" + id + ") " + comment);
+    }
+
+    /**
+     * Writes out an Error record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the error record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkErr(String comment, String id)
+    {
+        outStream.println(sIndent + "ERROR  (" + id + ") " + comment);
+    }
 }  // end of class ConsoleLogger
 

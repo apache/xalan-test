@@ -354,7 +354,9 @@ public interface Logger
      * <p>Note this may have slightly different meanings for various
      * types of Loggers (file-based, network-based, etc.) or for
      * Reporters (which may still be able to function if only one
-     * of their Loggers has an error)
+     * of their Loggers has an error)</p>
+     * <p>Note: we should consider renaming this to avoid possible 
+     * confusion with the checkErr(String) method.</p>
      * @author Shane_Curcuru@lotus.com
      * @return status - true if an error has occoured, false if it's OK
      */
@@ -518,5 +520,45 @@ public interface Logger
      * @param comment comment to log with the error record.
      */
     public abstract void checkErr(String comment);
+
+
+    /* EXPERIMENTAL: have duplicate set of check*() methods 
+       that all output some form of ID as well as comment. 
+       Leave the non-ID taking forms for both simplicity to the 
+       end user who doesn't care about IDs as well as for 
+       backwards compatibility.
+    */
+    
+    /**
+     * Writes out a Pass record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the pass record.
+     * @param ID token to log with the pass record.
+     */
+    public abstract void checkPass(String comment, String id);
+
+    /**
+     * Writes out an ambiguous record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment to log with the ambg record.
+     * @param ID token to log with the pass record.
+     */
+    public abstract void checkAmbiguous(String comment, String id);
+
+    /**
+     * Writes out a Fail record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the fail record.
+     * @param ID token to log with the pass record.
+     */
+    public abstract void checkFail(String comment, String id);
+
+    /**
+     * Writes out an Error record with comment and ID.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the error record.
+     * @param ID token to log with the pass record.
+     */
+    public abstract void checkErr(String comment, String id);
 }  // end of class Logger
 

@@ -842,6 +842,95 @@ public class XMLFileLogger implements Logger
         }
     }
 
+    /* EXPERIMENTAL: have duplicate set of check*() methods 
+       that all output some form of ID as well as comment. 
+       Leave the non-ID taking forms for both simplicity to the 
+       end user who doesn't care about IDs as well as for 
+       backwards compatibility.
+    */
+
+    /** ID_ATTR optimization for extra ID attribute.  */
+    private static final String ATTR_ID = "\" id=\"";
+    /**
+     * Writes out a Pass record with comment.
+     * Record format: <pre>&lt;checkresult result="PASS" desc="comment"/&gt;</pre>
+     * @param comment comment to log with the pass record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkPass(String comment, String id)
+    {
+
+        if (isReady())
+        {
+            StringBuffer tmp = new StringBuffer(CHECKPASS_HDR + escapeString(comment));
+            if (id != null)
+                tmp.append(ATTR_ID + escapeString(id));
+                
+            tmp.append("\"/>");
+            reportPrinter.println(tmp);
+        }
+    }
+
+    /**
+     * Writes out an ambiguous record with comment.
+     * Record format: <pre>&lt;checkresult result="AMBG" desc="comment"/&gt;</pre>
+     * @param comment comment to log with the ambg record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkAmbiguous(String comment, String id)
+    {
+
+        if (isReady())
+        {
+            StringBuffer tmp = new StringBuffer(CHECKAMBG_HDR + escapeString(comment));
+            if (id != null)
+                tmp.append(ATTR_ID + escapeString(id));
+                
+            tmp.append("\"/>");
+            reportPrinter.println(tmp);
+        }
+    }
+
+    /**
+     * Writes out a Fail record with comment.
+     * Record format: <pre>&lt;checkresult result="FAIL" desc="comment"/&gt;</pre>
+     * @param comment comment to log with the fail record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkFail(String comment, String id)
+    {
+
+        if (isReady())
+        {
+            StringBuffer tmp = new StringBuffer(CHECKFAIL_HDR + escapeString(comment));
+            if (id != null)
+                tmp.append(ATTR_ID + escapeString(id));
+                
+            tmp.append("\"/>");
+            reportPrinter.println(tmp);
+        }
+    }
+
+    /**
+     * Writes out a Error record with comment.
+     * Record format: <pre>&lt;checkresult result="ERRR" desc="comment"/&gt;</pre>
+     * @param comment comment to log with the error record.
+     * @param ID token to log with the pass record.
+     */
+    public void checkErr(String comment, String id)
+    {
+
+        if (isReady())
+        {
+            StringBuffer tmp = new StringBuffer(CHECKERRR_HDR + escapeString(comment));
+            if (id != null)
+                tmp.append(ATTR_ID + escapeString(id));
+                
+            tmp.append("\"/>");
+            reportPrinter.println(tmp);
+        }
+    }
+
     //-----------------------------------------------------
     //-------- Worker routines for XML string escaping --------
     //-----------------------------------------------------

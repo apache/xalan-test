@@ -90,12 +90,27 @@ public interface CheckService
      * @param actual (current) Object to check
      * @param reference (gold, or expected) Object to check against
      * @param description of what you're checking
-     * NEEDSDOC @param msg
+     * @param msg comment to log out with this test point
      * @return Reporter.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
     public abstract int check(Reporter reporter, Object actual,
                               Object reference, String msg);
+
+    /**
+     * Compare two objects for equivalence, and return appropriate result.
+     *
+     * @param reporter to dump any output messages to
+     * @param actual (current) Object to check
+     * @param reference (gold, or expected) Object to check against
+     * @param description of what you're checking
+     * @param msg comment to log out with this test point
+     * @param id ID tag to log out with this test point
+     * @return Reporter.*_RESULT code denoting status; each method may define
+     * it's own meanings for pass, fail, ambiguous, etc.
+     */
+    public abstract int check(Reporter reporter, Object actual,
+                              Object reference, String msg, String id);
 
     /**
      * Description of algorithim used to check equivalence.  
