@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test include of a decimal-format. -->
 
-<xsl:include href="file:periodgroup.xsl"/>
+<xsl:include href="periodgroup.xsl"/>
 
 <xsl:decimal-format name="myminus" minus-sign='_' />
 

@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of include that does an import, providing two named decimal-formats. Three formats should not conflict. -->
 
-<xsl:include href="file:newminus.xsl"/>
+<xsl:include href="newminus.xsl"/>
 
 <xsl:template match="doc">
   <out>

@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of import that does an import, providing two named decimal-formats. Three formats should not conflict. -->
 
-<xsl:import href="file:newminus.xsl"/>
+<xsl:import href="newminus.xsl"/>
 
 <xsl:template match="doc">
   <out>

@@ -3,7 +3,7 @@
 
 <!-- This stylesheet is to be imported or included. It defines the 'newminus' format. -->
 
-  <xsl:import href="file:periodgroup.xsl"/>
+  <xsl:import href="periodgroup.xsl"/>
 
   <xsl:decimal-format name="newminus" minus-sign='_' />
 
