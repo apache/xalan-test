@@ -66,15 +66,21 @@ import java.util.StringTokenizer;
 /**
  * Datalet representing set of paths to files: input, output, gold.
  * 
- * This is a fairly simplistic Datalet implementation that's 
+ * <p>This is a fairly simplistic Datalet implementation that's 
  * useful for the many programs where the test requires reading 
  * an input file, performing an operation with the program, and 
- * then verifying an output file.
+ * then verifying an output file.</p>
  *
- * We normally operate on local path/filenames, since the Java 
+ * <p>We normally operate on local path/filenames, since the Java 
  * SDK's implementation of URLs and File objects is so poor at 
- * handling proper URI/URL's according to the RFCs.
+ * handling proper URI/URL's according to the RFCs.  A potential 
+ * future improvement is to add convenience accessor methods, like 
+ * getInputName() (just the bare filename) etc. but I'm not quite 
+ * convinced we need them yet.</p>
  * 
+ * @see FileTestlet
+ * @see FileTestletDriver
+ * @see FileDataletManager
  * @author Shane_Curcuru@us.ibm.com
  * @version $Id$
  */
@@ -83,34 +89,35 @@ public class FileDatalet implements Datalet
     /** Path of the location to get input resources from.  */
     protected String input = "tests/defaultInput";
 
-    /** Accessor method for input.  */
+    /** Accessor method for input; never null.  */
     public String getInput() { return input; }
 
     /** Path to put actual output resources into.  */
     protected String output = "output/defaultOutput";
 
-    /** Accessor method for output.  */
+    /** Accessor method for output; never null.  */
     public String getOutput() { return output; }
 
     /** Path of the location to get gold or reference resources from.  */
     protected String gold = "gold/defaultGold";
 
-    /** Accessor method for gold.  */
+    /** Accessor method for gold; never null.  */
     public String getGold() { return gold; }
 
 
     /** 
      * Worker method to validate the files/dirs we represent.  
      * 
-     * By default, ensures that the input already exists in some 
+     * <p>By default, ensures that the input already exists in some 
      * format; and attempts to create the output.  If asked to be 
      * strict, then we will fail if the output cannot be created, 
      * and we additionally will attempt to create the gold and 
-     * will fail if it can't be created.
+     * will fail if it can't be created.</p>
      *
-     * Note that we only attempt to create the gold if asked to 
+     * <p>Note that we only attempt to create the gold if asked to 
      * be strict, since users may simply want to run a 'crash test' 
-     * and get all AMBG results when prototyping new tests.
+     * and get all {@link org.apache.qetest.Logger#AMBG_RESULT AMBG}
+     * results when prototyping new tests.</p>
      *
      * @param strict if true, requires that output and gold must 
      * be created; otherwise they're optional
@@ -152,19 +159,21 @@ public class FileDatalet implements Datalet
     /** 
      * Generic placeholder for any additional options.  
      * 
-     * This allows FileDatalets to support additional kinds 
+     * <p>This allows FileDatalets to support additional kinds 
      * of tests, like performance tests, without having to change 
      * this data model.  These options can serve as a catch-all 
      * for any new properties or options or what-not that new 
      * tests need, without having to change how the most basic 
-     * member variables here work.
-     * Note that while this needs to be a Properties object to 
+     * member variables here work.</p>
+     * <p>Note that while this needs to be a Properties object to 
      * take advantage of the parent/default behavior in 
      * getProperty(), this doesn't necessarily mean they can only 
      * store Strings; however only String-valued items can make 
-     * use of the default properties mechanisim.
+     * use of the default properties mechanisim.</p>
      *
-     * Default is a null object.
+     * <p>Default is a null object; note that getOptions() will 
+     * never return null, but will create a blank Properties 
+     * block if needed.</p>
      */
     protected Properties options = null;
 
@@ -182,7 +191,12 @@ public class FileDatalet implements Datalet
         return options;
     }
 
-    /** Accessor method for optional properties; settable.  */
+    /** 
+     * Accessor method for optional properties; settable.  
+     * <p>Note this method simply points our options at the 
+     * caller's Properties; it does not do a clone since that 
+     * would be quite costly.</p>
+     */
     public void setOptions(Properties p) { options = p; }
 
 
@@ -213,6 +227,7 @@ public class FileDatalet implements Datalet
     /** Description of what this Datalet tests.  */
     protected String description = "FileDatalet: default description";
 
+
     /**
      * Accesor method for a brief description of this Datalet.  
      *
@@ -239,6 +254,7 @@ public class FileDatalet implements Datalet
 
     /**
      * Worker method to auto-set the description of this Datalet.  
+     * Conglomeration of input, output, gold values.
      */
     protected void setDescription()
     {
@@ -258,9 +274,10 @@ public class FileDatalet implements Datalet
      * Initialize this datalet from another FileDatalet which 
      * serves as a 'base' location, and a filename.  
      * 
-     * We set each of our input, output, gold to be concatenations 
+     * <p>We set each of our input, output, gold to be concatenations 
      * of the base + File.separator + fileName, and also copy 
-     * over the options from the base.
+     * over the options from the base.  Note we always attempt to 
+     * deal with local path/filename conventions.</p>
      *
      * @param base FileDatalet object to serve as base directories
      * @param fileName to concatenate for each of input/output/gold
@@ -283,7 +300,7 @@ public class FileDatalet implements Datalet
     /**
      * Initialize this datalet from a list of paths.
      *
-     * Our options are not initialized, and left as null.  
+     * <p>Our options are not initialized, and left as null.<p>
      * 
      * @param i path for input
      * @param o path for output
@@ -296,6 +313,54 @@ public class FileDatalet implements Datalet
         gold = g;
         
         setDescription(); 
+    }
+
+
+    /**
+     * Initialize this datalet from a string and defaults.
+     *
+     * <p>Our options are created as a new Properties block that 
+     * defaults to the existing one passed in, then 
+     * we parse the string for input, output, gold, and 
+     * optionally add additional args to the options.</p>
+     * 
+     * @param args command line to initialize from
+     * @param defaults for our options
+     */
+    public FileDatalet(String args, Properties defaults)
+    {
+        options = new Properties(defaults);
+
+        StringTokenizer st = new StringTokenizer(args);
+
+        // Fill in as many items as we can; leave as default otherwise
+        // Note that order is important!
+        if (st.hasMoreTokens())
+        {
+            input = st.nextToken();
+            if (st.hasMoreTokens())
+            {
+                output = st.nextToken();
+                if (st.hasMoreTokens())
+                {
+                    gold = st.nextToken();
+                }
+            }
+        }
+        // EXPERIMENTAL add extra name value pairs to our options
+        while (st.hasMoreTokens())
+        {
+            String name = st.nextToken();
+            if (st.hasMoreTokens())
+            {
+                options.put(name, st.nextToken());
+            }
+            else
+            {
+                // Just put it as 'true' for boolean options
+                options.put(name, "true");
+            }
+        }
     }
 
 

@@ -233,11 +233,10 @@ public class FileTestletDriver extends XSLProcessorTestBase
             // Process the specific list of tests the user supplied
             String desc = "User-supplied fileList: " + fileList; // provide default value
             // Use static worker class to process the list
-            // Vector datalets = FileDataletManager.readFileList(reporter, fileList, desc);
-            throw new RuntimeException("fileList not supported yet! Need a FileDataletManager");
+            Vector datalets = FileDataletManager.readFileList(reporter, fileList, desc, testProps);
 
             // Actually process the specified files in a testCase
-            // processFileList(datalets, desc);
+            processFileList(datalets, desc);
         }
         else
         {
@@ -283,21 +282,11 @@ public class FileTestletDriver extends XSLProcessorTestBase
             }
         }
 
-        FileDatalet subdir = new FileDatalet(topInputDir.getPath(), outputDir, goldDir);
-        // By default, we don't process the topmost inputDir, but 
-        //  we always want to recurse downwards from here
-        //  If user asks us to 'processTop', then also process this one
-        //@todo define better this property and meaning
-        String top = testProps.getProperty("processTop");
-        if ((null != top)
-            && (top.equalsIgnoreCase("true")))
-        {
-            recurseSubDir(subdir, true, true);
-        }
-        else            
-        {
-            recurseSubDir(subdir, false, true);
-        }
+        FileDatalet topDirs = new FileDatalet(topInputDir.getPath(), outputDir, goldDir);
+
+        // Optionally process this topDirs, and always recurse at 
+        //  least one level below it
+        recurseSubDir(topDirs, getProcessTopDir(), true);
     }
 
 
@@ -355,20 +344,9 @@ public class FileTestletDriver extends XSLProcessorTestBase
             }
             FileDatalet subdir = new FileDatalet(base, subdirs[i]);
 
-            // Always process subdirs, only top level might have 
-            //  had process=false
-            // Read property to determine if we should continue 
-            //  to recurse downwards from here
-            String down = testProps.getProperty("recurse");
-            if ((null != down)
-                && (down.equalsIgnoreCase("true")))
-            {
-                recurseSubDir(subdir, true, true);
-            }
-            else            
-            {
-                recurseSubDir(subdir, true, false);
-            }
+            // Process each other directory, and optionally continue 
+            //  to recurse downwards
+            recurseSubDir(subdir, true, getRecurseDirs());
         } // end of for...
     }
 
@@ -628,6 +606,14 @@ public class FileTestletDriver extends XSLProcessorTestBase
         //  put the fileChecker directly into their options
         base.getOptions().put("fileCheckerImpl", fileChecker);
     }
+
+    /** If we should process the top level directory (default:false).   */
+    protected boolean getProcessTopDir()
+    { return false; }
+
+    /** If we should always recurse lower level directories (default:false).   */
+    protected boolean getRecurseDirs()
+    { return false; }
 
     /** Default FilenameFilter FQCN for directories.   */
     protected String getDefaultDirFilter()
