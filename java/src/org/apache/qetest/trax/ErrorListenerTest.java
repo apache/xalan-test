@@ -314,16 +314,20 @@ public class ErrorListenerTest extends XSLProcessorTestBase
             handler.setResult(result);
             reader.setContentHandler(handler);
 
-            // transformer.setErrorListener(loggingErrorListener);
+            LoggingSAXErrorHandler loggingSAXErrorHandler = new LoggingSAXErrorHandler(reporter);
+            loggingSAXErrorHandler.setThrowWhen(LoggingSAXErrorHandler.THROW_NEVER);
+            reporter.logTraceMsg("LoggingSAXErrorHandler originally setup:" + loggingSAXErrorHandler.getQuickCounters());
+            reader.setErrorHandler(loggingSAXErrorHandler);
+            
             // Validate the first xsl:message call in the stylesheet
             loggingErrorListener.setExpected(transformExpectedType, 
                                              transformExpectedValue);
-            reporter.logTraceMsg("//@todo Need to hookup a SAX errorHandler to catch errors here!");
             reporter.logInfoMsg("about to parse/transform(" + QetestUtils.filenameToURL(testFileInfo.xmlName) + ")");
             reader.parse(QetestUtils.filenameToURL(testFileInfo.xmlName));
-            reporter.logTraceMsg("after parse/transform(...)");
+            reporter.logTraceMsg("LoggingSAXErrorHandler after parse:" + loggingSAXErrorHandler.getQuickCounters());
             // Clear out any setExpected or counters
             loggingErrorListener.reset();
+            loggingSAXErrorHandler.reset();
 
             // Validate the actual output file as well: in this case, 
             //  the stylesheet should still work
