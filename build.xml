@@ -97,13 +97,21 @@ dependencies - users must manually 'build jar' first.
     <property name="xml-apis.jar" value="${xalan.bin.dir}/xml-apis.jar"/>
     <property name="parserjar" value="${xalan.bin.dir}/xercesImpl.jar"/>
     <property name="bcel.jar" value="${xalan.bin.dir}/BCEL.jar"/>
-    <property name="bsf.jar" value="${xalan.bin.dir}/bsf.jar"/>
+
     <!-- JTidy is used by the XSLTC comparator -->
     <property name="jtidy.jar" value="${xalan.bin.dir}/Tidy.jar"/>
-    <!-- The js.jar is for Javascript extensions tests; you must 
-         get this .jar yourself.  Feel free to reset the location.
-    -->
+    
+    <!-- The js.jar is for Javascript extensions tests; you must get this .jar yourself.  
+         Feel free to reset the location. -->
     <property name="js.jar" value="../../js.jar"/>
+    
+    <!-- The Bean Scripting Framework is required for extensions written in languages 
+         other than Java. Xalan Java will attempt to use the Jakarta BSF implementation
+         by default (see the "extensions" target).  
+         bsf.jar is no longer distributed with Xalan Java; you must get this .jar yourself.  
+         For more information, see the Apache Jakarta project, http://jakarta.apache.org/
+         Feel free to reset the location.  -->    
+    <property name="bsf.jar" value="../../bsf.jar"/>
 
     <!-- Documentation-specific files and locations -->
     <property name="stylebook.jar" value="${xalan.bin.dir}/stylebook-1.0-b3_xalan-2.jar"/>
@@ -114,7 +122,6 @@ dependencies - users must manually 'build jar' first.
     <property name="test.xdocs.style" value="${test.xdocs.dir}/style"/>
     <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
     <path id="test.docs.class.path">
-        <pathelement location="${bsf.jar}" />
         <pathelement location="${stylebook.jar}" />
         <pathelement location="${doclet.jar}" />
         <pathelement location="${jtidy.jar}" />
@@ -263,6 +270,18 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use -->
             <sysproperty key="javax.xml.transform.TransformerFactory"
                          value="${sysprop.transfact}" />
+        </xalantest>
+    </target>
+
+    <target name="run.xalan-extension-test" >
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="${xalantest.classpathref}"
+            bootclasspathref="boot.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" >
+            <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
+                         value="${sysprop.BSFManager}" />
         </xalantest>
     </target>
 
@@ -503,22 +522,45 @@ dependencies - users must manually 'build jar' first.
     </target>
 
     <!-- ================================================================== -->
-    <!-- Run tests: various extensions tests using driver                    -->
+    <!-- Run tests: various extensions tests                                -->
     <!-- ================================================================== -->
-    <target name="extensions" description="Run various extensions tests using driver"
-        depends="init.test">
-        <echo message="Executing Xalan various extensions tests using driver" />
+    <target name="extensions" 
+            description="Run extensions tests.  
+                         Non-Java extensions will use the Jakarta BSF implementation."
+            depends="init.test">
+        <echo message="Executing Xalan extensions tests. Non-Java extensions will use the Jakarta BSF implementation." />
         <!-- Set the default conformance test driver, user may 
              override; note test.properties:extensions.testlet= 
         -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <property name="testType" value="extensions." />
-        <antcall target="run.xalantest">
-            <param name="xalantest.classpathref"
-                   value="extensions.class.path" />
+        <antcall target="run.xalan-extension-test">
+            <param name="xalantest.classpathref" value="extensions.class.path" />
+            <param name="sysprop.BSFManager" value="org.apache.bsf.BSFManager" />
         </antcall>
         <property name="scan.outputDir" value="${extensions.outputDir}"/>
-        <antcall target="scan"/>            
+        <antcall target="scan"/>
+        <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
+    </target>
+
+    <target name="extensions-with-ibm-bsf" 
+            description="Run extensions tests. 
+                         Non-Java extensions will use the IBM BSF implementation."
+            depends="init.test">
+        <echo message="Executing Xalan extensions tests.  Non-Java extensions will use the IBM BSF implementation." />
+        <!-- Set the default conformance test driver, user may 
+             override; note test.properties:extensions.testlet= 
+        -->
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <property name="testType" value="extensions.with-ibm-bsf." />
+        <property name="scan.outputDir" value="${extensions.with-ibm-bsf.outputDir}"/>
+
+        <antcall target="run.xalan-extension-test">
+            <param name="extensions.outputDir" value="${extensions.with-ibm-bsf.outputDir}" />
+            <param name="xalantest.classpathref" value="extensions.class.path" />
+            <param name="sysprop.BSFManager" value="com.ibm.bsf.BSFManager" />
+        </antcall>
+        <antcall target="scan"/>
         <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
     </target>
 
