@@ -68,7 +68,6 @@ goto checkJava
 
 :checkJava
 set _JAVACMD=%JAVACMD%
-set _ANT_CP=%CLASSPATH%
 rem Note: classpath handling is special for testing Xalan
 rem If PARSER_JAR blank, default to xerces in the xalan dir
 if "%PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xerces.jar
@@ -77,13 +76,18 @@ if not "%PARSER_JAR%" == "" set _PARSER_JAR=%PARSER_JAR%
 rem If JARDIR is blank, then only add Ant and a PARSER_JAR to the 
 rem    classpath before running Ant - then within the Ant file, it 
 rem    will add other .jars from default locations
-if "%JARDIR%" == "" set _ANT_CP=%CLASSPATH%;%_ANT_HOME%\bin\ant.jar;%_PARSER_JAR%
+if "%JARDIR%" == "" set _CLASSPATH=%CLASSPATH%;%_ANT_HOME%\bin\ant.jar;%_PARSER_JAR%
 
 rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files 
 rem    in the classpath first from that one dir
 rem Note: Does not yet support xsltc testing! TBD -sc
 rem Note: Does not yet support using crimson from JARDIR (forces xerces.jar)! TBD -sc
-if not "%JARDIR%" == "" set _ANT_CP=%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
+
+rem Attempt to automatically add system classes to very end of _CLASSPATH
+if exist "%JAVA_HOME%\lib\tools.jar" set _CLASSPATH=%_CLASSPATH%;%JAVA_HOME%\lib\tools.jar
+if exist "%JAVA_HOME%\lib\classes.zip" set _CLASSPATH=%_CLASSPATH%;%JAVA_HOME%\lib\classes.zip
+
 
 if "%JAVA_HOME%" == "" goto noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=%JAVA_HOME%\bin\java
@@ -101,14 +105,14 @@ set _ANT_OPTS=%ANT_OPTS% -Dparserjar=%_PARSER_JAR%
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 
 :runAnt
-"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" %_ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" %JAVA_OPTS% -classpath "%_CLASSPATH%" -Dant.home="%_ANT_HOME%" %_ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 goto end
 
 :runAntWithJikes
-"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %_ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" %JAVA_OPTS% -classpath "%_CLASSPATH%" -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %_ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 
 :end
-set _ANT_CP=
+set _CLASSPATH=
 set _ANT_HOME=
 set _ANT_OPTS=
 set _JAVACMD=
