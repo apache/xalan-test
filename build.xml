@@ -9,6 +9,11 @@
  * well as a number of targets designed to execute the tests once 
  * they're built.
  *
+ * In general the compilation targets (i.e. ones that compile the 
+ * test classes themselves) do list their dependencies explicitly.
+ * Targets that serve to execute tests do not normally list any 
+ * dependencies - users must manually 'build jar' first.
+ *
  * @author shane_curcuru@lotus.com
  * @see build.bat
  */
@@ -54,6 +59,7 @@
     <property name="test.build.dir" value="java/build"/>
     <property name="test.build.docs" value="${test.build.dir}/docs"/>
     <property name="test.build.apidocs" value="${test.build.docs}/apidocs"/>
+    <property name="test.bugzilla.dir" value="tests/bugzilla"/>
     <property name="testxsl.jar.name" value="${name}.jar"/>
     <property name="qetest.jar.name" value="qetest.jar"/>
     <property name="testxsl.jar" value="${test.build.dir}/${testxsl.jar.name}"/>
@@ -105,6 +111,9 @@
     --> 
     <property name="fail-on-error" value="yes"/>
 
+    <!-- ================================================================== -->
+    <!-- Initialize: define classpaths for use within specific targets      -->
+    <!-- ================================================================== -->
     <!-- Classpath used when compiling tests -->
     <path id="compiletest.class.path">
         <pathelement path="${java.class.path}" />
@@ -137,6 +146,12 @@
     <!-- Classpath used when running contrib or user-contributed tests -->
     <path id="contrib.class.path">
         <path refid="conf.class.path" />
+    </path>
+
+    <!-- Classpath used when running Bugzilla tests -->
+    <path id="bugzilla.class.path">
+        <path refid="conf.class.path" />
+        <pathelement location="${test.bugzilla.dir}" />
     </path>
 
     <!-- ================================================================== -->
@@ -267,6 +282,23 @@
         </antcall>
     </target>
 
+
+    <!-- ================================================================== -->
+    <!-- Run tests: all Bugzilla testlets to regress bugs                   -->
+    <!-- ================================================================== -->
+    <target name="bugzilla" description="Run all Bugzilla testlets to regress bugs"
+        depends="init.test">
+        <echo message="Executing various bugzilla Testlets and tests" />
+        <!-- Set the default conformance test driver, user may override -->
+        <property name="testClass" value="org.apache.qetest.xsl.BugzillaTestletDriver" />
+        <property name="testType" value="bugzilla." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="bugzilla.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" />
+        <echo message="If you got ClassNotFound, did you 'build bugzilla.classes' first?" />
+    </target>
 
     <!-- ================================================================== -->
     <!-- Run tests: Run the Xalan-J 2.x Minitest                            -->
@@ -445,6 +477,28 @@
         <jar jarfile="${testxsl.jar}" 
              basedir="${test.build.dir}" 
              includes="**/*.class,**/*.properties" />
+    </target>
+
+    <!-- excludes="Bugzilla1288.java"; test refers to removed classes -->
+    <target name="bugzilla.classes" depends="jar"
+        description="Compile any bugzilla testlet classes">
+        <javac srcdir="${test.bugzilla.dir}" 
+               destdir="${test.bugzilla.dir}" 
+               debug="${debug}"
+               excludes="Bugzilla1288.java"
+               classpathref="api.class.path" />
+    </target>
+
+    <target name="extension.classes" depends="jar"
+        description="[FUTUREUSE] Compile any extension test classes">
+        <echo message="[FUTUREUSE] Compile any extension test classes" />
+    </target>
+    <!-- This target compiles both the main tests and test drivers 
+         in testxsl.jar from the java/ directory, as well as 
+         various other classes in subdirs under tests/
+    -->
+    <target name="all" description="Build testxsl.jar *and* compile .java under tests/ dir"
+        depends="jar,bugzilla.classes,extension.classes">
     </target>
 
     <target name="clean"
