@@ -68,6 +68,7 @@ import org.apache.qetest.Logger;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.TestletImpl;
 import org.apache.qetest.xsl.StylesheetDatalet;
+import org.apache.qetest.xsl.StylesheetTestlet;
 import org.apache.qetest.xsl.XHTFileCheckService;
 import org.apache.qetest.xslwrapper.TransformWrapper;
 import org.apache.qetest.xslwrapper.TransformWrapperFactory;
@@ -90,7 +91,7 @@ import java.util.Hashtable;
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
  */
-public class ExtensionTestlet extends TestletImpl
+public class ExtensionTestlet extends StylesheetTestlet
 {
     // Initialize our classname for TestletImpl's main() method
     static { thisClassName = "org.apache.qetest.xsl.ExtensionTestlet"; }
@@ -114,76 +115,21 @@ public class ExtensionTestlet extends TestletImpl
     }
 
 
-    /**
-     * Run this ExtensionTestlet: execute it's test and return.
+    /** 
+     * Worker method to perform any pre-processing needed.  
      *
-     * @param Datalet to use as data point for the test.
-     */
-    public void execute(Datalet d)
-	{
-        // Common: ensure cast to StylesheetDatalet
-        StylesheetDatalet datalet = null;
-        try
-        {
-            datalet = (StylesheetDatalet)d;
-        }
-        catch (ClassCastException e)
-        {
-            logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue with " + d);
-            return;
-        }
-
-        // Common: generic pre-logging
-        logger.logMsg(Logger.STATUSMSG, "About to test: " 
-                      + (null == datalet.inputName
-                         ? datalet.xmlName
-                         : datalet.inputName));
-
-        // Continue if our Datalet is OK, and after we've performed 
-        //  any other pre-transform steps...
-        if (preCheck(datalet))
-        {
-            // ... then just perform a transform ...
-            if (doTransform(datalet))
-            {
-                // ... and if that's OK, then do verification
-                postCheck(datalet);
-            }
-        }
-	}
-
-
-    /**
-     * Perform any pre-transform validation or logging.  
      * This optionally does deleteOutFile, then attempts to load 
      * a matching TestableExtension class that matches the datalet's 
      * stylesheet.  If one is found, we call preCheck on that too.
-     * 
-     * @param d datalet to use for testing
+     *
+     * @param datalet to test with
      */
-    protected boolean preCheck(StylesheetDatalet datalet)
+    protected void testletInit(StylesheetDatalet datalet)
     {
-        //@todo validate our Datalet - ensure it has valid 
-        //  and/or existing files available.
+        // Simply grab any superclass functionality first
+        super.testletInit(datalet);
         
-        // Cleanup outName only if asked to - delete the file on disk
-        // Optimization: this takes extra time and often is not 
-        //  needed, so only do this if the option is set
-        if ("true".equalsIgnoreCase(datalet.options.getProperty("deleteOutFile")))
-        {
-            try
-            {
-                boolean btmp = (new File(datalet.outputName)).delete();
-                logger.logMsg(Logger.TRACEMSG, "Deleting OutFile of::" + datalet.outputName
-                                     + " status: " + btmp);
-            }
-            catch (SecurityException se)
-            {
-                logger.logMsg(Logger.WARNINGMSG, "Deleting OutFile of::" + datalet.outputName
-                                       + " threw: " + se.toString());
-                // But continue anyways...
-            }
-        }
+        // Now do custom initialization for extensions
 
         // See if we have a Java-based extension class
         // Side effect: fills in datalet.options
@@ -193,123 +139,39 @@ public class ExtensionTestlet extends TestletImpl
         Class extensionClazz = (Class)datalet.options.get(TESTABLE_EXTENSION);
         if (null != extensionClazz)
         {
-            return invokeMethodOn(extensionClazz, "preCheck", datalet);
+            boolean ignored = invokeMethodOn(extensionClazz, "preCheck", datalet);
         }
         else
         {
             logger.logMsg(Logger.TRACEMSG, "No extension class found");
-            return true; // This currently isn't fatal; you can 
-                         //  still run these tests
         }
     }
 
 
-    /**
-     * Perform just the transformation itself.  
-     * This is generic to most testlets and was just copied from 
-     * the body of StylesheetTestlet.
-     * 
-     * Accesses our class member logger.
-     * @param d datalet to use for testing
+    /** 
+     * Worker method to validate output file with gold.  
+     *
+     * Logs out applicable info while validating output file.
+     * Most commonly will call the underlying TestableExtension's 
+     * postCheck method to get validation done.
+     *
+     * @param datalet to test with
+     * @throws allows any underlying exception to be thrown
      */
-    protected boolean doTransform(StylesheetDatalet datalet)
-    {
-        // Just perform the transform and log it; don't verify yet
-        TransformWrapper transformWrapper = null;
-        try
-        {
-            transformWrapper = TransformWrapperFactory.newWrapper(datalet.flavor);
-            // Set our datalet's options as options in the wrapper
-            transformWrapper.newProcessor(datalet.options);
-        }
-        catch (Throwable t)
-        {
-            logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " newWrapper/newProcessor threw");
-            logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
-            return false;
-        }
-
-        // Transform our supplied input file
-        try
-        {
-            logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
-                          + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
-                          + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor);
-
-            // Simply have the wrapper do all the transforming
-            //  or processing for us - we handle either normal .xsl 
-            //  stylesheet tests or just .xml embedded tests
-            long retVal = 0L;
-            if (null == datalet.inputName)
-            {
-                // presume it's an embedded test
-                long [] times = transformWrapper.transformEmbedded(datalet.xmlName, datalet.outputName);
-                retVal = times[TransformWrapper.IDX_OVERALL];
-            }
-            else
-            {
-                // presume it's a normal stylesheet test
-                long[] times = transformWrapper.transform(datalet.xmlName, datalet.inputName, datalet.outputName);
-                retVal = times[TransformWrapper.IDX_OVERALL];
-            }
-            return true;
-        }
-        catch (Throwable t)
-        {
-            // Put the logThrowable first, so it appears before 
-            //  the Fail record, and gets color-coded
-            logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " " + datalet.getDescription());
-            logger.checkFail(getDescription() + " " + datalet.getDescription() 
-                             + " threw: " + t.toString());
-            return false;
-        }
-    }
-
-
-    /**
-     * Perform any post-transform validation or logging.  
-     * 
-     * Accesses our class member logger.
-     * @param d datalet to use for testing
-     */
-    protected boolean postCheck(StylesheetDatalet datalet)
+    protected void checkDatalet(StylesheetDatalet datalet)
+            throws Exception
     {
         // If we have an associated extension class, call postCheck
         // If found, ask the class to validate
         Class extensionClazz = (Class)datalet.options.get(TESTABLE_EXTENSION);
         if (null != extensionClazz)
         {
-            return invokeMethodOn(extensionClazz, "postCheck", datalet);
+            boolean ignored = invokeMethodOn(extensionClazz, "postCheck", datalet);
         }
         else
         {
-            // Simply validate the output files ourselves, as normal
-            CheckService fileChecker = (CheckService)datalet.options.get("fileCheckerImpl");
-            // Supply default value
-            if (null == fileChecker)
-                fileChecker = new XHTFileCheckService();
-            if (Logger.PASS_RESULT
-                != fileChecker.check(logger,
-                                     new File(datalet.outputName), 
-                                     new File(datalet.goldName), 
-                                     "Extension test of " + datalet.getDescription())
-               )
-            {
-                // Log a custom element with all the file refs first
-                // Closely related to viewResults.xsl select='fileref"
-                //@todo check that these links are valid when base 
-                //  paths are either relative or absolute!
-                Hashtable attrs = new Hashtable();
-                attrs.put("idref", (new File(datalet.inputName)).getName());
-                attrs.put("inputName", datalet.inputName);
-                attrs.put("xmlName", datalet.xmlName);
-                attrs.put("outputName", datalet.outputName);
-                attrs.put("goldName", datalet.goldName);
-                logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Extension test file references");
-            }
-            
-            return true; // This currently isn't fatal; you can 
-                         //  still run these tests
+            // Have our parent class do it's own validation
+            super.checkDatalet(datalet);
         }
     }
 
