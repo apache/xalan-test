@@ -226,6 +226,7 @@ public class XSLTestHarness
             //  default package - otherwise assume it's FQCN
             //  thus 'trax.TransformerAPITest' becomes
             //  'org.apache.qetest.trax.TransformerAPITest'
+            //@todo use QetestUtils.testClassForName instead!
             if (s.startsWith("org"))
             {   
                 // Assume user specified complete package.ClassName
@@ -281,7 +282,7 @@ public class XSLTestHarness
         // Note that we're hackishly re-using the 'test' metaphor 
         //      on a grand scale here, where each of the harness'
         //      testCases corresponds to one entire Test
-        reporter.testFileInit("XSLTestHarness", "Harness executing " + testList.length + " tests");
+        reporter.testFileInit("Harness", "Harness executing " + testList.length + " tests");
         logHarnessProps();
 
         // Note 'passCount' is poorly named: a test may fail but 
@@ -318,7 +319,12 @@ public class XSLTestHarness
         // Only for information; remember that the runTest status is not the pass/fail of the test!
         reporter.logCriticalMsg("All tests complete, testStatOK:" + passCount + " testStatNOTOK:" + nonPassCount);
 
-        // Close out our reporter and report pass only if all tests passed
+        // Have the reporter write out a summary file for us
+        reporter.writeResultsStatus(true);
+
+        // Close reporter and return true only if all tests passed
+        // Note the passCount/nonPassCount are misnomers, since they
+        //  really only report if a test aborted, not passed
         reporter.testFileClose();
         if ((passCount < 0) && (nonPassCount == 0))
             return true;
@@ -359,6 +365,7 @@ public class XSLTestHarness
         for (bareClassName = st.nextToken(); st.hasMoreTokens(); bareClassName = st.nextToken())
         { /* empty loop body */
         }
+        st = null; // no longer needed
 
         // Validate that the output directory exists for the test to put it's results in
         String testOutDir = hProps.getProperty(FileBasedTest.OPT_OUTPUTDIR);
@@ -408,7 +415,7 @@ public class XSLTestHarness
 
         // Disable the ConsoleReporter for the *individual* tests, it's too confusing
         testProps.put("noDefaultReporter", "true");
-        reporter.logHashtable(reporter.STATUSMSG, testProps, "testProps before test creation");
+        reporter.logHashtable(reporter.INFOMSG, testProps, "testProps before test creation");
 
         // Initialize the test with the properties we created
         test.setProperties(testProps);
@@ -422,9 +429,13 @@ public class XSLTestHarness
 
         // Report where the test stored it's results - future use 
         //  by multiViewResults.xsl or some other rolledup report
-        Hashtable h = new Hashtable(1);
+        // Note we should really handle the filenames here better, 
+        //  especially for relative vs. absolute issues
+        Hashtable h = new Hashtable(2);
+        h.put("result", reporter.resultToString(test.getReporter().getCurrentFileResult()));
         h.put("fileRef", (String)testProps.get(Logger.OPT_LOGFILE));
-        reporter.logElement(reporter.WARNINGMSG, "resultsfile", h, null);
+        reporter.logElement(reporter.WARNINGMSG, "resultsfile", h, test.getTestDescription());
+        h = null; // no longer needed
 
         // Call worker method to actually calculate the result and call check*()        
         logTestResult(bareClassName, test.getReporter().getCurrentFileResult(), 
