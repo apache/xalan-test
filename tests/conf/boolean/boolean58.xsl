@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: bool58 -->
+  <!-- FileName: boolean58 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.2 String Functions  -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: If $x is bound to a node-set, then $x="foo" does not 
        mean the same as not($x!="foo"): the former is true if and only 
        if some node in $x has the string-value foo; the latter is true if 

@@ -1,10 +1,11 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: avterr01 -->
+  <!-- FileName: attribvaltemplateerr01 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.6.2 -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test of nested curly braces. Not allowed. -->
   <!-- ExpectedException: XSL Warning: Found '}' but no attribute template open! -->
 
