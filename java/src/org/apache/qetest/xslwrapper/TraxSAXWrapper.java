@@ -259,6 +259,9 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         // Also set systemId to the stylesheet
         stylesheetHandler.setSystemId(QetestUtils.filenameToURL(xslName));
 
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(stylesheetHandler.getTransformer(), newProcessorOpts);
+
         // Apply any parameters needed
         applyParameters(stylesheetHandler.getTransformer());
 
@@ -437,6 +440,9 @@ public class TraxSAXWrapper extends TransformWrapperHelper
 
         // Create a ContentHandler to handle parsing of the XML
         TransformerHandler stylesheetHandler = saxFactory.newTransformerHandler(builtTemplates);
+
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(stylesheetHandler.getTransformer(), newProcessorOpts);
 
         // Apply any parameters needed
         applyParameters(stylesheetHandler.getTransformer());

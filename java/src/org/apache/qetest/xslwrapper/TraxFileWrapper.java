@@ -198,10 +198,13 @@ public class TraxFileWrapper extends TransformWrapperHelper
         long xslBuild = 0;
         long transform = 0;
         
-        // Timed: read/build xsl from a URL
+        // Timed: read/build xsl from a File
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(new StreamSource(new File(xslName)));
         xslBuild = System.currentTimeMillis() - startTime;
+
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
 
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
@@ -300,6 +303,9 @@ public class TraxFileWrapper extends TransformWrapperHelper
         // UNTimed: get Transformer from Templates
         Transformer transformer = builtTemplates.newTransformer();
 
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -357,6 +363,9 @@ public class TraxFileWrapper extends TransformWrapperHelper
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
         xslBuild = System.currentTimeMillis() - startTime;
+
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
 
         // Untimed: Apply any parameters needed
         applyParameters(transformer);

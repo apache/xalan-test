@@ -248,6 +248,9 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
         StreamResult byteResult = new StreamResult(outBytes);
         
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -400,6 +403,9 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
         StreamResult byteResult = new StreamResult(outBytes);
         
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -440,7 +446,8 @@ public class TraxStreamWrapper extends TransformWrapperHelper
      * @return array of longs denoting timing of only these parts of 
      * our operation: IDX_OVERALL, IDX_XSLREAD (time to find XSL
      * reference from the xml-stylesheet PI), IDX_XSLBUILD, (time 
-     * to then build the Transformer therefrom), IDX_TRANSFORM
+     * to then build the Transformer therefrom), IDX_TRANSFORM, 
+     * IDX_XMLREAD, IDX_RESULTWRITE
      *
      * @throws Exception any underlying exceptions from the 
      * wrappered processor are simply allowed to propagate; throws 
@@ -454,9 +461,79 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         long startTime = 0;
         long xslRead = 0;
         long xslBuild = 0;
+        long xmlRead = 0;
         long transform = 0;
+        long resultWrite = 0;
+        
 
-        throw new RuntimeException("transformEmbedded not implemented yet!");
+        File xmlFile = new File(xmlName);
+        int xmlLength = new Long(xmlFile.length()).intValue(); //@todo warning: possible overflow
+        byte[] xmlBytes = new byte[xmlLength];
+        FileInputStream xmlStream = new FileInputStream(xmlFile);
+        // Timed: read xml into a byte array
+        startTime = System.currentTimeMillis();
+        int xmlRetVal = xmlStream.read(xmlBytes);
+        xmlRead = System.currentTimeMillis() - startTime;
+
+        // Untimed: create StreamSource and setSystemId
+        StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xmlBytes));
+        xmlSource.setSystemId(QetestUtils.filenameToURL(xmlName));
+
+        // Timed: readxsl from the xml document
+        // Should this be timed as something?
+        startTime = System.currentTimeMillis();
+        Source xslSource = factory.getAssociatedStylesheet(xmlSource, null, null, null);
+        xslRead = System.currentTimeMillis() - startTime;
+
+        // Timed: build xsl from a URL
+        startTime = System.currentTimeMillis();
+        Transformer transformer = factory.newTransformer(xslSource);
+        xslBuild = System.currentTimeMillis() - startTime;
+
+        // Re-read the XML file for use in transform; not timed
+        xmlFile = new File(xmlName);
+        xmlLength = new Long(xmlFile.length()).intValue(); //@todo warning: possible overflow
+        xmlBytes = new byte[xmlLength];
+        xmlStream = new FileInputStream(xmlFile);
+        xmlRetVal = xmlStream.read(xmlBytes);
+
+        // Untimed: create StreamSource and setSystemId
+        xmlSource = new StreamSource(new ByteArrayInputStream(xmlBytes));
+        xmlSource.setSystemId(QetestUtils.filenameToURL(xmlName));
+
+        // Untimed: create StreamResult
+        ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
+        StreamResult byteResult = new StreamResult(outBytes);
+        
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
+        // Untimed: Apply any parameters needed
+        applyParameters(transformer);
+
+        // Timed: build xml (so to speak) and transform
+        startTime = System.currentTimeMillis();
+        transformer.transform(xmlSource, byteResult);
+        transform = System.currentTimeMillis() - startTime;
+
+        // Timed: writeResults from the byte array
+        startTime = System.currentTimeMillis();
+        byte[] writeBytes = outBytes.toByteArray(); // Should this be timed too or not?
+        FileOutputStream writeStream = new FileOutputStream(resultName);
+        writeStream.write(writeBytes);
+        writeStream.close();
+        resultWrite = System.currentTimeMillis() - startTime;
+
+        long[] times = getTimeArray();
+        times[IDX_OVERALL] = xslRead + xslBuild + xmlRead 
+                             + transform + resultWrite;
+        times[IDX_XSLREAD] = xslRead;
+        times[IDX_XSLBUILD] = xslBuild;
+        times[IDX_XMLREAD] = xmlRead;
+        times[IDX_TRANSFORM] = transform;
+        times[IDX_RESULTWRITE] = resultWrite;
+        return times;
+
     }
 
 

@@ -206,6 +206,9 @@ public class TraxLocalPathWrapper extends TransformWrapperHelper
                 new StreamSource(xslName));
         xslBuild = System.currentTimeMillis() - startTime;
 
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -305,6 +308,9 @@ public class TraxLocalPathWrapper extends TransformWrapperHelper
         // UNTimed: get Transformer from Templates
         Transformer transformer = builtTemplates.newTransformer();
 
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -362,6 +368,9 @@ public class TraxLocalPathWrapper extends TransformWrapperHelper
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
         xslBuild = System.currentTimeMillis() - startTime;
+
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
 
         // Untimed: Apply any parameters needed
         applyParameters(transformer);

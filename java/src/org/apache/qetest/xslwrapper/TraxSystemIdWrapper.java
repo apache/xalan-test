@@ -164,7 +164,7 @@ public class TraxSystemIdWrapper extends TransformWrapperHelper
             throw new TransformerConfigurationException("TraxSystemIdWrapper.newProcessor: factory does not support Streams!");
         }
         // Set any of our options as Attributes on the factory
-        TraxWrapperUtils.setAttributes(factory, options);
+        TraxWrapperUtils.setAttributes(factory, newProcessorOpts);
         return (Object)factory;
     }
 
@@ -202,6 +202,9 @@ public class TraxSystemIdWrapper extends TransformWrapperHelper
         Transformer transformer = factory.newTransformer(
                 new StreamSource(QetestUtils.filenameToURL(xslName)));
         xslBuild = System.currentTimeMillis() - startTime;
+
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
 
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
@@ -302,6 +305,9 @@ public class TraxSystemIdWrapper extends TransformWrapperHelper
         // UNTimed: get Transformer from Templates
         Transformer transformer = builtTemplates.newTransformer();
 
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -359,6 +365,9 @@ public class TraxSystemIdWrapper extends TransformWrapperHelper
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
         xslBuild = System.currentTimeMillis() - startTime;
+
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
 
         // Untimed: Apply any parameters needed
         applyParameters(transformer);

@@ -246,6 +246,9 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         Document outNode = docBuilder.newDocument();
         DOMResult domResult = new DOMResult(outNode);
         
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -395,6 +398,9 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         Document outNode = docBuilder.newDocument();
         DOMResult domResult = new DOMResult(outNode);
         
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
@@ -485,6 +491,9 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         Document outNode = docBuilder.newDocument();
         DOMResult domResult = new DOMResult(outNode);
         
+        // Untimed: Set any of our options as Attributes on the transformer
+        TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
+
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
