@@ -1,13 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<root xmlns:ped="http://www.tester.com">
-<ped:Out1/>
-<xyz:Out2 attr1="Hello" attr2="Goodbye">
-<HTML>
-<body>
-<text font="Courier">
-		  What's Up
-		</text>
-</body>
-</HTML>
-</xyz:Out2>
-</root>
+<out AtTrib-0.01="Mix-d.Char5">Text-A<Sub-Elem2.0/>teXt.B</out>
