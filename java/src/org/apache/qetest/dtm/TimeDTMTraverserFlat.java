@@ -103,6 +103,7 @@ static final String[] TYPENAME=
 
   public static void main(String argv[])
   {
+    long dtmStart = 0;
   	System.out.println("\nTesting Traversal of FLAT documents.");
     try
     {
@@ -139,8 +140,11 @@ static final String[] TYPENAME=
 	  // For testing with some of David Marston's files I do want to strip whitespace.
 	  dtmWSStripper stripper = new dtmWSStripper();
 
+	  // Time the creation of the dtm
+	  dtmStart = System.currentTimeMillis();
       DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       DTM dtm=manager.getDTM(source, true, stripper, false, true);
+	  System.out.println("DTM initialization took: "+ (System.currentTimeMillis() - dtmStart));
 
 	  // Get various nodes to use as context nodes.
 	  int dtmRoot = dtm.getDocument();					// #document

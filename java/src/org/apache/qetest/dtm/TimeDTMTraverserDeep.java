@@ -103,6 +103,8 @@ static final String[] TYPENAME=
 
   public static void main(String argv[])
   {
+  	long dtmStart = 0;		// Time the creation of dtmManager, and dtm initialization.
+
   	System.out.println("\nTesting Traversal of DEEP documents.");
   	try
     {
@@ -142,8 +144,18 @@ static final String[] TYPENAME=
 	  // For testing with some of David Marston's files I do want to strip whitespace.
 	  dtmWSStripper stripper = new dtmWSStripper();
 
+
+	  // Time the creation of the dtm
+
+
+	  System.out.println("Pre-DTM free memory:" + Runtime.getRuntime().freeMemory());
+	  dtmStart = System.currentTimeMillis();
       DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       DTM dtm=manager.getDTM(source, true, stripper, false, true);
+	  System.out.println("Post-DTM free memory:" + Runtime.getRuntime().freeMemory());
+	  System.out.println("DTM initialization took: "+ (System.currentTimeMillis() - dtmStart));
+	  Runtime.getRuntime().gc();
+	  System.out.println("Post-GC free memory:" + Runtime.getRuntime().freeMemory());
 
 	  // Get various nodes to use as context nodes.
 	  int dtmRoot = dtm.getDocument();					// #document
@@ -186,7 +198,6 @@ static final String[] TYPENAME=
       }
   }
   
-
  static void timeAxis(DTM dtm, int axis, int context, int[] rtdata)
   {	
     long startTime = 0;
