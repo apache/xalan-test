@@ -404,6 +404,7 @@ public abstract class QetestUtils
      * <li>org.apache.qetest.trax.dom</li>
      * <li>org.apache.qetest.trax.sax</li>
      * <li>org.apache.qetest.trax.stream</li>
+     * <li>org.apache.qetest.xslwrapper</li>
      * <li>org.apache.qetest.xalanj1</li>
      * <li>org.apache.qetest</li>
      * <li>org.apache.qetest.qetesttest</li>
@@ -421,6 +422,7 @@ public abstract class QetestUtils
         "org.apache.qetest.trax.dom", 
         "org.apache.qetest.trax.sax", 
         "org.apache.qetest.trax.stream", 
+        "org.apache.qetest.xslwrapper", 
         "org.apache.qetest.xalanj1", 
         "org.apache.qetest",
         "org.apache.qetest.qetesttest" 
