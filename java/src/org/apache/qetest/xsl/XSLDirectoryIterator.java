@@ -1127,14 +1127,11 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
                 processorW.setIndent(indentLevel);
             }
 
-            // Force filerefs to be URI's if needed
-            if (useURI)
-            {
-                xmlURI = QetestUtils.filenameToURL(XMLName);
-                xslURI = QetestUtils.filenameToURL(XSLName);
-                // Note: Currently 28-Jun-00, the output of files is handled differently, so 
-                //  we do NOT want to convert those.  Subject to change, however.
-            }
+            // Force filerefs to be URI's
+            xmlURI = QetestUtils.filenameToURL(XMLName);
+            xslURI = QetestUtils.filenameToURL(XSLName);
+            // Note: Currently 28-Jun-00, the output of files is handled differently, so 
+            //  we do NOT want to convert those.  Subject to change, however.
 
             fileTime = processorW.processToFile(xmlURI, xslURI, OutName);
 
@@ -1213,12 +1210,9 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
                 processorW.setIndent(indentLevel);
             }
 
-            // Force filerefs to be URI's if needed
-            if (useURI)
-            {
-                // Use this static convenience method; returns a URL; convert to String via toExternalForm()
-                XMLName = QetestUtils.filenameToURL(XMLName);
-            }
+            // Force filerefs to be URI's
+            // Use this static convenience method; returns a URL; convert to String via toExternalForm()
+            XMLName = QetestUtils.filenameToURL(XMLName);
             fileTime = processorW.processEmbeddedToFile(XMLName, OutName);
 
             if (fileTime != ProcessorWrapper.ERROR)
@@ -1410,32 +1404,6 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
             return false;
         }
 
-        if (diagnostics != null)
-        {
-            if (diagNameMgr == null)
-            {
-                // Create a new name manager, hardcode the .log extension just because
-                // New: put them in outputDir
-                diagNameMgr = new OutputNameManager(outputDir + File.separator 
-                                                    + diagnostics, ".log");
-            }
-
-            try
-            {
-                processorW.setDiagnosticsOutput(
-                    new PrintWriter(new FileWriter(diagNameMgr.nextName())));
-                reporter.logInfoMsg("createNewProcessor() new diagnostics = "
-                                    + diagNameMgr.currentName());
-            }
-            catch (IOException ioe)
-            {
-                reporter.logWarningMsg(
-                    "createNewProcessor() could not create new diagnostics = "
-                    + diagNameMgr.currentName());
-
-                return false;
-            }
-        }
 
         // Apply an optional indent if asked; this needs to be documented!
         // @todo this name conflicts with Logger.OPT_INDENT: we should 

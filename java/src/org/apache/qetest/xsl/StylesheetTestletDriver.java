@@ -55,11 +55,6 @@
  * <http://www.apache.org/>.
  */
 
-/*
- *
- * StylesheetTestletDriver.java
- *
- */
 package org.apache.qetest.xsl;
 
 // Support for test reporting and harness classes
@@ -78,8 +73,6 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
-
-//-------------------------------------------------------------------------
 
 /**
  * Test driver for XSLT stylesheet Testlets.
@@ -245,8 +238,9 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
         if (null != fileList)
         {
             // Process the specific list of tests the user supplied
-            String desc = "User-supplied fileList"; // provide default value
-            Vector datalets = readFileList(fileList, desc);
+            String desc = "User-supplied fileList: " + fileList; // provide default value
+            // Use static worker class to process the list
+            Vector datalets = StylesheetDataletManager.readFileList(reporter, fileList, desc);
 
             // Actually process the specified files in a testCase
             processFileList(datalets, desc);
@@ -587,117 +581,6 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
 
 
     /**
-     * Read in a file specifying a list of files to test.
-     * <p>File format is pretty simple:</p>
-     * <ul>
-     * <li># first line of comments is copied into desc</li>
-     * <li># beginning a line is a comment</li>
-     * <li># rest of lines are whitespace delimited filenames and options</li>
-     * <li>inputName xmlName outName goldName flavor options...</li>
-     * <li><b>Note:</b> see {@link StylesheetDatalet} for
-     * details on how the file lines are parsed!</li>
-     * </ul>
-     * <p>Most items are optional, but not having them may result 
-     * in validation oddities.  Future work would be to coordinate 
-     * this with various Datalet's implementations of .load() so 
-     * that Datalets can do better defaulting of non-provided 
-     * items; or maybe so that a user can specific a default 'mask' 
-     * of values to use for unspecified items.</p>
-     *
-     * @param fileName String; name of the file
-     * @param desc description; caller's copy changed
-     * @return Vector of StylesheetDatalets, or null if error
-     */
-    public Vector readFileList(String fileName, String desc)
-    {
-        final String COMMENT_CHAR = "#";
-        final String ABSOLUTE = "absolute";
-        final String RELATIVE = "relative";
-
-        // Verify the file is there
-        File f = new File(fileName);
-        if (!f.exists())
-        {
-            reporter.logErrorMsg("readFileList: " + fileName  + " does not exist!");
-            return null;
-        }
-
-        Vector vec = new Vector();
-        BufferedReader br = null;
-        String line = null;
-        try
-        {
-            br = new BufferedReader(new FileReader(f));
-            line = br.readLine(); // read just first line
-        }
-        catch (IOException ioe)
-        {
-            reporter.logErrorMsg("readFileList: " + fileName + " threw: "
-                                 + ioe.toString());
-            return null;
-        }
-
-        // Verify the first line
-        if (line == null)
-        {
-            reporter.logErrorMsg("readFileList: " + fileName
-                                 + " appears to be blank!");
-            return null;
-        }
-
-        // Check if the first line is a comment 
-        if (line.startsWith(COMMENT_CHAR))
-        {
-            // Save it as the description
-            desc = line;
-        }
-
-        // Load each line into a StylesheetDatalet
-        for (;;)
-        {
-            // Skip any lines beginning with # comment char or that are blank
-            if ((!line.startsWith(COMMENT_CHAR)) && (line.length() > 0))
-            {
-                // Create a Datalet and initialize with the line's contents
-                StylesheetDatalet d = new StylesheetDatalet(line);
-
-                //@todo Avoid spurious passes when output & gold not specified
-                //  needs to detect when StylesheetDatalet doesn't 
-                //  properly have outputName and goldName set
-
-                // Add it to our vector
-                vec.addElement(d);
-            }
-
-            // Read next line and loop
-            try
-            {
-                line = br.readLine();
-            }
-            catch (IOException ioe2)
-            {
-                // Just force us out of the loop; if we've already 
-                //  read part of the file, fine
-                reporter.logWarningMsg("readFileList: " + fileName
-                                       + " threw: " + ioe2.toString());
-                break;
-            }
-
-            if (line == null)
-                break;
-        } // end of for (;;)
-
-        if (vec.size() == 0)
-        {
-            reporter.logErrorMsg("readFileList: " + fileName
-                                 + " did not have any non-comment lines!");
-            return null;
-        }
-        return vec;
-    }
-
-
-    /**
      * Validate existence of or create various directories needed.
      * <p>If any optionalDir cannot be created, it's array entry 
      * will be null.</p>
@@ -773,22 +656,6 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
     }
 
 
-    /**
-     * List of common packages that Xalan testing classes are in.
-     * Note that Xalan-J 2.x packages are listed before Xalan-J 1.x 
-     * packages, and there is an inherent danger in the ordering 
-     * when two classes have the same name.
-     * This is used in QetestUtils.testClassForName()
-     */
-    protected String[] testPackages = 
-    {
-        "org.apache.qetest.xsl",
-        "org.apache.qetest.trax",
-        "org.apache.qetest.xalanj2",
-        "org.apache.qetest.xalanj1",
-        "org.apache.qetest"
-    };
-
     /** Default FilenameFilter FQCN for directories.   */
     protected String defaultDirFilter = "org.apache.qetest.xsl.ConformanceDirRules";
 
@@ -814,7 +681,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
         if (null == cachedTestletClazz)
         {
             cachedTestletClazz = QetestUtils.testClassForName(testlet, 
-                                                              testPackages,
+                                                              QetestUtils.defaultPackages,
                                                               defaultTestlet);
         }
         try
@@ -841,9 +708,9 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      */
     public FilenameFilter getDirFilter()
     {
-        // Find a Testlet class to use
+        // Find a FilenameFilter class to use
         Class clazz = QetestUtils.testClassForName(dirFilter, 
-                                                   testPackages,
+                                                   QetestUtils.defaultPackages,
                                                    defaultDirFilter);
         try
         {
@@ -877,13 +744,13 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      */
     public FilenameFilter getFileFilter()
     {
-        // Find a Testlet class to use
+        // Find a FilenameFilter class to use
         Class clazz = QetestUtils.testClassForName(fileFilter, 
-                                                   testPackages,
+                                                   QetestUtils.defaultPackages,
                                                    defaultFileFilter);
         try
         {
-            // Create it, optionally with a category
+            // Create it, optionally with excludes
             if ((null != excludes) && (excludes.length() > 1))  // Arbitrary check for non-null, non-blank string
             {
                 Class[] parameterTypes = { java.lang.String.class };

@@ -89,9 +89,6 @@ import org.apache.xalan.xslt.EnvironmentCheck;
  * <li>embedded - special case: tests with no .xsl file (embedded stylesheets)</li>
  * <li>liaison</li>
  * <li>flavor</li>
- * <li>diagnostics</li>
- * <li>noReuse</li>
- * <li>precompile</li>
  * <li>runErr</li>
  * </ul>
  * @author Shane_Curcuru@lotus.com
@@ -122,12 +119,6 @@ public class XSLProcessorTestBase extends FileBasedTest
                 + "   (liaisonClassName)\n" 
                 + "    -" + OPT_FLAVOR
                 + "    (xalan|lotusxsl|xt|etc...)  which kind of Processor to test\n"
-                + "    -" + OPT_DIAGNOSTICS
-                + "  (root filename for diagnostics output)\n" 
-                + "    -" + OPT_NOREUSE
-                + "    will force recreate processor each time\n" 
-                + "    -" + OPT_PRECOMPILE
-                + "  will use precompiled stylesheet, if applicable\n"
                 + "    -" + OPT_NOERRTEST
                 + "   will skip running 'err' tests, if applicable\n"
                 + super.usage());
@@ -148,22 +139,9 @@ public class XSLProcessorTestBase extends FileBasedTest
     protected String category = null;
 
     /**
-     * Parameter: Reuse/reset processor between cases or create a new one each time?
-     * <p>Default: false - create one processor and call reset between tests.</p>
-     * <p>Should be deprecated, I think. -sc 21-Mar-01</p>
-     */
-    // TODO: Move to directoryiterator
-    public static final String OPT_NOREUSE = "noReuse";
-
-    /** Parameter: Reuse/reset processor between cases or create a new one each time?  */
-    protected boolean noReuse = true;
-
-    /**
      * Parameter: What parser liaison or option to use?
      * <p>Default: null, Whichever default your processor uses.</p>
      */
-
-    // TODO: Move to directoryiterator
     public static final String OPT_LIAISON = "liaison";
 
     /** Parameter: What parser liaison or option to use?.   */
@@ -179,27 +157,6 @@ public class XSLProcessorTestBase extends FileBasedTest
     protected String flavor = "trax";
 
     /**
-     * Parameter: Name of output file for diagnostics/error logs?
-     * <p>Default: null, do not use one</p>
-     * <p>Should be deprecated, I think. -sc 21-Mar-01</p>
-     */
-
-    // TODO: Move to directoryiterator
-    public static final String OPT_DIAGNOSTICS = "diagnostics";
-
-    /** Parameter: Name of output file for diagnostics/error logs?  */
-    protected String diagnostics = null;
-
-    /**
-     * Parameter: Should we try to use a precompiled stylesheet?
-     * <p>Default: false, no (not applicable in all cases).</p>
-     */
-    public static final String OPT_PRECOMPILE = "precompile";
-
-    /** Parameter: Should we try to use a precompiled stylesheet?  */
-    protected boolean precompile = false;
-
-    /**
      * Parameter: Should we run any 'err' subdir tests or not?
      * <p>Default: false (i.e. <b>do</B> run error tests by default).</p>
      * <p>Should be deprecated, I think: don't try to run both 
@@ -210,16 +167,6 @@ public class XSLProcessorTestBase extends FileBasedTest
 
     /** Parameter: Should we run any 'err' subdir tests or not?  */
     protected boolean noErrTest = false;
-
-    /**
-     * Parameter: force use of URI's or leave filenames alone?
-     * <p>Default: true, use URI's</p>
-     * @todo update, this is clumsy
-     */
-    public static final String OPT_USEURI = "useURI";
-
-    /** Parameter: force use of URI's or leave filenames alone?  */
-    protected boolean useURI = true;
 
     /**
      * Parameter: Which CheckService should we use for XML output Files?
@@ -449,15 +396,6 @@ public class XSLProcessorTestBase extends FileBasedTest
         fileCheckerName = props.getProperty(OPT_FILECHECKER, fileCheckerName);
         excludes = props.getProperty(OPT_EXCLUDES, excludes);
         embedded = props.getProperty(OPT_EMBEDDED, embedded);
-        diagnostics = props.getProperty(OPT_DIAGNOSTICS, diagnostics);
-
-        String prec = props.getProperty(OPT_PRECOMPILE);
-        if ((prec != null) && prec.equalsIgnoreCase("true"))
-        {
-            precompile = true;
-            // Default the value in properties block too
-            testProps.put(OPT_PRECOMPILE, "true");
-        }
 
         String noet = props.getProperty(OPT_NOERRTEST);
 
@@ -466,15 +404,6 @@ public class XSLProcessorTestBase extends FileBasedTest
             noErrTest = true;
             // Default the value in properties block too
             testProps.put(OPT_NOERRTEST, "true");
-        }
-
-        String uURI = props.getProperty(OPT_USEURI);
-
-        if ((uURI != null) && uURI.equalsIgnoreCase("false"))
-        {
-            useURI = false;
-            // Default the value in properties block too
-            testProps.put(OPT_USEURI, "false");
         }
 
         return b;
@@ -598,23 +527,6 @@ public class XSLProcessorTestBase extends FileBasedTest
                 continue;
             }
 
-            if (args[i].equalsIgnoreCase(optPrefix + OPT_DIAGNOSTICS))
-            {
-                if (++i >= nArgs)
-                {
-                    System.out.println("ERROR: must supply arg for: "
-                                       + optPrefix + OPT_DIAGNOSTICS);
-
-                    return false;
-                }
-
-                diagnostics = args[i];
-
-                testProps.put(OPT_DIAGNOSTICS, diagnostics);
-
-                continue;
-            }
-
             if (args[i].equalsIgnoreCase(optPrefix + OPT_FILECHECKER))
             {
                 if (++i >= nArgs)
@@ -666,38 +578,11 @@ public class XSLProcessorTestBase extends FileBasedTest
                 continue;
             }
 
-            if (args[i].equalsIgnoreCase(optPrefix + OPT_NOREUSE))
-            {
-                noReuse = false;
-
-                testProps.put(OPT_NOREUSE, "false");
-
-                continue;
-            }
-
-            if (args[i].equalsIgnoreCase(optPrefix + OPT_PRECOMPILE))
-            {
-                precompile = true;
-
-                testProps.put(OPT_PRECOMPILE, "true");
-
-                continue;
-            }
-
             if (args[i].equalsIgnoreCase(optPrefix + OPT_NOERRTEST))
             {
                 noErrTest = true;
 
                 testProps.put(OPT_NOERRTEST, "true");
-
-                continue;
-            }
-
-            if (args[i].equalsIgnoreCase(optPrefix + OPT_USEURI))
-            {
-                useURI = false;  // Toggle from default of true; ugly but I'm in a hurry
-
-                testProps.put(OPT_USEURI, "false");
 
                 continue;
             }
