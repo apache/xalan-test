@@ -43,7 +43,7 @@ dependencies - users must manually 'build jar' first.
    -->
     <property environment="ENV" />
 
-    <property name="year" value="2000-2003"/>
+    <property name="year" value="2000-2004"/>
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
