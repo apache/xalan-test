@@ -742,7 +742,7 @@
         <!-- @deprecated ProcessorWrapper.java to be removed! -->
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}xslwrapper/ProcessorWrapper.java,${test.root}xslwrapper/TransformWrapperHelper.java,${test.root}xslwrapper/TransformWrapper.java,${test.root}xslwrapper/TransformWrapperFactory.java"
+               includes="${test.root}xslwrapper/TransformWrapperHelper.java,${test.root}xslwrapper/TransformWrapper.java,${test.root}xslwrapper/TransformWrapperFactory.java"
                debug="${debug}" />
         <!-- This javac depends on JAXP, SAX, DOM; hence the specific classpathref -->
         <javac srcdir="${test.src.dir}" 
