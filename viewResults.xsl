@@ -106,7 +106,8 @@
     <TR><TD width="20%"></TD><TD width="80%"></TD></TR>
     <!-- It is illegal for a testcase to contain another testcase, so don't bother 
          selecting them: however you must check for every other kind of item -->
-    <xsl:apply-templates select="message | arbitrary | checkresult | hashtable"/>
+    <!-- fileref comes from XSLDirectoryIterator when a test has a non-pass checkresult -->
+    <xsl:apply-templates select="message | arbitrary | checkresult | hashtable | fileref"/>
     <TR><TD></TD><TD><xsl:text>Case time (milliseconds): </xsl:text>
     <xsl:value-of select="(statistic[starts-with(@desc,$CASE_STOP)]/longval) - (statistic[starts-with(@desc,$CASE_START)]/longval)"/></TD></TR>
     <!-- Print out the overall caseresult at the end -->
@@ -115,17 +116,30 @@
 </xsl:template>
 
 <!-- Note: must match values in XMLFileReporter for attributes and values! -->
-<!-- Different processing for different kinds of results -->
+<!-- Different processing for different kinds of checkresults, 
+     normally only used within testcase elements -->
 <xsl:template match="checkresult[@result=$FAIL] | checkresult[@result=$ERRR]">
-  <TR><TD bgcolor="{$errfailcolor}"><B><xsl:value-of select="@result"/></B></TD><TD><xsl:value-of select="@desc"/></TD></TR>
+  <TR>
+    <TD bgcolor="{$errfailcolor}"><B><xsl:value-of select="@result"/></B></TD>
+    <TD>
+      <xsl:if test="@id">
+        <xsl:text>[</xsl:text><xsl:value-of select="@id"/><xsl:text>] </xsl:text>
+      </xsl:if>
+      <xsl:value-of select="@desc"/>
+    </TD>
+  </TR>
 </xsl:template>
 
-<xsl:template match="checkresult[@result=$AMBG]">
-  <TR><TD><I><xsl:value-of select="@result"/></I></TD><TD><xsl:value-of select="@desc"/></TD></TR>
-</xsl:template>
-
-<xsl:template match="checkresult[@result=$INCP]">
-  <TR><TD><I><xsl:value-of select="@result"/></I></TD><TD><xsl:value-of select="@desc"/></TD></TR>
+<xsl:template match="checkresult[@result=$AMBG] | checkresult[@result=$INCP]">
+  <TR>
+    <TD><I><xsl:value-of select="@result"/></I></TD>
+    <TD>
+      <xsl:if test="@id">
+        <xsl:text>[</xsl:text><xsl:value-of select="@id"/><xsl:text>] </xsl:text>
+      </xsl:if>
+      <xsl:value-of select="@desc"/>
+    </TD>
+  </TR>
 </xsl:template>
 
 <!-- If users want a 'condensed' report, set failsonly=true, and then we skip all pass records -->
@@ -133,6 +147,36 @@
   <xsl:if test="$failsonly='false'">
     <TR><TD><xsl:value-of select="@result"/></TD><TD><xsl:value-of select="@desc"/></TD></TR>
   </xsl:if>
+</xsl:template>
+
+<!-- 
+  Cheap-o way to output local filesystem links to the actual test files.
+  We should actually tie the fileref together with the checkresult that 
+  goes with it via fileref/@idref = checkresult/@id somehow, but 
+  this would be closely related to XSLDirectoryIterator.
+-->
+<xsl:template match="fileref">
+  <TR>
+    <TD><xsl:text>[</xsl:text><xsl:value-of select="@idref"/><xsl:text>] </xsl:text></TD>
+    <TD>
+      <xsl:element name="a">
+        <xsl:attribute name="href"><xsl:value-of select="@inputName"/></xsl:attribute>
+        <xsl:text>xsl</xsl:text>
+      </xsl:element><xsl:text>, </xsl:text>
+      <xsl:element name="a">
+        <xsl:attribute name="href"><xsl:value-of select="@xmlName"/></xsl:attribute>
+        <xsl:text>xml</xsl:text>
+      </xsl:element><xsl:text>, </xsl:text>
+      <xsl:element name="a">
+        <xsl:attribute name="href"><xsl:value-of select="@outputName"/></xsl:attribute>
+        <xsl:text>output</xsl:text>
+      </xsl:element><xsl:text>, </xsl:text>
+      <xsl:element name="a">
+        <xsl:attribute name="href"><xsl:value-of select="@goldName"/></xsl:attribute>
+        <xsl:text>gold</xsl:text>
+      </xsl:element>
+    </TD>
+  </TR>
 </xsl:template>
 
 <!-- Differentiate results that are not within a testcase! 
