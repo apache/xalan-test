@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:redirect="org.apache.xalan.xslt.extensions.Redirect"
-                xmlns:xalan="http://xml.apache.org/xslt"
+                xmlns:xalan="http://xml.apache.org/xalan"
                 extension-element-prefixes="redirect" version="1.0">
 	<xsl:output method="xml" indent="yes" xalan:indent-amount="2"
 			doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
@@ -17,14 +17,13 @@
 
 <!-- Quick how to use:
 
-	Note: If using Xalan to run this stylesheet, it requires Xalan >= 2.4.1.
-
   This stylesheet operates on the results of a build alltest.conf.
   1. In place of viewResults.xsl to analyze results:
-     In Windows, set RESULTSCANNER=tableResults.xsl
+     In Windows or UNIX, set the RESULTSCANNER environment 
+     variable to tableResults.xsl
      Execute viewResults.bat results-alltest\conf\sax\results.xml.
 		 (the stylesheet will find the other xml files).
-     In UNIX, modify viewResults.sh to call use tableResults.xsl.
+     In UNIX, execute viewResults.sh as above.
   2. To compare a current run against a previous run:
      Run the stylesheet with the parameter 'compareAgainst' which
      points to the results-alltest/conf directory of another test run.
@@ -70,23 +69,23 @@
 	<xsl:template match="testfile">
 		<!-- Set up two variables for test results, and old test results. -->
 		<xsl:variable name="resultsfile">
-			<xsl:value-of select="document(concat($resultDir,'/dom/results.xml'))/resultsfile 
-			  | document(concat($resultDir,'/sax/results.xml'))/resultsfile 
-			  | document(concat($resultDir,'/stream/results.xml'))/resultsfile 
-			  | document(concat($resultDir,'/file/results.xml'))/resultsfile 
-			  | document(concat($resultDir,'/systemId/results.xml'))/resultsfile 
-			  | document(concat($resultDir,'/localPath/results.xml'))/resultsfile"/>
+			<xsl:copy-of select="document(concat($resultDir,'/dom/results.xml'))/resultsfile/testfile 
+			  | document(concat($resultDir,'/sax/results.xml'))/resultsfile/testfile 
+			  | document(concat($resultDir,'/stream/results.xml'))/resultsfile/testfile 
+			  | document(concat($resultDir,'/file/results.xml'))/resultsfile/testfile 
+			  | document(concat($resultDir,'/systemId/results.xml'))/resultsfile/testfile 
+			  | document(concat($resultDir,'/localPath/results.xml'))/resultsfile/testfile"/>
 		</xsl:variable>
 		<xsl:variable name="oldfile">
-			<xsl:value-of select="document(concat($compareAgainst,'/dom/results.xml'))/resultsfile 
-					| document(concat($compareAgainst,'/sax/results.xml'))/resultsfile 
-					| document(concat($compareAgainst,'/stream/results.xml'))/resultsfile 
-					| document(concat($compareAgainst,'/file/results.xml'))/resultsfile 
-					| document(concat($compareAgainst,'/systemId/results.xml'))/resultsfile 
-					| document(concat($compareAgainst,'/localPath/results.xml'))/resultsfile"/>
+			<xsl:copy-of select="document(concat($compareAgainst,'/dom/results.xml'))/resultsfile/testfile 
+					| document(concat($compareAgainst,'/sax/results.xml'))/resultsfile/testfile 
+					| document(concat($compareAgainst,'/stream/results.xml'))/resultsfile/testfile 
+					| document(concat($compareAgainst,'/file/results.xml'))/resultsfile/testfile 
+					| document(concat($compareAgainst,'/systemId/results.xml'))/resultsfile/testfile 
+					| document(concat($compareAgainst,'/localPath/results.xml'))/resultsfile/testfile"/>
 		</xsl:variable>
 		<!-- Number of flavours; used for column widths -->
-		<xsl:variable name="flavs" select="count($resultsfile/testfile)"/>
+		<xsl:variable name="flavs" select="count(xalan:nodeset($resultsfile)/testfile)"/>
 		<TABLE BORDER="1" CELLPADDING="5" CELLSPACING="0">
 			<TR>
 				<xsl:element name="TD">
@@ -108,11 +107,12 @@
 					<b>Currently Tested:</b><br/>
 					<xsl:apply-templates select="." mode="hashElements"/><br/>
 					<b>Compared Against:</b><br/>
-					<xsl:apply-templates select="$oldfile/testfile[hashtable/hashitem[@key='flavor'] = $flavor]" mode="hashElements"/>
+					<xsl:apply-templates select="xalan:nodeset($oldfile)/testfile[hashtable/hashitem[@key='flavor'] = $flavor]" mode="hashElements"/>
 				</xsl:element>
 			</TR>
 			<xsl:call-template name="teststatus">
 				<xsl:with-param name="resultsfile" select="$resultsfile"/>
+				<xsl:with-param name="flavs" select="$flavs"/>
 			</xsl:call-template>
 			<TR>
 				<xsl:element name="TD">
@@ -166,18 +166,18 @@
 		<xsl:variable name="excludesListAll">
 			<xsl:call-template name="buildList">
 				<xsl:with-param name="category" select="$category"/>
-				<xsl:with-param name="list" select="$resultsfile//hashtable/hashitem[@key='excludes']"/>
+				<xsl:with-param name="list" select="xalan:nodeset($resultsfile)//hashtable/hashitem[@key='excludes']"/>
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:variable name="oldFailListAll">
-			<xsl:for-each select="$oldfile/testfile/testcase[contains(@desc,$category)]/checkresult[not(@result='Pass') and contains(@desc,$category)]">#</xsl:for-each>
+			<xsl:for-each select="xalan:nodeset($oldfile)/testfile/testcase[contains(@desc,$category)]/checkresult[not(@result='Pass') and contains(@desc,$category)]">#</xsl:for-each>
 		</xsl:variable>
 		<xsl:element name="TR">
 			<xsl:attribute name="BGCOLOR"><xsl:value-of select="$bg"/></xsl:attribute>
 			<xsl:element name="TD">
 				<xsl:attribute name="ROWSPAN">
 					<xsl:choose>
-						<xsl:when test="count($resultsfile/testfile/testcase[$category = substring-after(@desc,': ')]/checkresult[not(@result='Pass')]) > 0 or not($excludesListAll = '') or not($oldFailListAll = '')">
+						<xsl:when test="count(xalan:nodeset($resultsfile)/testfile/testcase[$category = substring-after(@desc,': ')]/checkresult[not(@result='Pass')]) > 0 or not($excludesListAll = '') or not($oldFailListAll = '')">
 							4
 						</xsl:when>
 						<xsl:otherwise>
@@ -191,7 +191,7 @@
 		<xsl:element name="TR">
 			<xsl:attribute name="BGCOLOR"><xsl:value-of select="$bg"/></xsl:attribute>
 			<TD VALIGN="TOP">#cases</TD>
-			<xsl:for-each select="$resultsfile/testfile/testcase[$category = substring-after(@desc,': ')]">
+			<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/testcase[$category = substring-after(@desc,': ')]">
 				<TD VALIGN="TOP">
 					<xsl:value-of select="count(checkresult)"/>
 				</TD>
@@ -200,7 +200,7 @@
 		<xsl:element name="TR">
 			<xsl:attribute name="BGCOLOR"><xsl:value-of select="$bg"/></xsl:attribute>
 			<TD VALIGN="TOP">pass</TD>
-			<xsl:for-each select="$resultsfile/testfile/testcase[$category = substring-after(@desc,': ')]">
+			<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/testcase[$category = substring-after(@desc,': ')]">
 				<TD VALIGN="TOP">
 					<xsl:variable name="passList">
 						<xsl:for-each select="checkresult[@result='Pass']">
@@ -219,11 +219,11 @@
 				</TD>
 			</xsl:for-each>
 		</xsl:element>
-		<xsl:if test="count($resultsfile/testfile/testcase[$category = substring-after(@desc,': ')]/checkresult[not(@result='Pass')]) > 0 or not($excludesListAll = '') or count($oldfile/testfile/testcase[contains(@desc,$category)]/checkresult[not(@result='Pass')]) > 0">
+		<xsl:if test="count(xalan:nodeset($resultsfile)/testfile/testcase[$category = substring-after(@desc,': ')]/checkresult[not(@result='Pass')]) > 0 or not($excludesListAll = '') or count(xalan:nodeset($oldfile)/testfile/testcase[contains(@desc,$category)]/checkresult[not(@result='Pass')]) > 0">
 			<xsl:element name="TR">
 				<xsl:attribute name="BGCOLOR"><xsl:value-of select="$bg"/></xsl:attribute>
 				<TD VALIGN="TOP">fail/err</TD>
-				<xsl:for-each select="$resultsfile/testfile/testcase[$category = substring-after(@desc,': ')]">
+				<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/testcase[$category = substring-after(@desc,': ')]">
 					<xsl:variable name="flavor">
 						<xsl:value-of select="../hashtable/hashitem[@key='flavor']"/>
 					</xsl:variable>
@@ -234,7 +234,7 @@
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:variable name="oldFailList">
-						<xsl:for-each select="$oldfile/testfile[hashtable/hashitem[@key='flavor'] = $flavor]/testcase[contains(@desc,$category)]/checkresult[not(@result='Pass') and contains(@desc,$category)]">
+						<xsl:for-each select="xalan:nodeset($oldfile)/testfile[hashtable/hashitem[@key='flavor'] = $flavor]/testcase[contains(@desc,$category)]/checkresult[not(@result='Pass') and contains(@desc,$category)]">
 							<xsl:sort select="substring-before(substring-after(@desc,$category),'.')" data-type="number"/>
 							<xsl:variable name="cur" select="substring-before(substring-after(@desc,$category),'.')"/>
 							<xsl:value-of select="$cur"/>
@@ -403,63 +403,63 @@
 	<!-- output Overall summaries -->
 	<xsl:template name="flavour">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/hashtable/hashitem[@key='flavor']">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/hashtable/hashitem[@key='flavor']">
 			<TD><B><xsl:value-of select="."/></B></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="totalCases">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Pass-cases + @Fail-cases + @Errr-cases"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="passCases">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Pass-cases"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="failCases">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Fail-cases"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="errrCases">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Errr-cases"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="totalChecks">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Pass-checks + @Fail-checks + @Errr-checks"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="passChecks">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Pass-checks"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="failChecks">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Fail-checks"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="errrChecks">
 		<xsl:param name="resultsfile"/>
-		<xsl:for-each select="$resultsfile/testfile/teststatus">
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
 			<TD><xsl:value-of select="@Errr-checks"/></TD>
 		</xsl:for-each>
 	</xsl:template>
@@ -467,13 +467,13 @@
 	<!-- Output Overall summary formatting -->
 	<xsl:template name="teststatus">
 		<xsl:param name="resultsfile"/>
-		<xsl:variable name="flavs" select="count($resultsfile/testfile) + 1"/>
+		<xsl:param name="flavs"/>
 		<TR>
 			<TD ROWSPAN="11"><B>Overall</B></TD>
 			<TD>Flavour:</TD><xsl:call-template name="flavour"><xsl:with-param name="resultsfile" select="$resultsfile"/></xsl:call-template>
 		</TR>
 		<TR>
-			<TD COLSPAN="{$flavs+1}">
+			<TD COLSPAN="{$flavs + 1}">
 				Categories
 			</TD>
 		</TR>
