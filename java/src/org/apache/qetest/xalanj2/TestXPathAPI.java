@@ -140,7 +140,7 @@ public class TestXPathAPI extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public TestXPathAPI()
     {
-        numTestCases = 4;  // REPLACE_num
+        numTestCases = 5;  // REPLACE_num
         testName = "XPathAPITest";
         testComment = "API coverage testing of XPathAPI";
     }
@@ -463,6 +463,65 @@ public class TestXPathAPI extends XSLProcessorTestBase
     }
    
     return true;
+  }
+  
+   /** Process input args and execute the XPath.  */
+  public boolean testCase5()
+    throws Exception
+  {        
+    filename = testFileInfo1.xmlName;
+
+    if ((filename != null) && (filename.length() > 0)
+        && (xpath != null) && (xpath.length > 0))
+    {
+      reporter.testCaseInit("Quick smoketest of XPathAPI");
+      // Tell that we're loading classes and parsing, so the time it 
+      // takes to do this doesn't get confused with the time to do 
+      // the actual query and serialization.
+      reporter.logInfoMsg("Loading classes, parsing "+filename);
+      
+      // Set up a DOM tree to query.
+      InputSource in = new InputSource(new FileInputStream(filename));
+      DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+      Document doc = dfactory.newDocumentBuilder().parse(in);
+      
+      // Set up an identity transformer to use as serializer.
+      Transformer serializer = TransformerFactory.newInstance().newTransformer();
+      serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+
+      
+      // Use the simple XPath API to select a nodeIterator.
+      reporter.logWarningMsg("Querying DOM using 'a' and a non document node");
+      NodeList nl = XPathAPI.selectNodeList(doc.getFirstChild(), "a");
+      
+      // Serialize the found nodes to System.out.
+      
+      Node n;
+      int j = 0;
+      while (j < nl.getLength())
+      {        
+        n = nl.item(j++);
+        serializer.transform(new DOMSource(n), new StreamResult(outNames.nextName()));
+        File f = new File(outNames.currentName()); 
+        int result = fileChecker.check(reporter, 
+                                       f, 
+                                       new File(testFileInfo2.goldName + f.getName()), 
+                                       "(1)transform into " + outNames.currentName());
+        if (result == Logger.FAIL_RESULT)
+          reporter.logInfoMsg("(1)TestXPathAPI failure reason:" + fileChecker.getExtendedInfo());
+
+        reporter.logTraceMsg(outNames.currentName());
+      }
+      
+      reporter.testCaseClose();
+    }
+    else
+    {
+      reporter.logWarningMsg("Bad input args: " + filename + ", " + xpath);
+    }
+    
+    return true;
+    
   }
   
    //-----------------------------------------------------------
