@@ -57,6 +57,8 @@
 package org.apache.qetest.xslwrapper;
 
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.ErrorListener;
 
 import java.lang.reflect.Field;
 import java.util.Enumeration;
@@ -120,9 +122,13 @@ public abstract class TraxWrapperUtils
 
 
     /**
-     * Apply specific Attributes to a TransformerFactory.  
+     * Apply specific Attributes to a TransformerFactory OR call 
+     * specific setFoo() API's on a TransformerFactory.  
      *
      * Filters on hashkeys.startsWith("Processor.setAttribute.")
+     * Most Attributes are simply passed to factory.setAttribute(), 
+     * however certain special cases are handled:
+     * setURIResolver, setErrorListener.
      * Exceptions thrown by underlying factory are ignored.
      *
      * @param factory TransformerFactory to call setAttributes on.
@@ -155,20 +161,58 @@ public abstract class TraxWrapperUtils
             {
                 // Strip off our marker for the property name
                 String processorKey = key.substring(TransformWrapper.SET_PROCESSOR_ATTRIBUTES.length());
-                Object value = null;
-                try
-                {
-                    value = ((Properties)attrs).getProperty(key);
-                }
-                catch (ClassCastException cce)
-                {
-                    // Simply get as Hashtable instead
-                    value = attrs.get(key);
-                }
-                // Note: allow exceptions to propagate here
-                factory.setAttribute(processorKey, value);
+                Object value = attrs.get(key);
+                setAttribute(factory, processorKey, value);
             }
         }
 
+    }
+
+
+    /** Token specifying a call to setURIResolver.  */
+    public static String SET_URI_RESOLVER = "setURIResolver";
+
+    /** Token specifying a call to setErrorListener.  */
+    public static String SET_ERROR_LISTENER = "setErrorListener";
+
+    /**
+     * Apply specific Attributes to a TransformerFactory OR call 
+     * specific setFoo() API's on a TransformerFactory.  
+     *
+     * Filters on hashkeys.startsWith("Processor.setAttribute.")
+     * Most Attributes are simply passed to factory.setAttribute(), 
+     * however certain special cases are handled:
+     * setURIResolver, setErrorListener.
+     * Exceptions thrown by underlying factory are ignored.
+     *
+     * @param factory TransformerFactory to call setAttributes on.
+     * @param key specific attribute or special case attr.
+     * @param value to set for key.
+     */
+    private static void setAttribute(TransformerFactory factory, 
+                                     String key, 
+                                     Object value)
+                                     throws IllegalArgumentException
+    {
+        if ((null == factory) || (null == key))
+            return;
+
+        // Note: allow exceptions to propagate here
+
+        // Check if this is a special case to call a specific 
+        //  API, or the general case to call setAttribute(key...)
+        if (SET_URI_RESOLVER.equals(key))
+        {
+            factory.setURIResolver((URIResolver)value);
+        }
+        else if (SET_ERROR_LISTENER.equals(key))
+        {
+            factory.setErrorListener((ErrorListener)value);
+        }
+        else
+        {
+            // General case; just call setAttribute
+            factory.setAttribute(key, value);
+        }
     }
 }
