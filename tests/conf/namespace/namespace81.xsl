@@ -7,9 +7,6 @@
   <!-- Section: 7.1.2 Creating Elements -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Mix xmlns declaration and namespace attrib (to same) in xsl:element; name has prefix. -->
-  <!-- NOTE: Processor developers could legitimately disagree about where the default name
-     has to be set in the result. It must be in effect for yyy, but could be for foo
-     as well. The spec doesn't address this point. -->
 
 <xsl:template match = "/">
   <out>

@@ -7,10 +7,6 @@
   <!-- Section: 7.1.2 Creating Elements -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Set default namespace in outer, then specify namespace for inner; add prefixed decl. -->
-  <!-- NOTE: Processor developers could legitimately disagree about where the "p2" name
-     has to be in scope on the result, if anywhere. Since there are no LREs inside foo,
-     there is no requirement to pick up and emit the p2 declaration.
-     The spec doesn't address this point. -->
 
 <xsl:template match = "/">
   <out xmlns="abc">

@@ -8,9 +8,6 @@
   <!-- Section: 7.1.2 Creating Elements -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Reset default locally, but namespace attribute matches stylesheet default. -->
-  <!-- NOTE: Processor developers could legitimately disagree about where the default name
-     has to be set the 2nd time in the result. It must be correct for yyy, but could be reset for foo
-     as well. The spec doesn't address this point. -->
 
 <xsl:template match = "/">
   <out>
