@@ -941,6 +941,7 @@ class TMTThreadsRunner implements Runnable
 
         // Parse in the xml data into a DOM
         DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+        dfactory.setNamespaceAware(true);
         DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
         Node xmlDoc = docBuilder.parse(new InputSource(xmlName));
         Source xmlSource = new DOMSource(xmlDoc);
