@@ -36,6 +36,7 @@ dependencies - users must manually 'build jar' first.
     <!-- Then, read in the default checked-in properties -->
     <property file="test.properties" />
 
+    <property name="smoketest.conf.excludes" value="${smoketest.conf.normal.excludes};${smoketest.conf.supplemental.excludes}"/>
     <!-- Also provide environment properties with a special prefix which 
          allows us to detect if JARDIR is set.
    -->
