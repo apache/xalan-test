@@ -40,10 +40,15 @@ if [ "$ROUT" = "" ] ; then
     ROUT=results.html
 fi
 
-echo Transforming Results: $RIN into $ROUT
-echo "$JAVA_HOME"/bin/java $JAVA_OPTS -classpath "$TEST_CP" org.apache.xalan.xslt.Process -in "$RIN" -xsl viewResults.xsl -out "$ROUT" $@
+XSLFILE=$RESULTSCANNER
+if [ "$XSLFILE" = "" ] ; then
+    XSLFILE=viewResults.xsl
+fi
 
-"$JAVA_HOME"/bin/java $JAVA_OPTS -classpath "$TEST_CP" org.apache.xalan.xslt.Process -in "$RIN" -xsl viewResults.xsl -out "$ROUT" $@
+echo Transforming Results: $RIN into $ROUT
+echo "$JAVA_HOME"/bin/java $JAVA_OPTS -classpath "$TEST_CP" org.apache.xalan.xslt.Process -in "$RIN" -xsl "$XSLFILE" -out "$ROUT" $@
+
+"$JAVA_HOME"/bin/java $JAVA_OPTS -classpath "$TEST_CP" org.apache.xalan.xslt.Process -in "$RIN" -xsl "$XSLFILE" -out "$ROUT" $@
 
 echo viewResults.sh complete!
 
