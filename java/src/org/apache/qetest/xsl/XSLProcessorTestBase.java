@@ -332,7 +332,7 @@ public class XSLProcessorTestBase extends FileBasedTest
         reporter.logHashtable(reporter.CRITICALMSG, System.getProperties(),
                               "System.getProperties");
         reporter.logHashtable(reporter.CRITICALMSG, testProps, "testProps");
-        reporter.logHashtable(reporter.CRITICALMSG, (new EnvironmentCheck()).getEnvironmentHash(), "EnvironmentCheck");
+        reporter.logHashtable(reporter.CRITICALMSG, QetestUtils.getEnvironmentHash(), "getEnvironmentHash");
     }
 
     /**
