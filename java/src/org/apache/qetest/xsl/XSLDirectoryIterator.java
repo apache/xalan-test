@@ -436,7 +436,7 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
 
                                 // Use special filter to look for parentName+"err"
                                 reporter.testCaseInit(
-                                    "Conformance Test of errDir: "
+                                    "Conformance Test of: " + dirNames[i]
                                     + errDirNames[k]);
                                 processSingleDir(errTestDir, errOutDir,
                                                  errGoldDir, errFileFilter);
@@ -742,7 +742,8 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
 
                     default:
                         // This should never happen
-                        reporter.logErrorMsg("Unexpected return value from processEmbeddedFile!");
+                        reporter.checkErr("Unexpected return value from processSingleFile(" 
+                                          + xslF.getName() + ")!", xslF.getName());
                     }
                 }  // of if (dotIndex > 0)
                 else
@@ -926,7 +927,8 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
                 
                 default:
                     // This should never happen
-                    reporter.logErrorMsg("Unexpected return value from processEmbeddedFile!");
+                    reporter.checkErr("Unexpected return value from processEmbeddedFile(" 
+                                      + xmlF.getName() + ")!", xmlF.getName());
                 }
             }  // of if (dotIndex > 0)
             else
@@ -1154,11 +1156,29 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
         // Catch any Throwable, check if they're expected, and restart
         catch (Throwable t)
         {
-            reporter.logThrowable(reporter.WARNINGMSG, t, 
-                                  "processSingleFile(" + xslURI + ") threw");
-
             // Here, use the original, non-URI'd name
             int retVal = checkExpectedException(t, XSLName, OutName);
+
+            // Only log out the full exception if needed
+            switch (retVal)
+            {
+                case GOT_EXPECTED_EXCEPTION:
+                    // Log just the .toString for simplicity 
+                    //  (since it's expected, this is enough)
+                    reporter.logStatusMsg("processSingleFile(" + xslURI + ") expected threw: " + t.toString());
+                    break;
+                case UNEXPECTED_EXCEPTION:
+                    // Log the whole exception for debugging
+                    reporter.logThrowable(reporter.ERRORMSG, t, 
+                           "processSingleFile(" + xslURI + ") unexpected threw");
+                    break;
+                default:
+                    // Should never happen, but cover it anyways
+                    // Log the whole exception for debugging
+                    reporter.logThrowable(reporter.ERRORMSG, t, 
+                           "processSingleFile(" + xslURI + ") unexpected! threw");
+                    break;
+            }
 
             createNewProcessor();
 
