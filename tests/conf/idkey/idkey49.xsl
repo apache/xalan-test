@@ -13,13 +13,15 @@
 
 <xsl:template match="doc">
   <out>
+   <values>
     <xsl:for-each select="document(a)//body">
-      <xsl:value-of select="."/><xsl:text>,</xsl:text>
-    </xsl:for-each>
+      <xsl:value-of select="."/><xsl:text>,  </xsl:text>
+    </xsl:for-each></values>
     <xsl:text>&#10;</xsl:text>
+   <ids>
     <xsl:for-each select="document(a)//body">
-      <xsl:value-of select="generate-id(.)"/><xsl:text>,</xsl:text>
-    </xsl:for-each>
+      <xsl:value-of select="generate-id(.)"/><xsl:text>,  </xsl:text>
+    </xsl:for-each></ids>
   </out>
 </xsl:template>
 
