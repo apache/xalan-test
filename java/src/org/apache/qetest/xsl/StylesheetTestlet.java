@@ -163,7 +163,12 @@ public class StylesheetTestlet extends TestletImpl
         try
         {
             transformWrapper = TransformWrapperFactory.newWrapper(datalet.flavor);
-            transformWrapper.newProcessor(null);
+            // Set our datalet's options as options in the wrapper
+            //@todo this is inefficient, since our datalet may 
+            //  have many options that don't pertain to the wrapper, 
+            //  but it does allow users to simply pass new options 
+            //  without us having to change code
+            transformWrapper.newProcessor(datalet.options);
         }
         catch (Throwable t)
         {
