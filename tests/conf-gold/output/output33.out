@@ -1,6 +1,5 @@
 <HTML>
-<area test="&amp;">
-<area href="cgiprogram?param1=1&Param2=2">
+<area tabindex="2">
 <base>
 <basefont>
 <br>
