@@ -126,8 +126,6 @@ dependencies - users must manually 'build jar' first.
     <path id="compiletest.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
-	<pathelement location="${xsltc.jar}" />
-	<pathelement location="${bcel.jar}" />
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${jtidy.jar}" />
@@ -1053,7 +1051,6 @@ dependencies - users must manually 'build jar' first.
 
     <path id="xsltc.runtime.class.path">
         <pathelement path="${java.class.path}" />
-        <pathelement location="${xalan.build.dir}/xsltc.jar" />
         <pathelement location="${xalan.build.dir}/xalan.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
@@ -1062,7 +1059,7 @@ dependencies - users must manually 'build jar' first.
     </path>
     <path id="xsltc.compile.class.path">
         <pathelement path="${java.class.path}" />
-        <pathelement location="${xalan.build.dir}/xsltc.jar" />
+        <pathelement location="${xalan.build.dir}/xalan.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
