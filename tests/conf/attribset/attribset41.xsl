@@ -3,8 +3,7 @@
 <xsl:output indent="yes"/>
 
   <!-- FileName: attribset41 -->
-  <!-- Document: http://www.w3.org/TR/xslt -->
-  <!-- DocVersion: 19991116 -->
+  <!-- Document: http://www.w3.org/TR/xslt -->  <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.4 Named Attribute Sets -->
   <!-- Creator: Morten Jorgensen -->
   <!-- Purpose: Test inheritance of attribute sets. A literal result element
