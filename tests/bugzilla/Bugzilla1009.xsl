@@ -11,7 +11,7 @@ bevan.arps@clear.net.nz (Bevan Arps)
 	<!-- Below line causes error due to unclosed '{', but:
 		 error is not helpful either on cmd line or programmatically -->
 	<link ref="{foo(bar)"></link>
-	<out>
+    </out>
   </xsl:template>
      
 </xsl:stylesheet>
