@@ -149,11 +149,12 @@ public abstract class TraxWrapperUtils
         Enumeration attrKeys = null;
         try
         {
+            // Attempt to use as a Properties block..
             attrKeys = ((Properties)attrs).propertyNames();
         }
         catch (ClassCastException cce)
         {
-            // Simply get as Hashtable instead
+            // .. but fallback to get as Hashtable instead
             attrKeys = attrs.keys();
         }
 
@@ -164,9 +165,19 @@ public abstract class TraxWrapperUtils
             if ((null != key)
                 && (key.startsWith(TransformWrapper.SET_PROCESSOR_ATTRIBUTES)))
             {
+                Object value = null;
+                try
+                {
+                    // Attempt to use as a Properties block..
+                    value = ((Properties)attrs).getProperty(key);
+                }
+                catch (ClassCastException cce)
+                {
+                    // .. but fallback to get as Hashtable instead
+                    value = attrs.get(key);
+                }
                 // Strip off our marker for the property name
                 String processorKey = key.substring(TransformWrapper.SET_PROCESSOR_ATTRIBUTES.length());
-                Object value = attrs.get(key);
                 // Ugly, but it works -sc
                 if (setPropsOn instanceof TransformerFactory)
                     setAttribute((TransformerFactory)setPropsOn, processorKey, value);
