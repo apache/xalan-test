@@ -177,8 +177,7 @@ public class ThreadedTestletDriver extends StylesheetTestletDriver
             transformWrapper = TransformWrapperFactory.newWrapper(firstDatalet.flavor);
             transformWrapper.newProcessor(null);
             reporter.logMsg(Logger.INFOMSG, "Created transformWrapper, about to process shared: " + firstDatalet.inputName);
-            //@todo should key off of useURL/useURI
-            transformWrapper.buildStylesheet(QetestUtils.filenameToURL(firstDatalet.inputName));
+            transformWrapper.buildStylesheet(firstDatalet.inputName);
         }
         catch (Throwable t)
         {
@@ -235,12 +234,12 @@ public class ThreadedTestletDriver extends StylesheetTestletDriver
         // We now wait for every thread to finish, and only then 
         //  will we write a final report and finish the test
         //@todo probably an easier way; for now, just join the last one
-        reporter.logMsg(Logger.STATUSMSG, "Driver main thread now joining last thread");
+        reporter.logMsg(Logger.STATUSMSG, "Driver Attempting-to-Join last thread");
         long maxWaitMillis = 100000; // Wait at most xxxx milliseconds
         // Try waiting for the last thread several times
         testletThreads[testletThreads.length - 1].waitForComplete
                 (reporter, maxWaitMillis, 10);
-        reporter.logMsg(Logger.TRACEMSG, "Apparently-Joined last thread");
+        reporter.logMsg(Logger.TRACEMSG, "Driver Apparently-Joined last thread");
 
         // Also join all other threads
         for (int i = 0; i < (testletThreads.length - 1); i++)
@@ -248,7 +247,7 @@ public class ThreadedTestletDriver extends StylesheetTestletDriver
             // Only wait a little while for these
             testletThreads[i].waitForComplete(reporter, maxWaitMillis, 2);
         }
-        reporter.logMsg(Logger.STATUSMSG, "Apparently-joined all threads");
+        reporter.logMsg(Logger.INFOMSG, "Driver Apparently-joined all threads");
         
         // Log results from all threads
         for (int i = 0; i < testletThreads.length; i++)
@@ -327,7 +326,8 @@ public class ThreadedTestletDriver extends StylesheetTestletDriver
             //  so each testlet can automatically get a new logger 
             //  based off of our logger
             String testletLogFile = testProps.getProperty(Logger.OPT_LOGFILE, "threadedTestlet");
-            testletLogFile = testletLogFile + ctr + ".xml";
+            int idx = testletLogFile.lastIndexOf("."); // Assumption: there'll be a .extension
+            testletLogFile = testletLogFile.substring(0, idx) + ctr + testletLogFile.substring(idx);
             Properties testletLoggerProperties = new Properties(testProps);
             testletLoggerProperties.put(Logger.OPT_LOGFILE, testletLogFile);
             t.setLogger(new Reporter(testletLoggerProperties));

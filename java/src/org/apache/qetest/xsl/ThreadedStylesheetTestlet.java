@@ -265,7 +265,7 @@ public class ThreadedStylesheetTestlet
         for (int ctr = 1; (ctr <= iterations); ctr++)
         {
             // Only validate on first and last iteration
-            boolean doValidation = ((1 == ctr) || (sharedDatalet.iterations == ctr));
+            boolean doValidation = ((1 == ctr) || (iterations == ctr));
             logger.logMsg(Logger.TRACEMSG, "About to do iteration " + ctr);
             // Note: logic moved to worker methods for clarity; 
             //  these methods just use our local vars and datalet
@@ -320,14 +320,12 @@ public class ThreadedStylesheetTestlet
         //  just go ahead and ask it to transform
         try
         {
-            // Store local copies of XSL, XML references to avoid 
-            //  potential for changing datalet            
-            String xmlName = datalet.xmlName;
+            String outputName = datalet.outputName + threadIdentifier;
 
             //@todo Should we log a custom logElement here instead?
             logger.logMsg(Logger.TRACEMSG, "About to test shared Templates: "
-                          + " xmlName=" + xmlName 
-                          + " outputName=" + datalet.outputName + "-" + threadIdentifier
+                          + " xmlName=" + datalet.xmlName 
+                          + " outputName=" + outputName
                           + " goldName=" + datalet.goldName);
 
             // Simply have the wrapper do all the transforming
@@ -335,12 +333,12 @@ public class ThreadedStylesheetTestlet
             //  stylesheet tests or just .xml embedded tests
             long retVal = 0L;
             // Here, we only use the existing Templates to do the transform
-            long[] times = datalet.transformWrapper.transformWithStylesheet(xmlName, datalet.outputName + "-" + threadIdentifier);
+            long[] times = datalet.transformWrapper.transformWithStylesheet(datalet.xmlName, outputName);
             retVal = times[TransformWrapper.IDX_OVERALL];
 
             if (!doValidation)
             {
-                logger.logMsg(Logger.TRACEMSG, "Skipping validation of outputName=" + datalet.outputName + "-" + threadIdentifier);
+                logger.logMsg(Logger.TRACEMSG, "Skipping validation of outputName=" + outputName);
                 // Only bother to validate the output if asked
                 return;
             }
@@ -351,7 +349,7 @@ public class ThreadedStylesheetTestlet
             if (null == fileChecker)
                 fileChecker = new XHTFileCheckService();
             fileChecker.check(logger,
-                              new File(datalet.outputName + "-" + threadIdentifier), 
+                              new File(outputName), 
                               new File(datalet.goldName), 
                               "Shared Templates of: " + datalet.getDescription());
         }
@@ -377,14 +375,11 @@ public class ThreadedStylesheetTestlet
         // Test our supplied input file, and compare with gold
         try
         {
-            // Store local copies of XSL, XML references to avoid 
-            //  potential for changing datalet            
-            String inputName = datalet.inputName;
-            String xmlName = datalet.xmlName;
+            String outputName =  datalet.outputName + threadIdentifier;
 
             //@todo Should we log a custom logElement here instead?
-            logger.logMsg(Logger.TRACEMSG, "About to test: inputName=" + inputName
-                          + " xmlName=" + xmlName + " outputName=" + datalet.outputName + "-" + threadIdentifier
+            logger.logMsg(Logger.TRACEMSG, "About to test: inputName=" + datalet.inputName
+                          + " xmlName=" + datalet.xmlName + " outputName=" + outputName
                           + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor);
 
             // Create a new TransformWrapper of appropriate flavor
@@ -409,19 +404,19 @@ public class ThreadedStylesheetTestlet
             if (null == datalet.inputName)
             {
                 // presume it's an embedded test
-                long [] times = transformWrapper.transformEmbedded(xmlName, datalet.outputName + "-" + threadIdentifier);
+                long [] times = transformWrapper.transformEmbedded(datalet.xmlName, outputName);
                 retVal = times[TransformWrapper.IDX_OVERALL];
             }
             else
             {
                 // presume it's a normal stylesheet test
-                long[] times = transformWrapper.transform(xmlName, inputName, datalet.outputName + "-" + threadIdentifier);
+                long[] times = transformWrapper.transform(datalet.xmlName, datalet.inputName, outputName);
                 retVal = times[TransformWrapper.IDX_OVERALL];
             }
 
             if (!doValidation)
             {
-                logger.logMsg(Logger.TRACEMSG, "Skipping validation of outputName=" + datalet.outputName + "-" + threadIdentifier);
+                logger.logMsg(Logger.TRACEMSG, "Skipping validation of outputName=" + outputName);
                 // Only bother to validate the output if asked
                 return;
             }
@@ -432,9 +427,9 @@ public class ThreadedStylesheetTestlet
             if (null == fileChecker)
                 fileChecker = new XHTFileCheckService();
             fileChecker.check(logger,
-                              new File(datalet.outputName + "-" + threadIdentifier), 
+                              new File(outputName), 
                               new File(datalet.goldName), 
-                              getDescription() + " " + datalet.getDescription())
+                              getDescription() + " " + datalet.getDescription());
         }
         // Note that this class can only validate positive test 
         //  cases - we don't handle ExpectedExceptions
