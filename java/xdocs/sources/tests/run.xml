@@ -12,11 +12,12 @@
     <anchor name="how-to-run"/>
     <s2 title="How-to: Run tests">
 
-    <p>1: <link idref="getstarted" anchor="how-to-build">Build a fresh copy of testxsl.jar</link>, 
-    including setting the environment variable JARDIR and putting all the needed .jar files 
-    there, including testxsl.jar<br/></p>
-    <p>2: cd xml-xalan\test<br/></p>
-    <p>3: (<ref>either</ref>) Run Any of the 'convenience' batch files provided:<br/>
+    <p>1: <link idref="getstarted" anchor="how-to-build">Build a fresh copy of testxsl.jar.</link>
+    <br/></p>
+    <p>2: Set the JARDIR environment variable, and put <code>testxsl.jar</code> and the other required JAR files in the JARDIR directory.<br/></p>
+    <p>3: cd xml-xalan\test<br/></p>
+    <p>4: Run any of the convenience batch files (see below) or run java.exe with the desired test class.<br/></p>
+    <p>
       <code>traxapitest.bat TRAXAPITestClassName [<link anchor="test-options">options</link>]</code> 
       <br/>(runs TRAX interface tests with Xalan-J 2.x, equivalent to 
         <code>runtest trax.TRAXAPITestClassName -load APITest.properties [<link anchor="test-options">options</link>]</code><br/><br/>
@@ -31,12 +32,12 @@
         need to provide the last part of the end_pkg name as well as the classname - as well 
         as providing any extra arguments for the test too.<br/>
     </p>
-    <p>3: (<ref>or</ref>) Run java.exe and the desired test class yourself:<br/></p>
+    <p>Alternately: Run java.exe and the desired test class yourself:<br/></p>
     <p>Note: the above batch and shell files, and the JARDIR environment variable, 
     are simply conveniences for running the tests. The Java API tests and test drivers can 
     also be executed by hand, for those who wish to manage their own classpaths and/or
     simply pass all arguments to the tests on the command line, etc.</p>
-    <p>Sorry! We don't have .sh equivalents for all the convenience .bat files - 
+    <p>Sorry! We don't have .sh equivalents for the convenience .bat files - 
     submissions of ports of these files are welcomed!</p>
     <note>Running tests with alternate JAXP parsers: all org.apache.qetest.trax.* 
     tests can be run with Xalan-J 2.x and any JAXP 1.1 compatible parser, like 
@@ -52,7 +53,7 @@
       output results file is easier to deal with. The basic format is 
       fairly simple and you can certainly read it as-is.</p>
       <p>To 'pretty-print' results or produce reports, please use the 
-        viewResults.xsl stylesheet and associated batch/shell files, like so:
+        viewResults.xsl stylesheet and associated batch/shell files, like so:<br/>
         <code>cd \xml-xalan\test</code><br/><br/>
         <code>runTest.bat MyTest -options blah <link anchor="test-options-logfile">-logFile results\MyResults.xml</link></code><br/><br/>
         <code>viewResults.bat results\MyResults.xml results\MyPrettyResults.html [options]</code><br/><br/>
@@ -70,12 +71,16 @@
       or simply from the command line (which overrides the properties file) like:<br/>
       <code>&nbsp;&nbsp;TestName -arg1 value1 -arg2 -arg3 value3</code><br/><br/></p>
       <p>To see all options, call a test with an illegal argument to force it 
-      to print out it's .usage().</p>
-      <p>For another description of options, see <code>xml-xalan\test\ContribTest.properties</code>, 
+      to print out it's .usage(). You may mix setting options from a properties 
+      file and from the command line; command line options will take precedence.</p>
+      <p>For another description of options, see <br/><code>xml-xalan\test\ContribTest.properties</code>,<br/> 
       which describes most of them as used in the context of running the ConformanceTest driver 
       over the xml-xalan\tests\contrib tree of stylesheets.  Simply change inputDir and goldDir
       to run over a different set of files (like a conformance test suite, which we hope to 
       add soon).</p>
+      <note>Path-like options set in a properties file must use the local system's 
+      File.separator character, and backslashes \ must be escaped \\. The checked in 
+      copy of ContribTest.properties is for a Windows platform.</note>
       <p>Quick list of options</p>
         <anchor name="test-options-logfile"/>
       <gloss>
@@ -90,8 +95,6 @@
         <label>-goldDir <ref>path/to/gold</ref></label>
           <item>path to a directory tree of reference output - this tree should be 
           a parallel structure to the inputDir tree</item>
-        <label>(paths should be appropriate to the platform you're on, 
-        and must be \\escaped\\properly if in a .properties file)</label>
         <label>-category <ref>dirName</ref></label>
           <item>only run this single named subdir within inputDir</item>
         <label>-excludes <ref>'test1.xsl;test2.xsl'</ref></label>

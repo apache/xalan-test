@@ -46,7 +46,7 @@ their vendor-independent project on XSLT/XPath Conformance Testing. For more
 information about this project, visit 
 <jump href="http://www.oasis-open.org/committees/xslt/index.html">http://www.oasis-open.org/committees/xslt/index.html</jump></p>
 
-<p>The OASIS project will combine test cases from different sources and provide a way to 
+<p>The OASIS project will combine test cases from different sources and will provide a way to 
 customize the set of tests according to design decisions made for each processor 
 under test. We expect that when the OASIS test system is delivered, it will supplant 
 most or all of the "conf" group provided here. Conformance tests are designed as 

@@ -9,19 +9,16 @@
 <li><link anchor="credits">Credits for the tests</link></li>
 </ul>
 
-<note>The documentation for the tests is still in the process of being
-migrated into Apache, so expect changes and improvements over the next couple of weeks. 
-The doc will also be much better organized once 
-I get Don to edit it!</note>
-
     <anchor name="purpose"/>
     <s2 title="Purpose of these tests">
     <p>These tests are provided for Xalan contributors to evaluate the impact of code changes. 
-    Run the tests on the unchanged code, make the change and rebuild, then run the tests again 
+    Run the tests on the unchanged code, make the change and rebuild. Then run the tests again 
     and compare the results. Results should also be compared to the files in the "-gold" 
     directory trees. Even though not all tests have "gold" files, it's still valuable to run 
-    the tests before and after a code change. That way you can at least ensure yourself that 
-    your changes didn't cause any regressions to the code before checking in.</p>
+    the tests before and after a code change. That way you can at least ensure that 
+    your changes didn't cause any regressions to the code before you check your 
+    changes in. In the future, we hope to provide a tool to compare test results from 
+    one run to another to make this process even simpler.</p>
     </s2>
       
     <anchor name="dir-map"/>
@@ -30,14 +27,15 @@ I get Don to edit it!</note>
       <label>Brief overview of directory structure:</label>
       <label><code>xml-xalan/test</code></label>
       <item>Top level dir for all Xalan versions/products tests</item>
+      <label></label>
       <label><code>xml-xalan/test/java</code></label>
       <item>Top level for Java test automation</item>
       <label><code>xml-xalan/test/java/bin</code></label>
       <item>Java test automation dependencies (includes 
         <jump href="http://jakarta.apache.org/ant/index.html">Ant 1.2</jump>)</item>
       <label><code>xml-xalan/test/java/src</code></label>
-      <item>Java test automation source tree - this includes both 
-      a generic testing framework as well as both specific API tests for parts of Xalan 
+      <item>Java test automation source tree - this includes 
+      a generic testing framework as well as specific API tests for parts of Xalan 
       and several test drivers for testing conformance / performance / etc. over a large 
       number of xsl test stylesheets.
       <br/>Primary packages are:<br/>
@@ -47,19 +45,23 @@ I get Don to edit it!</note>
       <jump href="apidocs/org/apache/qetest/trax/dom/package-summary.html">org.apache.qetest.trax.dom</jump><br/>
       <jump href="apidocs/org/apache/qetest/trax/stream/package-summary.html">org.apache.qetest.trax.stream</jump><br/>
       <jump href="apidocs/org/apache/qetest/xalanj1/package-summary.html">org.apache.qetest.xalanj1</jump><br/>
-      </item>
+      <br/></item>
       <label><code>xml-xalan/test/tests</code></label><item>Top level for XSLT stylesheet trees</item>
       <label><code>xml-xalan/test/tests/contrib</code></label><item>Directory tree of user-contributed stylesheets</item>
       <label><code>xml-xalan/test/tests/contrib-gold</code></label><item>Directory tree of user-contributed stylesheets gold 
-      output reference files (this tree should mirror the structure of contrib)</item>
+      output reference files (this tree should mirror the structure of contrib)<br/></item>
       <label><code>xml-xalan/test/tests/api</code></label><item>Directory tree for stylesheets used in Java API tests</item>
       <label><code>xml-xalan/test/tests/api/trax</code></label><item>Stylesheets used in Java API tests in 
       <jump href="apidocs/org/apache/qetest/trax/package-summary.html">org.apache.qetest.trax</jump></item>
-      <label><code>xml-xalan/test/tests/api-gold</code></label><item>Matching Directory tree of gold files for Java API tests</item>
+      <label><code>xml-xalan/test/tests/api/trax/dom</code></label><item>Stylesheets used in Java API tests in 
+      <jump href="apidocs/org/apache/qetest/trax/dom/package-summary.html">org.apache.qetest.trax.dom</jump></item>
+      <label></label><item>etc. - often the directory tree in the stylesheet area
+      will match the Java sources directory/package tree.</item>
+      <label><code>xml-xalan/test/tests/api-gold</code></label><item>Matching Directory tree of gold files for Java API tests<br/></item>
       <label><code>xml-xalan/test/tests/extension</code></label><item>Directory tree for stylesheets used in Xalan-specific extension tests</item>
       <label><code>xml-xalan/test/tests/extension/xalanj1</code></label><item>Xalan-J 1.x version-specific extension tests</item>
       <label><code>xml-xalan/test/tests/extension/xalanj2</code></label><item>Xalan-J 2.x version-specific extension tests</item>
-      <label><code>xml-xalan/test/tests/extension-gold</code></label><item>Matching Directory tree of gold files for Xalan-specific extension tests</item>
+      <label><code>xml-xalan/test/tests/extension-gold</code></label><item>Matching Directory tree of gold files for Xalan-specific extension tests<br/></item>
       <label><code>xml-xalan/test/tests/...</code></label><item>More stylesheet trees of testfiles to be added!
       (namely: tests/conf - Conformance tests to the XSLT spec)</item>
       <label><code>xml-xalan/test/tests/...-gold</code></label><item></item>
@@ -68,21 +70,34 @@ I get Don to edit it!</note>
 
     <anchor name="test-map"/>
     <s2 title="Listing of Java tests and drivers">
-<p>Java Test Drivers (primarily to execute directory trees full of or 
-explicit fileLists of xsl/xml file pairs to produce output files, which 
-are then verified against a corresponding '-gold' tree)</p>
+<p>Java Test Drivers</p>
+<p>A Java Test Driver executes a test for each xml/xsl file pair in 
+the specified directory tree or each pair in the specified fileList. 
+For each test, the driver generates an output file which may be 
+compared to the corresponding file in the "gold" tree. The Test 
+Drivers supply the code to determine which files to operate on 
+and the order to do those operations (including logging performance 
+and other data out).</p> 
+<p>The Test Drivers rely on ProcessorWrapper 
+subclasses to perform the actual test of processing or transformation 
+of the xml.xsl file pair into the output file. We can then plug 
+in different ProcessorWrapper "flavors" easily. Different 
+ProcessorWrappers can process or transform in various ways, like 
+using DOM trees, SAX events, or input/output streams.</p>
 <gloss>
 <label>org.apache.qetest.xsl.ConformanceTest</label>
 <item>basic test driver, either takes an 
 inputDir to iterate over (using ConformanceDirRules/ConformanceFileRules),
-or an explicit -fileList. Processes all files using a specific 
+or an explicit fileList. Processes all files using a specific 
 -flavor of a <jump href="apidocs/org/apache/qetest/xslwrapper/ProcessorWrapper.html">ProcessorWrapper</jump>, so identical test runs can be done 
-using different processors (eg. -flavor xalan = XalanWrapper = Xalan-J 1.x; 
+using different processors (e.g., -flavor xalan = XalanWrapper = Xalan-J 1.x; 
 -flavor trax = TraxWrapper = Trax interface using streams by default;
 -flavor trax.d2d = TraxWrapper = Trax interface using DOMs)
 <br/>Actually, 'ConformanceTest' is a bad name - this is a generic stylesheet 
-test driver that can be used to run any sort of stylesheet tests, not 
-just conformance tests - this is a common bit of confusion.  Alternate names welcomed.
+test driver that can be used to run using any matching xml source 
+and xsl stylesheet file names, as specified in the ConformanceFileRules, 
+not just conformance tests.
+<br/>Suggestions for alternate names welcomed!
 'StylesheetTestDriver' perhaps?</item>
 <label>org.apache.qetest.xsl.PerformanceTest</label><item>essentially the same as ConformanceTest, 
 but provides additional timing/memory output, as well as an -iterations
@@ -102,52 +117,56 @@ All in package: org.apache.qetest.trax</p>
 <item><ref>utility:</ref> wraps javax.xml.transform.ErrorListener, and logs info</item>
 <label>LoggingURIResolver.java</label>
 <item><ref>utility:</ref> wraps javax.xml.transform.URIResolver, and logs info</item>
-<label>TransformerAPITest.java (sc)</label>
+<label>ExamplesTest.java</label>
+<item>A testing version of samples/trax/Examples.java, a sample file
+provided in Xalan-J 2.x showing various uses of the TRAX or 
+javax.xml.transform API to process stylesheets.</item>
+<label>TransformerAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.Transformer</item>
-<label>TransformerFactoryAPITest.java (sc)</label>
+<label>TransformerFactoryAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.TransformerFactory</item>
-<label>TemplatesAPITest.java (sc)</label>
+<label>TemplatesAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.Templates</item>
-<label>ResultAPITest.java (sc)</label>
+<label>ResultAPITest.java</label>
 <item>API test for Result class - may be obsolete, should 
 have separate tests for SAXResult, DOMResult, StreamResult</item>
-<label>ProcessorAPITest.java (sc)</label>
+<label>ProcessorAPITest.java</label>
 <item>API test: obsolete: from a previous version of TRAX</item>
-<label>TestThreads.java (sc)</label>
+<label>TestThreads.java</label>
 <item>MANUALLY executed test for running multiple threads 
 and transforming multiple stylesheets simultaneously.</item>
 </gloss>
 
 <p>All in subpackages of: org.apache.qetest.trax</p>
 <gloss>
-<label>stream.StreamSourceAPITest.java (sc)</label>
+<label>stream.StreamSourceAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.stream.StreamSource (mostly done)</item>
-<label>stream.StreamResultAPITest.java (sc)</label>
+<label>stream.StreamResultAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.stream.StreamResult (mostly done)</item>
 
-<label>dom.DOMSourceAPITest.java (sc)</label>
+<label>dom.DOMSourceAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.dom.DOMSource (mostly done)</item>
-<label>dom.DOMResultAPITest.java (sc)</label>
+<label>dom.DOMResultAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.dom.DOMResult (mostly done)</item>
-<label>dom.DOMLocatorAPITest.java (sc)</label>
+<label>dom.DOMLocatorAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.dom.DOMLocator (@todo)</item>
 
-<label>sax.SAXSourceAPITest.java (km/rm)</label>
+<label>sax.SAXSourceAPITest.java (to be done)</label>
 <item>API coverage tests for javax.xml.transform.sax.SAXSource (@todo)</item>
-<label>sax.SAXResultAPITest.java (km/rm)</label>
+<label>sax.SAXResultAPITest.java (to be done)</label>
 <item>API coverage tests for javax.xml.transform.sax.SAXResult (@todo)</item>
-<label>sax.SAXTransformerFactoryAPITest.java (km/rm)</label>
+<label>sax.SAXTransformerFactoryAPITest.java (to be done)</label>
 <item>API coverage tests for javax.xml.transform.sax.SAXTransformerFactory (@todo)</item>
-<label>sax.TemplatesHandlerAPITest.java (km/rm)</label>
+<label>sax.TemplatesHandlerAPITest.java (to be done)</label>
 <item>API coverage tests for javax.xml.transform.sax.TemplatesHandler (@todo)</item>
-<label>sax.TransformerHandlerAPITest.java (km/rm)</label>
+<label>sax.TransformerHandlerAPITest.java (to be done)</label>
 <item>API coverage tests for javax.xml.transform.sax.TransformerHandler (@todo)</item>
 </gloss>
 
 <p>Java API tests for Xalan-J 1.x.</p>
 <gloss>
 <label>org.apache.qetest.xalanj1.ParamTest</label>
-<item>setting parameters and verifies 
+<item>setting stylesheet parameters and verifies 
 they're used correctly in a transform/process</item>
 </gloss>
 
@@ -157,7 +176,9 @@ A number of tests may also be missing matching "gold" files, if we haven't
 yet had time to confirm the correct output.  It's still useful to run these 
 tests (although the ConformanceTest driver will report an AMBG or 'Ambiguous' 
 result) because you can still see if the output looks basically correct, and 
-compare the output to previous test runs before your code changes, etc. 
+compare the output to previous test runs before you submit your code changes, etc.</p>
+<p>The tests have several different types of results beyond just pass or fail, 
+which are documented in <jump href="apidocs/org/apache/qetest/Logger.html#PASS_RESULT">org.apache.qetest.Logger</jump>.
 At Lotus/IBM, we have some additional test cases that we can't give away, so a 
 patch may pass all these tests and fail others, but those cases should be rare.</p>
 
