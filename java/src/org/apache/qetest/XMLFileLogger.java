@@ -279,9 +279,10 @@ public class XMLFileLogger implements Logger
      * Opens a FileWriter for our output, and logs Record format:
      * <pre>&lt;resultfile fileName="<i>name of result file</i>"&gt;</pre>
      *
-     * NEEDSDOC @param p
+     * If no name provided, supplies a default one in current dir.
      *
-     * NEEDSDOC ($objectName$) @return
+     * @param p Properties block to initialize from
+     * @return true if we think we initialized OK
      */
     public boolean initialize(Properties p)
     {
@@ -292,25 +293,27 @@ public class XMLFileLogger implements Logger
 
         if ((fileName == null) || fileName.equals(""))
         {
-
-            // We don't have a valid file, so bail
-            error = true;
-            ready = false;
-
-            System.err.println("XMLFileLogger.initialize() ERROR: "
-                               + OPT_LOGFILE + " is blank");
-
-            return false;
+            // Make up a file name
+            fileName = "XMLFileLogger-default-results.xml";
+            loggerProps.put(OPT_LOGFILE, fileName);
         }
 
-        // Create a file and ensure it has a place to live
+        // Create a file and ensure it has a place to live; be sure 
+        //  to insist on an absolute path for later parent path creation
         reportFile = new File(fileName);
+        try
+        {
+            reportFile = new File(reportFile.getCanonicalPath());
+        } 
+        catch (IOException ioe1)
+        {
+            reportFile = new File(reportFile.getAbsolutePath());
+        }
 
         // Note: bare filenames may not have parents, so catch and ignore exceptions
         try
         {
             File parent = new File(reportFile.getParent());
-
             if ((!parent.mkdirs()) && (!parent.exists()))
             {
 
