@@ -388,11 +388,11 @@
     <!-- ================================================================== -->
     <target name="smoketest" 
             description="Run the Xalan-J 2.x Smoketest"
-            depends="minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
+            depends="minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
     </target>
     <target name="smoketest.dev" 
             description="Run the Xalan-J 2.x Smoketest with dependencies"
-            depends="jar,minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
+            depends="jar,extensions.classes,minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
         <!-- This compiles the minimum to run the smoketests, runs them, 
              and creates distros just of the results and existing tree, 
              without actually running the docs - this is to ensure that 
@@ -401,7 +401,7 @@
     </target>
     <target name="smoketest.gump" 
             description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies"
-            depends="jar,minitest-execute,smoketest-execute,smoketest-results-dist,dist-nodeps,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
+            depends="jar,extensions.classes,minitest-execute,smoketest-execute,smoketest-results-dist,dist-nodeps,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
         <!-- This compiles the minimum to run the smoketests, runs them, 
              and creates distros just of the results and existing tree, 
              without actually running the docs - this is to ensure that 
@@ -414,34 +414,38 @@
         <antcall target="conf">
             <param name="testType" value="smoketest.conf."/>
         </antcall>
-        <available file="${smoketest.conf.passFile}" property="smoketest-conf-passed" />
 
         <echo message="About to execute other API tests..." />
         <antcall target="api">
             <param name="testClass" value="org.apache.qetest.xsl.XSLTestHarness"/>
             <param name="testType" value="smoketest.api."/>
         </antcall>
-        <available file="${smoketest.api.passFile}" property="smoketest-api-passed" />
+
+        <echo message="About to execute XalanJ2 extensions tests..." />
+        <antcall target="extensions">
+            <param name="testType" value="smoketest.extensions."/>
+        </antcall>
+
+        <condition property="smoketest-passed">
+            <and>
+                <available file="${smoketest.conf.passFile}" />
+                <available file="${smoketest.api.passFile}" />
+                <available file="${smoketest.extensions.passFile}" />
+            </and>
+        </condition>
     </target>
-    <target name="smoketest-conf-notpass" unless="smoketest-conf-passed">
-        <echo message=" [minitest] ERROR! The Smoketest-conf failed!" />
+
+    <target name="smoketest-notpass" unless="smoketest-passed">
+        <echo message=" [minitest] ERROR! The Smoketest failed!" />
         <echo message=" [minitest] See details in ${smoketest.conf.logFile}, output is in ${smoketest.conf.outputDir}" />
-        <echo message=" [minitest] Please fix any conformance problems before checking in!" />
-        <fail message="Please fix any conformance problems before checking in!" />
-    </target>
-    <target name="smoketest-conf-pass" if="smoketest-conf-passed">
-        <echo message=" [minitest] CONGRATULATIONS! The Smoketest-conf passed!" />
-        <echo message=" [minitest] See details in ${smoketest.conf.logFile}" />
-    </target>
-    <target name="smoketest-api-notpass" unless="smoketest-api-passed">
-        <echo message=" [minitest] ERROR! The Smoketest-api failed!" />
         <echo message=" [minitest] See details in ${smoketest.api.logFile}, output is in ${smoketest.api.outputDir}" />
-        <echo message=" [minitest] Please fix any API test problems before checking in!" />
-        <fail message="Please fix any API test problems before checking in!" />
+        <echo message=" [minitest] See details in ${smoketest.extensions.logFile}, output is in ${smoketest.extensions.outputDir}" />
+        <echo message=" [minitest] Please fix any smoketest problems before checking in!" />
+        <fail message="Please fix any smoketest problems before checking in!" />
     </target>
-    <target name="smoketest-api-pass" if="smoketest-api-passed">
-        <echo message=" [minitest] CONGRATULATIONS! The Smoketest-api passed!" />
-        <echo message=" [minitest] See details in ${smoketest.api.logFile}" />
+    <target name="smoketest-pass" if="smoketest-passed">
+        <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />
+        <echo message=" [minitest] Details are in ${smoketest.conf.logFile}, ${smoketest.api.logFile}, ${smoketest.extensions.logFile}" />
     </target>
 
     <target name="smoketest-results-dist" depends="init.test">
