@@ -279,9 +279,6 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
                                   "Problem creating factory; can't continue testcase");
             return true;
         }
-
-        String outName1 = outNames.nextName();
-        String outName2 = outNames.nextName();
         try
         {
             // Verify we can do basic transforms with readers/streams
@@ -292,13 +289,20 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             InputStream xmlStream1 = new FileInputStream(testFileInfo.xmlName);
             Source xmlSource1 = new StreamSource(xmlStream1);
             xmlSource1.setSystemId(xmlID);
-            FileOutputStream fos1 = new FileOutputStream(outName1);
-            Result result1 = new StreamResult(fos1);
 
-            reporter.logInfoMsg("Transform into " + outName1);
+            reporter.logTraceMsg("Create FileOutputStream to " + outNames.nextName());
+            FileOutputStream fos1 = new FileOutputStream(outNames.currentName());
+            Result result1 = new StreamResult(fos1);
             Templates templates1 = factory.newTemplates(xslSource1);
             Transformer transformer1 = templates1.newTransformer();
+            reporter.logTraceMsg("about to transform to streams after setSystemId");
             transformer1.transform(xmlSource1, result1);
+            int result = fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(testFileInfo.goldName), 
+                              "transform to streams after setSystemId into " + outNames.currentName());
+            if (result == reporter.FAIL_RESULT)
+                reporter.logInfoMsg("transform to streams... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
         {
@@ -312,18 +316,19 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             Source xslSource2 = new StreamSource(xslStream2, xslID);
             InputStream xmlStream2 = new FileInputStream(testFileInfo.xmlName);
             Source xmlSource2 = new StreamSource(xmlStream2, xmlID);
-            FileOutputStream fos2 = new FileOutputStream(outName2);
+            FileOutputStream fos2 = new FileOutputStream(outNames.nextName());
             Result result2 = new StreamResult(fos2);
 
-            reporter.logInfoMsg("Transform into " + outName2);
+            reporter.logInfoMsg("Transform into " + outNames.currentName());
             Templates templates2 = factory.newTemplates(xslSource2);
             Transformer transformer2 = templates2.newTransformer();
             transformer2.transform(xmlSource2, result2);
-            reporter.checkAmbiguous("@todo also verify one against a real gold file");
-            fileChecker.check(reporter, 
-                              new File(outName2), 
-                              new File(outName1), 
-                              "transform to streams with both settings of systemId");
+            int result = fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(testFileInfo.goldName), 
+                              "transform to streams after SystemId in ctor into " + outNames.currentName());
+            if (result == reporter.FAIL_RESULT)
+                reporter.logInfoMsg("transform to streams... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
         {
@@ -350,19 +355,18 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             Source xslSource3 = new StreamSource(xslStream3);
             InputStream xmlStream3 = new FileInputStream(testFileInfo.xmlName);
             Source xmlSource3 = new StreamSource(xmlStream3);
-            String outName3 = outNames.nextName();
-            FileOutputStream fos3 = new FileOutputStream(outName3);
+            FileOutputStream fos3 = new FileOutputStream(outNames.nextName());
             Result result3 = new StreamResult(fos3);
 
-            reporter.logInfoMsg("Transform into " + outName3);
             Templates templates3 = factory.newTemplates(xslSource3);
             Transformer transformer3 = templates3.newTransformer();
+            reporter.logStatusMsg("About to transform without systemID; probably throws exception");
             transformer3.transform(xmlSource3, result3);
-            reporter.checkFail("The above transform should probably have thrown an exception");
+            reporter.checkFail("The above transform should probably have thrown an exception; into " + outNames.currentName());
         }
         catch (Throwable t)
         {
-            reporter.checkPass("Transforming with include/import and wrong SystemId throws exception");
+            reporter.checkPass("Transforming with include/import and wrong SystemId throws exception; into " + outNames.currentName());
             reporter.logThrowable(reporter.ERRORMSG, t, "Transforming with include/import and wrong SystemId");
         }
 
@@ -399,7 +403,6 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
     {
         return ("Common [optional] options supported by StreamSourceAPITest:\n"
                 + "(Note: assumes inputDir=.\\tests\\api)\n"
-                + "REPLACE_any_new_test_arguments\n"
                 + super.usage());   // Grab our parent classes usage as well
     }
 
