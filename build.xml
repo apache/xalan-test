@@ -39,8 +39,8 @@
     <property name="Name" value="Testxsl"/>
     <property name="year" value="2000-2001"/>
     <property name="copyright" value="Copyright &#169; ${year} The Apache Software Foundation.  All rights reserved."/>
-    <property name="testxsl.jar.name" value="${name}.jar"/>
-    <property name="qetest.jar.name" value="qetest.jar"/>
+    <property name="javadocs.packages" 
+              value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.trax.dom,org.apache.qetest.trax.sax,org.apache.qetest.trax.stream,org.apache.qetest.xalanj2"/>
 
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
@@ -54,24 +54,17 @@
     <property name="build.dir" value="java/build"/>
     <property name="build.docs" value="${build.dir}/docs"/>
     <property name="build.apidocs" value="${build.docs}/apidocs"/>
-    <property name="javadocs.packages" 
-              value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.trax.dom,org.apache.qetest.trax.sax,org.apache.qetest.trax.stream,org.apache.qetest.xalanj2"/>
-
-    <property name="xdocs.dir" value="java/xdocs"/>
-    <property name="xdocs.book" value="${xdocs.dir}/sources/xalantest.xml"/>
-    <property name="xdocs.style" value="${xdocs.dir}/style"/>
-
+    <property name="testxsl.jar.name" value="${name}.jar"/>
+    <property name="qetest.jar.name" value="qetest.jar"/>
     <property name="testxsl.jar" value="${build.dir}/${testxsl.jar.name}"/>
+    <property name="qetest.jar" value="${build.dir}/${qetest.jar.name}"/>
 
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
     <property name="xalan.reldir" value="../java"/>
     <property name="xalan.bin.dir" value="${xalan.reldir}/bin"/> 
     <property name="xalan.build.dir" value="${xalan.reldir}/build"/> 
     <property name="xalan.xdocs.dir" value="${xalan.reldir}/xdocs"/>
-    <property name="xalan.doclet.jar" value="${xalan.bin.dir}/xalan2jdoc.jar"/>
-    <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
     <property name="xalan.generator.styletargz" value="${xalan.xdocs.dir}/xml-site-style.tar.gz"/>
-    <property name="xdocs.generator.styletar" value="${xdocs.dir}/xml-site-style.tar"/>
 
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
@@ -81,7 +74,23 @@
          get this .jar yourself.  Feel free to reset the location.
     -->
     <property name="js.jar" value="../js.jar"/>
- 
+
+    <!-- Documentation-specific files and locations -->
+    <property name="stylebook.jar" value="${xalan.bin.dir}/stylebook-1.0-b3_xalan-2.jar"/>
+    <property name="doclet.jar" value="${xalan.bin.dir}/xalan2jdoc.jar"/>
+    <property name="test.xdocs.dir" value="java/xdocs"/>
+    <property name="test.generator.styletar" value="${test.xdocs.dir}/xml-site-style.tar"/>
+    <property name="test.xdocs.book" value="${test.xdocs.dir}/sources/xalantest.xml"/>
+    <property name="test.xdocs.style" value="${test.xdocs.dir}/style"/>
+    <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
+    <path id="docs.class.path">
+        <pathelement location="${bsf.jar}" />
+        <pathelement location="${stylebook.jar}" />
+        <pathelement location="${doclet.jar}" />
+        <pathelement location="${xalan.jar}" />
+        <pathelement path="${java.class.path}" />
+    </path>
+
     <!-- Note: given that many of the tests interact with xerces and 
          xalan classes, and that Ant may use these classes (especially parser 
          ones) I've found it's best to fork the tests.
@@ -176,9 +185,9 @@
         description="Prepare output tree for documentation">
         <mkdir dir="${build.apidocs}" />
         <!-- Copy the Xalan-specific version of doc files and untargz them -->
-        <gunzip src="${xalan.generator.styletargz}" dest="${xdocs.generator.styletar}"/>
-        <untar src="${xdocs.generator.styletar}" dest="${xdocs.dir}"/>
-        <delete file="${xdocs.generator.styletar}"/>
+        <gunzip src="${xalan.generator.styletargz}" dest="${test.generator.styletar}"/>
+        <untar src="${test.generator.styletar}" dest="${test.xdocs.dir}"/>
+        <delete file="${test.generator.styletar}"/>
     </target>
 
 
@@ -264,7 +273,7 @@
 
     <target name="jar.qetest" depends="compile.qetest"
         description="Jar base qetest files; no Xalan dependencies">
-        <jar jarfile="${build.dir}/${qetest.jar.name}" 
+        <jar jarfile="${qetest.jar}" 
              basedir="${build.dir}" 
              includes="${test.root}*.java,${test.root}*.properties" />
     </target>
@@ -354,14 +363,12 @@
     <!-- ================================================================== -->
     <target name="docs" depends="init.docs"
         description="Build the framework/overview docs for tests">
-    <java fork="yes" classname="${doc.generator}"> 
-        <classpath>
-            <pathelement location="${xalan.bin.dir}/stylebook-1.0-b3_xalan-2.jar" />
-            <pathelement path="${java.class.path}" />
-        </classpath>
-        <arg line="targetDirectory=${build.docs} ${xdocs.book} ${xdocs.style}"/>    
-    </java>
-  </target>
+        <java fork="yes" 
+            classname="${doc.generator}" 
+            classpathref="docs.class.path" >
+            <arg line="targetDirectory=${build.docs} ${test.xdocs.book} ${test.xdocs.style}"/>
+        </java>	 
+    </target>
 
     <!-- ================================================================== -->
     <!-- Build docs: Creates the Javadoc API documentation                  -->
@@ -383,10 +390,31 @@
              doctitle="${Name}"
              bottom="${copyright}"
              destdir="${build.apidocs}">
-               <doclet name="xalanjdoc.Standard" path="${xalan.doclet.jar}">
+               <doclet name="xalanjdoc.Standard" path="${doclet.jar}">
                   <param name="-d" value="${build.apidocs}"/>
                </doclet>             
         </javadoc>
+    </target>
+
+
+    <!-- =================================================================== -->
+    <!-- Build distribution - simple zip/tar.gz for sharing tests            -->
+    <!-- =================================================================== -->
+    <target name="dist" depends="jar,docs,javadocs"
+        description="Build a simple distribution module">
+        <echo message="Subject to change! Just a simple way to zip it all up for now" />
+        <!-- Zip just the xml/xsl/out test files -->
+        <zip zipfile="${build.dir}/xalan-tests-${DSTAMP}.zip" 
+             excludes="**/*.zip"
+             includes="test/tests/"
+             basedir=".."
+             />
+        <!-- Zip the automation and batch files, etc. -->
+        <zip zipfile="${build.dir}/xalan-automation-${DSTAMP}.zip" 
+             excludes="**/*.zip"
+             includes="test/*.*,test/java/"
+             basedir=".." 
+             />
     </target>
 
 
