@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.2 Creating Elements -->
+  <!-- Discretionary: name="element-name-not-QName" choice="pass-through" -->
   <!-- Creator: Scott Boag -->
   <!-- Purpose: Test for resetting of a prefixed namespace by a LRE. -->
   <!-- Should see one warning about namespace "none" unresolvable.
@@ -19,5 +20,3 @@
 </xsl:template>
 
 </xsl:stylesheet>
-
-
