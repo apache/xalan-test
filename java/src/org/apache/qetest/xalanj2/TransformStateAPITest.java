@@ -93,6 +93,7 @@ import org.xml.sax.SAXException;
 
 // java classes
 import java.io.File;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.lang.reflect.Method;
 
@@ -118,11 +119,14 @@ public class TransformStateAPITest extends XSLProcessorTestBase
      */
     protected XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
 
-    /** 
-     * Another simple test.  
-     */
+    /**  Another simple test.  */
     protected XSLTestfileInfo testFileInfo2 = new XSLTestfileInfo();
 
+    /**  Another simple test for manual debugging.  */
+    protected XSLTestfileInfo testFileInfo3 = new XSLTestfileInfo();
+
+    /**  Another simple test for manual debugging.  */
+    protected XSLTestfileInfo testFileInfo4 = new XSLTestfileInfo();
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String X2J_SUBDIR = "xalanj2";
@@ -133,7 +137,7 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public TransformStateAPITest()
     {
-        numTestCases = 1;  // REPLACE_num
+        numTestCases = 4;  // REPLACE_num
         testName = "TransformStateAPITest";
         testComment = "API coverage testing of TransformState interface";
     }
@@ -168,10 +172,15 @@ public class TransformStateAPITest extends XSLProcessorTestBase
 
         testFileInfo.inputName = testBasePath + "identity.xsl";
         testFileInfo.xmlName = testBasePath + "identity.xml";
-        testFileInfo.goldName = goldBasePath + "identity.out";
-        testFileInfo2.inputName = testBasePath + "URIResolverTest.xsl";
-        testFileInfo2.xmlName = testBasePath + "URIResolverTest.xml";
-        testFileInfo2.goldName = goldBasePath + "URIResolverTest.out";
+
+        testFileInfo3.inputName = testBasePath + "RootTemplate.xsl";
+        testFileInfo3.xmlName = testBasePath + "RootTemplate.xml";
+
+        testFileInfo2.inputName = testBasePath + "TransformStateAPITest.xsl";
+        testFileInfo2.xmlName = testBasePath + "TransformStateAPITest.xml";
+
+        testFileInfo4.inputName = testBasePath + "URIResolverTest.xsl";
+        testFileInfo4.xmlName = testBasePath + "URIResolverTest.xml";
 
         return true;
     }
@@ -186,33 +195,95 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Quick smoketest of TransformState");
         reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
+        doTransform(QetestUtils.filenameToURL(testFileInfo.inputName), 
+                    QetestUtils.filenameToURL(testFileInfo.xmlName), 
+                    null);
 
-        try
-        {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer transformer = factory.newTransformer(new StreamSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
-            reporter.logWarningMsg("---- About to process " + QetestUtils.filenameToURL(testFileInfo.inputName));
-            transformer.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo.xmlName)),
-                                  new SAXResult(this)); // use us to handle result
-            // Reset our transformState after each transform
-            transformState = null;
-
-            Transformer transformer2 = factory.newTransformer(new StreamSource(QetestUtils.filenameToURL(testFileInfo2.inputName)));
-            reporter.logWarningMsg("---- About to process " + QetestUtils.filenameToURL(testFileInfo2.inputName));
-            transformer2.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo2.xmlName)),
-                                  new SAXResult(this)); // use us to handle result
-            //@todo: add specific validation for selected trace elements in specific stylesheets
-        }
-        catch (Throwable t)
-        {
-            reporter.checkFail("testCase1 threw: " + t.toString());
-            reporter.logThrowable(Logger.ERRORMSG, t, "testCase1 threw: ");
-        }
-
+        //@todo: add specific validation for selected trace elements in specific stylesheets
+        reporter.checkPass("Crash test: we haven't crashed yet!");
         reporter.testCaseClose();
         return true;
     }
 
+    /**
+     * Quick smoketest of TransformState.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase2()
+    {
+        reporter.testCaseInit("Quick smoketest of TransformState");
+        reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
+        doTransform(QetestUtils.filenameToURL(testFileInfo2.inputName), 
+                    QetestUtils.filenameToURL(testFileInfo2.xmlName), 
+                    null);
+
+        //@todo: add specific validation for selected trace elements in specific stylesheets
+        reporter.checkPass("Crash test: we haven't crashed yet!");
+        reporter.testCaseClose();
+        return true;
+    }
+
+    /**
+     * Quick smoketest of TransformState.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("Quick smoketest of TransformState");
+        reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
+        doTransform(QetestUtils.filenameToURL(testFileInfo3.inputName), 
+                    QetestUtils.filenameToURL(testFileInfo3.xmlName), 
+                    null);
+
+        //@todo: add specific validation for selected trace elements in specific stylesheets
+        reporter.checkPass("Crash test: we haven't crashed yet!");
+        reporter.testCaseClose();
+        return true;
+    }
+
+    /**
+     * Quick smoketest of TransformState.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Quick smoketest of TransformState");
+        reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
+        doTransform(QetestUtils.filenameToURL(testFileInfo4.inputName), 
+                    QetestUtils.filenameToURL(testFileInfo4.xmlName), 
+                    null);
+
+        //@todo: add specific validation for selected trace elements in specific stylesheets
+        reporter.checkPass("Crash test: we haven't crashed yet!");
+        reporter.testCaseClose();
+        return true;
+    }
+
+    /** Cheap-o worker method to do transform with us as output handler.  */
+    protected void doTransform(String inputURL, String xmlURL, String options)
+    {
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            reporter.logInfoMsg("---- doTransform:" + options); // options otherwise currently unused
+            reporter.logTraceMsg("---- About to newTransformer " + inputURL);
+            Transformer transformer = factory.newTransformer(new StreamSource(inputURL));
+            reporter.logTraceMsg("---- About to transform " + xmlURL + " into: SAXResult(this)");
+            transformer.transform(new StreamSource(xmlURL),
+                                  new SAXResult(this)); // use us to handle result
+            reporter.logInfoMsg("---- Afterwards, this.transformState=" + transformState);
+            transformState = null; // just in case
+            
+        }
+        catch (TransformerException te)
+        {
+            reporter.logThrowable(Logger.ERRORMSG, te, "doTransform threw: ");
+            reporter.checkFail("doTransform threw: " + te.toString());
+        }
+    }
 
     ////////////////// partially Implement LoggingHandler ////////////////// 
     /** Cheap-o string representation of last event we got.  */
@@ -238,17 +309,20 @@ public class TransformStateAPITest extends XSLProcessorTestBase
         return lastItem;
     }
 
-    protected void validateTransformState(TransformState ts, String event, String value)
+    /** Cheap-o static counter to detect multithreading.  */
+    static int validateTransformStateCtr = 0;
+
+    /** Worker routine to validate a TransformState based on an event/value.  */
+    protected synchronized void validateTransformState(TransformState ts, String event, String value)
     {
+        validateTransformStateCtr++;
         if(null == transformState)
         {
-            reporter.logTraceMsg("TS null for:" + event + value);
+            reporter.logTraceMsg("validateTransformState" + validateTransformStateCtr + "(" + event + ")=" + value);
             return;
         }
-        reporter.logArbitrary(traceLoggingLevel, event 
-                + "L" + ts.getCurrentTemplate().getLineNumber()
-                + "C" + ts.getCurrentTemplate().getColumnNumber() + "\n"
-                + getTransformStateDump(ts));
+        reporter.logTraceMsg("validateTransformState" + validateTransformStateCtr + "(" + event + ")=" + value);
+        logTransformStateDump(reporter, traceLoggingLevel, ts, event);
         //@todo: implement validation service for this stuff
         //  focus on what tooling/debugging clients will want to see
     }
@@ -286,31 +360,48 @@ public class TransformStateAPITest extends XSLProcessorTestBase
      * Utility method to dump data from TransformState.  
      * @return String describing various bits of the state
      */
-    protected String getTransformStateDump(TransformState ts)
+    protected void logTransformStateDump(Reporter reporter, int traceLoggingLevel, 
+            TransformState ts, String event)
     {
+        reporter.logTraceMsg("//@todo HACK debug logTransformStateDump " + event);
+        String elemName = "transformStateDump";
+        Hashtable attrs = new Hashtable();
+        attrs.put("event", event);
+        attrs.put("location", "L" + ts.getCurrentTemplate().getLineNumber()
+                  + "C" + ts.getCurrentTemplate().getColumnNumber());
+
         StringBuffer buf = new StringBuffer();
         ElemTemplateElement elem = ts.getCurrentElement(); // may be actual or default template
-        buf.append("getCurrentElement:" + XalanDumper.dump(elem, XalanDumper.DUMP_DEFAULT) + "\n");
+        buf.append("  <currentElement>" 
+                + XMLFileLogger.escapeString(XalanDumper.dump(elem, XalanDumper.DUMP_DEFAULT)) + "</currentElement>\n");
 
         ElemTemplate currentTempl = ts.getCurrentTemplate(); // Actual current template
-        buf.append("getCurrentTemplate:" + XalanDumper.dump(currentTempl, XalanDumper.DUMP_DEFAULT) + "\n");
+        buf.append("  <currentTemplate>" 
+                + XMLFileLogger.escapeString(XalanDumper.dump(currentTempl, XalanDumper.DUMP_DEFAULT)) + "</currentTemplate>\n");
 
         ElemTemplate matchTempl = ts.getMatchedTemplate(); // Actual matched template
         if (matchTempl != currentTempl)
-            buf.append("getMatchedTemplate:" + XalanDumper.dump(matchTempl, XalanDumper.DUMP_DEFAULT) + "\n");
+            buf.append("  <matchedTemplate>" 
+                + XMLFileLogger.escapeString(XalanDumper.dump(matchTempl, XalanDumper.DUMP_DEFAULT)) + "</matchedTemplate>\n");
 
         Node n = ts.getCurrentNode();   // current context node in source tree
-        buf.append("getCurrentNode:" + XalanDumper.dump(n, XalanDumper.DUMP_DEFAULT) + "\n");
+        buf.append("  <currentNode>" 
+                + XMLFileLogger.escapeString(XalanDumper.dump(n, XalanDumper.DUMP_DEFAULT)) + "</currentNode>\n");
 
         Node matchedNode = ts.getMatchedNode(); // node in source matched via getMatchedTemplate
-        buf.append("getMatchedNode:" + XalanDumper.dump(matchedNode, XalanDumper.DUMP_DEFAULT) + "\n");
+        buf.append("  <matchedNode>" 
+                + XMLFileLogger.escapeString(XalanDumper.dump(matchedNode, XalanDumper.DUMP_DEFAULT)) + "</matchedNode>\n");
 
         NodeIterator contextNodeList = ts.getContextNodeList(); // current context node list
-        buf.append("getContextNodeList:" + contextNodeList + "\n");
+        Node rootNode = contextNodeList.getRoot();
+        buf.append("  <contextNodeListGetRoot>" 
+                + XMLFileLogger.escapeString(XalanDumper.dump(rootNode, XalanDumper.DUMP_DEFAULT)) + "</contextNodeListGetRoot>\n");
 
-        Transformer transformer = ts.getTransformer(); // current transformer working
-        buf.append("getTransformer:" + transformer + "\n"); // TBD
-        return buf.toString();
+        // Skip dumping Transformer info until we actually do something with it
+        // Transformer transformer = ts.getTransformer(); // current transformer working
+        // buf.append("getTransformer:" + transformer + "\n"); // TBD
+
+        reporter.logElement(traceLoggingLevel, elemName, attrs, buf.toString());
     }
 
 
@@ -353,7 +444,10 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         setLastItem("startDocument");
         reporter.logMsg(traceLoggingLevel, getLast());
-        reporter.check((null != transformState), true, "transformState non-null in startDocument");
+        // Comment out check call since the spec'd functionality
+        //  is very likely to change to *not* be in startDocument 19-Jun-01 -sc 
+        // reporter.check((null != transformState), true, "transformState non-null in startDocument");
+        reporter.logStatusMsg("transformState in startDocument is: " + transformState);
         docCachedTransformState = transformState; // see endDocument
     }
 
@@ -364,8 +458,11 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         setLastItem("endDocument");
         reporter.logMsg(traceLoggingLevel, getLast());
-        reporter.checkObject(docCachedTransformState, transformState, 
-                       "transformState same in endDocument as startDocument"); // see startDocument
+        // Comment out check call since the spec'd functionality
+        //  is very likely to change to *not* be in startDocument 19-Jun-01 -sc 
+        // reporter.checkObject(docCachedTransformState, transformState, 
+        //               "transformState same in endDocument as startDocument"); // see startDocument
+        reporter.logStatusMsg("transformState in endDocument is: " + transformState);
         docCachedTransformState = null;
     }
 
