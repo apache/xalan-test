@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000-2001 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,17 +55,14 @@
  * <http://www.apache.org/>.
  */
 
-/*
- *
- * XTWrapper.java
- *
- */
 package org.apache.qetest.xslwrapper;
 
 import java.io.File;
 import java.io.PrintWriter;
 
 import java.net.URL;
+import java.util.Hashtable;
+import java.util.Properties;
 
 // The XT (James Clark) implementation
 import org.xml.sax.InputSource;
@@ -77,12 +74,25 @@ import com.jclark.xsl.sax.OutputMethodHandlerImpl;
 import com.jclark.xsl.sax.FileDestination;
 
 /**
- * Implementation of a ProcessorWrapper for XT.
+ * Implementation of TransformWrapper that uses the simplest method 
+ * possible to use James Clark's XT processor.
+ *
  * @author Shane Curcuru
  * @version $Id$
  */
-public class XTWrapper extends ProcessorWrapper
+public class XTWrapper extends TransformWrapperHelper
 {
+
+    /**
+     * Get a general description of this wrapper itself.
+     *
+     * @return Uses XT in simplest manner possible
+     */
+    public String getDescription()
+    {
+        return "Uses XT in simplest manner possible";
+    }
+
 
     /** No-op Ctor for the Xalan-J 1.x wrapper. */
     public XTWrapper(){}
@@ -91,39 +101,50 @@ public class XTWrapper extends ProcessorWrapper
     protected com.jclark.xsl.sax.XSLProcessorImpl processor = null;
 
     /**
-     * NEEDSDOC Method getXTProcessor 
-     *
-     *
-     * NEEDSDOC (getXTProcessor) @return
+     * Cached copy of newProcessor() Hashtable.
      */
-    public com.jclark.xsl.sax.XSLProcessorImpl getXTProcessor()
+    protected Hashtable newProcessorOpts = null;
+
+    /**
+     * Get a specific description of the wrappered processor.  
+     *
+     * @return specific description of the underlying processor or 
+     * transformer implementation: this should include both the 
+     * general product name, as well as specific version info.  If 
+     * possible, should be implemented without actively creating 
+     * an underlying processor.
+     */
+    public Properties getProcessorInfo()
     {
-        return (processor);
+        Properties p = new Properties();
+        p.put("traxwrapper.method", "simple");
+        p.put("traxwrapper.desc", getDescription());
+        //@todo call XT to find version info
+        return p;
     }
 
     /**
-     * Construct a processor of the appropriate flavor, optionally specifying a liaison.
-     * <p>May throw exceptions related to the creating of a new processor.</p>
-     * <ul>XT supports ??? liaisons:
-     * <li>com.jclark.xml.sax.CommentDriver (default)</li>
-     * </ul>
-     * @param liaisonClassName [optional] if non-null & non-blank, classname of an XML liaison
-     * @return (Object)processor as a side effect; null if error
-     * @exception Exception may be thrown by underlying operation
+     * Actually create/initialize an underlying processor or factory.
+     * This creates a com.jclark.xsl.sax.XSLProcessorImpl.  
      *
-     * @throws java.lang.Exception
+     * @param options Hashtable of options, unused.
+     *
+     * @return (Object)getProcessor() as a side-effect, this will 
+     * be null if there was any problem creating the processor OR 
+     * if the underlying implementation doesn't use this
+     *
+     * @throws Exception covers any underlying exceptions thrown 
+     * by the actual implementation
      */
-    public Object createNewProcessor(String liaisonClassName)
-            throws java.lang.Exception  // Cover all exception cases
+    public Object newProcessor(Hashtable options) throws Exception
     {
-
+        newProcessorOpts = options;
         // Cleanup any prior objects 
-        cleanup();
+        reset(false);
 
         processor = new com.jclark.xsl.sax.XSLProcessorImpl();
 
-        if (liaisonClassName == null)
-            liaisonClassName = "com.jclark.xml.sax.CommentDriver";  // default
+        String liaisonClassName = "com.jclark.xml.sax.CommentDriver";  // default
 
         try
         {
@@ -143,62 +164,29 @@ public class XTWrapper extends ProcessorWrapper
             processor = null;
         }
 
-        p = (Object) processor;
-
-        // Return here; will be null if error or exception raised
-        return (p);
+        return (Object)processor;
     }
 
     /**
-     * Get a description of the wrappered processor.
-     * @return info-string describing the processor and possibly it's common options
-     */
-    public String getDescription()
-    {
-
-        if (processor == null)
-        {
-            return ("ERROR: must call createNewProcessor first from: "
-                    + getDescription());
-        }
-        else
-        {
-            StringBuffer buf = new StringBuffer("XT");
-
-            buf.append(";");
-            buf.append("JAVA");
-            buf.append(";");
-            buf.append("unknown_version");
-            buf.append(";");
-            buf.append("unknown_liaison");
-
-            return buf.toString();
-        }
-    }
-
-    /**
-     * Process the xmlSource using the xslStylesheet to produce the resultFile.
-     * <p>May throw exceptions related to asking the processor to perform the process.</p>
-     * <p>Attempts to ask each processor to accomplish the task in the simplest
-     * and most obvious manner.  Often copied from various processor's samples.</p>
-     * @param xmlSource name of source XML file
-     * @param xslStylesheet name of stylesheet XSL file
-     * @param resultFile name of output file, presumably XML
-     * @return milliseconds process time took
-     * @exception Exception may be thrown by underlying operation
+     * Transform supplied xmlName file with the stylesheet in the 
+     * xslName file into a resultName file using XT.
      *
-     * @throws java.lang.Exception
+     * @param xmlName local path\filename of XML file to transform
+     * @param xslName local path\filename of XSL stylesheet to use
+     * @param resultName local path\filename to put result in
+     *
+     * @return array of longs denoting timing of all parts of 
+     * our operation: IDX_OVERALL, IDX_XSLREAD, IDX_XSLBUILD, 
+     * IDX_TRANSFORM, IDX_RESULTWRITE
+     *
+     * @throws Exception any underlying exceptions from the 
+     * wrappered processor are simply allowed to propagate; throws 
+     * a RuntimeException if any other problems prevent us from 
+     * actually completing the operation
      */
-    public long processToFile(
-            String xmlSource, String xslStylesheet, String resultFile)
-                throws java.lang.Exception  // Cover all exception cases
+    public long[] transform(String xmlName, String xslName, String resultName)
+        throws Exception
     {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
         // Declare variables ahead of time to minimize latency
         long startTime = 0;
         long endTime = 0;
@@ -207,10 +195,10 @@ public class XTWrapper extends ProcessorWrapper
         OutputMethodHandlerImpl outHandler =
             new OutputMethodHandlerImpl(processor);
 
-        outHandler.setDestination(new FileDestination(new File(resultFile)));
+        outHandler.setDestination(new FileDestination(new File(resultName)));
 
-        InputSource xmlIS = xtInputSourceFromString(xmlSource);
-        InputSource xslIS = xtInputSourceFromString(xslStylesheet);
+        InputSource xmlIS = xtInputSourceFromString(xmlName);
+        InputSource xslIS = xtInputSourceFromString(xslName);
 
         // Begin timing the process: stylesheet, output, and process
         startTime = System.currentTimeMillis();
@@ -221,15 +209,149 @@ public class XTWrapper extends ProcessorWrapper
 
         endTime = System.currentTimeMillis();
 
-        return (endTime - startTime);
+        long[] times = getTimeArray();
+        times[IDX_OVERALL] = endTime - startTime;
+        return times;
+    }
+
+
+    /**
+     * Pre-build/pre-compile a stylesheet.
+     *
+     * Although the actual mechanics are implementation-dependent, 
+     * most processors have some method of pre-setting up the data 
+     * needed by the stylesheet itself for later use in transforms.
+     * In TrAX/javax.xml.transform, this equates to creating a 
+     * Templates object.
+     * 
+     * Sets isStylesheetReady() to true if it succeeds.  Users can 
+     * then call transformWithStylesheet(xmlName, resultName) to 
+     * actually perform a transformation with this pre-built 
+     * stylesheet.
+     *
+     * @param xslName local path\filename of XSL stylesheet to use
+     *
+     * @return array of longs denoting timing of all parts of 
+     * our operation: IDX_OVERALL, IDX_XSLBUILD
+     *
+     * @throws Exception any underlying exceptions from the 
+     * wrappered processor are simply allowed to propagate; throws 
+     * a RuntimeException if any other problems prevent us from 
+     * actually completing the operation
+     *
+     * @see #transformWithStylesheet(String xmlName, String resultName)
+     */
+    public long[] buildStylesheet(String xslName) throws Exception
+    {
+        // Declare variables ahead of time to minimize latency
+        long startTime = 0;
+        long endTime = 0;
+
+        // Create XT-specific source
+        InputSource xslIS = xtInputSourceFromString(xslName);
+
+        // Begin timing loading the stylesheet
+        startTime = System.currentTimeMillis();
+
+        processor.loadStylesheet(xslIS);  // side effect: also sets the stylesheet
+
+        endTime = System.currentTimeMillis();
+        m_stylesheetReady = true;
+
+        long[] times = getTimeArray();
+        times[IDX_OVERALL] = endTime - startTime;
+        return times;
+    }
+
+    /**
+     * Transform supplied xmlName file with a pre-built/pre-compiled 
+     * stylesheet into a resultName file.  
+     *
+     * User must have called buildStylesheet(xslName) beforehand,
+     * obviously.
+     * Names are assumed to be local path\filename references, and 
+     * will be converted to URLs as needed.
+     *
+     * @param xmlName local path\filename of XML file to transform
+     * @param resultName local path\filename to put result in
+     *
+     * @return array of longs denoting timing of all parts of 
+     * our operation: IDX_OVERALL, 
+     * IDX_XMLREAD, IDX_TRANSFORM, IDX_RESULTWRITE
+     *
+     * @throws Exception any underlying exceptions from the 
+     * wrappered processor are simply allowed to propagate; throws 
+     * a RuntimeException if any other problems prevent us from 
+     * actually completing the operation; throws an 
+     * IllegalStateException if isStylesheetReady() == false.
+     *
+     * @see #buildStylesheet(String xslName)
+     */
+    public long[] transformWithStylesheet(String xmlName, String resultName)
+        throws Exception
+    {
+        if (!isStylesheetReady())
+            throw new IllegalStateException("transformWithStylesheet() when isStylesheetReady() == false");
+
+        // Declare variables ahead of time to minimize latency
+        long startTime = 0;
+        long endTime = 0;
+
+        // Create XT-specific sources
+        OutputMethodHandlerImpl outHandler =
+            new OutputMethodHandlerImpl(processor);
+
+        outHandler.setDestination(new FileDestination(new File(resultName)));
+
+        InputSource xmlIS = xtInputSourceFromString(xmlName);
+
+        // Begin timing the process: stylesheet, output, and process
+        startTime = System.currentTimeMillis();
+
+        processor.setOutputMethodHandler(outHandler);
+        processor.parse(xmlIS);
+
+        endTime = System.currentTimeMillis();
+
+        long[] times = getTimeArray();
+        times[IDX_OVERALL] = endTime - startTime;
+        return times;
+    }
+
+    /**
+     * Transform supplied xmlName file with a stylesheet found in an 
+     * xml-stylesheet PI into a resultName file.
+     *
+     * Names are assumed to be local path\filename references, and 
+     * will be converted to URLs as needed.  Implementations will 
+     * use whatever facilities exist in their wrappered processor 
+     * to fetch and build the stylesheet to use for the transform.
+     *
+     * @param xmlName local path\filename of XML file to transform
+     * @param resultName local path\filename to put result in
+     *
+     * @return array of longs denoting timing of only these parts of 
+     * our operation: IDX_OVERALL, IDX_XSLREAD (time to find XSL
+     * reference from the xml-stylesheet PI), IDX_XSLBUILD, (time 
+     * to then build the Transformer therefrom), IDX_TRANSFORM
+     *
+     * @throws Exception any underlying exceptions from the 
+     * wrappered processor are simply allowed to propagate; throws 
+     * a RuntimeException if any other problems prevent us from 
+     * actually completing the operation
+     */
+    public long[] transformEmbedded(String xmlName, String resultName)
+        throws Exception
+    {
+        throw new RuntimeException("XTWrapper.transformEmbedded not implemented yet!");
     }
 
     /**
      * Worker method for using XT to process.  
      *
-     * NEEDSDOC @param name
+     * @param name local name of file
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return InputSource for XT after munging name as needed
      */
     private InputSource xtInputSourceFromString(String name)
     {
@@ -258,178 +380,63 @@ public class XTWrapper extends ProcessorWrapper
     }
 
     /**
-     * Preprocess a stylesheet and set it into the processor, based on string inputs.
-     * @param xslStylesheet name of stylesheet XSL file
-     * @return milliseconds process time took or ProcessorWrapper.ERROR
-     * @exception Exception may be thrown by underlying operation
+     * Reset our parameters and wrapper state, and optionally 
+     * force creation of a new underlying processor implementation.
      *
-     * @throws java.lang.Exception
-     */
-    public long preProcessStylesheet(String xslStylesheet)
-            throws java.lang.Exception  // should cover all exception cases
-    {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
-        // Declare variables ahead of time to minimize latency
-        long startTime = 0;
-        long endTime = 0;
-
-        // Create XT-specific source
-        InputSource xslIS = xtInputSourceFromString(xslStylesheet);
-
-        // Begin timing loading the stylesheet
-        startTime = System.currentTimeMillis();
-
-        processor.loadStylesheet(xslIS);  // side effect: also sets the stylesheet
-
-        endTime = System.currentTimeMillis();
-        stylesheetReady = true;
-
-        return (endTime - startTime);
-    }
-
-    /**
-     * Process the xmlSource using the xslStylesheet to produce the resultFile.
-     * @param xmlSource name of source XML file
-     * @param resultFile name of output file, presumably XML
-     * @return milliseconds process time took or ProcessorWrapper.ERROR
-     * @exception Exception may be thrown by underlying operation
+     * This always clears our built stylesheet and any parameters 
+     * that have been set.  If newProcessor is true, also forces a 
+     * re-creation of our underlying processor as if by calling 
+     * newProcessor().
      *
-     * @throws java.lang.Exception
+     * @param newProcessor if we should reset our underlying 
+     * processor implementation as well
      */
-    public long processToFile(String xmlSource, String resultFile)
-            throws java.lang.Exception  // should cover all exception cases
+    public void reset(boolean newProcessor)
     {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
-        // Ensure we (apparently) have already processed a stylesheet
-        if (!stylesheetReady)
-            throw new java.lang.IllegalStateException(
-                "You must call preProcessStylesheet first!");
-
-        // Declare variables ahead of time to minimize latency
-        long startTime = 0;
-        long endTime = 0;
-
-        // Create XT-specific sources
-        OutputMethodHandlerImpl outHandler =
-            new OutputMethodHandlerImpl(processor);
-
-        outHandler.setDestination(new FileDestination(new File(resultFile)));
-
-        InputSource xmlIS = xtInputSourceFromString(xmlSource);
-
-        // Begin timing the process: stylesheet, output, and process
-        startTime = System.currentTimeMillis();
-
-        processor.setOutputMethodHandler(outHandler);
-        processor.parse(xmlIS);
-
-        endTime = System.currentTimeMillis();
-
-        return (endTime - startTime);
+        super.reset(newProcessor); // clears indent and parameters
+        m_stylesheetReady = false;
+        if (newProcessor)
+        {
+            try
+            {
+                newProcessor(newProcessorOpts);
+            }
+            catch (Exception e)
+            {
+                //@todo Hmm: what should we do here?
+            }
+        }
     }
 
     /**
-     * Reset the state.
-     */
-    public void reset()
-    {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
-        // processor.reset();  // FIXME: no applicable API?
-        stylesheetReady = false;
-    }
-
-    /**
-     * Set diagnostics output PrintWriter:unimplemented.  
+     * Apply a single parameter to a Transformer.
      *
-     * NEEDSDOC @param pw
-     */
-    public void setDiagnosticsOutput(java.io.PrintWriter pw)
-    {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
-        //processor.setDiagnosticsOutput(pw);  // FIXME: no applicable API?
-    }
-
-    /**
-     * Set the indent level of the processor:unimplemented.  
+     * Overridden for XT to call setParameter().
      *
-     * NEEDSDOC @param i
+     * @param passThru to be passed to each applyParameter() method 
+     * call - for TrAX, you might pass a Transformer object.
+     * @param namespace for the parameter, may be null
+     * @param name for the parameter, should not be null
+     * @param value for the parameter, may be null
      */
-    public void setIndent(int i)
+    protected void applyParameter(Object passThru, String namespace, 
+                                  String name, Object value)
     {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
-        // processor.getXMLProcessorLiaison().setIndent(i); // FIXME: needs to be implemented
+        try
+        {
+            XSLProcessorImpl p = (XSLProcessorImpl)passThru;
+            //@todo: HACK: smash the namespace in - not sure if this is correct
+            if (null != namespace)
+            {
+                name = namespace + ":" + name;
+            }
+            p.setParameter(name, value);
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException("applyParameter threw: " + e.toString());
+        }
     }
 
-    /**
-     * Set a String name=value param in the processor, if applicable.  
-     *
-     * NEEDSDOC @param key
-     * NEEDSDOC @param expression
-     */
-    public void setStylesheetParam(String key, String expression)
-    {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
-        // NEEDSWORK: ensure XT is expecting the same kind of expression as other processors
-        processor.setParameter(key, (Object) expression);
-    }
-
-    /**
-     * Set a String namespace:name=value param in the processor, if applicable.
-     * @todo Needs Implementation: namespace is currently <b>ignored!</b>
-     * @param namespace of the param
-     * @param key name of the param
-     * @param expression value of the param
-     */
-    public void setStylesheetParam(String namespace, String key,
-                                   String expression)
-    {
-
-        // Ensure we (apparently) have some processor
-        if (processor == null)
-            throw new java.lang.IllegalStateException(
-                "You must call createNewProcessor first!");
-
-        // NEEDSWORK: ensure XT is expecting the same kind of expression as other processors
-        processor.setParameter(key, (Object) expression);
-    }
-
-    /** Worker method to cleanup any internal state. */
-    private void cleanup()
-    {
-
-        processor = null;
-        p = null;
-        stylesheetReady = false;
-    }
 }  // end of class XTWrapper
 
