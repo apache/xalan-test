@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-                xmlns:cextend="http://xml.apache.org/xslt"
+                xmlns:cextend="http://xml.apache.org/xalan"
 		        xmlns:test="http://www.cnn.com"
         		xmlns:default="http://www.hello.com"
                 exclude-result-prefixes="test default cextend">
