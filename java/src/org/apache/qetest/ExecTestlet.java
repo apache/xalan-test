@@ -86,6 +86,12 @@ public abstract class ExecTestlet extends FileTestlet
     public static final String OPT_PROGNAME = "progName";
 
     /**
+     * Timing data: how long process takes to exec.  
+     * Default is -1 to represent a bogus number.  
+     */
+    protected long timeExec = -1;
+
+    /**
      * Default path/name of external program to call, OR 
      * actual name of class to call.  
      * @return foo, must be overridden.
@@ -181,7 +187,9 @@ public abstract class ExecTestlet extends FileTestlet
             // ...and execute the method!
             Object[] mainArgs = new Object[1];
             mainArgs[0] = cmdline;
+            final long startTime = System.currentTimeMillis();
             main.invoke(null, mainArgs);
+            timeExec = System.currentTimeMillis() - startTime;
         }
         catch (Throwable t)
         {
@@ -225,6 +233,7 @@ public abstract class ExecTestlet extends FileTestlet
         //  to specify any additional environment needed for the 
         //  second arg to exec();
         String[] environment = null;
+        final long startTime = System.currentTimeMillis();
         proc = r.exec(cmdline, environment);
 
         // Immediately begin capturing any output therefrom
@@ -243,6 +252,8 @@ public abstract class ExecTestlet extends FileTestlet
         {
             // Wait for the process to exit normally
             processReturnVal = proc.waitFor();
+            // Record time we finally rejoin, i.e. when the process is done
+            timeExec = System.currentTimeMillis() - startTime;
         }
         catch (InterruptedException ie1)
         {
@@ -311,10 +322,20 @@ public abstract class ExecTestlet extends FileTestlet
             buf.append("</system-out>\n");
         }
         logger.logElement(Logger.INFOMSG, "checkOutputStreams", attrs, buf.toString());
-        attrs = null;
         buf = null;
-        checkStreams(datalet, cmdline, outBuf, errBuf, processReturnVal);
 
+        // Also log out a perf element by default
+        attrs = new Hashtable();
+        attrs.put("idref", datalet.getInput());
+        attrs.put("program", cmdline[0]);
+        attrs.put("isExternal", new Boolean(isExternal()));
+        attrs.put("timeExec", new Long(timeExec));
+        logger.logElement(Logger.STATUSMSG, "perf", attrs, "Performance/timing info");
+        attrs = null;
+
+        // Also call worker method to allow subclasses to 
+        //  override checking of the output streams, as available
+        checkStreams(datalet, cmdline, outBuf, errBuf, processReturnVal);
     }
     /** 
      * Worker method to validate the System.out/.err streams.  
