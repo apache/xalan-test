@@ -64,6 +64,7 @@ package org.apache.qetest.xalanj2;
 
 // Support for test reporting and harness classes
 import org.apache.qetest.*;
+import org.apache.qetest.trax.*;
 import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
@@ -78,9 +79,7 @@ import org.apache.xalan.serialize.Serializer;
 import org.apache.xalan.templates.OutputProperties;
 
 // Needed SAX, DOM, JAXP classes
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.*;
 // Needed SAX classes
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -95,7 +94,6 @@ import org.xml.sax.ext.DeclHandler;
 
 // Needed DOM classes
 import org.w3c.dom.Node;
-
 
 // java classes
 import java.io.File;
@@ -134,7 +132,7 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public SmoketestOuttakes()
     {
-        numTestCases = 2;  // REPLACE_num
+        numTestCases = 4;  // REPLACE_num
         testName = "SmoketestOuttakes";
         testComment = "Individual test points taken out of other automation files";
     }
@@ -376,7 +374,8 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
 
 
     /**
-    * Serialize a node to System.out.
+    * Serialize a node to System.out; 
+    * used in ExamplesTest; testCase1, testCase2 above
     */
     public void exampleSerializeNode(Node node)
         throws TransformerException, TransformerConfigurationException, 
@@ -395,6 +394,219 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
         reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         // TEST UPDATE - Caller must validate outNames.currentName()
     }  
+
+
+    /**
+     * From ErrorListenerTest.java testCase2
+     * Build a bad stylesheet/do a transform with SAX.
+     * Verify that the ErrorListener is called properly.
+     * Primarily using SAXSources.
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("Build a bad stylesheet/do a transform with SAX");
+        XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+        testFileInfo.inputName = inputDir 
+                              + File.separator 
+                              + "err"
+                              + File.separator + "ErrorListenerTest.xsl";
+        testFileInfo.xmlName = inputDir 
+                              + File.separator 
+                              + "err"
+                              + File.separator + "ErrorListenerTest.xml";
+        testFileInfo.goldName = goldDir 
+                              + File.separator 
+                              + "err"
+                              + File.separator + "ErrorListenerTest.out";
+        int templatesExpectedType = LoggingErrorListener.TYPE_FATALERROR;
+        String templatesExpectedValue = "decimal-format names must be unique. Name \"myminus\" has been duplicated";
+        int transformExpectedType = LoggingErrorListener.TYPE_WARNING;
+        String transformExpectedValue = "ExpectedMessage from:list1";
+        
+        
+        LoggingErrorListener loggingErrorListener = new LoggingErrorListener(reporter);
+        loggingErrorListener.setThrowWhen(LoggingErrorListener.THROW_NEVER);
+        reporter.logTraceMsg("loggingErrorListener originally setup:" + loggingErrorListener.getQuickCounters());
+
+        TransformerFactory factory = null;
+        SAXTransformerFactory saxFactory = null;
+        XMLReader reader = null;
+        Templates templates = null;
+        Transformer transformer = null;
+        TransformerHandler handler = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            saxFactory = (SAXTransformerFactory)factory; // assumes SAXSource.feature!
+
+            // Set the errorListener and validate it
+            saxFactory.setErrorListener(loggingErrorListener);
+            reporter.check((saxFactory.getErrorListener() == loggingErrorListener),
+                           true, "set/getErrorListener on saxFactory");
+
+            // Use the JAXP way to get an XMLReader
+            reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+            InputSource is = new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName));
+
+            // Attempt to build templates from known-bad stylesheet
+            // Validate known errors in stylesheet building 
+            loggingErrorListener.setExpected(templatesExpectedType, 
+                                             templatesExpectedValue);
+            reporter.logTraceMsg("About to factory.newTransformerHandler(SAX:" + QetestUtils.filenameToURL(testFileInfo.inputName) + ")");
+            handler = saxFactory.newTransformerHandler(new SAXSource(is));
+            reporter.logTraceMsg("loggingErrorListener after newTransformerHandler:" + loggingErrorListener.getQuickCounters());
+            // Clear out any setExpected or counters
+            loggingErrorListener.reset();
+            reporter.checkPass("set ErrorListener prevented any exceptions in newTransformerHandler()");
+
+            // This stylesheet will still work, even though errors 
+            //  were detected during it's building.  Note that 
+            //  future versions of Xalan or other processors may 
+            //  not be able to continue here...
+
+            // Create a result and setup SAX parsing 'tree'
+            Result result = new StreamResult(outNames.nextName());
+            handler.setResult(result);
+            reader.setContentHandler(handler);
+
+            LoggingSAXErrorHandler loggingSAXErrorHandler = new LoggingSAXErrorHandler(reporter);
+            loggingSAXErrorHandler.setThrowWhen(LoggingSAXErrorHandler.THROW_NEVER);
+            reporter.logTraceMsg("LoggingSAXErrorHandler originally setup:" + loggingSAXErrorHandler.getQuickCounters());
+            reader.setErrorHandler(loggingSAXErrorHandler);
+            
+            // Validate the first xsl:message call in the stylesheet
+            loggingErrorListener.setExpected(transformExpectedType, 
+                                             transformExpectedValue);
+            reporter.logInfoMsg("about to parse/transform(" + QetestUtils.filenameToURL(testFileInfo.xmlName) + ")");
+            reader.parse(QetestUtils.filenameToURL(testFileInfo.xmlName));
+            reporter.logTraceMsg("LoggingSAXErrorHandler after parse:" + loggingSAXErrorHandler.getQuickCounters());
+            // Clear out any setExpected or counters
+            loggingErrorListener.reset();
+            loggingSAXErrorHandler.reset();
+
+            // Validate the actual output file as well: in this case, 
+            //  the stylesheet should still work
+            fileChecker.check(reporter, 
+                    new File(outNames.currentName()), 
+                    new File(testFileInfo.goldName), 
+                    "Bugzilla#4044 SAX transform of error xsl into: " + outNames.currentName());
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("errorListener-SAX unexpectedly threw: " + t.toString());
+            reporter.logThrowable(Logger.ERRORMSG, t, "errorListener-SAX unexpectedly threw");
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * From ErrorListenerTest.java testCase3
+     * Build a bad stylesheet/do a transform with DOMs.
+     * Verify that the ErrorListener is called properly.
+     * Primarily using DOMSources.
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Build a bad stylesheet/do a transform with DOMs");
+        XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+        testFileInfo.inputName = inputDir 
+                              + File.separator 
+                              + "err"
+                              + File.separator + "ErrorListenerTest.xsl";
+        testFileInfo.xmlName = inputDir 
+                              + File.separator 
+                              + "err"
+                              + File.separator + "ErrorListenerTest.xml";
+        testFileInfo.goldName = goldDir 
+                              + File.separator 
+                              + "err"
+                              + File.separator + "ErrorListenerTest.out";
+        int templatesExpectedType = LoggingErrorListener.TYPE_FATALERROR;
+        String templatesExpectedValue = "decimal-format names must be unique. Name \"myminus\" has been duplicated";
+        int transformExpectedType = LoggingErrorListener.TYPE_WARNING;
+        String transformExpectedValue = "ExpectedMessage from:list1";
+
+        LoggingErrorListener loggingErrorListener = new LoggingErrorListener(reporter);
+        loggingErrorListener.setThrowWhen(LoggingErrorListener.THROW_NEVER);
+        reporter.logTraceMsg("loggingErrorListener originally setup:" + loggingErrorListener.getQuickCounters());
+
+        TransformerFactory factory = null;
+        Templates templates = null;
+        Transformer transformer = null;
+        DocumentBuilderFactory dfactory = null;
+        DocumentBuilder docBuilder = null;
+        Node xmlNode = null;
+        Node xslNode = null;
+        try
+        {
+            // Startup a DOM factory, create some nodes/DOMs
+            dfactory = DocumentBuilderFactory.newInstance();
+            dfactory.setNamespaceAware(true);
+            docBuilder = dfactory.newDocumentBuilder();
+            reporter.logInfoMsg("parsing xml, xsl files to DOMs");
+            xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
+            xmlNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.xmlName)));
+
+            // Create a transformer factory with an error listener
+            factory = TransformerFactory.newInstance();
+            factory.setErrorListener(loggingErrorListener);
+
+            // Attempt to build templates from known-bad stylesheet
+            // Validate known errors in stylesheet building 
+            loggingErrorListener.setExpected(templatesExpectedType, 
+                                             templatesExpectedValue);
+            reporter.logTraceMsg("About to factory.newTemplates(DOM:" + QetestUtils.filenameToURL(testFileInfo.inputName) + ")");
+            templates = factory.newTemplates(new DOMSource(xslNode));
+            reporter.logTraceMsg("loggingErrorListener after newTemplates:" + loggingErrorListener.getQuickCounters());
+            // Clear out any setExpected or counters
+            loggingErrorListener.reset();
+            reporter.checkPass("set ErrorListener prevented any exceptions in newTemplates()");
+
+            // This stylesheet will still work, even though errors 
+            //  were detected during it's building.  Note that 
+            //  future versions of Xalan or other processors may 
+            //  not be able to continue here...
+            reporter.logErrorMsg("Bugzilla#1062 throws NPE below at templates.newTransformer()");
+            transformer = templates.newTransformer();
+
+            reporter.logTraceMsg("default transformer's getErrorListener is: " + transformer.getErrorListener());
+            // Set the errorListener and validate it
+            transformer.setErrorListener(loggingErrorListener);
+            reporter.check((transformer.getErrorListener() == loggingErrorListener),
+                           true, "set/getErrorListener on transformer");
+
+            // Validate the first xsl:message call in the stylesheet
+            loggingErrorListener.setExpected(transformExpectedType, 
+                                             transformExpectedValue);
+            reporter.logInfoMsg("about to transform(DOM, StreamResult)");
+            transformer.transform(new DOMSource(xmlNode), 
+                                  new StreamResult(outNames.nextName()));
+            reporter.logTraceMsg("after transform(...)");
+            // Clear out any setExpected or counters
+            loggingErrorListener.reset();
+
+            // Validate the actual output file as well: in this case, 
+            //  the stylesheet should still work
+            fileChecker.check(reporter, 
+                    new File(outNames.currentName()), 
+                    new File(testFileInfo.goldName), 
+                    "DOM transform of error xsl into: " + outNames.currentName());
+            
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("errorListener-DOM unexpectedly threw: " + t.toString());
+            reporter.logThrowable(Logger.ERRORMSG, t, "errorListener-DOM unexpectedly threw");
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
 
 
     /**

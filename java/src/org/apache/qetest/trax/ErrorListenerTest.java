@@ -89,6 +89,15 @@ import java.util.Properties;
 
 /**
  * Verify that ErrorListeners are called properly from Transformers.
+ * Also verifies basic Transformer behavior after a stylesheet 
+ * with errors has been built.
+ * Note: parts of this test may rely on specific Xalan functionality, 
+ * in that with the specific errors I've chosen, Xalan can actually 
+ * continue to process the stylesheet, even though it had an error.
+ * XSLTC mode may either throw slighly different kinds of errors, or 
+ * may not be able to continue after the error (we should 
+ * investigate changing this test to just verify common things, 
+ * and then check the rest into the xalanj2 directory).
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
@@ -240,14 +249,10 @@ public class ErrorListenerTest extends XSLProcessorTestBase
 
             // Validate the actual output file as well: in this case, 
             //  the stylesheet should still work
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            fileChecker.check(reporter, 
                     new File(outNames.currentName()), 
                     new File(testFileInfo.goldName), 
-                    "transform of error xsl into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("transform of error xsl failure reason:" + fileChecker.getExtendedInfo());
-            
+                    "transform of error xsl into: " + outNames.currentName());
         }
         catch (Throwable t)
         {
@@ -331,13 +336,13 @@ public class ErrorListenerTest extends XSLProcessorTestBase
 
             // Validate the actual output file as well: in this case, 
             //  the stylesheet should still work
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            reporter.logErrorMsg("Output file validation Moved to SmoketestOuttakes.java.testCase3 Oct-01 -sc Bugzilla#4044");
+/* **** Moved to SmoketestOuttakes.java.testCase3 Oct-01 -sc 
+            fileChecker.check(reporter, 
                     new File(outNames.currentName()), 
                     new File(testFileInfo.goldName), 
-                    "SAX transform of error xsl into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("SAX transform of error xsl failure reason:" + fileChecker.getExtendedInfo());
+                    "SAX transform of error xsl into: " + outNames.currentName());
+**** Moved to SmoketestOuttakes.java.testCase3 Oct-01 -sc **** */
             
         }
         catch (Throwable t)
@@ -400,6 +405,9 @@ public class ErrorListenerTest extends XSLProcessorTestBase
             //  were detected during it's building.  Note that 
             //  future versions of Xalan or other processors may 
             //  not be able to continue here...
+            reporter.logErrorMsg("DOM templates/validation Moved to SmoketestOuttakes.java.testCase3 Oct-01 -sc Bugzilla#1062");
+/* **** Moved to SmoketestOuttakes.java.testCase4 Oct-01 -sc 
+            
             transformer = templates.newTransformer();
 
             reporter.logTraceMsg("default transformer's getErrorListener is: " + transformer.getErrorListener());
@@ -420,13 +428,11 @@ public class ErrorListenerTest extends XSLProcessorTestBase
 
             // Validate the actual output file as well: in this case, 
             //  the stylesheet should still work
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            fileChecker.check(reporter, 
                     new File(outNames.currentName()), 
                     new File(testFileInfo.goldName), 
-                    "DOM transform of error xsl into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("DOM transform of error xsl failure reason:" + fileChecker.getExtendedInfo());
+                    "DOM transform of error xsl into: " + outNames.currentName());
+**** Moved to SmoketestOuttakes.java.testCase4 Oct-01 -sc **** */
             
         }
         catch (Throwable t)
@@ -480,18 +486,17 @@ public class ErrorListenerTest extends XSLProcessorTestBase
 
             // Validate that one warning (about illegal-encoding-value) should have been reported
             int[] errCtr = loggingErrorListener.getCounters();
+            reporter.logErrorMsg("Validation of warning throw Moved to Bugzilla1266.java Oct-01 -sc");
+/* **** Moved to Bugzilla1266.java Oct-01 -sc
             reporter.check((errCtr[LoggingErrorListener.TYPE_WARNING] > 0), true, "At least one Warning listned to for illegal-encoding-value");
+**** Moved to Bugzilla1266.java Oct-01 -sc **** */
             
             // Validate the actual output file as well: in this case, 
             //  the stylesheet should still work
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            fileChecker.check(reporter, 
                     new File(outNames.currentName()), 
                     new File(goodFileInfo.goldName), 
-                    "transform of good xsl w/bad output props into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("transform of error xsl failure reason:" + fileChecker.getExtendedInfo());
-            
+                    "transform of good xsl w/bad output props into: " + outNames.currentName());
         }
         catch (Throwable t)
         {
