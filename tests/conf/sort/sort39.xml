@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<xml>
+  <data>
+    <row><COLUMN1>ABC</COLUMN1><COLUMN2>ABC2</COLUMN2></row>
+    <row><COLUMN1>GHI</COLUMN1><COLUMN2>GHI2</COLUMN2></row>
+    <row><COLUMN1>DEF</COLUMN1><COLUMN2>DEF2</COLUMN2></row>
+    <columntype>
+      <COLUMN1>string</COLUMN1>
+      <COLUMN2>string</COLUMN2>
+    </columntype>
+    <truncated>no</truncated>
+    <truncationsize>1000</truncationsize>
+  </data>
+</xml>
