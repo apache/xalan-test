@@ -76,10 +76,9 @@ import org.apache.xalan.xsltc.compiler.Constants;
 import org.apache.xalan.xsltc.compiler.XSLTC;
 import org.apache.xalan.xsltc.dom.Axis;
 import org.apache.xalan.xsltc.dom.DOMImpl;
-import org.apache.xalan.xsltc.dom.DTDMonitor;
 import org.apache.xalan.xsltc.runtime.AbstractTranslet;
-import org.apache.xalan.xsltc.runtime.DefaultSAXOutputHandler;
-import org.apache.xalan.xsltc.runtime.TextOutput;
+import org.apache.xml.serializer.SerializationHandler;
+import org.apache.xml.serializer.ToTextStream;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -275,20 +274,11 @@ private DOMImpl getDOM(String xmldocname)
 
 private void doTransform(Translet translet, DOMImpl dom) 
 {
-    DefaultSAXOutputHandler outputhandlr = null;
-    TextOutput textoutput = null;
-    try 
-    {
-      outputhandlr= new DefaultSAXOutputHandler(System.out, "utf-8");
-      textoutput = new TextOutput(outputhandlr, "utf-8");
-    } 
+    SerializationHandler textoutput;
     
-    catch (IOException e) 
-    {
-      System.err.println("Could not create SAX Output Handler."+
-                          e.getMessage());
-      System.exit(1);
-    }
+    textoutput = new ToTextStream();
+    textoutput.setOutputStream(System.out);
+    textoutput.setEncoding("utf-8");
   
     // for XSL keys
     AbstractTranslet absTranslet = (AbstractTranslet)translet;

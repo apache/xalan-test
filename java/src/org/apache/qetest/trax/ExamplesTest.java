@@ -62,6 +62,7 @@
  */
 package org.apache.qetest.trax;
 
+// Support for test reporting and harness classes
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -99,9 +100,9 @@ import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
-import org.apache.xalan.serialize.Serializer;
-import org.apache.xalan.serialize.SerializerFactory;
-import org.apache.xalan.templates.OutputProperties;
+import org.apache.xml.serializer.OutputPropertiesFactory;
+import org.apache.xml.serializer.Serializer;
+import org.apache.xml.serializer.SerializerFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -543,7 +544,7 @@ public class ExamplesTest extends FileBasedTest
 
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
-                                  (OutputProperties.getDefaultMethodProperties("xml"));
+                                  (OutputPropertiesFactory.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());
           serializer.setOutputStream(fos);
           reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());
@@ -616,7 +617,7 @@ public class ExamplesTest extends FileBasedTest
           
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
-                                  (OutputProperties.getDefaultMethodProperties("xml"));
+                                  (OutputPropertiesFactory.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());                        
           serializer.setOutputStream(fos);
           reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());
@@ -672,7 +673,7 @@ public class ExamplesTest extends FileBasedTest
 
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
-                                  (OutputProperties.getDefaultMethodProperties("xml"));
+                                  (OutputPropertiesFactory.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());
           serializer.setOutputStream(fos);
           reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());
@@ -784,7 +785,7 @@ public class ExamplesTest extends FileBasedTest
 
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
-                                  (OutputProperties.getDefaultMethodProperties("xml"));
+                                  (OutputPropertiesFactory.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());
           serializer.setOutputStream(fos);
           reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());

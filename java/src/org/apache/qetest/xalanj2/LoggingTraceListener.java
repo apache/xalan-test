@@ -73,6 +73,7 @@ import org.apache.xalan.trace.GenerateEvent;
 import org.apache.xalan.trace.SelectionEvent;
 import org.apache.xalan.trace.TraceListener;
 import org.apache.xalan.trace.TracerEvent;
+import org.apache.xml.serializer.SerializerTrace;
 import org.apache.xpath.axes.ContextNodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
@@ -358,45 +359,45 @@ public class LoggingTraceListener extends LoggingHandler
         StringBuffer buf = new StringBuffer("  <eventtype ");
         switch (generateEvent.m_eventtype)
         {
-            case GenerateEvent.EVENTTYPE_STARTDOCUMENT :
+            case SerializerTrace.EVENTTYPE_STARTDOCUMENT :
                 buf.append("type=\"STARTDOCUMENT\">");
             break;
 
-            case GenerateEvent.EVENTTYPE_ENDDOCUMENT :
+            case SerializerTrace.EVENTTYPE_ENDDOCUMENT :
                 buf.append("type=\"ENDDOCUMENT\">");
             break;
 
-            case GenerateEvent.EVENTTYPE_STARTELEMENT :
+            case SerializerTrace.EVENTTYPE_STARTELEMENT :
                 buf.append("type=\"STARTELEMENT\">" + generateEvent.m_name);
             break;
 
-            case GenerateEvent.EVENTTYPE_ENDELEMENT :
+            case SerializerTrace.EVENTTYPE_ENDELEMENT :
                 buf.append("type=\"ENDELEMENT\">" + generateEvent.m_name);
             break;
 
-            case GenerateEvent.EVENTTYPE_CHARACTERS :
+            case SerializerTrace.EVENTTYPE_CHARACTERS :
                 String chars1 = new String(generateEvent.m_characters, generateEvent.m_start, generateEvent.m_length);
                 buf.append("type=\"CHARACTERS\">" + chars1);
             break;
 
-            case GenerateEvent.EVENTTYPE_CDATA :
+            case SerializerTrace.EVENTTYPE_CDATA :
                 String chars2 = new String(generateEvent.m_characters, generateEvent.m_start, generateEvent.m_length);
                 buf.append("type=\"CDATA\">" + chars2);
             break;
 
-            case GenerateEvent.EVENTTYPE_COMMENT :
+            case SerializerTrace.EVENTTYPE_COMMENT :
                 buf.append("type=\"COMMENT\">" + generateEvent.m_data);
             break;
 
-            case GenerateEvent.EVENTTYPE_PI :
+            case SerializerTrace.EVENTTYPE_PI :
                 buf.append("type=\"PI\">" + generateEvent.m_name + ", " + generateEvent.m_data);
             break;
 
-            case GenerateEvent.EVENTTYPE_ENTITYREF :
+            case SerializerTrace.EVENTTYPE_ENTITYREF :
                 buf.append("type=\"ENTITYREF\">" + generateEvent.m_name);
             break;
 
-            case GenerateEvent.EVENTTYPE_IGNORABLEWHITESPACE :
+            case SerializerTrace.EVENTTYPE_IGNORABLEWHITESPACE :
                 buf.append("type=\"IGNORABLEWHITESPACE\">");
             break;
         }

@@ -62,6 +62,7 @@
  */
 package org.apache.qetest.xalanj2;
 
+// Support for test reporting and harness classes
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -96,9 +97,9 @@ import org.apache.qetest.trax.LoggingErrorListener;
 import org.apache.qetest.trax.LoggingURIResolver;
 import org.apache.qetest.xsl.LoggingSAXErrorHandler;
 import org.apache.qetest.xsl.XSLTestfileInfo;
-import org.apache.xalan.serialize.Serializer;
-import org.apache.xalan.serialize.SerializerFactory;
-import org.apache.xalan.templates.OutputProperties;
+import org.apache.xml.serializer.OutputPropertiesFactory;
+import org.apache.xml.serializer.Serializer;
+import org.apache.xml.serializer.SerializerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -213,7 +214,7 @@ public class SmoketestOuttakes extends FileBasedTest
 
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
-                                  (OutputProperties.getDefaultMethodProperties("xml"));
+            (OutputPropertiesFactory.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());
           serializer.setOutputStream(fos);
           reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());

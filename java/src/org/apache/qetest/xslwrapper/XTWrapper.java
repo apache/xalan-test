@@ -58,20 +58,11 @@
 package org.apache.qetest.xslwrapper;
 
 import java.io.File;
-import java.io.PrintWriter;
-
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Properties;
 
-// The XT (James Clark) implementation
 import org.xml.sax.InputSource;
-import org.xml.sax.Parser;
-
-import com.jclark.xsl.sax.XMLProcessorEx;
-import com.jclark.xsl.sax.XSLProcessorImpl;
-import com.jclark.xsl.sax.OutputMethodHandlerImpl;
-import com.jclark.xsl.sax.FileDestination;
 
 /**
  * Implementation of TransformWrapper that uses the simplest method 
