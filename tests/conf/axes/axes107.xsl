@@ -6,7 +6,10 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.2 -->
   <!-- Purpose: Tests apply-templates starting with a attribute axes
-       followed by additional relative-location-path steps. -->
+       followed by additional relative-location-path steps. Note that
+       namespace nodes should not be included on the preceeding axis,
+       and specifically that the implied declaration of xml: should
+       not appear in the output. -->
   <!-- Author: Paul Dick -->
 
 <xsl:template match="/">
