@@ -61,7 +61,7 @@ import java.io.StringReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.xml.xdm.Axis;
+import org.apache.xml.dtm.Axis;
 import org.apache.xml.dtm.DTM;
 import org.apache.xml.dtm.DTMAxisTraverser;
 import org.apache.xml.dtm.DTMManager;
