@@ -392,7 +392,12 @@
     </target>
     <target name="smoketest.gump" 
             description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies"
-            depends="jar,minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass,smoketest-results-dist">
+            depends="jar,minitest-execute,smoketest-execute,smoketest-results-dist,dist-nodeps,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
+        <!-- This compiles the minimum to run the smoketests, runs them, 
+             and creates distros just of the results and existing tree, 
+             without actually running the docs - this is to ensure that 
+             doc build errors in the tests won't affect GUMP runs.
+        -->
     </target>
 
     <target name="smoketest-execute">
@@ -430,9 +435,18 @@
         <echo message=" [minitest] See details in ${smoketest.api.logFile}" />
     </target>
 
-    <target name="smoketest-results-dist" if="smoketest.results.dist" depends="init.test">
+    <target name="smoketest-results-dist" depends="init.test">
+        <!-- tar.gz the automation and batch files, etc. -->
+        <tar tarfile="../xalan-smoketest-${DSTAMP}.tar" 
+             includes="xml-xalan/test/smoketest/"
+             basedir="../.." 
+             />
+        <gzip src="../xalan-smoketest-${DSTAMP}.tar" 
+              zipfile="../xalan-smoketest-${DSTAMP}.tar.gz"/>
+        <delete file="../xalan-smoketest-${DSTAMP}.tar"/>
+
         <!-- Create a cheap .zip file of just the results from the smoketest -->
-        <zip zipfile="${test.build.dir}/smoketest-results-${DSTAMP}.zip" 
+        <zip zipfile="../xalan-smoketest-${DSTAMP}.zip" 
              includes="xml-xalan/test/smoketest/"
              basedir="../.."
              />
@@ -689,20 +703,46 @@
     <!-- =================================================================== -->
     <!-- Build distribution - simple zip/tar.gz for sharing tests            -->
     <!-- =================================================================== -->
-    <target name="dist" depends="all,docs,javadocs"
-        description="Build a simple distribution module">
-        <echo message="Subject to change! Just a simple way to zip it all up for now" />
+    <target name="dist" depends="all,docs,javadocs,dist-nodeps"
+        description="Build a simple distribution module from all plus docs">
+    </target>
+
+    <target name="dist-nodeps" depends="init.build"
+        description="Build a simple distribution module, without depends">
+        <echo message="Create .zip/.tar/gz in parent xml-xalan directory" />
+        <!-- Note: I'd rather dump these in the xml-xalan/test/java/build 
+             directory where all the rest of the outputs from the build 
+             go, but for the life of me I can't get excludes to work 
+             properly when doing that from basedir ../..
+        -->
+        <!-- Build .tars, then .gzs, then cleanup .tars before doing .zips -->
+        <!-- tar.gz just the xml/xsl/out test files -->
+        <tar tarfile="../xalan-tests-${DSTAMP}.tar" 
+             includes="xml-xalan/test/tests/"
+             basedir="../.."
+             />
+        <gzip src="../xalan-tests-${DSTAMP}.tar" 
+              zipfile="../xalan-tests-${DSTAMP}.tar.gz"/>
+        <delete file="../xalan-tests-${DSTAMP}.tar"/>
+              
+        <!-- tar.gz the automation and batch files, etc. -->
+        <tar tarfile="../xalan-automation-${DSTAMP}.tar" 
+             includes="xml-xalan/test/*.*,xml-xalan/test/java/"
+             basedir="../.." 
+             />
+        <gzip src="../xalan-automation-${DSTAMP}.tar" 
+              zipfile="../xalan-automation-${DSTAMP}.tar.gz"/>
+        <delete file="../xalan-automation-${DSTAMP}.tar"/>
+
         <!-- Zip just the xml/xsl/out test files -->
-        <zip zipfile="${test.build.dir}/xalan-tests-${DSTAMP}.zip" 
-             excludes="**/*.zip"
-             includes="test/tests/"
-             basedir=".."
+        <zip zipfile="../xalan-tests-${DSTAMP}.zip" 
+             includes="xml-xalan/test/tests/"
+             basedir="../.."
              />
         <!-- Zip the automation and batch files, etc. -->
-        <zip zipfile="${test.build.dir}/xalan-automation-${DSTAMP}.zip" 
-             excludes="**/*.zip"
-             includes="test/*.*,test/java/"
-             basedir=".." 
+        <zip zipfile="../xalan-automation-${DSTAMP}.zip" 
+             includes="xml-xalan/test/*.*,xml-xalan/test/java/"
+             basedir="../.." 
              />
     </target>
 
