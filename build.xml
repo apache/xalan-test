@@ -36,10 +36,6 @@
    -->
     <property environment="ENV" />
 
-    <!-- Note the testxsl.jar property may be overwritten when external 
-         build.xml scripts call us via <ant>, thus creating a 
-         differently-named output jar instead of 'testxsl' 
-   -->
     <property name="name" value="testxsl"/>
     <property name="Name" value="Testxsl"/>
     <property name="year" value="2000-2001"/>
@@ -59,8 +55,13 @@
     <property name="test.build.dir" value="java/build"/>
     <property name="test.build.docs" value="${test.build.dir}/docs"/>
     <property name="test.build.apidocs" value="${test.build.docs}/apidocs"/>
-    <property name="test.bugzilla.dir" value="tests/bugzilla"/>
-    <property name="testxsl.jar.name" value="${name}.jar"/>
+    <property name="tests.bugzilla.dir" value="tests/bugzilla"/>
+    <property name="tests.bugzilla.build.dir" value="tests/bugzilla/build"/>
+    <property name="tests.extensions.dir" value="${extensions.inputDir}/java"/>
+    <property name="tests.extensions.build.dir" value="${extensions.inputDir}/java/build"/>
+    
+    <!-- Names/locations of .jar files we build -->
+    <property name="testxsl.jar.name" value="testxsl.jar"/>
     <property name="qetest.jar.name" value="qetest.jar"/>
     <property name="testxsl.jar" value="${test.build.dir}/${testxsl.jar.name}"/>
     <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
@@ -76,10 +77,10 @@
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
     <property name="xerces.jar" value="${xalan.bin.dir}/xerces.jar"/>
     <property name="bsf.jar" value="${xalan.bin.dir}/bsf.jar"/>
-    <!-- The js.jar is for Javascript extension tests; you must 
+    <!-- The js.jar is for Javascript extensions tests; you must 
          get this .jar yourself.  Feel free to reset the location.
     -->
-    <property name="js.jar" value="../js.jar"/>
+    <property name="js.jar" value="../../js.jar"/>
 
     <!-- Documentation-specific files and locations -->
     <property name="stylebook.jar" value="${xalan.bin.dir}/stylebook-1.0-b3_xalan-2.jar"/>
@@ -127,7 +128,6 @@
         <pathelement location="${xalan.jar}" />
         <pathelement location="${xerces.jar}" />
         <pathelement location="${testxsl.jar}" />
-        <!-- Need to add extensions dir too -->
     </path>
 
     <!-- Classpath used when running conf or conformance tests -->
@@ -150,8 +150,17 @@
 
     <!-- Classpath used when running Bugzilla tests -->
     <path id="bugzilla.class.path">
-        <path refid="conf.class.path" />
-        <pathelement location="${test.bugzilla.dir}" />
+        <path refid="api.class.path" />
+        <pathelement location="${tests.bugzilla.build.dir}" />
+    </path>
+
+    <!-- Classpath used when running extensions tests -->
+    <path id="extensions.class.path">
+        <path refid="api.class.path" />
+        <pathelement location="${bsf.jar}" />
+        <pathelement location="${js.jar}" />
+        <pathelement location="${tests.extensions.build.dir}" />
+        <!-- Add more pathelements if we add more Java extensions dirs -->        
     </path>
 
     <!-- ================================================================== -->
@@ -282,13 +291,12 @@
         </antcall>
     </target>
 
-
     <!-- ================================================================== -->
     <!-- Run tests: all Bugzilla testlets to regress bugs                   -->
     <!-- ================================================================== -->
-    <target name="bugzilla" description="Run all Bugzilla testlets to regress bugs"
+    <target name="bugzilla" description="Run all Bugzilla Testlets and tests to regress bugs"
         depends="init.test">
-        <echo message="Executing various bugzilla Testlets and tests" />
+        <echo message="Run all Bugzilla Testlets and tests to regress bugs" />
         <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.BugzillaTestletDriver" />
         <property name="testType" value="bugzilla." />
@@ -298,6 +306,25 @@
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <echo message="If you got ClassNotFound, did you 'build bugzilla.classes' first?" />
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- Run tests: various extensions tests using driver                    -->
+    <!-- ================================================================== -->
+    <target name="extensions" description="Run various extensions tests using driver"
+        depends="init.test">
+        <echo message="Run various extensions tests using driver" />
+        <!-- Set the default conformance test driver, user may 
+             override; note test.properties:extensions.testlet= 
+        -->
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <property name="testType" value="extensions." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="extensions.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" />
+        <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
     </target>
 
     <!-- ================================================================== -->
@@ -482,28 +509,37 @@
     <!-- excludes="Bugzilla1288.java"; test refers to removed classes -->
     <target name="bugzilla.classes" depends="jar"
         description="Compile any bugzilla testlet classes">
-        <javac srcdir="${test.bugzilla.dir}" 
-               destdir="${test.bugzilla.dir}" 
+        <mkdir dir="${tests.bugzilla.build.dir}" />
+        <javac srcdir="${tests.bugzilla.dir}" 
+               destdir="${tests.bugzilla.build.dir}" 
                debug="${debug}"
                excludes="Bugzilla1288.java"
-               classpathref="api.class.path" />
+               classpathref="bugzilla.class.path" />
     </target>
 
-    <target name="extension.classes" depends="jar"
-        description="[FUTUREUSE] Compile any extension test classes">
-        <echo message="[FUTUREUSE] Compile any extension test classes" />
+    <target name="extensions.classes" depends="jar"
+        description="Compile any extensions test classes">
+        <mkdir dir="${tests.extensions.build.dir}" />
+        <javac srcdir="${tests.extensions.dir}" 
+               destdir="${tests.extensions.build.dir}" 
+               debug="${debug}"
+               classpathref="extensions.class.path" />
+        <!-- Add more javac calls if we add more Java extensions dirs -->        
     </target>
+
     <!-- This target compiles both the main tests and test drivers 
          in testxsl.jar from the java/ directory, as well as 
          various other classes in subdirs under tests/
     -->
     <target name="all" description="Build testxsl.jar *and* compile .java under tests/ dir"
-        depends="jar,bugzilla.classes,extension.classes">
+        depends="jar,bugzilla.classes,extensions.classes">
     </target>
 
     <target name="clean"
         description="Clean up the compiled tests and docs">
         <delete dir="${test.build.dir}"/>
+        <delete dir="${tests.bugzilla.build.dir}"/>
+        <delete dir="${tests.extensions.build.dir}"/>
         <delete dir="${xdocs.style}"/> <!-- init.build.docs creates this tree -->
     </target>
 
@@ -550,7 +586,7 @@
     <!-- =================================================================== -->
     <!-- Build distribution - simple zip/tar.gz for sharing tests            -->
     <!-- =================================================================== -->
-    <target name="dist" depends="jar,docs,javadocs"
+    <target name="dist" depends="all,docs,javadocs"
         description="Build a simple distribution module">
         <echo message="Subject to change! Just a simple way to zip it all up for now" />
         <!-- Zip just the xml/xsl/out test files -->
@@ -572,26 +608,50 @@
     <!-- Special: Targets specific to XSLTC which requires extra .jars      -->
     <!-- This section will be updated as xsltc integrates more with xalan   -->
     <!-- ================================================================== -->
-    <path id="xsltc.class.path">
+    <!-- Actually, I'd like to figure out some sneaky Ant trick to 
+         allow swapping of parts of classpaths (i.e. swap in xsltc.jar 
+         and related files instead of xalan.jar; likewise replace 
+         xerces.jar with the PARSER_JAR defined outside) to clean 
+         this section up.  But for the time being I'm planning on 
+         simply maintaining separate-but-equal targets.xsltc
+    -->
+
+    <path id="xsltc.runtime.class.path">
+        <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.build.dir}/xsltc.jar" />
         <pathelement location="${xalan.bin.dir}/BCEL.jar" />
         <pathelement location="${xalan.bin.dir}/JLex.jar" />
         <pathelement location="${xalan.bin.dir}/java_cup.jar" />
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
         <pathelement location="${testxsl.jar}" />
-        <pathelement path="${java.class.path}" />
         <pathelement location="${xerces.jar}" />
         <pathelement location="${xalan.jar}" />
-        <!-- Note addition of . to the classpath to enable loading of translets -->
+    </path>
+    <!-- xsltc-folk: are these the correct classpaths needed? -->
+    <path id="xsltc.compile.class.path">
+        <pathelement path="${java.class.path}" />
+        <pathelement location="${xalan.build.dir}/xsltc.jar" />
+        <pathelement location="${xalan.bin.dir}/BCEL.jar" />
+        <pathelement location="${xalan.bin.dir}/JLex.jar" />
+        <pathelement location="${xalan.bin.dir}/java_cup.jar" />
+        <pathelement location="${xalan.bin.dir}/runtime.jar" />
+        <pathelement location="${testxsl.jar}" />
+        <pathelement location="${xerces.jar}" />
+        <pathelement location="${xalan.jar}" />
+        <!-- Note addition of . to the classpath to enable loading 
+             of translets; this needs more work and coordination 
+             with tests and translet output dirs.
+        -->
         <pathelement location="." />
     </path>
+
     <target name="compile.xsltc.xslwrappers" depends="compile.xsl"
         description="Compile Xsltc*Wrapper xslwrappers only">
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xslwrapper/Xsltc*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
                debug="${debug}">
-            <classpath refid="xsltc.class.path" />
+            <classpath refid="xsltc.compile.class.path" />
         </javac>               
     </target>
 
@@ -601,7 +661,7 @@
                destdir="${test.build.dir}" 
                includes="${test.root}xsltc/*.java"
                debug="${debug}">
-            <classpath refid="xsltc.class.path" />
+            <classpath refid="xsltc.compile.class.path" />
         </javac>               
     </target>
 
@@ -620,7 +680,25 @@
         <property name="testType" value="conf.xsltc." />
         <xalantest test="${testClass}"
             testType="${testType}"
-            classpathref="xsltc.class.path"
+            classpathref="xsltc.runtime.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}">
+            <!-- Explicitly set TransformerFactory property to use xsltc -->
+            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
+        </xalantest>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- Run tests: a specific named API test with xsltc code               -->
+    <!-- ================================================================== -->
+    <target name="api.xsltc" description="Run a specific API test with xsltc code"
+        depends="init.test">
+        <!-- Note no default is set; also testClass is not prefixed! -->
+        <echo message="Executing Xalan-xsltc api test: ${testClass}" />
+        <property name="testType" value="api." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="xsltc.compile.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}">
             <!-- Explicitly set TransformerFactory property to use xsltc -->
