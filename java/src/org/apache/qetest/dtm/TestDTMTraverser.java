@@ -111,8 +111,7 @@ static final String[] TYPENAME=
 			String defaultSource=
 				"<?xml version=\"1.0\"?>\n"+
 				"<Document>"+
-				"<A><B hat=\"new\" car=\"Honda\" dog=\"Boxer\">NodeB</B></A>"+
-				"<C>NodeC<D/>Words</C>"+
+				"<A><B><C><D><E><F/></E></D></C></B></A><Aa/>"+
 				"</Document>";
 
 			source=new StreamSource(new StringReader(defaultSource));
@@ -135,17 +134,41 @@ static final String[] TYPENAME=
       DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       DTM dtm=manager.getDTM(source, true, null, false, true);
 
-	  // Get the root node and then the first child.
-	  int parent = dtm.getDocument();
-	  parent = dtm.getFirstChild(parent);
+	  // Get the Document node and then the first child.
+	  int dtmRoot = dtm.getDocument();			// #document
+	  int child = dtm.getFirstChild(dtmRoot);	// <Document>
+	  int sndChild = dtm.getFirstChild(child);	// <A>
       
 	  // Get a traverser for CHILD:: axis.
+	  System.out.println("#### First Traverser for <Document>\n");			   
       DTMAxisTraverser at = dtm.getAxisTraverser(Axis.CHILD);
 
 	  // Traverse the axis and print out node info.
-      for (int child = at.first(parent); DTM.NULL != child;
-              child = at.next(parent, child))
-		printNode(dtm, child, " ");
+      for (int atNode = at.first(child); DTM.NULL != atNode;
+              atNode = at.next(child, atNode))
+		printNode(dtm, atNode, " ");
+
+	  // Get a traverser for DESCENDANT:: axis.
+	  System.out.println("#### Second Traverser for <A>\n");
+      DTMAxisTraverser at2 = dtm.getAxisTraverser(Axis.DESCENDANT);
+
+	  // Traverse the axis and print out node info.
+	  int lastNode = 0;
+      for (int atNode = at2.first(sndChild); DTM.NULL != atNode;
+              atNode = at2.next(sndChild, atNode))
+		{
+			printNode(dtm, atNode, " ");
+			lastNode = atNode;
+		}
+
+	  // Get a traverser for ANCESTOR:: axis.
+	  System.out.println("#### Third Traverser for <F>\n");
+      DTMAxisTraverser at3 = dtm.getAxisTraverser(Axis.ANCESTOR);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at3.first(lastNode); DTM.NULL != atNode;
+              atNode = at3.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
 
     }
     catch(Exception e)
