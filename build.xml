@@ -60,13 +60,14 @@
     <property name="tests.bugzilla.build.dir" value="tests/bugzilla/build"/>
     <property name="tests.extensions.dir" value="${extensions.inputDir}/java"/>
     <property name="tests.extensions.build.dir" value="${extensions.inputDir}/java/build"/>
+
     
     <!-- Names/locations of .jar files we build -->
     <property name="testxsl.jar.name" value="testxsl.jar"/>
     <property name="qetest.jar.name" value="qetest.jar"/>
     <property name="testxsl.jar" value="${test.build.dir}/${testxsl.jar.name}"/>
     <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
-
+	
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
     <property name="xalan.relpath" value="../java"/>
     <property name="xalan.bin.dir" value="${xalan.relpath}/bin"/> 
@@ -724,6 +725,7 @@
                debug="${debug}" />
     </target>
 
+
     <target name="jar.qetest" depends="compile.qetest"
         description="Jar base qetest files; no Xalan dependencies">
         <jar jarfile="${qetest.jar}" 
@@ -792,7 +794,7 @@
         <echo message="Compile Xalan-J 2.x specific tests" />
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}xalanj2/*.java"
+               includes="${test.root}xalanj2/*.java,${test.root}dtm/*.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
     </target>
@@ -1093,6 +1095,26 @@
         </antcall>
     </target>
 
+
+    <target name="perf.saxon" description="Run TestletDriver over the perf tree using Saxon">
+		<!-- New addition,  NOT TESTED -->
+        <!-- Set the default conformance test driver, user may override -->
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <echo message="Executing Saxon perf test: ${testClass}" />
+        <!-- Special: allow explicit test.properties overrides for inputDir, etc for Saxon -->
+        <property name="testType" value="perf.saxon." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="saxon.runtime.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}">
+            <!-- Explicitly set TransformerFactory property to use saxon -->
+            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.saxon.trax.TransformerFactoryImpl"/>
+        </xalantest>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${perf.saxon.outputDir}"/>
+        </antcall>
+    </target>
 
     <!-- ================================================================== -->
     <!-- Run tests: a specific named API test with xsltc code               -->
