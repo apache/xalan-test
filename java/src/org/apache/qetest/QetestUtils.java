@@ -199,17 +199,20 @@ public class QetestUtils
      * analysis stylesheets to create comparative charts showing 
      * differences in results and timing data from one run of 
      * a test to another.
+     *
+     * Current format: MMMdd-hhmm[;baseId]
+     * where baseId is not used if null.
      * 
      * @param String Id base to start with
      * @return String Id to use; normally will include a timestamp
      */
     public static String createRunId(String baseId)
     {
-        //@todo  Hmmm - what do we want in the runId?
-        // For now, just use milliseconds timer and some strings
-        String timeId = Long.toString(System.currentTimeMillis());
-        return "runId;" + baseId + ";" + timeId;
-
+        java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat ("MMMdd-hhmm");
+        if (null != baseId)
+            return formatter.format(new java.util.Date())+ ";" + baseId;
+        else
+            return formatter.format(new java.util.Date());
     }
 
 
