@@ -240,7 +240,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
             // Process the specific list of tests the user supplied
             String desc = "User-supplied fileList: " + fileList; // provide default value
             // Use static worker class to process the list
-            Vector datalets = StylesheetDataletManager.readFileList(reporter, fileList, desc);
+            Vector datalets = StylesheetDataletManager.readFileList(reporter, fileList, desc, testProps);
 
             // Actually process the specified files in a testCase
             processFileList(datalets, desc);

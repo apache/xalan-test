@@ -65,6 +65,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -201,9 +202,10 @@ public abstract class StylesheetDataletManager // provide static services only
      * @param logger to report problems to
      * @param fileName String; name of the file
      * @param desc description; caller's copy changed
+     * @param defaults default properties to potentially add to each datalet
      * @return Vector of StylesheetDatalets, or null if error
      */
-    public static Vector readFileList(Logger logger, String fileName, String desc)
+    public static Vector readFileList(Logger logger, String fileName, String desc, Properties defaults)
     {
         // Verify the file is there
         File f = new File(fileName);
@@ -243,18 +245,18 @@ public abstract class StylesheetDataletManager // provide static services only
         if (line.startsWith(XSLTMARK_CHAR))
         {
             // This is an xsltmark .ini style file
-            vec = readXsltmarkFileList(logger, br, line, fileName, desc);
+            vec = readXsltmarkFileList(logger, br, line, fileName, desc, defaults);
         }
         else if (line.startsWith(QETEST_COMMENT_CHAR))
         {
             // This is a native qetest style file
-            vec = readQetestFileList(logger, br, line, fileName, desc);
+            vec = readQetestFileList(logger, br, line, fileName, desc, defaults);
         }
         else
         {
             logger.logMsg(Logger.WARNINGMSG, "readFileList: " + fileName
                           + " could not determine file type; assuming qetest!");
-            vec = readQetestFileList(logger, br, line, fileName, desc);
+            vec = readQetestFileList(logger, br, line, fileName, desc, defaults);
         }
 
         if (vec.size() == 0)
@@ -289,10 +291,12 @@ public abstract class StylesheetDataletManager // provide static services only
      * @param firstLine already read from br
      * @param fileName String; name of the file
      * @param desc to use of this file
+     * @param defaults default properties to potentially add to each datalet
      * @return Vector of StylesheetDatalets, or null if error
      */
     protected static Vector readQetestFileList(Logger logger, BufferedReader br, 
-                                               String firstLine, String fileName, String desc)
+                                               String firstLine, String fileName, 
+                                               String desc, Properties defaults)
     {
         final String ABSOLUTE = "absolute";
         final String RELATIVE = "relative";
@@ -325,6 +329,9 @@ public abstract class StylesheetDataletManager // provide static services only
             {
                 // Create a Datalet and initialize with the line's contents
                 StylesheetDatalet d = new StylesheetDatalet(line);
+
+                // Also pass over the global runId, if set
+                d.options.put("runId", defaults.getProperty("runId"));
 
                 //@todo Avoid spurious passes when output & gold not specified
                 //  needs to detect when StylesheetDatalet doesn't 
@@ -373,10 +380,12 @@ public abstract class StylesheetDataletManager // provide static services only
      * @param firstLine already read from br
      * @param fileName String; name of the file
      * @param desc to use of this file
+     * @param defaults default properties to potentially add to each datalet
      * @return Vector of StylesheetDatalets, or null if error
      */
     protected static Vector readXsltmarkFileList(Logger logger, BufferedReader br, 
-                                                 String firstLine, String fileName, String desc)
+                                                 String firstLine, String fileName, 
+                                                 String desc, Properties defaults)
     {
         Vector vec = new Vector();
         String line = firstLine;
@@ -386,7 +395,11 @@ public abstract class StylesheetDataletManager // provide static services only
             // If we're starting a section, parse the section to a datalet
             if (line.startsWith(XSLTMARK_CHAR))
             {
-                StylesheetDatalet d = readXsltmarkDatalet(logger, br, line, fileName, desc);
+                StylesheetDatalet d = readXsltmarkDatalet(logger, br, line, fileName, desc, defaults);
+
+                // Also pass over the global runId, if set
+                d.options.put("runId", defaults.getProperty("runId"));
+
                 // Add datalet to our vector
                 vec.addElement(d);
             }
@@ -431,10 +444,12 @@ public abstract class StylesheetDataletManager // provide static services only
      * @param firstLine already read from br
      * @param fileName String; name of the file
      * @param desc to use of this file
+     * @param defaults default properties to potentially add to each datalet
      * @return StylesheetDatalet with appropriate data, or null if error
      */
     private static StylesheetDatalet readXsltmarkDatalet(Logger logger, BufferedReader br, 
-                                                String firstLine, String fileName, String desc)
+                                                String firstLine, String fileName, 
+                                                String desc, Properties defaults)
     {
         final String STYLESHEET_MARKER = "stylesheet=";
         final String INPUT_MARKER = "input=";
@@ -444,6 +459,10 @@ public abstract class StylesheetDataletManager // provide static services only
         
         String line = firstLine;
         StylesheetDatalet d = new StylesheetDatalet();
+
+        // Also pass over the global runId, if set
+        d.options.put("runId", defaults.getProperty("runId"));
+
         // Parse lines throughout the section to build the datalet
         for (;;)
         {
