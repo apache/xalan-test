@@ -416,7 +416,7 @@ public class TraxWrapper extends ProcessorWrapper
         DOMSource dsource = new DOMSource(xslDoc);
         // If we don't do this, the transformer won't know how to 
         // resolve relative URLs in the stylesheet.
-        dsource.setBaseID(xslStylesheet);
+        dsource.setSystemId(xslStylesheet);
 
         // Build a stylesheet from the DOMSource
         Templates templates = processor.newTemplates(dsource);
