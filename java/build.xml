@@ -671,6 +671,30 @@
         </javadoc>
     </target>
 
+    <!-- =================================================================== -->
+    <!-- Cheap-o: 'distribution' module for quickly sharing tests            -->
+    <!-- =================================================================== -->
+    <target name="dist" depends="package.xalan2,docs,javadocs"
+            description="Build a simple distribution module">
+        <echo message="Subject to change! Just a simple way to zip it all up for now" />
+        <!-- Zip just the xml/xsl/out test files -->
+        <zip zipfile="${build.dir}/xalan-tests-${DSTAMP}.zip" 
+             excludes="**/*.zip"
+             includes="test/tests/"
+             basedir="../.."
+             />
+        <!-- Zip the automation and batch files, etc. -->
+        <zip zipfile="${build.dir}/xalan-automation-${DSTAMP}.zip" 
+             excludes="**/*.zip"
+             includes="test/*.*,test/java/"
+             basedir="../.." 
+             />
+    <!--
+        <tar tarfile="${build.dir}/xalan-test-${DSTAMP}.tar" basedir="${build.dir}" includes="xalan-test-${DSTAMP}/**"/>
+        <gzip src="${build.dir}/xalan-test-${DSTAMP}.tar" zipfile="${build.dir}/xalan-test-${DSTAMP}.tar.gz"/>
+    -->
+        
+    </target>
 
 
     <!-- =================================================================== -->
