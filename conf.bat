@@ -14,7 +14,10 @@ call runtest.bat %DASHCRIMSON% StylesheetTestletDriver -load conf.properties %1 
 set END_PKG=
 
 @REM Automatically attempt to style the results into HTML
-call viewResults.bat %DASHCRIMSON% results-conf\results.xml results-conf\results.html -param summaryfile results-conf\results.txt
+@REM Note that the summaryfile param appears to be resolved relative 
+@REM    to the output file, not the current dir (i.e. here, 
+@REM    it will go into the same dir as the results)
+call viewResults.bat %DASHCRIMSON% results-conf\results.xml results-conf\results.html -param summaryfile results.txt
 
 :end
 set DASHCRIMSON=
