@@ -1105,6 +1105,8 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
     {
 
         long fileTime = ProcessorWrapper.ERROR;
+        String xmlURI = XMLName;    // default to what user gave us
+        String xslURI = XSLName;
 
         try
         {
@@ -1120,19 +1122,13 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
             // Force filerefs to be URI's if needed
             if (useURI)
             {
-
-                // Use this static convenience method; returns a URL; convert to String via toExternalForm()
-                XMLName = filenameToURL(XMLName);
-                XSLName = filenameToURL(XSLName);
-
-                // HACK (end)- replicate this code locally, since we may test Xalan2 which doesn't have this!
+                xmlURI = filenameToURL(XMLName);
+                xslURI = filenameToURL(XSLName);
                 // Note: Currently 28-Jun-00, the output of files is handled differently, so 
                 //  we do NOT want to convert those.  Subject to change, however.
-                reporter.logTraceMsg("processSingleFile() useURI: "
-                                     + XSLName);
             }
 
-            fileTime = processorW.processToFile(XMLName, XSLName, OutName);
+            fileTime = processorW.processToFile(xmlURI, xslURI, OutName);
 
             if (fileTime != ProcessorWrapper.ERROR)
             {
@@ -1140,14 +1136,14 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
 
                 dirFilesProcessed++;
 
-                reporter.logTraceMsg("processSingleFile(" + XSLName
+                reporter.logTraceMsg("processSingleFile(" + xslURI
                                      + ") no exceptions; time " + fileTime);
             }
             else
             {
 
                 // Do not increment performance counters if there's an error
-                reporter.logWarningMsg("processSingleFile(" + XSLName
+                reporter.logWarningMsg("processSingleFile(" + xslURI
                                        + ") returned ERROR code!");
             }
 
@@ -1158,11 +1154,10 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
         // Catch any Throwable, check if they're expected, and restart
         catch (Throwable t)
         {
-            reporter.logStatusMsg("processSingleFile(" + XSLName
-                                  + ") threw: " + t.toString());
             reporter.logThrowable(reporter.WARNINGMSG, t, 
-                                  "processSingleFile(" + XSLName + ") threw");
+                                  "processSingleFile(" + xslURI + ") threw");
 
+            // Here, use the original, non-URI'd name
             int retVal = checkExpectedException(t, XSLName, OutName);
 
             createNewProcessor();
@@ -1294,16 +1289,27 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
                 if (idx <= 0)
                     continue;  // not on this line, keep going
 
-                // The expected exception.getMessage is the rest of the line, trimmed
-                //   Note that there's actually a " -->" at the end of the line probably,
-                //   but we'll ignore that by using .startsWith()
+                // The expected exception.getMessage is the rest of the line...
                 String expExc =
                     inbuf.substring((idx + EXPECTED_EXCEPTION.length()),
-                                    inbuf.length()).trim();
+                                    inbuf.length());
 
-                if (expExc.startsWith(ee.toString()))
+                // Hack off the end of the line if it's the " -->" comment end
+                //  (which it should be: we need to make this a standard)
+                int endComment = expExc.indexOf("-->");
+                expExc = expExc.substring(0, endComment).trim();
+
+                // They pass if the expected appears whole anywhere 
+                //  in the actual exception .toString: this takes 
+                //  care of the case where sometimes you might get 
+                //  wrapped in a TransformerConfigurationException,
+                //  and sometimes in a TransformerException
+                // Note this could also give false pass results 
+                //  if you have a very short string that could be 
+                //  found anywhere... oops!
+                if (ee.toString().indexOf(expExc) > -1)
                 {
-                    gotExpected = true;  // equal, they pass
+                    gotExpected = true;  // match partially, they pass
 
                     break;
                 }
