@@ -1,12 +1,12 @@
 @echo off
 @goto start
-rem     Name:   test.bat
+rem     Name:   build.bat
 rem     Author: shane_curcuru@lotus.com
-rem     See:    test.xml
+rem     See:    build.xml
 :usage
-@echo test.bat - executes Xalan Java-based test automation
+@echo build.bat - compiles and executes Xalan Java-based test automation
 @echo   Usage:   test [target] [-D options]
-@echo   Example: test api -DtestClass=TransformerAPITest -Dqetest.loggingLevel
+@echo   Example: test api -DtestClass=TransformerAPITest -Dqetest.loggingLevel=99
 @echo.
 @echo   EITHER: set environment variable JARDIR to point to dir 
 @echo   containing *all* needed .jars to run, ...
@@ -15,11 +15,17 @@ rem     See:    test.xml
 @echo   ... OR: pass appropriate ANT_OPTS or the like to reset .jar 
 @echo   file locations to your locations
 @echo.
+@echo   Note that even when JARDIR is set, normal .jar files may still be 
+@echo     on the end of the classpath; see build.xml for details
+@echo.
 @echo   You should have JAVA_HOME/lib/tools.jar, etc. in your CLASSPATH
 @echo   You may set PARSER_JAR to specific path/filename.jar of parser
+@echo     Note: PARSER_JAR is ignored when JARDIR is set
 @echo   You may set JAVA_OPTS to be passed to java program
 @echo   All other command line opts are passed to Ant
+@echo   build -projecthelp   will show you Ant help and build targets
 @echo.
+
 goto mainEnd
 rem ------------------------------------------------------------------------
 rem Blatantly modeled on ant.bat
@@ -76,6 +82,7 @@ if "%JARDIR%" == "" set _ANT_CP=%CLASSPATH%;%_ANT_HOME%\bin\ant.jar;%_PARSER_JAR
 rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files 
 rem    in the classpath first from that one dir
 rem Note: Does not yet support xsltc testing! TBD -sc
+rem Note: Does not yet support using crimson from JARDIR (forces xerces.jar)! TBD -sc
 if not "%JARDIR%" == "" set _ANT_CP=%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
 
 if "%JAVA_HOME%" == "" goto noJavaHome
@@ -92,11 +99,11 @@ echo.
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 
 :runAnt
-"%_JAVACMD%" -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 goto end
 
 :runAntWithJikes
-"%_JAVACMD%" -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 
 :end
 set _ANT_CP=
