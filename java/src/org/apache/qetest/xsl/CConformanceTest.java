@@ -63,7 +63,7 @@
 package org.apache.qetest.xsl;
 
 import org.apache.qetest.*;
-import org.apache.qetest.xslwrapper.ProcessorWrapper;  // Merely for the ERROR constant
+import org.apache.qetest.xslwrapper.TransformWrapper;  // Merely for an error constant
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -154,9 +154,8 @@ public class CConformanceTest extends XSLDirectoryIterator
      * @todo make this table-driven for the argument names
      * @todo update to include all supported args
      *
-     * NEEDSDOC @param p
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param p Properties block of options to use - unused
+     * @return true if OK, false if we should abort
      */
     public boolean doTestFileInit(Properties p)
     {
@@ -247,9 +246,9 @@ public class CConformanceTest extends XSLDirectoryIterator
     /**
      * Worker method to add a single "-"arg if found in properties block.  
      *
-     * NEEDSDOC @param name
-     * NEEDSDOC @param p
-     * NEEDSDOC @param v
+     * @param name of argument, without the "-" dash
+     * @param p Properties block to look in for arg
+     * @param v Vector arg is added to, with an extra "-" dash
      */
     protected void setSingleArg(String name, Properties p, Vector v)
     {
@@ -265,7 +264,7 @@ public class CConformanceTest extends XSLDirectoryIterator
     /**
      * Subclassed callback to provide info about the processor you're testing.
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return ProcessorVersion;command line TestXSLT.exe:Xalan only
      */
     public String getDescription()
     {
@@ -275,9 +274,8 @@ public class CConformanceTest extends XSLDirectoryIterator
     /**
      * Run through the directory given to us and run tests found in subdirs.
      *
-     * NEEDSDOC @param p
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param p Properties block of options to use - unused
+     * @return true
      */
     public boolean runTestCases(Properties p)
     {
@@ -298,17 +296,16 @@ public class CConformanceTest extends XSLDirectoryIterator
      * the overhead of shelling out the process and processing
      * the command line.</p>
      *
-     * NEEDSDOC @param XMLName
-     * NEEDSDOC @param XSLName
-     * NEEDSDOC @param OutName
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param XMLName local path/filename of .xml
+     * @param XSLName local path/filename of .xsl
+     * @param OutName  local path/filename of desired .out
+     * @return true if OK, false if we should abort
      */
     public int processSingleFile(String XMLName, String XSLName,
                                  String OutName)
     {
 
-        long fileTime = ProcessorWrapper.ERROR;
+        long fileTime = TransformWrapper.TIME_UNUSED;
 
         try
         {
@@ -364,7 +361,7 @@ public class CConformanceTest extends XSLDirectoryIterator
 
             // if the execution of the process was basically OK, 
             //  then add this file to overall timing info
-            if (returnVal != ProcessorWrapper.ERROR)
+            if (returnVal != TransformWrapper.TIME_UNUSED)
             {
                 dirTime += fileTime;
 
@@ -385,25 +382,12 @@ public class CConformanceTest extends XSLDirectoryIterator
             }
         }
 
-        // Catch general Exceptions, check if they're expected, and restart
-        catch (Exception e)
-        {
-            reporter.logStatusMsg("processSingleFile(" + XSLName
-                                  + ") threw: " + e.toString());
-
-            int retVal = checkExpectedException(e, XSLName, OutName);
-
-            return retVal;
-        }
-
         // Catch any Throwable, check if they're expected, and restart
         catch (Throwable t)
         {
-            reporter.logStatusMsg("processSingleFile(" + XSLName
-                                  + ") threw: " + t.toString());
-
+            reporter.logThrowable(Logger.ERRORMSG, t, 
+                                  "processSingleFile(" + XSLName + ") threw");
             int retVal = checkExpectedException(t, XSLName, OutName);
-
             return retVal;
         }
 
@@ -414,6 +398,11 @@ public class CConformanceTest extends XSLDirectoryIterator
      * Worker method to translate filenames into appropriate format for C program.
      * <p>Always returns a string - will be blank if the file does not exist
      * or if we can't figure out the appropriate name to use</p>
+     * <p><b>NOTE:</b> This should be delegated to 
+     * QetestUtils.filenameToURL to put this code in a common 
+     * place.  Also note that this may be incorrect on unix machines, 
+     * since there should never be four slashes after the file: 
+     * scheme name, only three.
      * @param name of file
      * @return appropriate translation into format that the .exe expects for -in, -xsl
      */
@@ -461,17 +450,15 @@ public class CConformanceTest extends XSLDirectoryIterator
     public class ThreadedStreamReader extends Thread
     {  // Begin of inner class
 
-        /** NEEDSDOC Field is          */
+        /** BufferedReader to grab input.  */
         BufferedReader is = null;
 
-        /** NEEDSDOC Field sb          */
+        /** StringBuffer to hold input when done.  */
         StringBuffer sb = null;
 
         /**
-         * NEEDSDOC Method setInputStream 
-         *
-         *
-         * NEEDSDOC @param set
+         * Accessor method setInputStream 
+         * @param set stream to set for is
          */
         public void setInputStream(BufferedReader set)
         {
@@ -479,8 +466,7 @@ public class CConformanceTest extends XSLDirectoryIterator
         }
 
         /**
-         * NEEDSDOC Method run 
-         *
+         * Run this thread; begins reading input stream until done.
          */
         public void run()
         {
@@ -527,10 +513,9 @@ public class CConformanceTest extends XSLDirectoryIterator
         }
 
         /**
-         * NEEDSDOC Method getBuffer 
+         * Accessor method getBuffer 
          *
-         *
-         * NEEDSDOC (getBuffer) @return
+         * @return our StringBuffer, after we've run
          */
         public StringBuffer getBuffer()
         {
@@ -545,7 +530,7 @@ public class CConformanceTest extends XSLDirectoryIterator
      * the process.  Inherits the same environment that the current
      * JVM is in.</p>
      * @param cmdLine actual command line to run, including program name
-     * NEEDSDOC @param environment
+     * @param environment passed as-is to Process.run
      * @return return value from program
      * @exception Exception may be thrown by Runtime.exec
      */
@@ -553,11 +538,11 @@ public class CConformanceTest extends XSLDirectoryIterator
             throws Exception
     {
 
-        // @todo check the logic here: will '-1' be a likely 
+        // @todo check the logic here: will '-2' be a likely 
         //  return value from the process anyways?
         // this is needed in our caller to see if they should 
         //  use this process as part of timing data
-        int retVal = (new Long(ProcessorWrapper.ERROR)).intValue();
+        int retVal = (new Long(TransformWrapper.TIME_UNUSED)).intValue();
 
         if ((cmdLine == null) || (cmdLine.length < 1))
         {
@@ -567,7 +552,7 @@ public class CConformanceTest extends XSLDirectoryIterator
             return retVal;
         }
 
-        int bufSize = 2048;
+        int bufSize = 2048; // Arbitrary bufSize seems to work well
         ThreadedStreamReader outReader = new ThreadedStreamReader();
         ThreadedStreamReader errReader = new ThreadedStreamReader();
         Runtime r = Runtime.getRuntime();
@@ -598,8 +583,8 @@ public class CConformanceTest extends XSLDirectoryIterator
         }
         catch (InterruptedException ie1)
         {
-            reporter.logWarningMsg("execProcess proc.waitFor() threw: "
-                                   + ie1.toString());
+            reporter.logThrowable(Logger.ERRORMSG, ie1, 
+                                  "execProcess proc.waitFor() threw");
         }
 
         // Now that we're done, presumably the Readers are also done
@@ -614,8 +599,8 @@ public class CConformanceTest extends XSLDirectoryIterator
         }
         catch (InterruptedException ie2)
         {
-            reporter.logWarningMsg("Joining outReader threw: "
-                                   + ie2.toString());
+            reporter.logThrowable(Logger.ERRORMSG, ie2, 
+                                  "Joining outReader threw");
         }
 
         try
@@ -626,8 +611,8 @@ public class CConformanceTest extends XSLDirectoryIterator
         }
         catch (InterruptedException ie3)
         {
-            reporter.logWarningMsg("Joining errReader threw: "
-                                   + ie3.toString());
+            reporter.logThrowable(Logger.ERRORMSG, ie3, 
+                                  "Joining errReader threw");
         }
 
         reporter.logArbitrary(reporter.INFOMSG,
@@ -641,14 +626,11 @@ public class CConformanceTest extends XSLDirectoryIterator
 
     /**
      * Main method to run test from the command line - can be left alone.  
-     *
-     * NEEDSDOC @param args
+     * @param args command line arguments
      */
     public static void main(String[] args)
     {
-
         CConformanceTest app = new CConformanceTest();
-
         app.doMain(args);
     }
 }  // end of class CConformanceTest
