@@ -71,6 +71,8 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
+import javax.xml.parsers.DocumentBuilder; // for testCase3
+import javax.xml.parsers.DocumentBuilderFactory; // for testCase3
 
 // Needed SAX, DOM, JAXP classes
 import org.xml.sax.ContentHandler;
@@ -114,6 +116,11 @@ public class SAXResultAPITest extends XSLProcessorTestBase
      */
     protected XSLTestfileInfo impInclFileInfo = new XSLTestfileInfo();
 
+    /** 
+     * Information about an xsl/xml file pair for transforming with DTD, etc.  
+     */
+    protected XSLTestfileInfo dtdFileInfo = new XSLTestfileInfo();
+
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_SAX_SUBDIR = "trax" + File.separator + "sax";
 
@@ -123,7 +130,7 @@ public class SAXResultAPITest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public SAXResultAPITest()
     {
-        numTestCases = 2;  // REPLACE_num
+        numTestCases = 3;  // REPLACE_num
         testName = "SAXResultAPITest";
         testComment = "API Coverage test for the SAXResult class of TRAX";
     }
@@ -162,7 +169,11 @@ public class SAXResultAPITest extends XSLProcessorTestBase
 
         impInclFileInfo.inputName = testBasePath + "SAXImpIncl.xsl";
         impInclFileInfo.xmlName = testBasePath + "SAXImpIncl.xml";
-        impInclFileInfo.goldName = testBasePath + "SAXImpIncl.out";
+        impInclFileInfo.goldName = goldBasePath + "SAXImpIncl.out";
+
+        dtdFileInfo.inputName = testBasePath + "SAXdtd.xsl";
+        dtdFileInfo.xmlName = testBasePath + "SAXdtd.xml";
+        dtdFileInfo.goldName = goldBasePath + "SAXdtd.out";
         try
         {
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -372,6 +383,181 @@ public class SAXResultAPITest extends XSLProcessorTestBase
         {
             reporter.checkFail("transform(..., nullsaxResult) unexpectedly threw: " + t.toString());
             reporter.logThrowable(reporter.ERRORMSG, t, "transform(..., nullsaxResult) threw");
+        }
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Detailed functionality of SAXResults: setLexicalHandler.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("Detailed functionality of SAXResults: setLexicalHandler");
+        String xslURI = filenameToURL(dtdFileInfo.inputName);
+        String xmlURI = filenameToURL(dtdFileInfo.xmlName);
+
+        TransformerFactory factory = null;
+        SAXTransformerFactory saxFactory = null;
+        Templates streamTemplates;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            saxFactory = (SAXTransformerFactory)factory;
+            // Process a simple stylesheet for use later
+            reporter.logTraceMsg("factory.newTemplates(new StreamSource(" + xslURI + "))");
+            streamTemplates = factory.newTemplates(new StreamSource(xslURI));
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem creating factory; can't continue testcase");
+            reporter.logThrowable(reporter.ERRORMSG, t,"Problem creating factory; can't continue testcase");
+            return true;
+        }
+        try
+        {
+            // Validate a StreamSource to a logging SAXResult, 
+            //  where we validate the actual events passed 
+            //  through the SAXResult's ContentHandler and 
+            //  LexicalHandler
+
+            // Have an actual handler that does the physical output
+            reporter.logInfoMsg("TransformerHandler.setResult(StreamResult)");
+            TransformerHandler tHandler = saxFactory.newTransformerHandler();
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result realResult = new StreamResult(fos);
+            tHandler.setResult(realResult);
+
+            SAXResult saxResult = new SAXResult();
+            // Add a contentHandler that logs out info about the 
+            //  transform, and that passes-through calls back 
+            //  to the original tHandler
+            reporter.logInfoMsg("loggingSaxResult.setHandler(loggingContentHandler)");
+            LoggingContentHandler lch = new LoggingContentHandler((Logger)reporter);
+            lch.setDefaultHandler(tHandler);
+            saxResult.setHandler(lch);
+
+            // Add a lexicalHandler that logs out info about the 
+            //  transform, and that passes-through calls back 
+            //  to the original tHandler
+            reporter.logInfoMsg("loggingSaxResult.setLexicalHandler(loggingLexicalHandler)");
+            LoggingLexicalHandler llh = new LoggingLexicalHandler((Logger)reporter);
+            llh.setDefaultHandler(tHandler);
+            saxResult.setLexicalHandler(llh);
+            
+            // Just do a normal transform to this result
+            Transformer transformer = streamTemplates.newTransformer();
+            reporter.logTraceMsg("transform(new StreamSource(" + xmlURI + "), loggingSaxResult)");
+            transformer.transform(new StreamSource(xmlURI), saxResult);
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(dtdFileInfo.goldName), 
+                              "transform loggingSaxResult into: " + outNames.currentName())
+               )
+                reporter.logInfoMsg("transform loggingSaxResult failure reason:" + fileChecker.getExtendedInfo());
+            reporter.logWarningMsg("//@todo validate that llh got lexical events: Bugzilla#888");
+            reporter.logWarningMsg("//@todo validate that lch got content events");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Basic functionality1 of SAXResults threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "Basic functionality1 of SAXResults");
+        }
+        try
+        {
+            // Same as above, with identityTransformer
+            reporter.logInfoMsg("TransformerHandler.setResult(StreamResult)");
+            TransformerHandler tHandler = saxFactory.newTransformerHandler();
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result realResult = new StreamResult(fos);
+            tHandler.setResult(realResult);
+
+            SAXResult saxResult = new SAXResult();
+            reporter.logInfoMsg("loggingSaxResult.setHandler(loggingContentHandler)");
+            LoggingContentHandler lch = new LoggingContentHandler((Logger)reporter);
+            lch.setDefaultHandler(tHandler);
+            saxResult.setHandler(lch);
+
+            reporter.logInfoMsg("loggingSaxResult.setLexicalHandler(loggingLexicalHandler)");
+            LoggingLexicalHandler llh = new LoggingLexicalHandler((Logger)reporter);
+            llh.setDefaultHandler(tHandler);
+            saxResult.setLexicalHandler(llh);
+            
+            // Do an identityTransform to this result
+            Transformer identityTransformer = TransformerFactory.newInstance().newTransformer();
+            reporter.logTraceMsg("identityTransform(new StreamSource(" + xmlURI + "), loggingSaxResult)");
+            identityTransformer.transform(new StreamSource(xmlURI), saxResult);
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(dtdFileInfo.xmlName), 
+                              "identity transform loggingSaxResult into: " + outNames.currentName())
+               )
+                reporter.logInfoMsg("identity transform loggingSaxResult failure reason:" + fileChecker.getExtendedInfo());
+            reporter.logWarningMsg("//@todo validate that llh got lexical events: Bugzilla#888");
+            reporter.logWarningMsg("//@todo validate that lch got content events");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Basic functionality2 of SAXResults threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "Basic functionality2 of SAXResults");
+        }
+        try
+        {
+            // Validate a DOMSource to a logging SAXResult, as above 
+            DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+            dfactory.setNamespaceAware(true);
+            DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+            reporter.logTraceMsg("docBuilder.parse(" + xmlURI + ")");
+            Node xmlNode = docBuilder.parse(new InputSource(xmlURI));
+
+
+            // Have an actual handler that does the physical output
+            TransformerHandler tHandler = saxFactory.newTransformerHandler();
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result realResult = new StreamResult(fos);
+            tHandler.setResult(realResult);
+
+            SAXResult saxResult = new SAXResult();
+            // Add a contentHandler that logs out info about the 
+            //  transform, and that passes-through calls back 
+            //  to the original tHandler
+            LoggingContentHandler lch = new LoggingContentHandler((Logger)reporter);
+            lch.setDefaultHandler(tHandler);
+            saxResult.setHandler(lch);
+
+            // Add a lexicalHandler that logs out info about the 
+            //  transform, and that passes-through calls back 
+            //  to the original tHandler
+            LoggingLexicalHandler llh = new LoggingLexicalHandler((Logger)reporter);
+            llh.setDefaultHandler(tHandler);
+            saxResult.setLexicalHandler(llh);
+            
+            // Just do a normal transform to this result
+            Transformer transformer = streamTemplates.newTransformer();
+            reporter.logTraceMsg("transform(new DOMSource(" + xmlURI + "), loggingSaxResult)");
+            transformer.transform(new DOMSource(xmlNode), saxResult);
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(dtdFileInfo.goldName), 
+                              "transform DOM-loggingSaxResult into: " + outNames.currentName())
+               )
+                reporter.logInfoMsg("transform DOM-loggingSaxResult failure reason:" + fileChecker.getExtendedInfo());
+            reporter.logWarningMsg("//@todo validate that llh got lexical events: Bugzilla#888");
+            reporter.logWarningMsg("//@todo validate that lch got content events");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Basic functionality3 of SAXResults threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "Basic functionality3 of SAXResults");
         }
         reporter.testCaseClose();
         return true;
