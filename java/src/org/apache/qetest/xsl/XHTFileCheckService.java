@@ -170,15 +170,33 @@ public class XHTFileCheckService implements CheckService
             return Logger.AMBG_RESULT;
         }
 
-        boolean warning[] = new boolean[1];  // TODO: should use this!
+        boolean warning[] = new boolean[1];
         warning[0] = false;
         boolean isEqual = false;
 
+        // Inefficient code to get around very rare spurious exception:
+        // java.io.IOException: The process cannot access the file because it is being used by another process
+	    //    at java.io.Win32FileSystem.canonicalize(Native Method)
+	    //    at java.io.File.getCanonicalPath(File.java:442)
+	    //    at org.apache.qetest.xsl.XHTFileCheckService.check(XHTFileCheckService.java:181)
+        // So get filenames first separately, then call comparator
+        String referenceFileName = referenceFile.getAbsolutePath();
+        String actualFileName = actualFile.getAbsolutePath();
+        try
+        {
+            referenceFileName = referenceFile.getCanonicalPath();
+            // Occasional spurious exception happens here, perhaps 
+            //  because sometimes the previous transform or whatever 
+            //  hasn't quite closed the actualFile yet
+            actualFileName = actualFile.getCanonicalPath();
+        } 
+        catch (Exception e) { /* no-op, ignore */ }
+        
         try
         {
             // Note calling order (gold, act) is different than checkFiles()
-            isEqual = comparator.compare(referenceFile.getCanonicalPath(),
-                                         actualFile.getCanonicalPath(), pw,
+            isEqual = comparator.compare(referenceFileName,
+                                         actualFileName, pw,
                                          warning, attributes);
             // Side effect: fills in pw/sw with info about the comparison
         }
