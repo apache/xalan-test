@@ -763,7 +763,6 @@ public class SmoketestOuttakes extends FileBasedTest
             reporter.logCriticalMsg("Bugzilla#5133: will throw DOM003 exception");
             Element xslBuiltElem = xslBuiltDoc.createElementNS(xslNamespace, "xsl:stylesheet");
             xslBuiltElem.setAttributeNS(null, "version", "1.0");
-            xslBuiltElem.setAttributeNS(nsNamespace, "xmlns:xsl", xslNamespace);
             appendIdentityDOMXSL(xslBuiltElem, xslBuiltDoc, false);
             // For debugging, write the generated stylesheet out
             reporter.logInfoMsg("Writing out xslBuiltElem to "+ outNames.nextName());
