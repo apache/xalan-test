@@ -148,9 +148,10 @@ public class CmdlineTestlet extends StylesheetTestlet
         for (int i = 0; i < args.length; i++)
         {
             argBuf.append(args[i]);
+            argBuf.append(" ");
         }
         //@todo Should we log a custom logElement here instead?
-        logger.logMsg(Logger.TRACEMSG, "cmdline executing with: " + argBuf.toString());
+        logger.logMsg(Logger.TRACEMSG, "cmdline executing: " + argBuf.toString());
 
         // Declare variables ahead of time to minimize latency
         long startTime = 0;
