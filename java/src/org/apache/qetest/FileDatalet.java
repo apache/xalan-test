@@ -58,6 +58,7 @@
 package org.apache.qetest;
 
 import java.io.File;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -102,8 +103,14 @@ public class FileDatalet implements Datalet
      * Worker method to validate the files/dirs we represent.  
      * 
      * By default, ensures that the input already exists in some 
-     * format, and for both the output and gold, attempts to create 
-     * them if they don't already exist.
+     * format; and attempts to create the output.  If asked to be 
+     * strict, then we will fail if the output cannot be created, 
+     * and we additionally will attempt to create the gold and 
+     * will fail if it can't be created.
+     *
+     * Note that we only attempt to create the gold if asked to 
+     * be strict, since users may simply want to run a 'crash test' 
+     * and get all AMBG results when prototyping new tests.
      *
      * @param strict if true, requires that output and gold must 
      * be created; otherwise they're optional
@@ -129,10 +136,11 @@ public class FileDatalet implements Datalet
         f = new File(getGold());
         if (!f.exists())
         {
-            if (!f.mkdirs())
+            // For gold, only attempt to mkdirs if asked...
+            if (strict)
             {
-                // Only fail if asked to be strict
-                if (strict)
+                // ...Only fail here if we can't
+                if (!f.mkdirs())
                     return false;
             }
         }        
@@ -216,7 +224,8 @@ public class FileDatalet implements Datalet
      * serves as a 'base' location, and a filename.  
      * 
      * We set each of our input, output, gold to be concatenations 
-     * of the base + File.separator + fileName.
+     * of the base + File.separator + fileName, and also copy 
+     * over the options from the base.
      *
      * @param base FileDatalet object to serve as base directories
      * @param fileName to concatenate for each of input/output/gold
@@ -230,13 +239,16 @@ public class FileDatalet implements Datalet
         input = base.getInput() + buf;
         output = base.getOutput() + buf;
         gold = base.getGold() + buf;
+        setOptions(base.getOptions());
         
         setDescription(); 
     }
 
 
     /**
-     * Initialize this datalet from a list of paths.  
+     * Initialize this datalet from a list of paths.
+     *
+     * Our options are not initialized, and left as null.  
      * 
      * @param i path for input
      * @param o path for output
@@ -255,6 +267,8 @@ public class FileDatalet implements Datalet
     /**
      * Load fields of this Datalet from a Hashtable.  
      * Caller must provide data for all of our fields.
+     * Additionally, we set all values from the hash into 
+     * our options block.
      * 
      * @param Hashtable to load
      */
@@ -266,12 +280,22 @@ public class FileDatalet implements Datalet
         input = (String)h.get("input");
         output = (String)h.get("output");
         gold = (String)h.get("gold");
+
+        // Also copy over all items in hash to options
+        options = new Properties();
+        for (Enumeration enum = h.keys(); 
+             enum.hasMoreElements(); 
+             /* no increment portion */)
+        {
+            String key = (String)enum.nextElement();
+            options.put(key, h.get(key));
+        }
     }
 
 
     /**
      * Load fields of this Datalet from an array.  
-     * Order: input, output, gold
+     * Order: input, output, gold.  Options are left null.
      * If too few args, then fields at end of list are left at default value.
      * @param args array of Strings
      */
@@ -283,8 +307,8 @@ public class FileDatalet implements Datalet
         try
         {
             input = args[0];
-            output = args[2];
-            gold = args[3];
+            output = args[1];
+            gold = args[2];
         }
         catch (ArrayIndexOutOfBoundsException  aioobe)
         {
