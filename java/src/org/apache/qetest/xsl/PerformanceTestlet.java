@@ -78,7 +78,7 @@ public class PerformanceTestlet extends TestletImpl
     static { thisClassName = "org.apache.qetest.xsl.PerformanceTestlet"; }
 
     // Initialize our defaultDatalet
-    { defaultDatalet = new PerformanceDatalet(); }
+    { defaultDatalet = (Datalet)new PerformanceDatalet(); }
 
     /**
      * Accesor method for a brief description of this test.  

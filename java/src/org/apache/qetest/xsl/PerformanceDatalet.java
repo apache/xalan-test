@@ -88,19 +88,19 @@ import java.util.Hashtable;
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
  */
-public class PerformanceDatalet extends DataletImpl
+public class PerformanceDatalet implements Datalet
 {
     /** URL of the stylesheet.  */
-    public String inputName = "identity.xsl";
+    public String inputName = "tests/api/trax/identity.xsl";
 
     /** URL of the xml document.  */
-    public String xmlName = "identity.xml";
+    public String xmlName = "tests/api/trax/identity.xml";
 
     /** URL to put output into.  */
-    public String outputName = "identity.out";
+    public String outputName = "PerformanceDatalet.out";
 
     /** URL of the a gold file or data.  */
-    public String goldName = "identity.gold";
+    public String goldName = "tests/api-gold/trax/identity.out";
 
     /** Flavor of a ProcessorWrapper to use.  */
     public String flavor = "trax";
