@@ -1,3 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<out>49A-Hello,49B-Shirt,49B-Overt,49C-GoodBye,49D-Tie,49D-Sly,
-NC00004,N1000004,N1000007,N1400004,N1800004,N1800007,</out>
+<out><values>49A-Hello,  49B-Shirt,  49B-Overt,  49C-GoodBye,  49D-Tie,  49D-Sly,  </values>
+<ids>N0.5,  N1.5,  N1.8,  N2.5,  N3.5,  N3.8,  </ids></out>
