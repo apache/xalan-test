@@ -110,8 +110,13 @@ static final String[] TYPENAME=
 		{
 			String defaultSource=
 				"<?xml version=\"1.0\"?>\n"+
-				"<Document>"+
-				"<A><B><C><D><E><F/></E></D></C></B></A><Aa/>"+
+				"<Document xmlns:x=\"www.x.com\" a1=\"hello\" a2=\"goodbye\">"+
+				"<!-- Default test document -->"+
+				"<?api a1=\"yes\" a2=\"no\"?>"+
+				"<A><B><C><D><E><F/></E></D></C></B></A>"+
+				"<Aa/><Ab/><Ac><Ac1/></Ac>"+
+				"<Ad xmlns:xx=\"www.xx.com\" xmlns:y=\"www.y.com\" xmlns:z=\"www.z.com\">"+
+				"<Ad1/></Ad>"+
 				"</Document>";
 
 			source=new StreamSource(new StringReader(defaultSource));
@@ -131,61 +136,191 @@ static final String[] TYPENAME=
       // with no whitespace filtering, nonincremental, but _with_
       // indexing (a fairly common case, and avoids the special
       // mode used for RTF DTMs).
-      DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      DTM dtm=manager.getDTM(source, true, null, false, true);
 
-	  // Get the Document node and then the first child.
-	  int dtmRoot = dtm.getDocument();			// #document
-	  int child = dtm.getFirstChild(dtmRoot);	// <Document>
-	  int sndChild = dtm.getFirstChild(child);	// <A>
+	  // For testing with some of David Marston's files I do want to strip whitespace.
+	  dtmWSStripper stripper = new dtmWSStripper();
+
+      DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
+      DTM dtm=manager.getDTM(source, true, stripper, false, true);
+
+	  // Get various nodes to use as context nodes.
+	  int dtmRoot = dtm.getDocument();					// #document
+	  String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
+	  int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
+	  String DNodeName = dtm.getNodeName(DNode);
+	  int CNode = dtm.getFirstChild(DNode);				// <Comment>
+	  int PINode = dtm.getNextSibling(CNode);			// <PI>
+	  int ANode = dtm.getNextSibling(PINode);			// <A>
+	  String ANodeName = dtm.getNodeName(ANode);
+	  int lastNode = 0;
       
 
-	  // Get a Iterator for CHILD:: axis and set startNode <Document>
+	  // Get a Iterator for CHILD:: axis.
       DTMAxisIterator iter = dtm.getAxisIterator(Axis.CHILD);
-      iter.setStartNode(child);
+      iter.setStartNode(DNode);
 
-	  System.out.println("#### First Iterator for <Document>\n");			   
+	  System.out.println("#### CHILD from "+"<"+DNodeName+">, Reverse Axis:" + iter.isReverse());			   
 	  // Iterate the axis and print out node info.
-      for (int nextNode = iter.next(); DTM.NULL != nextNode;
-              nextNode = iter.next())
-		  printNode(dtm, iter, nextNode, " ");
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		{ printNode(dtm, iter, itNode, " ");
+		  lastNode = itNode;
+		}
+	  
+	  String lastNodeName = dtm.getNodeName(lastNode);
 
-
-	  // Get a second Iterator of Descendants, and get the last node.	  
-	  DTMAxisIterator iter2 = dtm.getAxisIterator(Axis.DESCENDANT);
-	  iter2.setStartNode(sndChild);
-
-	  System.out.println("VARIOUS NODES USED:\n\ndtmRoot=" +dtm.getNodeName(dtmRoot)+"  "+
-						 "child="+dtm.getNodeName(child)+"  "+
-						 "2ndChild="+dtm.getNodeName(sndChild)+"\n\n");
-	  System.out.println("#### Second Iterator\n");
+	  // Get iterator for PARENT:: Axis
+	  iter = dtm.getAxisIterator(Axis.PARENT);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### PARENT from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
 	  // Iterate the axis and print out node info.
-	  int lastNode= 0;
-      for (int nextNode = iter2.next(); DTM.NULL != nextNode;
-              nextNode = iter2.next())
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+
+	  // Get iterator for SELF:: Axis
+	  iter = dtm.getAxisIterator(Axis.SELF);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### SELF from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+/**** Not Implemented
+	  // Get iterator for NAMESPACEDECLS:: Axis
+	  iter = dtm.getAxisIterator(Axis.NAMESPACEDECLS);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### NAMESPACEDECLS from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+****/
+	  // Get iterator for NAMESPACE:: Axis
+	  iter = dtm.getAxisIterator(Axis.NAMESPACE);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### NAMESPACE from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+
+	  // Get iterator for PRECEDING:: Axis
+	  iter = dtm.getAxisIterator(Axis.PRECEDING);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### PRECEDING from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+
+	  // Get iterator for PRECEDINGSIBLING:: Axis
+	  iter = dtm.getAxisIterator(Axis.PRECEDINGSIBLING);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### PRECEDINGSIBLING from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+/**** ArrayIndexOutOfBoundsException
+	  // Get iterator for ATTRIBUTE:: Axis
+	  iter = dtm.getAxisIterator(Axis.ATTRIBUTE);
+	  iter.setStartNode(DNode);
+	  System.out.println("\n#### ATTRIBUTE from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+****/
+	  // Get iterator for FOLLOWING:: Axis
+	  iter = dtm.getAxisIterator(Axis.FOLLOWING);
+	  iter.setStartNode(ANode);
+	  System.out.println("\n#### FOLLOWING from "+"<"+ANodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+
+	  // Get iterator for FOLLOWINGSIBLING:: Axis
+	  iter = dtm.getAxisIterator(Axis.FOLLOWINGSIBLING);
+	  iter.setStartNode(ANode);
+	  System.out.println("\n#### FOLLOWINGSIBLING from "+"<"+ANodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+
+	  // Get a iterator for  DESCENDANT:: axis.
+	  iter = dtm.getAxisIterator(Axis.DESCENDANT);
+	  iter.setStartNode(ANode);
+	  System.out.println("\n#### DESCENDANT from "+"<"+ANodeName+">, Reverse Axis:" + iter.isReverse());
+
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
 		  {
-		  	printNode(dtm, iter2, nextNode, " ");
-			lastNode = nextNode;
-			System.out.println("****** lastNode="+dtm.getNodeName(lastNode));
+		  	printNode(dtm, iter, itNode, " ");
+			lastNode = itNode;
 		  }
-	  //lastNode = iter2.getLast();	 // Uncomment for Bugzilla 7885.
 
-	  // Get a third itertor of Ancestors starting from the last descendant
+	  // Get iterator for DESCENDANTORSELF:: Axis
+	  iter = dtm.getAxisIterator(Axis.DESCENDANTORSELF);
+	  iter.setStartNode(ANode);
+	  System.out.println("\n#### DESCENDANT-OR-SELF from "+"<"+ANodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		{
+		  printNode(dtm, iter, itNode, " ");
+		  lastNode = itNode;
+		}
+
+	  //lastNode = iter.getLast();	 // Uncomment for Bugzilla 7885.
+      lastNodeName = dtm.getNodeName(lastNode);
+	  
+	  // Get iterator for ANCESTOR:: Axis
+	  iter = dtm.getAxisIterator(Axis.ANCESTOR);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### ANCESTOR from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+
+	  // Get iterator for ANCESTORORSELF:: Axis
+	  iter = dtm.getAxisIterator(Axis.ANCESTORORSELF);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### ANCESTOR-OR-SELF from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
+  
+	  // Iterate the axis and print out node info.
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+
+/**** Absolute axis (ALL, DESCENDANTSFROMROOT, or DESCENDANTSORSELFFROMROOT) not implemented.  
+	  // Get itertor for ALL:: Axis
 	  // of previous iterator, i.e. lastNode.
-	  DTMAxisIterator revIter = dtm.getAxisIterator(Axis.ANCESTOR);
-	  revIter.setStartNode(lastNode);
+	  iter = dtm.getAxisIterator(Axis.ALL);
+	  iter.setStartNode(lastNode);
+	  System.out.println("\n#### ALL from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
 
-	  System.out.println("VARIOUS NODES USED:\n\ndtmRoot=" +dtm.getNodeName(dtmRoot)+"  "+
-						 "child="+dtm.getNodeName(child)+"  "+
-						 "2ndChild="+dtm.getNodeName(sndChild)+"  "+
-						 "lastNode="+dtm.getNodeName(lastNode)+"\n\n");  
-	  System.out.println("#### Third Iterator\n");
 	  // Iterate the axis and print out node info.
 	  // The output of this loop is what Bugzilla 7886 is all about.
-      for (int nextNode = revIter.next(); DTM.NULL != nextNode;
-              nextNode = revIter.next())
-		  printNode(dtm, revIter, nextNode, " ");
-
+      for (int itNode = iter.next(); DTM.NULL != itNode;
+              itNode = iter.next())
+		  printNode(dtm, iter, itNode, " ");
+****/
     }
     catch(Exception e)
       {
@@ -205,38 +340,17 @@ static final String[] TYPENAME=
     String value=dtm.getNodeValue(nodeHandle);
     String vq=(value==null) ? "" : "\"";
 
-    System.out.println(indent+
-		       "Node "+nodeHandle+": "+
-		       TYPENAME[dtm.getNodeType(nodeHandle)]+" \""+
-		       dtm.getNodeNameX(nodeHandle)+ " : " +
-			   dtm.getNodeName(nodeHandle)+
-		       "\" expandedType="+dtm.getExpandedTypeID(nodeHandle)+
-
-		       "\n"+
-		       indent+
-			   "\tQName Info: "+
-			   //"Prefix= " +dtm.getPrefix(kid)+
-			   " LocalName="+"\""+dtm.getLocalName(nodeHandle)+"\""+
-			   " URI= "+"\""+dtm.getNamespaceURI(nodeHandle)+"\""+
-
-		       "\n"+
-		       indent+
-			   "\tIterator Info: "+
-			   " StartNode= "+"\""+iter.getStartNode()+"\""+
-			   " Postion="+"\""+iter.getPosition()+"\""+
-			   //" LastNode="+"\""+iter.getLast()+"\""+
-			   " Reverse Axis? = "+"\""+iter.isReverse()+"\""+
-
-		       "\n"+
-		       indent+
-		       "\tParent=" + dtm.getParent(nodeHandle) +
-		       " FirstChild=" + dtm.getFirstChild(nodeHandle) +
-		       " NextSib=" + dtm.getNextSibling(nodeHandle)+
-			   " Level=" + dtm.getLevel(nodeHandle)+"\n"+
-		       
-		       indent+
+    // Skip outputing of text nodes. In most cases they clutter the output, 
+	// besides I'm only interested in the elemental structure of the dtm. 
+    if( TYPENAME[dtm.getNodeType(nodeHandle)] != "TEXT" )
+	{
+    	System.out.println(indent+
+		       +nodeHandle+": "+
+		       TYPENAME[dtm.getNodeType(nodeHandle)]+" "+
+			   dtm.getNodeName(nodeHandle)+" "+
+			   " Level=" + dtm.getLevel(nodeHandle)+" "+
 		       "\tValue=" + vq + value + vq
 		       ); 
+	}
   }
-  
 }
