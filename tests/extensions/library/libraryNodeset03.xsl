@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
                 xmlns:cextend="http://xml.apache.org/xalan"
-		        xmlns:test="http://www.extension03.test"
+				xmlns:default="http://www.hello.com"
+				xmlns:test="http://www.extension03.test"
 				xmlns:BTM="www.btm.com"
-                exclude-result-prefixes="cextend test BTM">
+                exclude-result-prefixes="cextend default test BTM">
 
-  <!-- FileName: extension03 -->
+  <!-- FileName: libraryNodeset03 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 14 Extensions -->
@@ -15,7 +16,6 @@
 <xsl:output indent="yes"/>
              
 <xsl:variable name="rtf">
-	<docelem/>
 	<docelem>
 		<elem1>
 			<elem2>
@@ -42,6 +42,12 @@
 		</elem1>
 	</docelem>
 	<docelem/>
+	<docelem xmlns="http://www.hello.com">
+		<elem3>1</elem3>
+		<elem3>2</elem3>
+		<test:elem3><elem3a/></test:elem3>
+		<elem3>4</elem3>
+	</docelem>
  </xsl:variable>
 
 <xsl:template match="/">
@@ -208,6 +214,14 @@
 
 	  <xsl:element name="CopyElem3-2">
 		<xsl:copy-of select="cextend:nodeset($rtf)/docelem/elem1/elem2/Elem3[2]"/>
+	  </xsl:element>
+
+	  <xsl:element name="Copy-of-RTF">
+	  	<xsl:copy-of select="cextend:nodeset($rtf)/default:docelem"/>
+	  </xsl:element>
+
+	  <xsl:element name="Copy-of-TEST-ELEM3">
+	  	<xsl:copy-of select="cextend:nodeset($rtf)/default:docelem/test:elem3"/>
 	  </xsl:element>
 
 	</out>

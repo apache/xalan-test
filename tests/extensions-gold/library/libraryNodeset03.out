@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <out>
-<CountDOCELEM>3</CountDOCELEM>
+<CountDOCELEM>2</CountDOCELEM>
 <CountELEM2andELEM3>10</CountELEM2andELEM3>
 <SumELEM2>10</SumELEM2>
 <NumberELEM2>1234</NumberELEM2>
@@ -22,7 +22,7 @@
 <elem1/>
 <BTM:BreakingTheMold xmlns:BTM="www.btm.com"/>
 </Ancestor-or-Self>
-<Attribute attr1="Q" attr2="P" attr3="O"/>
+<Attribute attr3="O" attr2="P" attr1="Q"/>
 <Child>
 <elem1/>
 <elem1/>
@@ -43,22 +43,10 @@
 <elem2/>
 <BTM:BreakingTheMold xmlns:BTM="www.btm.com"/>
 </Descendant-or-Self>
-<Following>
-<elem1/>
-<elem2/>
-<elem4/>
-<test:elem4 xmlns:test="http://www.extension03.test"/>
-<elem4/>
-<test:elem4 xmlns:test="http://www.extension03.test"/>
-<docelem/>
-</Following>
-<Following-Sibling>
-<elem1/>
-<elem1/>
-</Following-Sibling>
-<Namespace test="http://www.extension03.test" BTM="www.btm.com"/>
+<Following/>
+<Following-Sibling/>
 <Parent0/>
-<Parent1>elem2</Parent1>
+<Parent1/>
 <Preceding>test:elem3</Preceding>
 <Preceding-Sibling>1</Preceding-Sibling>
 <Self>BTM:BreakingTheMold</Self>
@@ -66,7 +54,22 @@
 <AT-Elem3-Elem4/>
 <AT-NSElem3-NSElem4/>
 <AT-Elem3-NSElem4/>
-<FE-FE-AT-Mode>Elem3.1 NS-Elem3.2 Elem3.3 NS-Elem3.4 Elem4.1 NS-Elem4.2 Elem4.3 NS-Elem4.4 </FE-FE-AT-Mode>
+<FE-FE-AT-Mode/>
 <CopyElem1-1/>
 <CopyElem3-2/>
+<Copy-of-RTF>
+<docelem xmlns="http://www.hello.com">
+<elem3>1</elem3>
+<elem3>2</elem3>
+<test:elem3 xmlns:test="http://www.extension03.test">
+<elem3a/>
+</test:elem3>
+<elem3>4</elem3>
+</docelem>
+</Copy-of-RTF>
+<Copy-of-TEST-ELEM3>
+<test:elem3 xmlns:test="http://www.extension03.test" xmlns="http://www.hello.com">
+<elem3a/>
+</test:elem3>
+</Copy-of-TEST-ELEM3>
 </out>

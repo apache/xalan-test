@@ -5,7 +5,7 @@
         		xmlns:default="http://www.hello.com"
                 exclude-result-prefixes="test default cextend">
 
-  <!-- FileName: extend14 -->
+  <!-- FileName: libraryNodeset01 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 14 Extensions -->
@@ -28,7 +28,7 @@
 			</elem2>
 			<elem3>1</elem3>
 			<elem3>2</elem3>
-			<test:elem3>3</test:elem3>
+			<test:elem3/>
 			<elem3>4</elem3>
 			<elem3>5</elem3>
 			<elem4>Yahoo</elem4>
@@ -71,7 +71,7 @@
 	  		<xsl:value-of select="namespace-uri(cextend:nodeset($rtf)/default:docelem/default:elem1)"/>
 	  	</xsl:attribute>
 	  	<xsl:attribute name="uri3">
-	  		<xsl:value-of select="namespace-uri(cextend:nodeset($rtf)/default:docelem/test:elem3)"/>: <xsl:value-of select="(cextend:nodeset($rtf)/default:docelem/test:elem3)"/>
+	  		<xsl:value-of select="namespace-uri(cextend:nodeset($rtf)/default:docelem/test:elem3)"/>
 	  	</xsl:attribute>
 	  </xsl:element>
 
@@ -95,21 +95,9 @@
 	  	<xsl:apply-templates select="cextend:nodeset($rtf)/default:docelem/default:elem4"/>
 	  </xsl:element>
 
-	  <xsl:element name="Copy-of-RTF">
-	  	<xsl:copy-of select="cextend:nodeset($rtf)/default:docelem"/>
-	  </xsl:element>
-
 	  <xsl:element name="Copy-of-ELEM1B">
 	  	<xsl:copy-of select="cextend:nodeset($rtf)/default:docelem/default:elem1/default:elem1b"/>
 	  </xsl:element>
-
-	  <xsl:element name="Copy-of-TEST-ELEM3">
-	  	<xsl:copy-of select="cextend:nodeset($rtf)/default:docelem/test:elem3"/>
-	  </xsl:element>
-
-	  <!-- xsl:text>generate-id: </xsl:text>  
-	  <xsl:value-of select="generate-id(cextend:nodeset($rtf)/default:docelem/default:elem4)"/ -->
-
 
    </out>
 </xsl:template>
