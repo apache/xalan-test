@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,6 +63,7 @@
 package org.apache.qetest;
 
 import java.io.File;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -155,6 +156,9 @@ public class XMLFileLogger implements Logger
     /** XML attribute tag: test filename on ELEM_TESTFILE.  */
     public static final String ATTR_TESTFILENAME = "filename";
 
+    /** Parameter: if we should flush on every testCaseClose().  */
+    public static final String OPT_FLUSHONCASECLOSE = "flushOnCaseClose";
+
     //-----------------------------------------------------
     //-------- Class members and accessors --------
     //-----------------------------------------------------
@@ -165,13 +169,13 @@ public class XMLFileLogger implements Logger
     /** If an error has occoured in this Logger. */
     protected boolean error = false;
 
-    /** If we should flush after every logTestCaseClose. */
+    /** If we should flush on every testCaseClose(). */
     protected boolean flushOnCaseClose = true;
 
     /**
      * Accessor for flushing; is set from properties.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return current flushing status
      */
     public boolean getFlushOnCaseClose()
     {
@@ -181,7 +185,7 @@ public class XMLFileLogger implements Logger
     /**
      * Accessor for flushing; is set from properties.  
      *
-     * NEEDSDOC @param b
+     * @param b If we should flush on every testCaseClose() 
      */
     public void setFlushOnCaseClose(boolean b)
     {
@@ -244,7 +248,9 @@ public class XMLFileLogger implements Logger
         String pinfo[][] =
         {
             { OPT_LOGFILE, "String",
-              "Name of file to use for output; required" }
+              "Name of file to use for output; required" },
+            { OPT_FLUSHONCASECLOSE, "boolean",
+              "if we should flush on every testCaseClose(); optional; default:true" }
         };
 
         return pinfo;
@@ -253,7 +259,7 @@ public class XMLFileLogger implements Logger
     /**
      * Accessor methods for our properties block.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return our current properties; may be null
      */
     public Properties getProperties()
     {
@@ -351,7 +357,14 @@ public class XMLFileLogger implements Logger
             return false;
         }
 
-        reportPrinter = new PrintWriter(reportWriter);
+        String tmp = loggerProps.getProperty(OPT_FLUSHONCASECLOSE);
+        if (null != tmp)
+        {
+            setFlushOnCaseClose((Boolean.valueOf(tmp)).booleanValue());
+        }
+
+        // Use BufferedWriter for better general performance
+        reportPrinter = new PrintWriter(new BufferedWriter(reportWriter));
         ready = true;
 
         return startResultsFile();
@@ -409,7 +422,8 @@ public class XMLFileLogger implements Logger
     /**
      * worker method to dump the xml header and open the resultsfile element.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return true if ready/OK, false if not ready (meaning we may 
+     * not have output anything!)
      */
     protected boolean startResultsFile()
     {
@@ -433,7 +447,8 @@ public class XMLFileLogger implements Logger
     /**
      * worker method to close the resultsfile element.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return true if ready/OK, false if not ready (meaning we may 
+     * not have output a closing tag!)
      */
     protected boolean closeResultsFile()
     {
@@ -506,9 +521,8 @@ public class XMLFileLogger implements Logger
      * Report that a testcase has begun.
      * Begins a testcase element.  Record format:
      * <pre>&lt;testcase desc="<i>case description</i>"&gt;</pre>
-     * @param msg message to log out
      *
-     * NEEDSDOC @param comment
+     * @param comment message to log out
      */
     public void testCaseInit(String comment)
     {
