@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <out>
 		 
-Imported stylesheet - Stylesheets\t12last-imp.xsl - on Spitfire: Text of one-tag
+Imported stylesheet - stylesheets\t12last-imp.xsl - on xrt11: Text of one-tag
 		 
-Included stylesheet - stylesheets\t12inc.xsl - on Spitfire: Text of two-tag
+Included stylesheet - stylesheets\t12inc.xsl - on xrt11: Text of two-tag
 		 
-Included stylesheet - Stylesheets\Imports\t12imp1.xsl - on Spitfire: Text of three-tag
+Included stylesheet - stylesheets\imports\t12imp1.xsl - on xrt11: Text of three-tag
 		 
-Imported stylesheet - Includes\t12inc1.xsl - on Spitfire: Text of four-tag
+Imported stylesheet - includes\t12inc1.xsl - on xrt11: Text of four-tag
 		 
-Imported stylesheet - Stylesheets\t12last-imp.xsl - on Spitfire: Text of five-tag
+Imported stylesheet - stylesheets\t12last-imp.xsl - on xrt11: Text of five-tag
 		 
-Imported stylesheet - Stylesheets\Includes\t12inc2.xsl - on Spitfire: Text of six-tag
+Imported stylesheet - stylesheets\includes\t12inc2.xsl - on xrt11: Text of six-tag
 		 
-Included stylesheet - Stylesheets\Imports\t12imp3.xsl - on Spitfire: Text of seven-tag
+Included stylesheet - stylesheets\imports\t12imp3.xsl - on xrt11: Text of seven-tag
 		 
-Imported stylesheet - Stylesheets\Includes\t12inc3.xsl - on Spitfire: Text of eight-tag
+Imported stylesheet - stylesheets\includes\t12inc3.xsl - on xrt11: Text of eight-tag
 		 
-Imported stylesheet - Stylesheets\t12last-imp.xsl - on Spitfire: Text of nine-tag
+Imported stylesheet - stylesheets\t12last-imp.xsl - on xrt11: Text of nine-tag
 		 
-Included stylesheet - Stylesheets\t12last-inc.xsl - on Spitfire: Text of ten-tag
+Included stylesheet - stylesheets\t12last-inc.xsl - on xrt11: Text of ten-tag
 </out>
