@@ -72,6 +72,9 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
+// Solely for postTestFileInit() and logTestProps()
+import org.apache.xalan.xslt.EnvironmentCheck;
+
 //------------------------------------------------------------------------
 
 /**
@@ -400,6 +403,7 @@ public class XSLProcessorTestBase extends FileBasedTest
         reporter.logHashtable(reporter.CRITICALMSG, System.getProperties(),
                               "System.getProperties");
         reporter.logHashtable(reporter.CRITICALMSG, testProps, "testProps");
+        reporter.logHashtable(reporter.CRITICALMSG, (new EnvironmentCheck()).getEnvironmentHash(), "EnvironmentCheck");
     }
 
     /**
