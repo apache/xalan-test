@@ -7,7 +7,8 @@
   <!-- Section: 12.4 Miscellaneous Additional Functions  -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'generate-id()' -->
-  <!-- Results will vary by processor. Should see 5 different values regardless of what they are. -->
+  <!-- Should see 2 IDs, blank, 2 more IDs, and all IDs should be different.
+       Exact strings will vary by processor. -->
 
 <xsl:template match="doc">
   <out>
