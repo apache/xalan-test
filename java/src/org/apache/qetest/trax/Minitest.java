@@ -265,8 +265,10 @@ public class Minitest extends XSLProcessorTestBase
                                  + filenameToURI(testFileInfo.inputName)  + ", "
                                  + outNames.nextName());
             transformer = templates.newTransformer();
+            FileOutputStream fos = new FileOutputStream(outNames.currentName());
             transformer.transform(new StreamSource(filenameToURI(testFileInfo.xmlName)), 
-                                  new StreamResult(new FileOutputStream(outNames.currentName())));
+                                  new StreamResult(fos));
+            fos.close();
             int fileCheckStatus = fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(testFileInfo.goldName), 
@@ -281,8 +283,10 @@ public class Minitest extends XSLProcessorTestBase
             reporter.logTraceMsg("Basic stream transform(2)(" + filenameToURI(testFileInfo.xmlName) + ", "
                                  + filenameToURI(testFileInfo.inputName)  + ", "
                                  + outNames.nextName());
+            fos = new FileOutputStream(outNames.currentName());
             transformer.transform(new StreamSource(filenameToURI(testFileInfo.xmlName)), 
-                                  new StreamResult(new FileOutputStream(outNames.currentName())));
+                                  new StreamResult(fos));
+            fos.close();
             fileCheckStatus = fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(testFileInfo.goldName), 
@@ -352,8 +356,10 @@ public class Minitest extends XSLProcessorTestBase
             reporter.logTraceMsg("Stream-param transform(" + filenameToURI(paramFileInfo.xmlName) + ", "
                                  + filenameToURI(paramFileInfo.inputName)  + ", "
                                  + outNames.nextName());
+            FileOutputStream fos = new FileOutputStream(outNames.currentName());
             paramTransformer.transform(new StreamSource(filenameToURI(paramFileInfo.xmlName)), 
-                                  new StreamResult(new FileOutputStream(outNames.currentName())));
+                                  new StreamResult(fos));
+            fos.close();
             int fileCheckStatus = fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(paramFileInfo.goldName), 
@@ -467,9 +473,9 @@ public class Minitest extends XSLProcessorTestBase
     {
         File f = new File(filename);
         String tmp = f.getAbsolutePath();
-	    if (File.separatorChar == '\\') {
-	        tmp = tmp.replace('\\', '/');
-	    }
+            if (File.separatorChar == '\\') {
+                tmp = tmp.replace('\\', '/');
+            }
         return "file:///" + tmp;
     }
 
