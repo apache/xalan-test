@@ -601,7 +601,22 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
                )
                 reporter.logInfoMsg("processor.process(xml-pi, null, target) transform failure reason:" + fileChecker.getExtendedInfo());
             processor.reset();
-
+        } 
+        catch (Throwable t)
+        {
+            reporter.checkErr("Testcase threw: " + t.toString());
+            reporter.logThrowable(Logger.ERRORMSG, t, "Testcase threw");
+        }
+        try
+        {
+            if ((liaison == null) || ("".equals(liaison)))
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessor();
+            }
+            else
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
+            }
             // SPR reported: normr@accelr8.com
             reporter.logStatusMsg("Use BufferedReaders in specific processing call; reported by mailto:normr@accelr8.com");
             // Note use plain local filepaths to create readers; also don't set systemId
@@ -621,8 +636,6 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
                )
                 reporter.logInfoMsg("processor.process(xml-readers, null, target) transform failure reason:" + fileChecker.getExtendedInfo());
             processor.reset();
-
-
         } 
         catch (Throwable t)
         {
