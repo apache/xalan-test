@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Set one-character attribute percent too large in decimal-format. -->
   <!-- ExpectedException: An XSLT attribute of type T_CHAR must be only 1 character -->
+  <!-- ExpectedException: Illegal value: toobig used for CHAR attribute: percent.  An attribute of type CHAR must be only 1 character! -->
 
 <xsl:decimal-format percent="toobig" />
 
