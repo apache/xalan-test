@@ -190,6 +190,12 @@ dependencies - users must manually 'build jar' first.
         <!-- Add more pathelements if we add more Java extensions dirs -->        
     </path>
 
+    <!-- Classpath used when build/running xslt20 XPath 2.0 RWAPI tests -->
+    <path id="rwapitest.class.path">
+        <path refid="api.class.path" />
+        <pathelement location="${xalan.build.dir}/xpathapi.jar" />
+    </path>
+
     <!-- ================================================================== -->
     <!-- Initialize: Define an Ant task that executes Xalan test automation -->
     <!-- ================================================================== -->
@@ -457,6 +463,21 @@ dependencies - users must manually 'build jar' first.
         <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
     </target>
 
+    <target name="rwapi" description="Run TestletDriver with xslt20 XPath2.0 RWAPI tests"
+        depends="init.test,compile.rwapi,jar">
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <echo message="Executing Xalan conf test: ${testClass}" />
+        <property name="testType" value="conf." />
+        <property name="conf.testlet" value="org.apache.qetest.rwapi.XPathASTTestlet" />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="rwapitest.class.path"
+            bootclasspathref="boot.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" />
+        <property name="scan.outputDir" value="${conf.outputDir}"/>
+        <antcall target="scan"/>
+    </target>
     <!-- ================================================================== -->
     <!-- Run tests: Run the Xalan-J 2.x Minitest                            -->
     <!-- ================================================================== -->
@@ -1070,6 +1091,15 @@ dependencies - users must manually 'build jar' first.
                excludes="${test.root}dtm/xsltcDocCode.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
+    </target>
+
+    <target name="compile.rwapi" depends="compile">
+        <echo message="Compile xslt20 / XPath2.0 RWAPI tests" />
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
+               includes="${test.root}rwapi/*.*"
+               debug="${debug}"
+               classpathref="rwapitest.class.path" />
     </target>
 
     <!-- Note that this target must *not* depend on any XSLTC tests, 
