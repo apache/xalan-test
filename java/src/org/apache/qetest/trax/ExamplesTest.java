@@ -323,11 +323,11 @@ public class ExamplesTest extends XSLProcessorTestBase
     
         // Create a transformer for the stylesheet.
         Transformer transformer 
-          = tfactory.newTransformer(new StreamSource(xslID));
+          = tfactory.newTransformer(new StreamSource("file:///"+xslID));
         // No need to setSystemId, the transformer can get it from the URL
     
         // Transform the source XML to System.out.
-        transformer.transform( new StreamSource(sourceID),
+        transformer.transform( new StreamSource("file:///"+sourceID),
                                new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(fooFile.goldName),
@@ -384,7 +384,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         InputStream xslIS = new BufferedInputStream(new FileInputStream(xslID));
         StreamSource xslSource = new StreamSource(xslIS);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xslSource.setSystemId(xslID);
+        xslSource.setSystemId("file:///"+xslID);
 
         // Create a transformer for the stylesheet.
         Transformer transformer = tfactory.newTransformer(xslSource);
@@ -392,7 +392,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         InputStream xmlIS = new BufferedInputStream(new FileInputStream(sourceID));
         StreamSource xmlSource = new StreamSource(xmlIS);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xmlSource.setSystemId(sourceID);
+        xmlSource.setSystemId("file:///"+sourceID);
     
         // Transform the source XML to System.out.
         transformer.transform( xmlSource, new StreamResult(outNames.nextName()));
@@ -423,7 +423,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         Reader xslReader = new BufferedReader(new FileReader(xslID));
         StreamSource xslSource = new StreamSource(xslReader);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xslSource.setSystemId(xslID);
+        xslSource.setSystemId("file:///"+xslID);
 
         // Create a transformer for the stylesheet.
         Transformer transformer = tfactory.newTransformer(xslSource);
@@ -432,7 +432,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         Reader xmlReader = new BufferedReader(new FileReader(sourceID));
         StreamSource xmlSource = new StreamSource(xmlReader);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xmlSource.setSystemId(sourceID);
+        xmlSource.setSystemId("file:///"+sourceID);
     
         // Transform the source XML to System.out.
         transformer.transform( xmlSource, new StreamResult(outNames.nextName()));
@@ -462,20 +462,20 @@ public class ExamplesTest extends XSLProcessorTestBase
     
         // Create a templates object, which is the processed, 
         // thread-safe representation of the stylesheet.
-        Templates templates = tfactory.newTemplates(new StreamSource(xslID));
+        Templates templates = tfactory.newTemplates(new StreamSource("file:///"+xslID));
 
         // Illustrate the fact that you can make multiple transformers 
         // from the same template.
         Transformer transformer1 = templates.newTransformer();
         Transformer transformer2 = templates.newTransformer();
     
-        transformer1.transform(new StreamSource(sourceID1),
+        transformer1.transform(new StreamSource("file:///"+sourceID1),
                               new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(fooFile.goldName),
                           "exampleUseTemplatesObj(1) fileChecker of:" + outNames.currentName());
     
-        transformer2.transform(new StreamSource(sourceID2),
+        transformer2.transform(new StreamSource("file:///"+sourceID2),
                               new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(bazFile.goldName),
@@ -512,7 +512,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           // SAX events, and transform them to the result.
           reporter.logTraceMsg("newTransformerHandler..." + xslID);
           TransformerHandler handler 
-            = stfactory.newTransformerHandler(new StreamSource(xslID));
+            = stfactory.newTransformerHandler(new StreamSource("file:///"+xslID));
 
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
@@ -551,7 +551,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           
           // Parse the source XML, and send the parse events to the TransformerHandler.
           reporter.logTraceMsg("reader.parse " + sourceID);
-          reader.parse(sourceID);
+          reader.parse("file:///"+sourceID);
 
           reporter.logTraceMsg("Note: See SPR SCUU4RZT78 for discussion as to why this output is different than XMLReader/XMLFilter");
         fileChecker.check(reporter, new File(outNames.currentName()),
@@ -583,7 +583,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         }
           reporter.logTraceMsg("newXMLFilter..." + xslID);
           XMLReader reader 
-            = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(xslID));
+            = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource("file:///"+xslID));
           
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
@@ -593,7 +593,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           reader.setContentHandler(serializer.asContentHandler());
 
           reporter.logTraceMsg("reader.parse " + sourceID);
-          reader.parse(new InputSource(sourceID));
+          reader.parse(new InputSource("file:///"+sourceID));
 
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(saxGoldName),
@@ -660,7 +660,7 @@ public class ExamplesTest extends XSLProcessorTestBase
 
         reporter.logTraceMsg("newXMLFilter..." + xslID);
         XMLFilter filter 
-          = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(xslID));
+          = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource("file:///"+xslID));
 
         filter.setParent(reader);
 
@@ -668,7 +668,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         // the content handler for the parser object (it's "parent"), and 
         // will then call the parse method on the parser.
           reporter.logTraceMsg("filter.parse " + sourceID);
-        filter.parse(new InputSource(sourceID));
+        filter.parse(new InputSource("file:///"+sourceID));
 
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(saxGoldName),
@@ -693,7 +693,7 @@ public class ExamplesTest extends XSLProcessorTestBase
     {
         TransformerFactory tfactory = TransformerFactory.newInstance();
     
-        Templates stylesheet1 = tfactory.newTemplates(new StreamSource(xslID_1));
+        Templates stylesheet1 = tfactory.newTemplates(new StreamSource("file:///"+xslID_1));
         Transformer transformer1 = stylesheet1.newTransformer();
     
          // If one success, assume all will succeed.
@@ -723,11 +723,11 @@ public class ExamplesTest extends XSLProcessorTestBase
           if( reader==null ) reader = XMLReaderFactory.createXMLReader();
 
           reporter.logTraceMsg("newXMLFilter..." + xslID_1);
-          XMLFilter filter1 = stf.newXMLFilter(new StreamSource(xslID_1));
+          XMLFilter filter1 = stf.newXMLFilter(new StreamSource("file:///"+xslID_1));
           reporter.logTraceMsg("newXMLFilter..." + xslID_2);
-          XMLFilter filter2 = stf.newXMLFilter(new StreamSource(xslID_2));
+          XMLFilter filter2 = stf.newXMLFilter(new StreamSource("file:///"+xslID_2));
           reporter.logTraceMsg("newXMLFilter..." + xslID_3);
-          XMLFilter filter3 = stf.newXMLFilter(new StreamSource(xslID_3));
+          XMLFilter filter3 = stf.newXMLFilter(new StreamSource("file:///"+xslID_3));
 
           if (null == filter1) // If one success, assume all were success.
           {
@@ -757,7 +757,7 @@ public class ExamplesTest extends XSLProcessorTestBase
             // which will set itself as the content listener for the 
             // SAX parser, and call parser.parse(new InputSource(fooFile.xmlName)).
           reporter.logTraceMsg("filter3.parse " + sourceID);
-            filter3.parse(new InputSource(sourceID));
+            filter3.parse(new InputSource("file:///"+sourceID));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(NOT_DEFINED),
                           "exampleXMLFilterChain fileChecker of:" + outNames.currentName());
@@ -793,12 +793,12 @@ public class ExamplesTest extends XSLProcessorTestBase
             dfactory.setNamespaceAware(true);
             DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
             org.w3c.dom.Document outNode = docBuilder.newDocument();
-            Node doc = docBuilder.parse(new InputSource(xslID));
+            Node doc = docBuilder.parse(new InputSource("file:///"+xslID));
      
             DOMSource dsource = new DOMSource(doc);
             // If we don't do this, the transformer won't know how to 
             // resolve relative URLs in the stylesheet.
-            dsource.setSystemId(xslID);
+            dsource.setSystemId("file:///"+xslID);
 
             templates = tfactory.newTemplates(dsource);
           }
@@ -807,7 +807,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
           DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
           org.w3c.dom.Document outNode = docBuilder.newDocument();
-          Node doc = docBuilder.parse(new InputSource(sourceID));
+          Node doc = docBuilder.parse(new InputSource("file:///"+sourceID));
 
           transformer.transform(new DOMSource(doc), new DOMResult(outNode));
           
@@ -839,13 +839,13 @@ public class ExamplesTest extends XSLProcessorTestBase
     try
     {
         TransformerFactory tfactory = TransformerFactory.newInstance();
-        Templates templates = tfactory.newTemplates(new StreamSource(xslID));
+        Templates templates = tfactory.newTemplates(new StreamSource("file:///"+xslID));
         Transformer transformer1 = templates.newTransformer();
         Transformer transformer2 = templates.newTransformer();
 
         transformer1.setParameter("a-param",
                                   "hello to you!");
-        transformer1.transform(new StreamSource(sourceID),
+        transformer1.transform(new StreamSource("file:///"+sourceID),
                                new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(param1GoldName),
@@ -853,7 +853,7 @@ public class ExamplesTest extends XSLProcessorTestBase
     
     
         transformer2.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer2.transform(new StreamSource(sourceID),
+        transformer2.transform(new StreamSource("file:///"+sourceID),
                                new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(outputGoldName),
@@ -871,7 +871,7 @@ public class ExamplesTest extends XSLProcessorTestBase
    * a parameter on the transformer.
    */
   public void exampleTransformerReuse(String sourceID, String xslID)
-  {
+  {System.err.println("********* exampleTransformerReuse");
     try
     {
         // Create a transform factory instance.
@@ -879,13 +879,13 @@ public class ExamplesTest extends XSLProcessorTestBase
     
         // Create a transformer for the stylesheet.
         Transformer transformer 
-          = tfactory.newTransformer(new StreamSource(xslID));
+          = tfactory.newTransformer(new StreamSource("file:///"+xslID));
     
         transformer.setParameter("a-param",
                                   "hello to you!");
     
         // Transform the source XML to System.out.
-        transformer.transform( new StreamSource(sourceID),
+        transformer.transform( new StreamSource("file:///"+sourceID),
                                new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(param1GoldName),
@@ -896,7 +896,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
         // Transform the source XML to System.out.
-        transformer.transform( new StreamSource(sourceID),
+        transformer.transform( new StreamSource("file:///"+sourceID),
                                new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(param2GoldName),
@@ -907,6 +907,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         reporter.checkFail("exampleTransformerReuse threw: " + t.toString());
         reporter.logThrowable(reporter.ERRORMSG, t, "exampleTransformerReuse threw");
     }
+    System.err.println("********* end exampleTransformerReuse");
   }
 
   /**
@@ -917,7 +918,7 @@ public class ExamplesTest extends XSLProcessorTestBase
     try
     {
         TransformerFactory tfactory = TransformerFactory.newInstance();
-        Templates templates = tfactory.newTemplates(new StreamSource(xslID));
+        Templates templates = tfactory.newTemplates(new StreamSource("file:///"+xslID));
         Properties oprops = templates.getOutputProperties();
 
         oprops.put(OutputKeys.INDENT, "yes");
@@ -925,7 +926,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         Transformer transformer = templates.newTransformer();
 
         transformer.setOutputProperties(oprops);
-        transformer.transform(new StreamSource(sourceID),
+        transformer.transform(new StreamSource("file:///"+sourceID),
                                new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(outputGoldName),
@@ -957,7 +958,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         }
           SAXTransformerFactory stf = ((SAXTransformerFactory) tfactory);
           Source sources =
-            stf.getAssociatedStylesheet(new StreamSource(sourceID),
+            stf.getAssociatedStylesheet(new StreamSource("file:///"+sourceID),
               null, null, null);
 
           if(null == sources)
@@ -967,7 +968,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           }
             Transformer transformer = tfactory.newTransformer(sources);
 
-            transformer.transform(new StreamSource(sourceID),
+            transformer.transform(new StreamSource("file:///"+sourceID),
                                new StreamResult(outNames.nextName()));
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(fooFile.goldName),
@@ -1009,7 +1010,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           // Create a ContentHandler that can liston to SAX events 
           // and transform the output to DOM nodes.
           TransformerHandler handler 
-            = sfactory.newTransformerHandler(new StreamSource(xslID));
+            = sfactory.newTransformerHandler(new StreamSource("file:///"+xslID));
           handler.setResult(new DOMResult(outNode));
           
           // Create a reader and set it's ContentHandler to be the 
@@ -1038,7 +1039,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           
           // Send the SAX events from the parser to the transformer,
           // and thus to the DOM tree.
-          reader.parse(sourceID);
+          reader.parse("file:///"+sourceID);
           
           // Serialize the node for diagnosis.
           //    This serializes to outNames.nextName()
@@ -1091,7 +1092,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
         org.w3c.dom.Document outNode = docBuilder.newDocument();
-        Node doc = docBuilder.parse(new InputSource(sourceID));
+        Node doc = docBuilder.parse(new InputSource("file:///"+sourceID));
 
         TransformerFactory tfactory = TransformerFactory.newInstance(); 
     
