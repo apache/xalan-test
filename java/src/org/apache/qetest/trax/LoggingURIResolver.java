@@ -74,6 +74,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import java.util.Hashtable;
 //-------------------------------------------------------------------------
 
 /**
@@ -289,40 +290,56 @@ public class LoggingURIResolver extends LoggingHandler implements URIResolver
      *
      * @param desc detail info from this kind of message
      */
-    protected void logOrCheck(String desc)
+    protected void checkExpected(String desc, String resolvedTo)
     {
+        // Note the order of logging is important, which is why
+        //  we store these values and then log them later
+        final int DONT_CARE = 0;
+        final int PASS = 1;
+        final int FAIL = 2;
+        int checkResult = DONT_CARE;
+        String checkDesc = null;
+        StringBuffer extraInfo = new StringBuffer("");
+        Hashtable attrs = new Hashtable();
+        attrs.put("source", "LoggingURIResolver");
+        attrs.put("counters", getQuickCounters());
+        attrs.put("resolvedTo", resolvedTo);
+
         String tmp = getQuickCounters() + " " + desc;
         if (expectedCtr > expected.length)
         {
             // Sanity check: prevent AIOOBE 
             expectedCtr = expected.length;
-            logger.logMsg(Logger.WARNINGMSG, getQuickCounters() 
-                          + " error: array overbounds " + expectedCtr);
+            extraInfo.append(getQuickCounters() 
+                          + " error: array overbounds " + expectedCtr + "\n");
         }
         // Either log the exception or call checkPass/checkFail 
         //  as requested by setExpected for this type
         if (ITEM_DONT_CARE == expected[expectedCtr])
         {
             // We don't care about this, just log it
-            logger.logMsg(level, tmp);
+            extraInfo.append("ITEM_DONT_CARE(" + expectedCtr + ") " + tmp + "\n");
         }
         else if (ITEM_CHECKFAIL == expected[expectedCtr])
         {
             // We shouldn't have been called here, so fail
-            logger.checkFail(tmp + " was unexpected");
+            checkResult = FAIL;
+            checkDesc = tmp + " was unexpected";
         }
         else if ((null != desc) 
                   && (desc.indexOf(expected[expectedCtr]) > -1))
         {   
             // We got a warning the user expected, so pass
-            logger.checkPass(tmp + " matched");
+            checkResult = PASS;
+            checkDesc = tmp + " matched";
             // Also reset this counter
             expected[expectedCtr] = ITEM_DONT_CARE;
         }
         else
         {
             // We got a warning the user didn't expect, so fail
-            logger.checkFail(tmp + " did not match");
+            checkResult = FAIL;
+            checkDesc = tmp + " did not match";
             // Also reset this counter
             expected[expectedCtr] = ITEM_DONT_CARE;
         }
@@ -333,11 +350,18 @@ public class LoggingURIResolver extends LoggingHandler implements URIResolver
             // If we run off the end, reset all expected
             if (expectedCtr >= expected.length)
             {
+                extraInfo.append("Ran off end of expected items, resetting\n");
                 expected = new String[1];
                 expected[0] = ITEM_DONT_CARE;
                 expectedCtr = 0;
             }
         }
+        logger.logElement(level, "loggingHandler", attrs, extraInfo);
+        if (PASS == checkResult)
+            logger.checkPass(checkDesc);
+        else if (FAIL == checkResult)
+            logger.checkFail(checkDesc);
+        // else - DONT_CARE is no-op
     }
 
 
@@ -358,11 +382,15 @@ public class LoggingURIResolver extends LoggingHandler implements URIResolver
     {
         counters[0]++;
         setLastItem("{" + base + "}" + href);
-        logOrCheck(getLast());
+        // Store the source we're about to resolve - note that the 
+        //  order of logging and calling checkExpected is important
+        Source resolvedSource = null;
+        String resolvedTo = null;    
+
         if (null != defaultHandler)
         {
-            logger.logMsg(level, prefix + " resolved by: " + defaultHandler);
-            return defaultHandler.resolve(href, base);
+            resolvedTo = "resolved by: " + defaultHandler;
+            resolvedSource = defaultHandler.resolve(href, base);
         }
         else
         {
@@ -370,9 +398,13 @@ public class LoggingURIResolver extends LoggingHandler implements URIResolver
             //  so the LoggingURIResolver class will just attempt 
             //  to use the SystemIDResolver class instead
             String sysId = SystemIDResolver.getAbsoluteURI(href, base);
-            logger.logMsg(level, prefix + " resolved into new StreamSource(" 
-                        + sysId + ")");
-            return new StreamSource(sysId);
+            resolvedTo = "resolved into new StreamSource(" + sysId + ")";
+            resolvedSource = new StreamSource(sysId);
         }
+
+        // Call worker method to log out various info and then 
+        //  call check for us if needed
+        checkExpected(getLast(), resolvedTo);
+        return resolvedSource;
     }
 }
