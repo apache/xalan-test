@@ -69,6 +69,7 @@ import java.io.FileReader;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Hashtable;
 
 /**
  * Uses an XML/HTML/Text diff comparator to check or diff two files.
@@ -145,18 +146,22 @@ public class XHTFileCheckService implements CheckService
         // Fail if Actual file doesn't exist or is 0 len
         if ((!actualFile.exists()) || (actualFile.length() == 0))
         {
-            logger.checkFail(msg, id);
-            pw.println("actual(" + actualFile.toString() + ") did not exist or was 0 len");
+            String errMsg = "actual(" + actualFile.toString() + ") did not exist or was 0 len";
+            logger.logMsg(Logger.WARNINGMSG, errMsg);
+            pw.println(errMsg);
             pw.flush();
+            logger.checkFail(msg, id);
             return logger.FAIL_RESULT;
         }
 
         // Ambiguous if gold file doesn't exist or is 0 len
         if ((!referenceFile.exists()) || (referenceFile.length() == 0))
         {
-            logger.checkAmbiguous(msg, id);
-            pw.println("reference(" + referenceFile.toString() + ") did not exist or was 0 len");
+            String errMsg = "reference(" + referenceFile.toString() + ") did not exist or was 0 len";
+            logger.logMsg(Logger.WARNINGMSG, errMsg);
+            pw.println(errMsg);
             pw.flush();
+            logger.checkAmbiguous(msg, id);
             return Logger.AMBG_RESULT;
         }
 
@@ -177,6 +182,7 @@ public class XHTFileCheckService implements CheckService
         catch (Throwable t)
         {
             // Add any exception info to pw/sw
+            logger.logThrowable(Logger.ERRORMSG, t, "XHTFileCheckService threw");
             pw.println("XHTFileCheckService threw: " + t.toString());
             t.printStackTrace(pw);
             isEqual = false;
@@ -184,11 +190,17 @@ public class XHTFileCheckService implements CheckService
 
         if (!isEqual)
         {
-            // We fail, obviously!
-            logger.checkFail(msg, id);
             pw.println("XHTFileCheckService files were not equal");
             pw.flush();
-
+            // We fail, obviously!  Bunch up info for logging 
+            //  a special element about fail
+            Hashtable attrs = new Hashtable();
+            attrs.put("actual", actualFile.toString());
+            attrs.put("reference", referenceFile.toString());
+            attrs.put("reportedBy", "XHTFileCheckService");
+            String elementBody = msg + "(" + id + ") \n" + sw.toString();
+            logger.logElement(Logger.STATUSMSG, "fileCheck", attrs, elementBody);
+            logger.checkFail(msg, id);
             return Logger.FAIL_RESULT;
         }
         else if (warning[0])
