@@ -240,7 +240,7 @@ public class CmdlineTest extends XSLDirectoryIterator
                 String args1[] = new String[pargs.length + 4];  // Need 4 extra slots for 
                 // -xsl XSL -lxcout tempXSL
                 args1[0] = "-xsl";  // Should be a constant
-                args1[1] = filenameToURL(XSLName);
+                args1[1] = QetestUtils.filenameToURL(XSLName);
                 args1[2] = "-LXCOUT";
                 args1[3] = lxcoutName;
 
@@ -279,7 +279,7 @@ public class CmdlineTest extends XSLDirectoryIterator
 
                 // -in XML -lxcin lxcfile -out OUT
                 args2[0] = "-in";
-                args2[1] = filenameToURL(XMLName);
+                args2[1] = QetestUtils.filenameToURL(XMLName);
                 args2[2] = "-LXCIN";
                 args2[3] = lxcoutName;
                 args2[4] = "-out";
@@ -321,9 +321,9 @@ public class CmdlineTest extends XSLDirectoryIterator
 
                 // -in XML -xsl XSL -out OUT
                 args[0] = "-in";
-                args[1] = filenameToURL(XMLName);
+                args[1] = QetestUtils.filenameToURL(XMLName);
                 args[2] = "-xsl";
-                args[3] = filenameToURL(XSLName);
+                args[3] = QetestUtils.filenameToURL(XSLName);
                 args[4] = "-out";
                 args[5] = OutName;
 

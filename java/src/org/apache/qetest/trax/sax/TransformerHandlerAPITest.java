@@ -247,8 +247,8 @@ public class TransformerHandlerAPITest extends XSLProcessorTestBase
             saxFactory = (SAXTransformerFactory)factory;
 
             // Basic construction of identity transformer
-            TransformerHandler tHandler = saxFactory.newTransformerHandler(new StreamSource(filenameToURL(testFileInfo.inputName)));
-            reporter.check((tHandler != null), true, "newTransformerHandler(.." + filenameToURL(testFileInfo.inputName) + ")) returns non-null");
+            TransformerHandler tHandler = saxFactory.newTransformerHandler(new StreamSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
+            reporter.check((tHandler != null), true, "newTransformerHandler(.." + QetestUtils.filenameToURL(testFileInfo.inputName) + ")) returns non-null");
 
             // getTemplates API coverage - simple
             Transformer transformer = tHandler.getTransformer();
@@ -296,10 +296,10 @@ public class TransformerHandlerAPITest extends XSLProcessorTestBase
         reporter.testCaseInit("Basic functionality of TransformerHandler");
         // Provide local copies of URLized filenames, so that we can
         //  later run tests with either Strings or URLs
-        String xslURI = filenameToURL(testFileInfo.inputName);
-        String xmlURI = filenameToURL(testFileInfo.xmlName);
-        String xslImpInclURI = filenameToURL(impInclFileInfo.inputName);
-        String xmlImpInclURI = filenameToURL(impInclFileInfo.xmlName);
+        String xslURI = QetestUtils.filenameToURL(testFileInfo.inputName);
+        String xmlURI = QetestUtils.filenameToURL(testFileInfo.xmlName);
+        String xslImpInclURI = QetestUtils.filenameToURL(impInclFileInfo.inputName);
+        String xmlImpInclURI = QetestUtils.filenameToURL(impInclFileInfo.xmlName);
 
         TransformerFactory factory = null;
         SAXTransformerFactory saxFactory = null;

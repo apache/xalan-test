@@ -1124,8 +1124,8 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
             // Force filerefs to be URI's if needed
             if (useURI)
             {
-                xmlURI = filenameToURL(XMLName);
-                xslURI = filenameToURL(XSLName);
+                xmlURI = QetestUtils.filenameToURL(XMLName);
+                xslURI = QetestUtils.filenameToURL(XSLName);
                 // Note: Currently 28-Jun-00, the output of files is handled differently, so 
                 //  we do NOT want to convert those.  Subject to change, however.
             }
@@ -1211,7 +1211,7 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
             if (useURI)
             {
                 // Use this static convenience method; returns a URL; convert to String via toExternalForm()
-                XMLName = filenameToURL(XMLName);
+                XMLName = QetestUtils.filenameToURL(XMLName);
             }
             fileTime = processorW.processEmbeddedToFile(XMLName, OutName);
 

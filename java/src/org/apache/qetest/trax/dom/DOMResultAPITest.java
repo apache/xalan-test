@@ -148,12 +148,12 @@ public class DOMResultAPITest extends XSLProcessorTestBase
                               + TRAX_DOM_SUBDIR
                               + File.separator;
 
-        testFileInfo.inputName = filenameToURL(testBasePath + "DOMTest.xsl");
-        testFileInfo.xmlName = filenameToURL(testBasePath + "DOMTest.xml");
+        testFileInfo.inputName = QetestUtils.filenameToURL(testBasePath + "DOMTest.xsl");
+        testFileInfo.xmlName = QetestUtils.filenameToURL(testBasePath + "DOMTest.xml");
         testFileInfo.goldName = goldBasePath + "DOMTest.out";
 
-        impInclFileInfo.inputName = filenameToURL(testBasePath + "DOMImpIncl.xsl");
-        impInclFileInfo.xmlName = filenameToURL(testBasePath + "DOMImpIncl.xml");
+        impInclFileInfo.inputName = QetestUtils.filenameToURL(testBasePath + "DOMImpIncl.xsl");
+        impInclFileInfo.xmlName = QetestUtils.filenameToURL(testBasePath + "DOMImpIncl.xml");
         impInclFileInfo.goldName = testBasePath + "DOMImpIncl.out";
         try
         {

@@ -177,16 +177,16 @@ public class URIResolverTest extends XSLProcessorTestBase
             //  build with the loggingURIResolver
             String[] expectedXslUris = 
             {
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdInclude.xsl"
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdInclude.xsl"
             };
             loggingURIResolver.setExpected(expectedXslUris);
             // Note that we don't currently have a default URIResolver, 
             //  so the LoggingURIResolver class will just attempt 
             //  to use the SystemIDResolver class instead
             // loggingURIResolver.setDefaultHandler(savedURIResolver);
-            reporter.logInfoMsg("About to factory.newTemplates(" + filenameToURL(testFileInfo.inputName) + ")");
-            templates = factory.newTemplates(new StreamSource(filenameToURL(testFileInfo.inputName)));
+            reporter.logInfoMsg("About to factory.newTemplates(" + QetestUtils.filenameToURL(testFileInfo.inputName) + ")");
+            templates = factory.newTemplates(new StreamSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
             reporter.logTraceMsg("loggingURIResolver after newTemplates:" + loggingURIResolver.getQuickCounters());
 
             // Clear out any setExpected or counters
@@ -204,16 +204,16 @@ public class URIResolverTest extends XSLProcessorTestBase
             reporter.logTraceMsg("//@todo investigate why every document() call is resolved twice twice");
             String[] expectedXmlUris = 
             {
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl",
-                "{" + filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl"
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl"
             };
             loggingURIResolver.setExpected(expectedXmlUris);
             reporter.logTraceMsg("about to transform(...)");
-            transformer.transform(new StreamSource(filenameToURL(testFileInfo.xmlName)), 
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo.xmlName)), 
                                   new StreamResult(outNames.nextName()));
             reporter.logTraceMsg("after transform(...)");
             // Clear out any setExpected or counters

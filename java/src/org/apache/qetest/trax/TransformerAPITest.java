@@ -203,21 +203,21 @@ public class TransformerAPITest extends XSLProcessorTestBase
         String goldBasePath = goldDir + File.separator + TRAX_SUBDIR
                               + File.separator;
 
-        simpleTest.xmlName = filenameToURL(testBasePath + "identity.xml");
-        simpleTest.inputName = filenameToURL(testBasePath + "identity.xsl");
+        simpleTest.xmlName = QetestUtils.filenameToURL(testBasePath + "identity.xml");
+        simpleTest.inputName = QetestUtils.filenameToURL(testBasePath + "identity.xsl");
         simpleTest.goldName = goldBasePath + "identity.out";
 
-        paramTest.xmlName = filenameToURL(testBasePath + "TransformerAPIParam.xml");
-        paramTest.inputName = filenameToURL(testBasePath + "TransformerAPIParam.xsl");
+        paramTest.xmlName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIParam.xml");
+        paramTest.inputName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIParam.xsl");
         paramTest.goldName = goldBasePath + "TransformerAPIParam.out";
         
-        outputFormatTest.xmlName = filenameToURL(testBasePath + "TransformerAPIOutputFormat.xml");
-        outputFormatTest.inputName = filenameToURL(testBasePath + "TransformerAPIOutputFormat.xsl");
+        outputFormatTest.xmlName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIOutputFormat.xml");
+        outputFormatTest.inputName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIOutputFormat.xsl");
         outputFormatTest.goldName = goldBasePath + "TransformerAPIOutputFormatUTF16.out";
         outputFormatTestUTF8 = goldBasePath + "TransformerAPIOutputFormatUTF8.out";
 
-        htmlFormatTest.xmlName = filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xml");
-        htmlFormatTest.inputName = filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xsl");
+        htmlFormatTest.xmlName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xml");
+        htmlFormatTest.inputName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xsl");
         htmlFormatTest.goldName = goldBasePath + "TransformerAPIHTMLFormat.out";
 
         // Cache trax system property

@@ -307,10 +307,10 @@ public class SAXSourceAPITest extends XSLProcessorTestBase
         reporter.testCaseInit("Basic functionality of SAXSources");
         // Provide local copies of URLized filenames, so that we can
         //  later run tests with either Strings or URLs
-        String xslURI = filenameToURL(testFileInfo.inputName);
-        String xmlURI = filenameToURL(testFileInfo.xmlName);
-        String xslImpInclURI = filenameToURL(impInclFileInfo.inputName);
-        String xmlImpInclURI = filenameToURL(impInclFileInfo.xmlName);
+        String xslURI = QetestUtils.filenameToURL(testFileInfo.inputName);
+        String xmlURI = QetestUtils.filenameToURL(testFileInfo.xmlName);
+        String xslImpInclURI = QetestUtils.filenameToURL(impInclFileInfo.inputName);
+        String xmlImpInclURI = QetestUtils.filenameToURL(impInclFileInfo.xmlName);
 
         TransformerFactory factory = null;
         SAXTransformerFactory saxFactory = null;

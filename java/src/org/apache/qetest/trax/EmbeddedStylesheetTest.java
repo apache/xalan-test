@@ -267,13 +267,13 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
         {
             // Verify you can process a simple embedded stylesheet 
             //  (also tested in TransformerFactoryAPITest)
-            Source stylesheet = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(embeddedFileInfo.xmlName)), 
+            Source stylesheet = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(embeddedFileInfo.xmlName)), 
                                                                 media, title, charset);
             reporter.logTraceMsg("got AssociatedStylesheet");
             Templates embedTemplates = factory.newTemplates(stylesheet);
             Transformer embedTransformer = embedTemplates.newTransformer();
             reporter.logTraceMsg("Got embedded templates, about to transform.");
-            embedTransformer.transform(new StreamSource(filenameToURL(embeddedFileInfo.xmlName)), 
+            embedTransformer.transform(new StreamSource(QetestUtils.filenameToURL(embeddedFileInfo.xmlName)), 
                                        new StreamResult(outNames.nextName()));
 
             int result = fileChecker.check(reporter, 
@@ -286,7 +286,7 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             // Verify the stylesheet you get from an embedded source 
             //  can be reused for other documents
             embedTransformer = embedTemplates.newTransformer();
-            embedTransformer.transform(new StreamSource(filenameToURL(embeddedFileInfo.xmlName)), 
+            embedTransformer.transform(new StreamSource(QetestUtils.filenameToURL(embeddedFileInfo.xmlName)), 
                                        new StreamResult(outNames.nextName()));
 
             result = fileChecker.check(reporter, 
@@ -298,7 +298,7 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
 
             // Verify the transformer itself can be reused
             //  on a *different* document
-            embedTransformer.transform(new StreamSource(filenameToURL(systemIdFileInfo.xmlName)), 
+            embedTransformer.transform(new StreamSource(QetestUtils.filenameToURL(systemIdFileInfo.xmlName)), 
                                        new StreamResult(outNames.nextName()));
 
             result = fileChecker.check(reporter, 
@@ -317,33 +317,33 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
         try
         {
             // Verify you can process an embedded stylesheet as fragment
-            testEmbeddedTransform(new StreamSource(filenameToURL(embeddedFragmentFileInfo.xmlName)),
-                                  new StreamSource(filenameToURL(embeddedFragmentFileInfo.xmlName)),
+            testEmbeddedTransform(new StreamSource(QetestUtils.filenameToURL(embeddedFragmentFileInfo.xmlName)),
+                                  new StreamSource(QetestUtils.filenameToURL(embeddedFragmentFileInfo.xmlName)),
                                   "(10)embedded fragment transform",
                                   embeddedFragmentFileInfo.goldName);
 
             // Verify you can process an embedded stylesheet that 
             //  comes from a relative path - default systemId
-            testEmbeddedTransform(new StreamSource(filenameToURL(embeddedRelativeXmlName)),
-                                  new StreamSource(filenameToURL(embeddedRelativeXmlName)),
+            testEmbeddedTransform(new StreamSource(QetestUtils.filenameToURL(embeddedRelativeXmlName)),
+                                  new StreamSource(QetestUtils.filenameToURL(embeddedRelativeXmlName)),
                                   "(11)embedded relative transform",
                                   relativeGoldFileLevel1);
 
             // ...Verify relative paths, explicit systemId up one level0
             // sysId for level0 up one: inputDir + File.separator + "EmbeddedRelative.xml"
             Source relativeXmlSrc = new StreamSource(new FileInputStream(embeddedRelativeXmlName));
-            relativeXmlSrc.setSystemId(filenameToURL(inputDir + File.separator + "EmbeddedRelative.xml"));
+            relativeXmlSrc.setSystemId(QetestUtils.filenameToURL(inputDir + File.separator + "EmbeddedRelative.xml"));
             Source relativeTransformSrc = new StreamSource(new FileInputStream(embeddedRelativeXmlName));
-            relativeTransformSrc.setSystemId(filenameToURL(inputDir + File.separator + "EmbeddedRelative.xml"));
+            relativeTransformSrc.setSystemId(QetestUtils.filenameToURL(inputDir + File.separator + "EmbeddedRelative.xml"));
             testEmbeddedTransform(relativeXmlSrc,
                                   relativeTransformSrc,
                                   "(12a)embedded relative, explicit sysId up level0",
                                   relativeGoldFileLevel0);
             // ...Verify relative paths, explicit systemId same level1
             relativeXmlSrc = new StreamSource(new FileInputStream(embeddedRelativeXmlName));
-            relativeXmlSrc.setSystemId(filenameToURL(embeddedRelativeXmlName));
+            relativeXmlSrc.setSystemId(QetestUtils.filenameToURL(embeddedRelativeXmlName));
             relativeTransformSrc = new StreamSource(new FileInputStream(embeddedRelativeXmlName));
-            relativeTransformSrc.setSystemId(filenameToURL(embeddedRelativeXmlName));
+            relativeTransformSrc.setSystemId(QetestUtils.filenameToURL(embeddedRelativeXmlName));
             testEmbeddedTransform(relativeXmlSrc,
                                   relativeTransformSrc,
                                   "(12b)embedded relative, explicit sysId same level1",
@@ -352,9 +352,9 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             // ...Verify relative paths, explicit systemId down one level2
             // sysId for level2 down one: inputDir + "/trax/systemid/" + "EmbeddedRelative.xml"
             relativeXmlSrc = new StreamSource(new FileInputStream(embeddedRelativeXmlName));
-            relativeXmlSrc.setSystemId(filenameToURL(inputDir + "/trax/systemid/" + "EmbeddedRelative.xml"));
+            relativeXmlSrc.setSystemId(QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + "EmbeddedRelative.xml"));
             relativeTransformSrc = new StreamSource(new FileInputStream(embeddedRelativeXmlName));
-            relativeTransformSrc.setSystemId(filenameToURL(inputDir + "/trax/systemid/" + "EmbeddedRelative.xml"));
+            relativeTransformSrc.setSystemId(QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + "EmbeddedRelative.xml"));
             testEmbeddedTransform(relativeXmlSrc,
                                   relativeTransformSrc,
                                   "(12c)embedded relative, explicit sysId down level2",
@@ -363,20 +363,20 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             // Verify you can process various types of embedded stylesheets
             // This also verifies that a type of 'not/found' is skipped
             // Xalan-specific: text/xsl
-            testEmbeddedTransform(new StreamSource(filenameToURL(typeNameTextXsl)),
-                                  new StreamSource(filenameToURL(typeNameTextXsl)),
+            testEmbeddedTransform(new StreamSource(QetestUtils.filenameToURL(typeNameTextXsl)),
+                                  new StreamSource(QetestUtils.filenameToURL(typeNameTextXsl)),
                                   "(20a)xml:stylesheet type=text/xsl",
                                   typeGoldName);
 
             // Proposed standard: text/xml
-            testEmbeddedTransform(new StreamSource(filenameToURL(typeNameTextXml)),
-                                  new StreamSource(filenameToURL(typeNameTextXml)),
+            testEmbeddedTransform(new StreamSource(QetestUtils.filenameToURL(typeNameTextXml)),
+                                  new StreamSource(QetestUtils.filenameToURL(typeNameTextXml)),
                                   "(20b)xml:stylesheet type=text/xml",
                                   typeGoldName);
 
             // Proposed standard: application/xml+xslt
-            testEmbeddedTransform(new StreamSource(filenameToURL(typeNameApplicationXmlXslt)),
-                                  new StreamSource(filenameToURL(typeNameApplicationXmlXslt)),
+            testEmbeddedTransform(new StreamSource(QetestUtils.filenameToURL(typeNameApplicationXmlXslt)),
+                                  new StreamSource(QetestUtils.filenameToURL(typeNameApplicationXmlXslt)),
                                   "(20b)xml:stylesheet type=application/xml+xslt",
                                   typeGoldName);
 
@@ -421,13 +421,13 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             String title = null;
             String charset = null;
             media = "foo/media";
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", media=" + media + ")");
-            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             Transformer transformer = factory.newTransformer(xslSrc);
             reporter.logTraceMsg("Got embedded templates, media=" + media + " , about to transform.");
-            transformer.transform(new StreamSource(filenameToURL(mediaTitleName)), 
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                        new StreamResult(outNames.nextName()));
 
             if (Logger.PASS_RESULT 
@@ -442,13 +442,13 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
 
 
             media = "bar/media";
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", media=" + media + ")");
-            xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             transformer = factory.newTransformer(xslSrc);
             reporter.logTraceMsg("Got embedded templates, media=" + media + " , about to transform.");
-            transformer.transform(new StreamSource(filenameToURL(mediaTitleName)), 
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                        new StreamResult(outNames.nextName()));
 
             if (Logger.PASS_RESULT 
@@ -473,13 +473,13 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             String title = null;
             String charset = null;
             title = "foo-title";
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", title=" + title + ")");
-            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             Transformer transformer = factory.newTransformer(xslSrc);
             reporter.logTraceMsg("Got embedded templates, title=" + title + " , about to transform.");
-            transformer.transform(new StreamSource(filenameToURL(mediaTitleName)), 
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                        new StreamResult(outNames.nextName()));
 
             if (Logger.PASS_RESULT 
@@ -494,13 +494,13 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
 
 
             title = "bar-title";
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", title=" + title + ")");
-            xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             transformer = factory.newTransformer(xslSrc);
             reporter.logTraceMsg("Got embedded templates, title=" + title + " , about to transform.");
-            transformer.transform(new StreamSource(filenameToURL(mediaTitleName)), 
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                        new StreamResult(outNames.nextName()));
 
             if (Logger.PASS_RESULT 
@@ -525,13 +525,13 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             String title = null;
             String charset = null;
             media = "alt/media"; // Should use alternate, I think
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", media=" + media + ")");
-            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             Transformer transformer = factory.newTransformer(xslSrc);
             reporter.logTraceMsg("Got embedded templates, media=" + media + " , about to transform.");
-            transformer.transform(new StreamSource(filenameToURL(mediaTitleName)), 
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                        new StreamResult(outNames.nextName()));
 
             if (Logger.PASS_RESULT 
@@ -555,9 +555,9 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             String title = null;
             String charset = null;
             title = "title-not-found"; // negative test: there is no title like this
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", title=" + title + ")");
-            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            Source xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             if (null == xslSrc)
             {
@@ -570,9 +570,9 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
             }
             title = null;
             media = "media/notfound"; // negative test: there is no media like this
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", media=" + media + ")");
-            xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             if (null == xslSrc)
             {
@@ -586,10 +586,10 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
 
             title = "alt-title";        // This title is in there, but
             media = "media/notfound"; // negative test: there is no media like this
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", media=" + media + ")"
                                  + ", title=" + title + ")");
-            xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             if (null == xslSrc)
             {
@@ -603,10 +603,10 @@ public class EmbeddedStylesheetTest extends XSLProcessorTestBase
 
             title = "title-not-found"; // No title like this, but
             media = "alt/media"; // there is a media like this
-            reporter.logTraceMsg("About to getAssociatedStylesheet(" + filenameToURL(mediaTitleName)
+            reporter.logTraceMsg("About to getAssociatedStylesheet(" + QetestUtils.filenameToURL(mediaTitleName)
                                  + ", media=" + media + ")"
                                  + ", title=" + title + ")");
-            xslSrc = factory.getAssociatedStylesheet(new StreamSource(filenameToURL(mediaTitleName)), 
+            xslSrc = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(mediaTitleName)), 
                                                                 media, title, charset);
             if (null == xslSrc)
             {

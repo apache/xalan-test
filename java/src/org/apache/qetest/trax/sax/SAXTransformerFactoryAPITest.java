@@ -247,7 +247,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory)tfactory;
             TransformerHandler handler = saxTFactory.newTransformerHandler(
-                        new StreamSource(filenameToURL(xslName)));
+                        new StreamSource(QetestUtils.filenameToURL(xslName)));
             //Result result = new StreamResult(System.out);
             // Send results out to the next output name
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
@@ -257,7 +257,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
             // Log what output is about to be created
             reporter.logInfoMsg("reader.parse() into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reader.parse(QetestUtils.filenameToURL(xmlName));
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
             if (Logger.PASS_RESULT
@@ -304,7 +304,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             // Log what output is about to be created
             reporter.logInfoMsg("SAXTFactoryTest002 into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reader.parse(QetestUtils.filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -357,8 +357,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(QetestUtils.filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -413,8 +413,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(QetestUtils.filenameToURL(xmlName));
             fos.close(); // just to be complete
 
             reporter.checkFail("Should have thrown exception because systemId not set!");
@@ -452,7 +452,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             DOMSource domSource = new DOMSource(node);
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo: update to new names
             // domSource.setSystemId("file:///" + testDirPath); // @todo: update to new names
-            domSource.setSystemId(filenameToURL(citiesIncludeFileName));
+            domSource.setSystemId(QetestUtils.filenameToURL(citiesIncludeFileName));
 
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
@@ -464,8 +464,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(QetestUtils.filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -505,7 +505,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             Node node = (Node) document;
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo update systemId
             // DOMSource domSource = new DOMSource(node, "file:///" + testDirPath); // @todo update systemId
-            DOMSource domSource = new DOMSource(node, filenameToURL(citiesIncludeFileName));
+            DOMSource domSource = new DOMSource(node, QetestUtils.filenameToURL(citiesIncludeFileName));
 
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
@@ -517,8 +517,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(QetestUtils.filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -613,8 +613,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
             reader.setContentHandler(thandler);
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xslName) + ")");
-            reader.parse(filenameToURL(xslName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xslName) + ")");
+            reader.parse(QetestUtils.filenameToURL(xslName));
 
             TransformerHandler tfhandler = saxTFactory.newTransformerHandler(thandler.getTemplates());
 
@@ -624,8 +624,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             tfhandler.setResult(result);
             reader.setContentHandler(tfhandler);
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(QetestUtils.filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -661,11 +661,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             TemplatesHandler thandler = saxTFactory.newTemplatesHandler();
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo update systemId
             // thandler.setSystemId("file:///" + testDirPath); // @todo update systemId
-            thandler.setSystemId(filenameToURL(citiesIncludeFileName)); // @todo update systemId
+            thandler.setSystemId(QetestUtils.filenameToURL(citiesIncludeFileName)); // @todo update systemId
 
             reader.setContentHandler(thandler);
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(citiesIncludeFileName) + ")");
-            reader.parse(filenameToURL(citiesIncludeFileName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(citiesIncludeFileName) + ")");
+            reader.parse(QetestUtils.filenameToURL(citiesIncludeFileName));
 
             TransformerHandler tfhandler =
                 saxTFactory.newTransformerHandler(thandler.getTemplates());
@@ -676,8 +676,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(tfhandler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            reader.parse(filenameToURL(xmlName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(QetestUtils.filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -718,8 +718,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             tHandler.setResult(realResult);
             reader.setContentHandler(tHandler);
 
-            reporter.logTraceMsg("saxTFactory.newXMLFilter(new StreamSource(" + filenameToURL(xslName) + "))");
-            XMLFilter filter = saxTFactory.newXMLFilter(new StreamSource(filenameToURL(xslName)));
+            reporter.logTraceMsg("saxTFactory.newXMLFilter(new StreamSource(" + QetestUtils.filenameToURL(xslName) + "))");
+            XMLFilter filter = saxTFactory.newXMLFilter(new StreamSource(QetestUtils.filenameToURL(xslName)));
 
             filter.setParent(reader);
 
@@ -727,8 +727,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // the content handler for the parser object (it's "parent"), and
             // will then call the parse method on the parser.
             // Log what output is about to be created
-            reporter.logTraceMsg("filter.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            filter.parse(new InputSource(filenameToURL(xmlName)));
+            reporter.logTraceMsg("filter.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            filter.parse(new InputSource(QetestUtils.filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -786,8 +786,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // will then call the parse method on the parser.
 
             // Log what output is about to be created
-            reporter.logTraceMsg("filter.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            filter.parse(new InputSource(filenameToURL(xmlName)));
+            reporter.logTraceMsg("filter.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            filter.parse(new InputSource(QetestUtils.filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -841,8 +841,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // the content handler for the parser object (it's "parent"), and
             // will then call the parse method on the parser.
             // Log what output is about to be created
-            reporter.logTraceMsg("filter.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
-            filter.parse(new InputSource(filenameToURL(xmlName)));
+            reporter.logTraceMsg("filter.parse(" + QetestUtils.filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            filter.parse(new InputSource(QetestUtils.filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
             fos.close(); // must close ostreams we own
@@ -881,11 +881,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             // I have put this as it was complaining about systemid
             // thandler.setSystemId("file:///" + testDirPath); // @todo update systemId
-            thandler.setSystemId(filenameToURL(xslName)); // @todo update systemId
+            thandler.setSystemId(QetestUtils.filenameToURL(xslName)); // @todo update systemId
 
             reader.setContentHandler(thandler);
-            reporter.logTraceMsg("reader.parse(" + filenameToURL(xslName) + ")");
-            reader.parse(filenameToURL(xslName));
+            reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xslName) + ")");
+            reader.parse(QetestUtils.filenameToURL(xslName));
 
             XMLFilter filter = saxTFactory.newXMLFilter(thandler.getTemplates());
 

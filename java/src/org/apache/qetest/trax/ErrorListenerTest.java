@@ -202,8 +202,8 @@ public class ErrorListenerTest extends XSLProcessorTestBase
             // Validate known errors in stylesheet building 
             loggingErrorListener.setExpected(templatesExpectedType, 
                                              templatesExpectedValue);
-            reporter.logInfoMsg("About to factory.newTemplates(" + filenameToURL(testFileInfo.inputName) + ")");
-            templates = factory.newTemplates(new StreamSource(filenameToURL(testFileInfo.inputName)));
+            reporter.logInfoMsg("About to factory.newTemplates(" + QetestUtils.filenameToURL(testFileInfo.inputName) + ")");
+            templates = factory.newTemplates(new StreamSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
             reporter.logTraceMsg("loggingErrorListener after newTemplates:" + loggingErrorListener.getQuickCounters());
             // Clear out any setExpected or counters
             loggingErrorListener.reset();
@@ -225,7 +225,7 @@ public class ErrorListenerTest extends XSLProcessorTestBase
             loggingErrorListener.setExpected(transformExpectedType, 
                                              transformExpectedValue);
             reporter.logTraceMsg("about to transform(...)");
-            transformer.transform(new StreamSource(filenameToURL(testFileInfo.xmlName)), 
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo.xmlName)), 
                                   new StreamResult(outNames.nextName()));
             reporter.logTraceMsg("after transform(...)");
             // Clear out any setExpected or counters
@@ -284,13 +284,13 @@ public class ErrorListenerTest extends XSLProcessorTestBase
 
             // Use the JAXP way to get an XMLReader
             reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
-            InputSource is = new InputSource(filenameToURL(testFileInfo.inputName));
+            InputSource is = new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName));
 
             // Attempt to build templates from known-bad stylesheet
             // Validate known errors in stylesheet building 
             loggingErrorListener.setExpected(templatesExpectedType, 
                                              templatesExpectedValue);
-            reporter.logTraceMsg("About to factory.newTransformerHandler(SAX:" + filenameToURL(testFileInfo.inputName) + ")");
+            reporter.logTraceMsg("About to factory.newTransformerHandler(SAX:" + QetestUtils.filenameToURL(testFileInfo.inputName) + ")");
             handler = saxFactory.newTransformerHandler(new SAXSource(is));
             reporter.logTraceMsg("loggingErrorListener after newTransformerHandler:" + loggingErrorListener.getQuickCounters());
             // Clear out any setExpected or counters
@@ -312,8 +312,8 @@ public class ErrorListenerTest extends XSLProcessorTestBase
             loggingErrorListener.setExpected(transformExpectedType, 
                                              transformExpectedValue);
             reporter.logTraceMsg("//@todo Need to hookup a SAX errorHandler to catch errors here!");
-            reporter.logInfoMsg("about to parse/transform(" + filenameToURL(testFileInfo.xmlName) + ")");
-            reader.parse(filenameToURL(testFileInfo.xmlName));
+            reporter.logInfoMsg("about to parse/transform(" + QetestUtils.filenameToURL(testFileInfo.xmlName) + ")");
+            reader.parse(QetestUtils.filenameToURL(testFileInfo.xmlName));
             reporter.logTraceMsg("after parse/transform(...)");
             // Clear out any setExpected or counters
             loggingErrorListener.reset();
@@ -367,8 +367,8 @@ public class ErrorListenerTest extends XSLProcessorTestBase
             dfactory.setNamespaceAware(true);
             docBuilder = dfactory.newDocumentBuilder();
             reporter.logInfoMsg("parsing xml, xsl files to DOMs");
-            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
-            xmlNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.xmlName)));
+            xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
+            xmlNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.xmlName)));
 
             // Create a transformer factory with an error listener
             factory = TransformerFactory.newInstance();
@@ -378,7 +378,7 @@ public class ErrorListenerTest extends XSLProcessorTestBase
             // Validate known errors in stylesheet building 
             loggingErrorListener.setExpected(templatesExpectedType, 
                                              templatesExpectedValue);
-            reporter.logTraceMsg("About to factory.newTemplates(DOM:" + filenameToURL(testFileInfo.inputName) + ")");
+            reporter.logTraceMsg("About to factory.newTemplates(DOM:" + QetestUtils.filenameToURL(testFileInfo.inputName) + ")");
             templates = factory.newTemplates(new DOMSource(xslNode));
             reporter.logTraceMsg("loggingErrorListener after newTemplates:" + loggingErrorListener.getQuickCounters());
             // Clear out any setExpected or counters

@@ -156,11 +156,11 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
                               + TRAX_SUBDIR
                               + File.separator;
 
-        testFileInfo.inputName = filenameToURL(testBasePath + "identity.xsl");
-        testFileInfo.xmlName = filenameToURL(testBasePath + "identity.xml");
+        testFileInfo.inputName = QetestUtils.filenameToURL(testBasePath + "identity.xsl");
+        testFileInfo.xmlName = QetestUtils.filenameToURL(testBasePath + "identity.xml");
         testFileInfo.goldName = goldBasePath + "identity.out";
 
-        embeddedFileInfo.xmlName = filenameToURL(testBasePath + "embeddedIdentity.xml");
+        embeddedFileInfo.xmlName = QetestUtils.filenameToURL(testBasePath + "embeddedIdentity.xml");
         embeddedFileInfo.goldName = goldBasePath + "embeddedIdentity.out";
 
         embeddedCSSFileInfo.xmlName = testBasePath + "TransformerFactoryAPIModern.xml"; // just the local path\filename
@@ -519,7 +519,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             }
             try 
             {
-                domSource.setSystemId(filenameToURL(embeddedCSSFileInfo.xmlName));
+                domSource.setSystemId(QetestUtils.filenameToURL(embeddedCSSFileInfo.xmlName));
                 reporter.logInfoMsg("About to getAssociatedStylesheet(domsource-w/systemid, screen,Modern,null)");
                 Source s = factory.getAssociatedStylesheet(domSource,"screen","Modern",null);
                 reporter.check((null == s), true, "getAssociatedStylesheet returns null Source for text/css");
@@ -546,7 +546,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             try 
             {
                 StreamSource ss = new StreamSource(new FileInputStream(embeddedCSSFileInfo.xmlName));
-                ss.setSystemId(filenameToURL(embeddedCSSFileInfo.xmlName));
+                ss.setSystemId(QetestUtils.filenameToURL(embeddedCSSFileInfo.xmlName));
                 reporter.logInfoMsg("About to getAssociatedStylesheet(streamsource-w/systemid, screen,Modern,null)");
                 Source s = factory.getAssociatedStylesheet(ss,"screen","Modern",null);
                 reporter.check((null == s), true, "getAssociatedStylesheet returns null Source for text/css");

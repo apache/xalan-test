@@ -199,17 +199,17 @@ public class OutputPropertiesTest extends XSLProcessorTestBase
         {
             // Preprocess the HTML stylesheet for later use
             factory = TransformerFactory.newInstance();
-            reporter.logInfoMsg("creating shared newTemplates(" + filenameToURL(htmlFileInfo.inputName) + ")");
-            templates = factory.newTemplates(new StreamSource(filenameToURL(htmlFileInfo.inputName)));
+            reporter.logInfoMsg("creating shared newTemplates(" + QetestUtils.filenameToURL(htmlFileInfo.inputName) + ")");
+            templates = factory.newTemplates(new StreamSource(QetestUtils.filenameToURL(htmlFileInfo.inputName)));
             reporter.logHashtable(Logger.STATUSMSG, 
                                   templates.getOutputProperties(), "shared templates output properties");
 
             // Process the file once with default properties
             Transformer transformer = templates.newTransformer();
             Result result = new StreamResult(outNames.nextName());
-            reporter.logInfoMsg("(0)shared transform(" + filenameToURL(htmlFileInfo.xmlName) 
+            reporter.logInfoMsg("(0)shared transform(" + QetestUtils.filenameToURL(htmlFileInfo.xmlName) 
                                 + ", " + outNames.currentName() + ")");
-            transformer.transform(new StreamSource(filenameToURL(htmlFileInfo.xmlName)), result);
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(htmlFileInfo.xmlName)), result);
             // Validate the default transform
             if
                 (Logger.PASS_RESULT 
@@ -235,20 +235,20 @@ public class OutputPropertiesTest extends XSLProcessorTestBase
         // If we reset only one property each time, the results should match
         //  whether we set it thru properties or individually
         setProps.put("indent", "no");
-        outputPropertyTestlet(templates, filenameToURL(htmlFileInfo.xmlName), 
+        outputPropertyTestlet(templates, QetestUtils.filenameToURL(htmlFileInfo.xmlName), 
                               setProps, CROSS_VALIDATE, CROSS_VALIDATE,
                               "(1)Just reset indent=no");
 
         setProps = new Properties();
         setProps.put("method", "xml");
-        outputPropertyTestlet(templates, filenameToURL(htmlFileInfo.xmlName), 
+        outputPropertyTestlet(templates, QetestUtils.filenameToURL(htmlFileInfo.xmlName), 
                               setProps, CROSS_VALIDATE, CROSS_VALIDATE,
                               "(2)Just reset method=xml");
 
         // Just changing the standalone doesn't affect HTML output
         setProps = new Properties();
         setProps.put("standalone", "no");
-        outputPropertyTestlet(templates, filenameToURL(htmlFileInfo.xmlName), 
+        outputPropertyTestlet(templates, QetestUtils.filenameToURL(htmlFileInfo.xmlName), 
                               setProps, htmlFileInfo.goldName, htmlFileInfo.goldName,
                               "(3)Just reset standalone=no");
         reporter.testCaseClose();
@@ -356,7 +356,7 @@ public class OutputPropertiesTest extends XSLProcessorTestBase
             reporter.logTraceMsg("docBld.parse(" + xslName + ")");
             Document document = db.parse(new File(xslName));
             DOMSource domSource = new DOMSource(document);
-            domSource.setSystemId(filenameToURL(xslName)); // sc
+            domSource.setSystemId(QetestUtils.filenameToURL(xslName)); // sc
 
             TransformerFactory tfactory = TransformerFactory.newInstance();
             Transformer transformer = tfactory.newTransformer(domSource);
@@ -406,7 +406,7 @@ public class OutputPropertiesTest extends XSLProcessorTestBase
             reporter.logTraceMsg("docBld.parse(" + xslName + ")");
             Document document = db.parse(new File(xslName));
             DOMSource domSource = new DOMSource(document);
-            domSource.setSystemId(filenameToURL(xslName)); // sc
+            domSource.setSystemId(QetestUtils.filenameToURL(xslName)); // sc
 
             TransformerFactory tfactory = TransformerFactory.newInstance();
             Transformer transformer = tfactory.newTransformer(domSource);
@@ -471,7 +471,7 @@ public class OutputPropertiesTest extends XSLProcessorTestBase
             reporter.logTraceMsg("docBld.parse(" + xslName + ")");
             Document document = db.parse(new File(xslName));
             DOMSource domSource = new DOMSource(document);
-            domSource.setSystemId(filenameToURL(xslName)); // sc
+            domSource.setSystemId(QetestUtils.filenameToURL(xslName)); // sc
 
             TransformerFactory tfactory = TransformerFactory.newInstance();
             Transformer transformer = tfactory.newTransformer(domSource);
@@ -524,7 +524,7 @@ public class OutputPropertiesTest extends XSLProcessorTestBase
             reporter.logTraceMsg("docBld.parse(" + xslName + ")");
             Document document = db.parse(new File(xslName));
             DOMSource domSource = new DOMSource(document);
-            domSource.setSystemId(filenameToURL(xslName)); // sc
+            domSource.setSystemId(QetestUtils.filenameToURL(xslName)); // sc
 
             TransformerFactory tfactory = TransformerFactory.newInstance();
             Transformer transformer = tfactory.newTransformer(domSource);

@@ -304,10 +304,10 @@ public class SAXResultAPITest extends XSLProcessorTestBase
         reporter.testCaseInit("Basic functionality of SAXResults");
         // Provide local copies of URLized filenames, so that we can
         //  later run tests with either Strings or URLs
-        String xslURI = filenameToURL(testFileInfo.inputName);
-        String xmlURI = filenameToURL(testFileInfo.xmlName);
-        String xslImpInclURI = filenameToURL(impInclFileInfo.inputName);
-        String xmlImpInclURI = filenameToURL(impInclFileInfo.xmlName);
+        String xslURI = QetestUtils.filenameToURL(testFileInfo.inputName);
+        String xmlURI = QetestUtils.filenameToURL(testFileInfo.xmlName);
+        String xslImpInclURI = QetestUtils.filenameToURL(impInclFileInfo.inputName);
+        String xmlImpInclURI = QetestUtils.filenameToURL(impInclFileInfo.xmlName);
 
         TransformerFactory factory = null;
         SAXTransformerFactory saxFactory = null;
@@ -397,8 +397,8 @@ public class SAXResultAPITest extends XSLProcessorTestBase
     public boolean testCase3()
     {
         reporter.testCaseInit("Detailed functionality of SAXResults: setLexicalHandler");
-        String xslURI = filenameToURL(dtdFileInfo.inputName);
-        String xmlURI = filenameToURL(dtdFileInfo.xmlName);
+        String xslURI = QetestUtils.filenameToURL(dtdFileInfo.inputName);
+        String xmlURI = QetestUtils.filenameToURL(dtdFileInfo.xmlName);
 
         TransformerFactory factory = null;
         SAXTransformerFactory saxFactory = null;

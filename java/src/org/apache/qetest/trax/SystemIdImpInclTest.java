@@ -242,11 +242,11 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             reporter.logInfoMsg("StreamSource.setSystemId(level1)");
             InputStream xslStream1 = new FileInputStream(testFileInfo.inputName);
             Source xslSource1 = new StreamSource(xslStream1);
-            xslSource1.setSystemId(filenameToURL(testFileInfo.inputName));
+            xslSource1.setSystemId(QetestUtils.filenameToURL(testFileInfo.inputName));
             
             InputStream xmlStream1 = new FileInputStream(testFileInfo.xmlName);
             Source xmlSource1 = new StreamSource(xmlStream1);
-            xmlSource1.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource1.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
             reporter.logTraceMsg("Create FileOutputStream to " + outNames.nextName());
             FileOutputStream fos1 = new FileOutputStream(outNames.currentName());
@@ -278,11 +278,11 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             reporter.logInfoMsg("StreamSource.setSystemId(level0)");
             InputStream xslStream1 = new FileInputStream(testFileInfo.inputName);
             Source xslSource1 = new StreamSource(xslStream1);
-            xslSource1.setSystemId(filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"));
+            xslSource1.setSystemId(QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"));
             
             InputStream xmlStream1 = new FileInputStream(testFileInfo.xmlName);
             Source xmlSource1 = new StreamSource(xmlStream1);
-            xmlSource1.setSystemId(filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xml"));
+            xmlSource1.setSystemId(QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xml"));
 
             reporter.logTraceMsg("Create FileOutputStream to " + outNames.nextName());
             FileOutputStream fos1 = new FileOutputStream(outNames.currentName());
@@ -314,11 +314,11 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             reporter.logInfoMsg("StreamSource.setSystemId(level2)");
             InputStream xslStream1 = new FileInputStream(testFileInfo.inputName);
             Source xslSource1 = new StreamSource(xslStream1);
-            xslSource1.setSystemId(filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"));
+            xslSource1.setSystemId(QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"));
             
             InputStream xmlStream1 = new FileInputStream(testFileInfo.xmlName);
             Source xmlSource1 = new StreamSource(xmlStream1);
-            xmlSource1.setSystemId(filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xml"));
+            xmlSource1.setSystemId(QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xml"));
 
             reporter.logTraceMsg("Create FileOutputStream to " + outNames.nextName());
             FileOutputStream fos1 = new FileOutputStream(outNames.currentName());
@@ -350,7 +350,7 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             reporter.logInfoMsg("StreamSource.setSystemId(xslonly level2)");
             InputStream xslStream1 = new FileInputStream(testFileInfo.inputName);
             Source xslSource1 = new StreamSource(xslStream1);
-            xslSource1.setSystemId(filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"));
+            xslSource1.setSystemId(QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"));
             
             InputStream xmlStream1 = new FileInputStream(testFileInfo.xmlName);
             Source xmlSource1 = new StreamSource(xmlStream1);
@@ -425,9 +425,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel0,
                                     "SAXSource(inpSrc(str)).systemId(level0: one up)");
 ********************************/
@@ -436,9 +436,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(testFileInfo.inputName), 
                                     xmlSource, goldFileLevel1,
                                     "SAXSource(inpSrc(str)).systemId(level1: same level)");
 
@@ -455,9 +455,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel2,
                                     "SAXSource(inpSrc(str)).systemId(level2: one down)");
 ********************************/
@@ -477,9 +477,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel0,
                                     "SAXSource(inpSrc(byteS)).systemId(level0: one up)");
 
@@ -488,9 +488,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(testFileInfo.inputName), 
                                     xmlSource, goldFileLevel1,
                                     "SAXSource(inpSrc(byteS)).systemId(level1: same level)");
 
@@ -499,9 +499,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel2,
                                     "SAXSource(inpSrc(byteS)).systemId(level2: one down)");
 
@@ -512,9 +512,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel0,
                                     "SAXSource(inpSrc(charS)).systemId(level0: one up)");
 
@@ -523,9 +523,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(testFileInfo.inputName), 
                                     xmlSource, goldFileLevel1,
                                     "SAXSource(inpSrc(charS)).systemId(level1: same level)");
 
@@ -534,9 +534,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel2,
                                     "SAXSource(inpSrc(charS)).systemId(level2: one down)");
 
@@ -548,9 +548,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(reader, xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel0,
                                     "SAXSource(reader, inpSrc(charS)).systemId(level0: one up)");
 
@@ -560,9 +560,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(reader, xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(testFileInfo.inputName), 
                                     xmlSource, goldFileLevel1,
                                     "SAXSource(reader, inpSrc(str)).systemId(level1: same level)");
 
@@ -572,9 +572,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new SAXSource(reader, xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel2,
                                     "SAXSource(reader, inpSrc(byteS)).systemId(level2: one down)");
         }
@@ -623,38 +623,38 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             // Verify basic transforms with with various systemId
             //  and a DOMSource(InputSource(String))
             // level0: one level up
-            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
-            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
+            reporter.logTraceMsg("about to parse(InputSource(" + QetestUtils.filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
             xslSource = new DOMSource(xslNode);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel0,
                                     "DOMSource(inpSrc(str)).systemId(level0: one up)");
 
             // level1: same systemId as actual file
-            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
-            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
+            reporter.logTraceMsg("about to parse(InputSource(" + QetestUtils.filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
             xslSource = new DOMSource(xslNode);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(testFileInfo.inputName), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(testFileInfo.inputName), 
                                     xmlSource, goldFileLevel1,
                                     "DOMSource(inpSrc(str)).systemId(level1: same level)");
 
             // level2: one level down
-            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
-            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
+            reporter.logTraceMsg("about to parse(InputSource(" + QetestUtils.filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
             xslSource = new DOMSource(xslNode);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + "/trax/systemid/" + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel2,
                                     "DOMSource(inpSrc(str)).systemId(level2: one down)");
 
@@ -662,16 +662,16 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             //  differently in the constructor - tests that you can 
             //  later call setSystemId and have it work
             // level0: one level up
-            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
-            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
+            reporter.logTraceMsg("about to parse(InputSource(" + QetestUtils.filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
             // Set the original systemId to itself, or level1
-            xslSource = new DOMSource(xslNode, filenameToURL(testFileInfo.inputName));
+            xslSource = new DOMSource(xslNode, QetestUtils.filenameToURL(testFileInfo.inputName));
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
             // Test it with a level0, or one level up systemId
-            checkSourceWithSystemId(xslSource, filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
+            checkSourceWithSystemId(xslSource, QetestUtils.filenameToURL(inputDir + File.separator + knownGoodBaseName + ".xsl"), 
                                     xmlSource, goldFileLevel0,
                                     "DOMSource(inpSrc(str),sysId-level1).systemId(level0: one up)");
         }
@@ -759,7 +759,7 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new StreamSource(new FileInputStream(testFileInfo.inputName));
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
             // Note that the systemId set (the second argument below)
             //  must be the path to the proper 'directory' level
@@ -773,7 +773,7 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             xslSource = new StreamSource(new FileInputStream(testFileInfo.inputName));
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
-            xmlSource.setSystemId(filenameToURL(testFileInfo.xmlName));
+            xmlSource.setSystemId(QetestUtils.filenameToURL(testFileInfo.xmlName));
 
             checkSourceWithSystemId(xslSource, httpSystemIdBase + "/" + knownGoodBaseName + ".xsl", 
                                     xmlSource, goldFileHttp,

@@ -704,7 +704,7 @@ public class SystemIdTest extends XSLProcessorTestBase
                 if (transformer != null)
                 {
                     // Actually try to use the object in a transform
-                    transformer.transform(new StreamSource(filenameToURL(knownGoodFileInfo.xmlName)), 
+                    transformer.transform(new StreamSource(QetestUtils.filenameToURL(knownGoodFileInfo.xmlName)), 
                                           new StreamResult(outNames.nextName()));
                     int result = fileChecker.check(reporter, 
                                       new File(outNames.currentName()), 
