@@ -16,9 +16,9 @@
 </xsl:template>
 
 <xsl:template match="tag">
-	<div style="border: solid red">
-		<xsl:apply-imports/>
-	</div>
+  <div style="border: solid red">
+    <xsl:apply-imports/>
+  </div>
 </xsl:template>
 
 </xsl:stylesheet>
