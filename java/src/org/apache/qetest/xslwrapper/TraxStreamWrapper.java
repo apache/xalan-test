@@ -426,9 +426,9 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         resultWrite = System.currentTimeMillis() - startTime;
 
         long[] times = getTimeArray();
-        times[IDX_OVERALL] = xmlRead + transform + resultWrite;
+        times[IDX_OVERALL] = getTransformer + xmlRead + transform + resultWrite;
         times[IDX_XMLREAD] = xmlRead;
-        times[IDX_TRANSFORM] = getTransformer + transform;
+        times[IDX_TRANSFORM] = getTransformer + xmlRead + transform;
         times[IDX_RESULTWRITE] = resultWrite;
         return times;
     }
