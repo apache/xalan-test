@@ -69,6 +69,16 @@ rem Default ANT_HOME to the one in the java dir
 if "%ANT_HOME%"=="" set _ANT_HOME=..\java
 if not "%ANT_HOME%"=="" set _ANT_HOME=%ANT_HOME%
 
+rem Patch for Ant limitation:
+rem   <property environment="xxx" /> is only available on certain platforms.
+rem   Apparently Windows 2003 is not one of the supported platforms.
+rem   A workaround (according to Ant's FAQ) is to set the os.name=Windows_NT
+rem   before calling Ant.
+rem   Since this is a Windows batch file and I don't think Xalan's test 
+rem   harness or targets care which Windows version we're running on, its
+rem   probably safe to use this workaround.
+set _ANT_OPTS=%ANT_OPTS% -Dos.name=Windows_NT
+
 rem Note: classpath handling is special for testing Xalan
 rem If PARSER_JAR blank, default to xerces in the xalan dir
 if "%PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xercesImpl.jar
@@ -105,7 +115,7 @@ echo.
 :checkJikes
 rem also pass along the selected parser to Ant
 rem Note: we don't need to do this for xml-apis.jar
-set _ANT_OPTS=%ANT_OPTS% -Dparserjar=%_PARSER_JAR%
+set _ANT_OPTS=%_ANT_OPTS% -Dparserjar=%_PARSER_JAR%
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 
 :runAnt
