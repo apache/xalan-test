@@ -173,7 +173,7 @@ public abstract class TransformWrapperFactory
         }
         catch (Exception e)
         {
-            throw new IllegalArgumentException("newWrapper() threw: " + e.toString());
+            throw new IllegalArgumentException("newWrapper(" + flavor + ") threw: " + e.toString());
         }
     }
 
