@@ -26,6 +26,7 @@
          build.xml scripts call us via <ant>, thus creating a 
          differently-named output jar instead of 'testxsl' -->
     <property name="testxsl.jar.name" value="testxsl.jar"/>
+    <property name="qetest.jar.name" value="qetest.jar"/>
     <property name="name" value="testxsl"/>
     <property name="Name" value="Testxsl"/>
     <property name="version" value="3.0"/>
@@ -134,6 +135,7 @@
     <!-- =================================================================== -->
     <!-- Common worker targets for all builds                                -->
     <!-- =================================================================== -->
+    <!-- Compile just the qetest stuff alone; has no Xalan dependencies -->
     <target name="compile.reporter" depends="prepare">
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
@@ -141,11 +143,21 @@
                debug="${debug}" />
     </target>
 
-    <!-- Compile Processor-wrapper based tests; must also compile ProcessorWrapper itself -->
+    <!-- Package just the qetest stuff alone; has no Xalan dependencies -->
+    <target name="package.reporter" depends="compile.reporter">
+        <jar jarfile="${build.dir}/${qetest.jar.name}" 
+             basedir="${build.dir}" 
+             includes="${test.root}*.java,${test.root}*.properties" />
+    </target>
+
+    <!-- Compile Processor-wrapper based tests; must also compile TransformWrapper itself -->
+    <!-- This should only be dependent on JAXP, SAX, DOM, and in 
+         theory should not depend directly on Xalan-J -->
+
     <target name="compile.xsl" depends="compile.reporter">
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
-               includes="${test.root}xslwrapper/ProcessorWrapper.java"
+               includes="${test.root}xslwrapper/ProcessorWrapper.java,${test.root}xslwrapper/TransformWrapperHelper.java,${test.root}xslwrapper/TransformWrapper.java,${test.root}xslwrapper/TransformWrapperFactory.java"
                debug="${debug}" />
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
@@ -191,13 +203,14 @@
          using compat.jar that provides backwards compatibility. -->
     <!-- =================================================================== -->
     <target name="compile.compat1" depends="compile.xsl">
-        <javac srcdir="${test.dir}xslwrapper" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
-               includes="XalanWrapper.java"
+               includes="${test.root}xslwrapper/XalanWrapper.java"
                debug="${debug}" 
                classpathref="compattest.class.path" />
-        <javac srcdir="${test.dir}xalanj1" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
+               includes="${test.root}xalanj1/*.java"
                debug="${debug}" 
                classpathref="compattest.class.path" />
         <!-- Note this may not support being called externally yet -->
@@ -212,31 +225,34 @@
     <!-- =================================================================== -->
     <!-- For Xalan-J 2.x testing, use these targets                          -->
     <!-- =================================================================== -->
-    <!-- Just compile any xslwrappers related to trax -->
+    <!-- Just compile any xslwrappers related to trax: note naming 
+         convention of Trax*Wrapper -->
     <target name="compile.trax.xslwrappers" depends="compile.xsl">
-        <javac srcdir="${test.dir}xslwrapper" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
-               includes="TraxWrapper.java"
-               debug="${debug}" 
+               includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
+               debug="${debug}"
                classpathref="compiletest.class.path" />
     </target>
 
     <!-- Compile various TRAX related API tests -->
     <target name="compile.trax" depends="compile.xsl,compile.trax.xslwrappers">
-        <echo message="Do just base trax directory first" />
-        <javac srcdir="${test.dir}trax" 
+        <echo message="Do just base trax directory first due to compiler oddities" />
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
-               includes="*.java" 
+               includes="${test.root}trax/*.java"
                debug="${debug}" />
-        <echo message="Do [dom|sax|stream] subdirectories as well" />
-        <javac srcdir="${test.dir}trax/stream" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
+               includes="${test.root}trax/stream/*.java"
                debug="${debug}" />
-        <javac srcdir="${test.dir}trax/dom" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
+               includes="${test.root}trax/dom/*.java"
                debug="${debug}" />
-        <javac srcdir="${test.dir}trax/sax" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
+               includes="${test.root}trax/sax/*.java"
                debug="${debug}" />
     </target>
     <target name="package.trax" depends="compile.trax"
