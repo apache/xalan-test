@@ -9,6 +9,7 @@
   <!-- Purpose: Call a template using invalid name. -->
   <!-- ExpectedException: Invalid template name -->
   <!-- ExpectedException: xsl:call-template has an invalid 'name' attribute -->
+  <!-- ExpectedException: Illegal value: tmplt1@bar used for QNAME attribute: name -->
 
 <xsl:template match="doc">
   <out>
