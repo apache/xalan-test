@@ -65,6 +65,7 @@ import org.apache.qetest.*;
 import org.apache.qetest.xslwrapper.ProcessorWrapper;
 
 import java.io.File;
+import java.util.Hashtable;
 
 /**
  * Testlet to capture basic timing performance data.
@@ -110,15 +111,15 @@ public class PerformanceTestlet extends TestletImpl
      */
     public void execute(Datalet d)
 	{
-        PerformanceDatalet datalet = null;
+        StylesheetDatalet datalet = null;
         try
         {
-            datalet = (PerformanceDatalet)d;
+            datalet = (StylesheetDatalet)d;
             
         }
         catch (ClassCastException e)
         {
-            logger.checkErr("Datalet provided is not a PerformanceDatalet; cannot continue");
+            logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue");
             return;
         }
         
@@ -140,6 +141,20 @@ public class PerformanceTestlet extends TestletImpl
         // Go do performance stuff!
         try
         {
+            // Save options from the datalet in convenience variables
+            int iterations = 10;
+            boolean preload = true;
+            try
+            {
+                iterations = Integer.parseInt(datalet.options.getProperty("iterations"));
+            }
+            catch (Exception e) { /* no-op, leave as default */ }
+            try
+            {
+                preload = (new Boolean(datalet.options.getProperty("preload"))).booleanValue();
+            }
+            catch (Exception e) { /* no-op, leave as default */ }
+
             // Create a new ProcessorWrapper of appropriate flavor
             ProcessorWrapper processorWrapper = ProcessorWrapper.getWrapper(datalet.flavor);
             if (null == processorWrapper.createNewProcessor(null))
@@ -148,15 +163,30 @@ public class PerformanceTestlet extends TestletImpl
                 return;
             }
 
-            logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
-                          + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
+            // Store local copies of XSL, XML references for 
+            //  potential change to URLs            
+            String inputName = datalet.inputName;
+            String xmlName = datalet.xmlName;
+            if (datalet.useURL)
+            {
+                // inputName may not exist if it's an embedded test
+                if (null != inputName)
+                    inputName = QetestUtils.filenameToURL(inputName);
+                xmlName = QetestUtils.filenameToURL(xmlName);
+            }
+            logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + inputName
+                          + " xmlName=" + xmlName + " outputName=" + datalet.outputName
                           + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor
-                          + " iterations=" + datalet.iterations + " preload=" + datalet.preload);
+                          + " iterations=" + iterations + " preload=" + preload);
             // Prime the pump, so to speak, if desired
-            if (datalet.preload)
+            long preloadTime = 0L;
+            if (preload)
             {
                 logMemory(true);  // dumps Runtime.freeMemory/totalMemory
-                long preloadTime = processorWrapper.processToFile(datalet.xmlName, datalet.inputName,
+
+                // Note we should revisit if we only want to do a 
+                //  single preload, or if we want to iterate here too
+                preloadTime = processorWrapper.processToFile(xmlName, inputName,
                                                     datalet.outputName);
 
                 if (preloadTime == ProcessorWrapper.ERROR)
@@ -165,23 +195,23 @@ public class PerformanceTestlet extends TestletImpl
                                      + datalet.inputName);
                     return;
                 }
-
-                logger.logStatistic(Logger.STATUSMSG, preloadTime, 0, 
-                                    PERF_PRELOAD + "Preload process of::" + datalet.inputName);
                 // @todo add verification of output file
             }
 
             logMemory(true);  // dumps Runtime.freeMemory/totalMemory
 
+            // Save individual times in a buffer; I'm not sure 
+            //  what this will be used for but it seems interesting
+            StringBuffer buf = new StringBuffer();
             long aggregate = 0L;
             int ctr;
-            for (ctr = 1; ctr <= datalet.iterations; ctr++)
+            for (ctr = 1; ctr <= iterations; ctr++)
             {
                 long retVal;
 
                 // Note: We re-write the same output file each time, so 
                 //       I suppose in theory that could affect future iterations
-                retVal = processorWrapper.processToFile(datalet.xmlName, datalet.inputName, datalet.outputName);
+                retVal = processorWrapper.processToFile(xmlName, inputName, datalet.outputName);
 
                 if (retVal == ProcessorWrapper.ERROR)
                 {
@@ -193,18 +223,31 @@ public class PerformanceTestlet extends TestletImpl
 
                 // Increment our overall counter
                 aggregate += retVal;
-                // Log this particular iteration's time
-                logger.logStatistic(Logger.STATUSMSG, retVal, 0,
-                                    PERF_ITERATION + "processToFile(" + ctr + ") of::"
-                                    + datalet.inputName);
+                // Save individual timing info, semicolon delimited
+                //  (no reason for semicolons, just picked on them)
+                buf.append(retVal);
+                buf.append(';');
+
                 // Should really make this optional
                 logMemory(false);
             }
-
-            logger.logStatistic(Logger.STATUSMSG, (aggregate / datalet.iterations), 0, 
-                                PERF_AVERAGE + "Average of (" + datalet.iterations
-                                + ") iterations of::" + datalet.inputName);
-                                
+            // Log special performance element with our timing
+            Hashtable attrs = new Hashtable();
+            // idref is the individual filename
+            attrs.put("idref", (new File(datalet.inputName)).getName());
+            // inputName is the actual name we gave to the processor
+            attrs.put("inputName", inputName);
+            // preload.onetime is the one time it took in the preload stage
+            if (preload)
+                attrs.put("preload.onetime", new Long(preloadTime));
+            // process.avg is the average processing time...
+            attrs.put("process.avg", new Long(aggregate / iterations));
+            // ... over a number of iterations
+            attrs.put("iterations", new Integer(iterations));
+            // The hackish buf at the end is simply a semicolon
+            //  delimited list of individual timings, just for 
+            //  fun - I'm not even sure we're going to use it
+            logger.logElement(Logger.STATUSMSG, "perf", attrs, PERF_ITERATION + buf.toString());
         }
         catch (Throwable t)
         {
