@@ -13,7 +13,7 @@
     <s2 title="Purpose of these tests">
     <p>These tests are provided for Xalan contributors to evaluate the impact of code changes. 
     Run the tests on the unchanged code, make the change and rebuild. Then run the tests again 
-    and compare the results. Results should also be compared to the files in the "-gold" 
+    and compare the results. Results are automatically compared to the files in the "-gold" 
     directory trees. Even though not all tests have "gold" files, it's still valuable to run 
     the tests before and after a code change. That way you can at least ensure that 
     your changes didn't cause any regressions to the code before you check your 
@@ -28,9 +28,7 @@
       <label><code>xml-xalan/test</code></label>
       <item>Top level dir for all Xalan versions/products tests</item>
       <label></label>
-      <label><code>xml-xalan/test/java</code></label>
-      <item>Top level for Java test automation</item>
-      <label><code>xml-xalan/test/java/bin</code></label>
+      <label><code>xml-xalan/test/bin</code></label>
       <item>Java test automation dependencies (includes 
         <jump href="http://jakarta.apache.org/ant/index.html">Ant 1.2</jump>)</item>
       <label><code>xml-xalan/test/java/src</code></label>
@@ -44,9 +42,13 @@
       <jump href="apidocs/org/apache/qetest/trax/package-summary.html">org.apache.qetest.trax</jump><br/>
       <jump href="apidocs/org/apache/qetest/trax/dom/package-summary.html">org.apache.qetest.trax.dom</jump><br/>
       <jump href="apidocs/org/apache/qetest/trax/stream/package-summary.html">org.apache.qetest.trax.stream</jump><br/>
-      <jump href="apidocs/org/apache/qetest/xalanj1/package-summary.html">org.apache.qetest.xalanj1</jump><br/>
+      <jump href="apidocs/org/apache/qetest/trax/sax/package-summary.html">org.apache.qetest.trax.sax</jump><br/>
+      <jump href="apidocs/org/apache/qetest/xalanj2/package-summary.html">org.apache.qetest.xalanj2</jump><br/>
       <br/></item>
-      <label><code>xml-xalan/test/tests</code></label><item>Top level for XSLT stylesheet trees</item>
+      <label><code>xml-xalan/test/tests</code></label><item>Top level for XSLT stylesheet trees and special API tests</item>
+      <label><code>xml-xalan/test/tests/conf</code></label><item>Directory tree of specific conformance testing stylesheets</item>
+      <label><code>xml-xalan/test/tests/conf-gold</code></label><item>Directory tree of specific conformance testing stylesheets gold 
+      output reference files (this tree should mirror the structure of contrib)<br/></item>
       <label><code>xml-xalan/test/tests/contrib</code></label><item>Directory tree of user-contributed stylesheets</item>
       <label><code>xml-xalan/test/tests/contrib-gold</code></label><item>Directory tree of user-contributed stylesheets gold 
       output reference files (this tree should mirror the structure of contrib)<br/></item>
@@ -58,23 +60,22 @@
       <label></label><item>etc. - often the directory tree in the stylesheet area
       will match the Java sources directory/package tree.</item>
       <label><code>xml-xalan/test/tests/api-gold</code></label><item>Matching Directory tree of gold files for Java API tests<br/></item>
-      <label><code>xml-xalan/test/tests/extension</code></label><item>Directory tree for stylesheets used in Xalan-specific extension tests</item>
-      <label><code>xml-xalan/test/tests/extension/xalanj1</code></label><item>Xalan-J 1.x version-specific extension tests</item>
-      <label><code>xml-xalan/test/tests/extension/xalanj2</code></label><item>Xalan-J 2.x version-specific extension tests</item>
-      <label><code>xml-xalan/test/tests/extension-gold</code></label><item>Matching Directory tree of gold files for Xalan-specific extension tests<br/></item>
-      <label><code>xml-xalan/test/tests/...</code></label><item>More stylesheet trees of testfiles to be added!
-      (namely: tests/conf - Conformance tests to the XSLT spec)</item>
-      <label><code>xml-xalan/test/tests/...-gold</code></label><item></item>
+      <label><code>xml-xalan/test/tests/extensions</code></label><item>Directory tree for stylesheets used in Xalan-specific extension tests</item>
+      <label><code>xml-xalan/test/tests/extensions/java</code></label><item>Tests for extensions written in Java</item>
+      <label><code>xml-xalan/test/tests/extensions/javascript</code></label><item>Tests for extensions written in Javascript</item>
+      <label><code>xml-xalan/test/tests/extension-gold</code></label><item>Matching Directory tree of gold files for extensions tests<br/></item>
     </gloss>
     </s2>
 
     <anchor name="test-map"/>
     <s2 title="Listing of Java tests and drivers">
-<p>Java Test Drivers</p>
+<p>Java Test Drivers (data driven testing</p>
 <p>A Java Test Driver executes a test for each xml/xsl file pair in 
 the specified directory tree or each pair in the specified fileList. 
 For each test, the driver iterates over the tree or list of files 
-and asks a Testlet to execute a test on each one. 
+and asks a Testlet to execute a test on each one.  This is also similar to 
+data driven testing, where a common algorithim is defined for a test case, and 
+then a large number of data points are run through the test case in order. 
 The best example is <jump href="apidocs/org/apache/qetest/xsl/StylesheetTestletDriver.html">StylesheetTestletDriver</jump></p> 
 <p>The Test Drivers rely on various Testlet implementations  
 to define the actual testing algorithim to apply to each xml.xsl 
@@ -83,11 +84,11 @@ file as well as logging out information about the test in progress.
 Examples include 
 <jump href="apidocs/org/apache/qetest/xsl/StylesheetTestlet.html">StylesheetTestlet</jump> and 
 <jump href="apidocs/org/apache/qetest/xsl/PerformanceTestlet.html">PerformanceTestlet</jump></p>
-<p>The Testlets rely on ProcessorWrapper 
+<p>The Testlets rely on <jump href="apidocs/org/apache/qetest/xslwrapper/TransformWrapper.html">TransformWrapper</jump> 
 subclasses to perform the actual test of processing or transformation 
 of the xml.xsl file pair into the output file. We can then plug 
-in different ProcessorWrapper "flavors" easily. Different 
-ProcessorWrappers can process or transform in various ways, like 
+in different TransformWrapper "flavors" easily. Different 
+TransformWrapper can process or transform in various ways, like 
 using DOM trees, SAX events, or input/output streams.</p>
 <p>The three levels of iteration, test algorithim, and 
 processor flavor are all independently changeable, so we can 
@@ -102,6 +103,7 @@ to provide better support for differing command lines.</item>
 <p>Java API tests for the TRAX (or javax.xml.transform) interface, that 
 Xalan-J 2.x implements.<br/>
 All in package: org.apache.qetest.trax</p>
+<note>(Aug-01 Section needs updating: many new tests have been added -sc)</note>
 <gloss>
 <label>REPLACE_template_for_new_tests.java</label>
 <item>a template for creating new TRAX API tests, see <link idref="submit" anchor="write-API-tests">Submitting New Tests</link></item>
@@ -169,12 +171,6 @@ and transforming multiple stylesheets simultaneously.</item>
 <item>API coverage tests for javax.xml.transform.sax.TransformerHandler</item>
 </gloss>
 
-<p>Java API tests for Xalan-J 1.x.</p>
-<gloss>
-<label>org.apache.qetest.xalanj1.ParamTest</label>
-<item>setting stylesheet parameters and verifies 
-they're used correctly in a transform/process</item>
-</gloss>
 
 <p>Some tests are ones that Xalan has not passed to date, but we know the 
 correct ("gold") result by analysis or by trying the test on other processors. 

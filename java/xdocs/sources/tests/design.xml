@@ -35,7 +35,9 @@
       automatically by a test driver; contributed tests, which are 
       stored in tests\contrib, where anyone is invited to submit their 
       own favorite stylesheets that we can use to test future Xalan 
-      releases.  We are working on better documentation and 
+      releases.  There are also a few specific tests of extensions, as well 
+      as a small but growing suite of individual Bugzilla bug regression tests. 
+      We are working on better documentation and 
       structure for the tests.</item>
       <label>What is a test result?</label>
       <item>While most people view tests as having a simple boolean 
@@ -152,12 +154,16 @@
       <label>*Test.java/.class</label>
       <item>As in 'ConformanceTest', 'PerformanceTest', etc.: a single, 
       automated test file designed to be run from the command line or 
-      from a testing harness.</item>
+      from a testing harness.  This may be used in the future by 
+      automated test discovery mechanisims.</item>
       <label>*Testlet.java/.class</label>
       <item>As in '<jump href="apidocs/org/apache/qetest/xsl/StylesheetTestlet.html">StylesheetTestlet</jump>', 'PerformanceTestlet', etc.: a single, 
       automated testlet designed to be run from the command line or 
       from a testing harness.  Testlets are generally focused on one 
-      or a very few test points, and usually are data-driven.</item>
+      or a very few test points, and usually are data-driven.  A testlet 
+      defines a single test case algorithim, and relies on the caller 
+      (or *TestletDriver) to provide it with the data point(s) to use 
+      in it's test, including gold comparison info.</item>
       <label>*Datalet.java/.class</label>
       <item>As in '<jump href="apidocs/org/apache/qetest/xsl/StylesheetDatalet.html">StylesheetDatalet</jump>': a single set of test data for 
       a Testlet to execute.  Separating a specific set of data from the 
@@ -211,7 +217,7 @@
       <code>contrib-gold\foo\foo.out</code><br/><br/>
       You could then run this test through the Conformance test driver like:<br/>
       <code>cd xml-xalan\test</code><br/>
-      <code>ContribTest.bat -category foo</code><br/>
+      <code>build contrib -Dqetest.category=foo</code><br/>
     </p>
 
   </s2>
