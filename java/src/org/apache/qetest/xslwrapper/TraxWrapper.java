@@ -78,6 +78,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.*; // LexicalHandler?
 import org.w3c.dom.Node;
 
 // javax parsers and trax imports
@@ -87,6 +88,12 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+// Xalan-specific serializers for sax-to-sax flavor
+import org.apache.xalan.serialize.SerializerFactory;
+import org.apache.xalan.serialize.Serializer;
+import org.apache.xalan.templates.OutputProperties;
+
 
 /**
  * Implementation of a ProcessorWrapper for a TrAX-compilant XSLT processor.
@@ -364,6 +371,10 @@ public class TraxWrapper extends ProcessorWrapper
             xmlTime = processDOMToDOM(xmlSource, xslStylesheet, resultStream);
             break;
 
+        case SAX_TO_SAX_TYPE :
+            xmlTime = processSAXToSAX(xmlSource, xslStylesheet, resultStream);
+            break;
+
         default :
             throw new java.lang.IllegalStateException("bad/unimplemented transformType("
                                                       + transformType
@@ -441,6 +452,90 @@ public class TraxWrapper extends ProcessorWrapper
         return (endTime - startTime);
     }
 
+    /**
+     * Perform the transform from SAX to SAX (then serialize).
+     *
+     * //@todo EVALUATE TIMING: currently times entire process
+     * @param xmlSource name of source XML file
+     * @param xslStylesheet name of stylesheet XSL file
+     * @param resultFile name of output file, presumably XML
+     * @return milliseconds process time took
+     * @throws java.lang.Exception covers any underlying exceptions
+     */
+    protected long processSAXToSAX(String xmlSource, 
+                                   String xslStylesheet, 
+                                   OutputStream resultStream)
+                throws java.lang.Exception  // Cover all exceptions
+    {
+        if (!(processor.getFeature(SAXSource.FEATURE) 
+              && processor.getFeature(SAXResult.FEATURE)))
+        {
+            // If SAX is not supported in either input (Sources)
+            //  or output (Results), then bail
+            return ERROR;
+        }
+        long endTime = 0;
+        long startTime = System.currentTimeMillis();
+
+        // Mostly copied from samples\SAX2SAX
+        // Cast the TransformerFactory.
+        SAXTransformerFactory stf = 
+                              ((SAXTransformerFactory) processor);
+
+        // Create a ContentHandler to handle parsing of the xsl
+        TemplatesHandler templatesHandler = stf.newTemplatesHandler();
+
+        // Create an XMLReader and set its ContentHandler.
+        XMLReader xslReader = XMLReaderFactory.createXMLReader();
+        xslReader.setContentHandler(templatesHandler);
+
+        // Parse the stylesheet.                       
+        xslReader.parse(xslStylesheet);
+        // @todo Do we need to set systemID at all?
+
+        //Get the Templates object from the ContentHandler.
+        Templates templates = templatesHandler.getTemplates();
+        // Get the outputProperties from the stylesheet, so 
+        //  we can later use them for the serialization
+        Properties xslOutputProps = templates.getOutputProperties();
+
+        // Create a ContentHandler to handle parsing of the XML
+        TransformerHandler stylesheetHandler = stf.newTransformerHandler(templates);
+
+        // Use a new XMLReader to parse the XML document
+        XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+        xmlReader.setContentHandler(stylesheetHandler);  
+
+        // Set the ContentHandler to also function as LexicalHandler,
+        // includes "lexical" events (e.g., comments and CDATA). 
+        xmlReader.setProperty(
+                "http://xml.org/sax/properties/lexical-handler", 
+                stylesheetHandler);
+
+        // Create a 'pipe'-like identity transformer, so we can 
+        //  easily get our results serialized to disk
+        TransformerHandler serializingHandler = stf.newTransformerHandler();
+        // Set the stylesheet's output properties into the output 
+        //  via it's Transformer
+        serializingHandler.getTransformer().setOutputProperties(xslOutputProps);
+        // Set the output to be our given resultStream
+        serializingHandler.setResult(new StreamResult(resultStream));
+
+        // Create a SAXResult dumping into our 'pipe' serializer
+        SAXResult saxResult = new SAXResult(serializingHandler);
+        saxResult.setLexicalHandler(serializingHandler);
+
+        // Set the original stylesheet to dump into our result
+        stylesheetHandler.setResult(saxResult);
+
+        // Parse the XML input document.
+        xmlReader.parse(xmlSource);
+
+        // Stop timing now
+        endTime = System.currentTimeMillis();
+
+        return (endTime - startTime);
+    }
 
     /**
      * Preprocess a stylesheet and set it into the processor, based on string inputs.
