@@ -4,9 +4,12 @@
   <!-- FileName: position97 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
-  <!-- Section: 4.1 -->
+  <!-- Section: 3.3 -->
   <!-- Creator: Joerg Heinicke, trimmed by David Marston -->
   <!-- Purpose: Use a (number-valued) variable in a predicate, but inside a for-each. -->
+  <!-- Also tests that weird sentence: "The predicate filters the node-set with respect to
+    the child axis" because .//description[2] means the second description that is a child
+    of the a (or b) node under which you found the description currently being considered. -->
 
 <xsl:output method="xml" indent="no" encoding="UTF-8"/>
 
