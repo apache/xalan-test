@@ -319,7 +319,7 @@ public class DOMResultAPITest extends XSLProcessorTestBase
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with re-using results(1)");
+            reporter.checkFail("Problem with re-using results(1)", "SCUU4RJKG4");
             reporter.logThrowable(reporter.ERRORMSG, t,
                                   "Problem with re-using results(1)");
         }
