@@ -136,8 +136,16 @@ public class TestDTMIter extends XSLProcessorTestBase
 	    "NAMESPACE"
 	};
 
-	public int lastNode = 0;	// Used as a starting point from axis to another
-	public String lastNodeName;
+	private int lastNode = 0;	// Set by first axis,  used by subsequent axis.
+	private String lastName;
+
+	private int lastNode2 = 0;	// Set by DESCENDANTORSELF, used in 11 & 12 
+	private String lastName2;
+
+	private int ANode = 0;		// Used in testcase 7 - 10
+	private String ANodeName;
+
+	private static dtmWSStripper stripper = new dtmWSStripper();
 
     /** Just initialize test name, comment, numTestCases. */
     public TestDTMIter()
@@ -160,6 +168,7 @@ public class TestDTMIter extends XSLProcessorTestBase
         File outSubDir = new File(outputDir + File.separator + DTM_SUBDIR);
         if (!outSubDir.mkdirs())
             reporter.logWarningMsg("Could not create output dir: " + outSubDir);
+
         // Initialize an output name manager to that dir with .out extension
         outNames = new OutputNameManager(outputDir + File.separator + DTM_SUBDIR
                                          + File.separator + testName, ".out");
@@ -203,26 +212,21 @@ public class TestDTMIter extends XSLProcessorTestBase
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase1.out";
 
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		// Create dtm and generate initial context
+		// Create DTM and generate initial context
     	Source source = new StreamSource(new StringReader(defaultSource));
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
 	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
+	  	int dtmRoot = dtm.getDocument();				// #document
 	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
 	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
 	  	String DNodeName = dtm.getNodeName(DNode);
-/*	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
+	  	int CNode = dtm.getFirstChild(DNode);			// <Comment>
 	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-*/      
-        // Output testcase description
-        //reporter.logInfoMsg("Testing CHILD AxisIterator");
+	  	ANode = dtm.getNextSibling(PINode);				// <A>, used in testcase 7 - 10
+	  	ANodeName = dtm.getNodeName(ANode);
+
 
 		// Get a Iterator for CHILD:: axis and query it's direction.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.CHILD);
@@ -233,10 +237,9 @@ public class TestDTMIter extends XSLProcessorTestBase
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		{ 
 			buf.append(getNodeInfo(dtm, itNode, " "));
-			lastNode = itNode;
+			lastNode = itNode;			// Setting this GLOBAL IS BAD, but easy. Investigate!!
 		}
-
-		lastNodeName = dtm.getNodeName(lastNode);
+		lastName = dtm.getNodeName(lastNode);
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -245,37 +248,19 @@ public class TestDTMIter extends XSLProcessorTestBase
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase1"); 
-
         reporter.testCaseClose();
         return true;
     }
 
-
     /**
      * Create AxisIterator and walk PARENT axis.
-     *
      * @return false if we should abort the test; true otherwise
      */
     public boolean testCase2()
     {
 		reporter.testCaseInit("Walk PARENT AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("TestCase2 failed: output file not available");
-			return true;
-		}
-
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase2.out";
 
 		// Create dtm and generate initial context
@@ -283,44 +268,19 @@ public class TestDTMIter extends XSLProcessorTestBase
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-/*	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-*/
-      
-        // Output testcase description
-        reporter.logInfoMsg("Testing PARENT AxisIterator");
-
 		// Get a Iterator for PARENT:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PARENT);
       	iter.setStartNode(lastNode);
 
 		// Print out info about the axis
-		buf.append("#### PARENT from "+lastNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		buf.append("#### PARENT from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
 
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 			 buf.append(getNodeInfo(dtm, itNode, " "));
 		 		
-
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("TestCase2 failed");
-			return true;
-		}
-
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
@@ -339,21 +299,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     {
 		reporter.testCaseInit("Walk SELF AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase3.out";
 
 		// Create dtm and generate initial context
@@ -361,37 +307,19 @@ public class TestDTMIter extends XSLProcessorTestBase
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-
-        // Output testcase description
-        reporter.logInfoMsg("Testing SELF AxisIterator");
-
 		// Get a Iterator for CHILD:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.SELF);
       	iter.setStartNode(lastNode);
 
 		// Print out info about the axis
-		buf.append("#### SELF from "+lastNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		buf.append("#### SELF from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
 
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		  buf.append(getNodeInfo(dtm, itNode, " "));
 
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
@@ -410,21 +338,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     {
 		reporter.testCaseInit("Walk NAMESPACE AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase4.out";
 
 		// Create dtm and generate initial context
@@ -432,38 +346,19 @@ public class TestDTMIter extends XSLProcessorTestBase
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-      
-        // Output testcase description
-        reporter.logInfoMsg("Testing NAMESPACE AxisIterator");
-
 		// Get a Iterator for NAMESPACE:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.NAMESPACE);
       	iter.setStartNode(lastNode);
 
 		// Print out info about the axis
-		buf.append("#### NAMESPACE from "+lastNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		buf.append("#### NAMESPACE from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
 
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		     buf.append(getNodeInfo(dtm, itNode, " "));
 
-
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
@@ -482,21 +377,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     {
 		reporter.testCaseInit("Walk PRECEDING AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase5.out";
 
 		// Create dtm and generate initial context
@@ -504,38 +385,19 @@ public class TestDTMIter extends XSLProcessorTestBase
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-
-        // Output testcase description
-        reporter.logInfoMsg("Testing PRECEDING AxisIterator");
-
 		// Get a Iterator for CHILD:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PRECEDING);
       	iter.setStartNode(lastNode);
 
 		// Print out info about the axis
-		buf.append("#### PRECEDING from "+lastNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		buf.append("#### PRECEDING from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
 
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		     buf.append(getNodeInfo(dtm, itNode, " "));
 
-
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
@@ -547,28 +409,14 @@ public class TestDTMIter extends XSLProcessorTestBase
     }
 
    /**
-    * Create AxisIterator and walk CHILD axis.
+    * Create AxisIterator and walk PRECEDINGSIBLING axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase6()
     {
 		reporter.testCaseInit("Walk PRECEDINGSIBLING AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase6.out";
 
 		// Create dtm and generate initial context
@@ -576,43 +424,24 @@ public class TestDTMIter extends XSLProcessorTestBase
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-      
-        // Output testcase description
-        reporter.logInfoMsg("Testing PRECEDINGSIBLING AxisIterator");
-
-		// Get a Iterator for CHILD:: axis.
+		// Get a Iterator for PRECEDINGSIBLING:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PRECEDINGSIBLING);
       	iter.setStartNode(lastNode);
 
 		// Print out info about the axis
-		buf.append("#### PRECEDINGSIBLING from "+lastNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		buf.append("#### PRECEDINGSIBLING from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
 
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		     buf.append(getNodeInfo(dtm, itNode, " "));
 
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase6"); 
-
         reporter.testCaseClose();
         return true;
     }
@@ -625,21 +454,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     {
 		reporter.testCaseInit("Walk FOLLOWING AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase7.out";
 
 		// Create dtm and generate initial context
@@ -647,21 +462,7 @@ public class TestDTMIter extends XSLProcessorTestBase
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-
- 
-         // Output testcase description
-        reporter.logInfoMsg("Testing FOLLOWING AxisIterator");
-
-		// Get a Iterator for CHILD:: axis.
+		// Get a Iterator for FOLLOWING:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.FOLLOWING);
       	iter.setStartNode(ANode);
 
@@ -672,24 +473,13 @@ public class TestDTMIter extends XSLProcessorTestBase
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		     buf.append(getNodeInfo(dtm, itNode, " "));
 
-
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase7"); 
-
         reporter.testCaseClose();
         return true;
     }
@@ -702,41 +492,13 @@ public class TestDTMIter extends XSLProcessorTestBase
     {
 		reporter.testCaseInit("Walk FOLLOWINGSIBLING AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase8.out";
 
 		// Create dtm and generate initial context
     	Source source = new StreamSource(new StringReader(defaultSource));
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
-
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-
-      
-        // Output testcase description
-        reporter.logInfoMsg("Testing FOLLOWINGSIBLING AxisIterator");
 
 		// Get a Iterator for FOLLOWINGSIBLING:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.FOLLOWINGSIBLING);
@@ -748,26 +510,16 @@ public class TestDTMIter extends XSLProcessorTestBase
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		{ buf.append(getNodeInfo(dtm, itNode, " "));
-		  lastNode = itNode;
+		  //lastNode = itNode;
 		}
 
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase8"); 
-
         reporter.testCaseClose();
         return true;
     }
@@ -781,21 +533,7 @@ public class TestDTMIter extends XSLProcessorTestBase
     {
 		reporter.testCaseInit("Walk DESCENDANT AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase9.out";
 
 		// Create dtm and generate initial context
@@ -803,21 +541,7 @@ public class TestDTMIter extends XSLProcessorTestBase
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-
-      
-        // Output testcase description
-        reporter.logInfoMsg("Testing DESCENDANT AxisIterator");
-
-		// Get a Iterator for FOLLOWINGSIBLING:: axis.
+		// Get a Iterator for DESCENDANT:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.DESCENDANT);
       	iter.setStartNode(ANode);
 
@@ -828,24 +552,13 @@ public class TestDTMIter extends XSLProcessorTestBase
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 		     buf.append(getNodeInfo(dtm, itNode, " "));
 
-
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase9"); 
-
         reporter.testCaseClose();
         return true;
     }
@@ -858,41 +571,13 @@ public class TestDTMIter extends XSLProcessorTestBase
     {
 		reporter.testCaseInit("Walk DESCENDANTORSELF AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase10.out";
 
 		// Create dtm and generate initial context
     	Source source = new StreamSource(new StringReader(defaultSource));
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
-
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-
-      
-        // Output testcase description
-        reporter.logInfoMsg("Testing DESCENDANTORSELF AxisIterator");
 
 		// Get a Iterator for DESCENDANTORSELF:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.DESCENDANTORSELF);
@@ -901,31 +586,20 @@ public class TestDTMIter extends XSLProcessorTestBase
 		// Print out info about the axis
 		buf.append("#### DESCENDANTORSELF from "+ANodeName+", Reverse Axis:" + iter.isReverse() + "\n");
 
-System.out.println("last: " + lastNode);
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 	   	{
 	   		buf.append(getNodeInfo(dtm, itNode, " "));
-		  	lastNode = itNode;
+		  	lastNode2 = itNode;
 		}
 
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase10"); 
-
         reporter.testCaseClose();
         return true;
     }
@@ -939,21 +613,7 @@ System.out.println("last: " + lastNode);
     {
 		reporter.testCaseInit("Walk ANCESTOR AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase11.out";
 
 		// Create dtm and generate initial context
@@ -961,50 +621,26 @@ System.out.println("last: " + lastNode);
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-
-        // Output testcase description
-        reporter.logInfoMsg("Testing ANCESTOR AxisIterator");
-
 		// Get a Iterator for ANCESTOR:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.ANCESTOR);
-      	iter.setStartNode(lastNode);
+      	iter.setStartNode(lastNode2);
 
-		lastNodeName = dtm.getNodeName(lastNode);
+		lastName2 = dtm.getNodeName(lastNode2);
 
 		// Print out info about the axis
-		buf.append("#### ANCESTOR from "+lastNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		buf.append("#### ANCESTOR from "+lastName2+", Reverse Axis:" + iter.isReverse() + "\n");
 
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 			 buf.append(getNodeInfo(dtm, itNode, " "));
 
-
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase11"); 
-
         reporter.testCaseClose();
         return true;
     }
@@ -1018,21 +654,7 @@ System.out.println("last: " + lastNode);
     {
 		reporter.testCaseInit("Walk ANCESTORORSELF AxisIterator");
 		StringBuffer buf = new StringBuffer();
-		FileOutputStream fos;
-
-	  	// For testing with some of David Marston's files I do want to strip whitespace.
-	  	dtmWSStripper stripper = new dtmWSStripper();
-
-		try
-		{
-			fos = new FileOutputStream(outNames.nextName());
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure opening output file.");
-			return true;
-		}
-
+		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase12.out";
 
 		// Create dtm and generate initial context
@@ -1040,49 +662,24 @@ System.out.println("last: " + lastNode);
       	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       	DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
-	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();					// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-	  	int CNode = dtm.getFirstChild(DNode);				// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	int ANode = dtm.getNextSibling(PINode);			// <A>
-	  	String ANodeName = dtm.getNodeName(ANode);
-
-      
-        // Output testcase description
-        reporter.logInfoMsg("Testing ANCESTORORSELF AxisIterator");
-
 		// Get a Iterator for ANCESTORORSELF:: axis.
       	DTMAxisIterator iter = dtm.getAxisIterator(Axis.ANCESTORORSELF);
-      	iter.setStartNode(lastNode);
+      	iter.setStartNode(lastNode2);
 
 		// Print out info about the axis
-		buf.append("#### ANCESTORORSELF from "+lastNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		buf.append("#### ANCESTORORSELF from "+lastName2+", Reverse Axis:" + iter.isReverse() + "\n");
 
 	  	// Iterate the axis and write node info to output file
       	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
 			 buf.append(getNodeInfo(dtm, itNode, " "));
 
-
 		// Write results and close output file.
-		try
-		{
-			fos.write(buf.toString().getBytes());
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			reporter.checkFail("Failure writing output.");
-			return true;
-		}
+		writeClose(fos, buf);
 
         // Verify results
         fileChecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase12"); 
-
         reporter.testCaseClose();
         return true;
     }
