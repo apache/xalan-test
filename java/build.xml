@@ -463,7 +463,7 @@
             <arg value="-inputDir" />
             <arg path="${tests.root}/api" />
             <arg value="-goldDir" />
-            <arg path="${tests.root}/api-gold" />
+            <arg path="${tests.root}/examples-gold" />
             <arg value="-outputDir" />
             <arg path="${examplestest-results.dir}" />
             <arg value="-logFile" />
