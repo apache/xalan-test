@@ -6,7 +6,7 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 11.2 Values of Variables and Parameters  -->
   <!-- Purpose: Test for xsl:variable with both content and select. -->
-  <!-- ExpectedException: xsl:variable cannot have both content and select attribute. -->
+  <!-- ExpectedException: xsl:variable element must not have both content and a select attribute. -->
   <!-- Author: David Marston -->
 
 <xsl:template match="doc">

@@ -6,7 +6,7 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 11.2 Values of Variables and Parameters  -->
   <!-- Purpose: Test for xsl:param with both content and select. -->
-  <!-- ExpectedException: xsl:param cannot have both content and select attribute. -->
+  <!-- ExpectedException: xsl:param element must not have both content and a select attribute. -->
   <!-- Author: David Marston -->
 
 <xsl:param name="n" select="3">2</xsl:param>
