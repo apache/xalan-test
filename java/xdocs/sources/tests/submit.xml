@@ -35,13 +35,11 @@ Results will be placed by default into xml-xalan\test\results-api\APITest.xml</p
 changes to the package name, etc.</p>
 <p>You can pretty-print the results by using the <link idref="run" anchor="how-to-view-results">viewResults.xsl stylesheet</link> to turn
 the XML into an HTML format.</p>
-<p>The same file can be used with minor modifications for either Xalan-J 1.x 
-or Xalan-J 2.x API tests, with proper package and import modifications.</p>
     </s2>
       
     <anchor name="write-xsl-tests"/>
     <s2 title="How to Write Stylesheet Tests">
-    <p>Test cases in the upcoming "conf" group will ultimately be submitted to OASIS as part of 
+    <p>Test cases in the "conf" group will ultimately be submitted to OASIS as part of 
 their vendor-independent project on XSLT/XPath Conformance Testing. For more 
 information about this project, visit 
 <jump href="http://www.oasis-open.org/committees/xslt/index.html">http://www.oasis-open.org/committees/xslt/index.html</jump></p>
@@ -65,5 +63,9 @@ OASIS project, so it may be necessary to add more comments or other annotation
 after the test is submitted. We hope to have a template for contributing 
 stylesheet tests available soon that will closely match the eventual OASIS format.</p>
 
+<p>The Xalan team will continue to provide test automation, like the 
+StylesheetTestletDriver and various StylesheetTestlet classes, that 
+enables a user to easily run large suites of tests with fully rolled-up 
+reporting and a rich set of options.</p>
     </s2>
 </s1>

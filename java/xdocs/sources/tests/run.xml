@@ -13,8 +13,8 @@
     <s2 title="How-to: Run tests">
     <p>Nearly all tests for Xalan are independent Java classes built 
     into testxsl.jar that 
-    can be run either standalone on the command line, programmatically 
-    from your application, or from 
+    can be run either individually on the command line, programmatically 
+    from your application or our handy Ant build.xml file, or in batches from 
     <jump href="apidocs/org/apache/qetest/xsl/XSLTestHarness.html">XSLTestHarness</jump>.
     There really isn't any magic to them: you can just set your classpath and 
     execute java.exe to run them; some Tests and Testlets currently provide defaults
@@ -35,21 +35,15 @@
       <br/>(runs TRAX interface tests with Xalan-J 2.x<br/>
     </p>
     <p>Alternately: some convenience batch files are provided for the most common 
-    tests - these simply turn around and call build.bat/.sh for you.<br/></p>
+    tests - these simply turn around and call build.bat/.sh for you.<br/>
+    (Namely conf.bat, perf.bat, and the like)</p>
     <p>Alternately: Run java.exe and the desired test class yourself:<br/></p>
-    <p>Note: the above batch and shell files, and the JARDIR environment variable, 
-    are simply conveniences for running the tests. The Java API tests and test drivers can 
-    also be executed by hand, for those who wish to manage their own classpaths and/or
-    simply pass all arguments to the tests on the command line, etc.</p>
-    <p>Sorry! We don't have .sh equivalents for the convenience .bat files - 
-    submissions of ports of these files are welcomed!  We do plan to add an Ant 
-    task that can run Xalan Tests and Testlets, so in the future both building 
-    and running tests will mostly be done from an Ant buildfile, which is 
-    cross-platform by default.</p>
     <note>Running tests with alternate JAXP parsers: all org.apache.qetest.trax.* 
     tests can be run with Xalan-J 2.x and any JAXP 1.1 compatible parser, like 
     crimson.jar.  Be sure to manually set the appropriate system properties to use 
-    your parser instead of xerces.jar, which is the default for Xalan-J.</note>
+    your parser instead of xerces.jar, which is the default for Xalan-J.  Tests will 
+    also run on any JAXP 1.1 compatible xslt processor, namely either our default 
+    xalan one or our new xsltc one.</note>
     </s2>
       
     <anchor name="how-to-view-results"/>
@@ -58,12 +52,13 @@
       writing a full set of output results to their <code><link anchor="test-options-logfile">logFile</link></code>, as 
       set from a .properties file or the command line. Generally the 
       output results file is easier to deal with. The basic format is 
-      fairly simple and you can certainly read it as-is.</p>
+      fairly simple and you can certainly read it as-is.  Also, many tests 
+      send only summary results to the console, but full output to the results file.</p>
       <p>To 'pretty-print' results or produce reports, please use the 
         viewResults.xsl stylesheet and associated batch/shell files, like so:<br/>
         <code>cd \xml-xalan\test</code><br/><br/>
         <code>build conf -DoptionName=optionValue <link anchor="test-options-logfile">-Dqetest.logFile results/MyResults.xml</link></code><br/><br/>
-        <code>viewResults.bat results/MyResults.xml results\MyPrettyResults.html [options]</code><br/><br/>
+        <code>viewResults.bat results/MyResults.xml results/MyPrettyResults.html [options]</code><br/><br/>
         These options are passed to Xalan's command line to transform the 
         xml formatted output results into a nicer-looking html file. The most 
         common option would be <code>-param loggingLevel 99</code> to get 
@@ -84,14 +79,14 @@
       <p>To see all options, call a test with an illegal argument to force it 
       to print out it's .usage(). You may mix setting options from a properties 
       file and from the command line; command line options will take precedence.</p>
-      <p>For another description of options, see <br/><code>xml-xalan\test\conf.properties</code>,<br/> 
-      which describes most of them as used in the context of running the StylesheetTestletDriver 
-      over the xml-xalan\tests\conf tree of stylesheets.  Simply change inputDir and goldDir
-      to run over a different set of files (like a performance test suite, which we hope to 
-      add soon).</p>
-      <note>Path-like options set in a properties file must use the local system's 
-      File.separator character, and backslashes \ must be escaped \\. The checked in 
-      copy of conf.properties is for a Windows platform.</note>
+      <p>For another description of options, see <br/><code>xml-xalan\test\test.properties</code>,<br/> 
+      which describes most of them with comments.  Remember that the prefixes 
+      'qetest.', 'conf.' etc. are used by the Ant build.xml file to manage which 
+      properties are used for different kinds of tests, and are ripped off before 
+      being passed to the Java test script itself.  Thus qetest.loggingLevel=99 in 
+      the test.properties file becomes just loggingLevel of 99 when passed to the test.</p>
+      <note>Path-like options set in a properties file generally should use 
+      forward slashes (legal in URL's), even on Windows platforms.</note>
       <p>Quick list of options</p>
         <anchor name="test-options-logfile"/>
       <gloss>
@@ -103,8 +98,6 @@
           <item>determines how much information is sent just to the default ConsoleLogger: 
           since often you won't be watching the console as the test is running, you can set this 
           lower than your loggingLevel to speed the tests up a little</item>
-        <label>-load <ref>file.properties</ref></label>
-          <item>(read in a .properties file, that can set any/all of the other opts)</item>
         <label>-inputDir <ref>path/to/tests</ref></label>
           <item>path to a directory tree of input *.xml/*.xsl files, using your system's separator</item>
         <label>-outputDir <ref>path/to/output/area</ref></label>
@@ -121,6 +114,10 @@
           <jump href="apidocs/org/apache/qetest/xslwrapper/ProcessorWrapper.html">ProcessorWrapper.java</jump> </item>
         <label>-testlet <ref>TestletClassname</ref></label>
           <item>For StylesheetTestletDriver, use a different class for the testing algorithim</item>
+        <label>-load <ref>file.properties</ref></label>
+          <item>(read in a .properties file, that can set any/all of the other opts)  
+          This option is automatically used by the Ant build.xml file, so you normally 
+          would not specify it yourself.</item>
         <label>-debug</label>
           <item>prints extra test debugging info</item>
       </gloss> 	

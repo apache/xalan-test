@@ -4,6 +4,7 @@
 <s1 title="Overview">
 <ul>
 <li><link anchor="purpose">Purpose of these tests</link></li>
+<li><link anchor="brief-overview">Brief overview of testing methods</link></li>
 <li><link anchor="dir-map">Directory Structure</link></li>
 <li><link anchor="test-map">Listing of Java tests and drivers</link></li>
 <li><link anchor="credits">Credits for the tests</link></li>
@@ -18,9 +19,23 @@
     the tests before and after a code change. That way you can at least ensure that 
     your changes didn't cause any regressions to the code before you check your 
     changes in. In the future, we hope to provide a tool to compare test results from 
-    one run to another to make this process even simpler.</p>
+    one run to another (without necessarily having to re-run the test) to make this process even simpler.</p>
     </s2>
       
+    <anchor name="brief-overview"/>
+    <s2 title="Brief overview of testing methods">
+    <p>The Xalan tests include a richly featured and fully automated testing framework 
+    that the great majority of the tests use.  The org.apache.qetest package provides 
+    an independent testing and automation harness for Xalan, including logging and 
+    reporting mechanisims.</p>
+    <p>Nearly all tests are automated, run without any user interaction and with a minimum amount of setup, and produce 
+    a rolled-up report of their pass/fail/other status.  Our existing testing library includes 
+    a wide array of tests, from XSLT conformance to detailed API tests, and welcomes 
+    user-submitted tests as well.  The 'smoketest' target (a subset of the most important 
+    tests) are also integrated into the <jump href="http://jakarta.apache.org/builds/gump">GUMP nightly build system</jump>, and thus ensure a 
+    minimum baseline of functionality on a daily basis.</p>
+    </s2>
+
     <anchor name="dir-map"/>
     <s2 title="Directory Structure">
     <gloss>
@@ -30,7 +45,8 @@
       <label></label>
       <label><code>xml-xalan/test/bin</code></label>
       <item>Java test automation dependencies (includes 
-        <jump href="http://jakarta.apache.org/ant/index.html">Ant 1.2</jump>)</item>
+        <jump href="http://jakarta.apache.org/ant/index.html">Ant 1.2</jump>
+        so that you don't have to install it yourself)</item>
       <label><code>xml-xalan/test/java/src</code></label>
       <item>Java test automation source tree - this includes 
       a generic testing framework as well as specific API tests for parts of Xalan 
@@ -69,13 +85,15 @@
 
     <anchor name="test-map"/>
     <s2 title="Listing of Java tests and drivers">
+    <note>This section is a sort of catalog of existing tests.  Beginning users 
+    will probably want to see <link idref="run" anchor="how-to-run">how to run tests</link> as well.</note>
 <p>Java Test Drivers (data driven testing</p>
 <p>A Java Test Driver executes a test for each xml/xsl file pair in 
 the specified directory tree or each pair in the specified fileList. 
 For each test, the driver iterates over the tree or list of files 
 and asks a Testlet to execute a test on each one.  This is also similar to 
 data driven testing, where a common algorithim is defined for a test case, and 
-then a large number of data points are run through the test case in order. 
+then a large number of data points (in this case, the xml/xsl file pairs) are run through the test case in order. 
 The best example is <jump href="apidocs/org/apache/qetest/xsl/StylesheetTestletDriver.html">StylesheetTestletDriver</jump></p> 
 <p>The Test Drivers rely on various Testlet implementations  
 to define the actual testing algorithim to apply to each xml.xsl 
@@ -92,11 +110,15 @@ TransformWrapper can process or transform in various ways, like
 using DOM trees, SAX events, or input/output streams.</p>
 <p>The three levels of iteration, test algorithim, and 
 processor flavor are all independently changeable, so we can 
-easily try out different kinds of tests.</p>
+easily try out different kinds of tests.  This technique is used to 
+run the full sets of 'conf' (conformance), 'perf' (performance), 
+extensions, and 'contrib' (user contributed stylesheets) tests.</p>
 <gloss>
 <label>org.apache.qetest.xsl.<link idref="run" anchor="how-to-run-c">CConformanceTest</link></label>
-<item>essentially the same as ConformanceTest, but for Xalan-C.  I plan to 
-make this use the Testlet model soon to simplify this model, and 
+<item>This is similar to the StylesheetTestlet, but for Xalan-C.  
+It has a different method of discovering test files, and simply shells 
+out to a command prompt to run each stylesheet through the TestXSLT.exe program.  
+I plan to make this use the Testlet model soon to simplify this model, and 
 to provide better support for differing command lines.</item>
 </gloss>
 
@@ -142,7 +164,9 @@ javax.xml.transform API to process stylesheets.</item>
 
 <label>TestThreads.java</label>
 <item>MANUALLY executed test for running multiple threads 
-and transforming multiple stylesheets simultaneously.</item>
+and transforming multiple stylesheets simultaneously.  An updated and automated 
+test is now available, org.apache.qetest.xsl.ThreadedTestletDriver, which 
+should be used instead. </item>
 </gloss>
 
 <p>All in subpackages of: org.apache.qetest.trax</p>

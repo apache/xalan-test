@@ -57,7 +57,8 @@
     the normal conf tests, but only on the axes subdir, and using the TraxSaxWrapper class.
     <br/><code>build api -DtestClass=TransformStateTest -Dapi.loggingLevel=30  </code> This runs 
     the org.apache.qetest.xalanj2.TransformStateTest with a lower loggingLevel (so less is output).
-    Note that testClass is one of the few properties that is not prefixed.
+    Note that testClass is one of the few properties that is not prefixed, since it is 
+    not passed on to the test itself, but is only used by the Ant script to load the test.
     </p>
   </s2>
 
@@ -110,26 +111,26 @@
     for a simple alternate way to set your classpath using JARDIR.  This allows QE/QA/test 
     people to run the same set of tests quickly against different versions of the product.</p>
     <note>(Aug-01 Section needs updating: JARDIR docs -sc)</note>
-    <p>ALTERNATE: Set an environment variable JARDIR to point to directory where you have all applicable jars.  
-      Delete testxsl.jar if present there.
+    <p>ALTERNATE way using JARDIR:</p>
+    <p>1: Set an environment variable JARDIR to point to directory where you have all applicable jars.
+      <br/>Delete testxsl.jar if already present there (if you want to rebuild it).
       <br/>Required: at least xalan.jar and  bsf.jar from a Xalan-J build;  
       xerces.jar from the <ref>same</ref> Xalan-J build  (or your parser's JAXP-compatible jar instead of xerces.jar);
-      and js.jar (see <jump href="http://xml.apache.org/xalan-j/extensions.html#supported-lang">Xalan-J doc for information on js.jar</jump>)
+      and js.jar (see <jump href="http://xml.apache.org/xalan-j/extensions.html#supported-lang">Xalan-J doc for information on js.jar, only needed for extensions tests</jump>)
       <br/><code>set JARDIR=e:\builds\myjars  </code>
     </p>
-    <p>3: Copy all product jars to the JARDIR</p>
-    <p>4: cd to the test directory and cleanup the tests.</p>
+    <p>2: Copy needed product jars to the JARDIR</p>
+    <p>3: cd to the test directory and cleanup the tests</p>
     <p><code>cd e:\builds\xml-xalan\test  </code>
-      <br/><code>build.bat clean  </code>
+      <br/><code>build clean  </code>
     </p>
-    <p>5: Build the tests appropriate to your product.
-      <br/>Xalan-J 1.x:  
-      <br/><code>build.bat package.xalan  </code>
-      <br/>Xalan-J 2.x:  
-      <br/><code>build.bat package.xalan2  </code> (<ref>or package.trax</ref>)
+    <p>4: Build the tests
+      <br/><code>build jar  </code>
     </p>
     <p>This will create <code>build\testxsl.jar  </code>, which you should manually copy 
-    into JARDIR before you <link idref="run" anchor="how-to-run">run any tests</link>.</p>
+    into JARDIR before you <link idref="run" anchor="how-to-run">run any tests</link>.  
+    Note that you might instead want to <code>build all</code> if you want to also 
+    run any of the bugzilla or extensions tests as well.</p>
     <note>The use of JARDIR is not required; you're free to manage the classpath 
     yourself, or the test build file will assume it should use the Xalan-J 2.0 
     directories by default.  I've found that simply putting all the needed jars in 
