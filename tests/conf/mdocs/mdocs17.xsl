@@ -37,7 +37,7 @@
       <month>
         <xsl:value-of select="document('')/xsl:stylesheet/months:name[@sequence=current()/@sequence]"/>
         <xsl:text> - </xsl:text>
-        <xsl:value-of select="format-number(miles-earned, '##,###')"/>
+        <xsl:value-of select="miles-earned"/>
         <xsl:text> miles earned.</xsl:text>
       </month>
       <xsl:value-of select="$newline"/>
