@@ -105,9 +105,11 @@
                destdir="${build.dir}" 
                includes="TraxWrapper.java"
                debug="${debug}" />
+<!-- comment out until javax.xml.transform interfaces stabilize
         <javac srcdir="${test.dir}/trax" 
                destdir="${build.dir}" 
                debug="${debug}" />
+comment out until javax.xml.transform interfaces stabilize -->
     </target>
     <target name="package.trax" depends="compile.trax">
         <jar jarfile="${build.dir}/${testxsl.jar}" 
