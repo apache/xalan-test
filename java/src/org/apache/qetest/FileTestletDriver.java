@@ -102,9 +102,6 @@ public class FileTestletDriver extends XSLProcessorTestBase
      */
     public static final String OPT_FILELIST = "fileList";
 
-    /** Name of fileList file to read in to get test definitions from.   */
-    protected String fileList = null;
-
     /**
      * Parameter: FQCN or simple classname of Testlet to use.  
      * <p>User may pass in either a FQCN or just a base classname, 
@@ -148,9 +145,6 @@ public class FileTestletDriver extends XSLProcessorTestBase
     /** Unique runId for each specific invocation of this test driver.  */
     protected String runId = null;
 
-    /** Convenience constant: .xml extension for input data file.  */
-    public static final String XML_EXTENSION = ".xml";
-
     /** Convenience constant: .gold extension for gold files.  */
     public static final String GLD_EXTENSION = ".gld";
 
@@ -162,7 +156,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
     public FileTestletDriver()
     {
         testName = "FileTestletDriver";
-        testComment = "Test driver for XSLT stylesheet Testlets";
+        testComment = "Test driver for File-based Testlets";
     }
 
 
@@ -180,7 +174,6 @@ public class FileTestletDriver extends XSLProcessorTestBase
         testlet = testProps.getProperty(OPT_TESTLET, testlet);
         dirFilter = testProps.getProperty(OPT_DIRFILTER, dirFilter);
         fileFilter = testProps.getProperty(OPT_FILEFILTER, fileFilter);
-        fileList = testProps.getProperty(OPT_FILELIST, fileList);
         flavor = testProps.getProperty(OPT_FLAVOR, flavor);
 
         // Grab a unique runid for logging out with our tests 
@@ -234,6 +227,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
 
         // Now either run a list of specific tests the user specified, 
         //  or do the default of iterating over a set of directories
+        String fileList = testProps.getProperty(OPT_FILELIST);
         if (null != fileList)
         {
             // Process the specific list of tests the user supplied
@@ -260,7 +254,8 @@ public class FileTestletDriver extends XSLProcessorTestBase
      * Do the default: test all files found in subdirs
      * of our inputDir, using FilenameFilters for dirs and files.
      * Parameters: none, uses our internal members inputDir, 
-     * outputDir, goldDir, etc.
+     * outputDir, goldDir, etc.  Will attempt to use a default 
+     * inputDir if the specified one doesn't exist.
      *
      * This is a special case of recurseSubDir, since we report 
      * differently from the top level.
@@ -307,7 +302,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
 
 
     /**
-     * Process all the files in this dir and optionally 
+     * Optionally process all the files in this dir and optionally 
      * recurse downwards using our dirFilter.
      * 
      * This is a pre-order traversal; we process files in this 
@@ -331,7 +326,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
         // If we should recurse, do so now
         File inputDir = new File(base.getInput());
         FilenameFilter filter = getDirFilter();
-        reporter.logTraceMsg("subInputDir(" + inputDir.getPath()
+        reporter.logTraceMsg("recurseSubDir(" + inputDir.getPath()
                             + ") looking for subdirs with: " + filter);
 
         // Use our filter to get a list of directories to process
@@ -340,7 +335,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
         // Validate that we have some valid directories to process
         if ((null == subdirs) || (subdirs.length <= 0))
         {
-            reporter.logWarningMsg("subInputDir(" + inputDir.getPath()
+            reporter.logWarningMsg("recurseSubDir(" + inputDir.getPath()
                                + ") no valid subdirs found!");
             return;
         }
@@ -393,19 +388,21 @@ public class FileTestletDriver extends XSLProcessorTestBase
         {
             // Just log it and continue; presumably we'll find 
             //  other directories to test
-            reporter.logWarningMsg("subInputDir(" + base.getInput() 
-                                   + ") and/or gold/output does not exist, skipping!");
+            reporter.logWarningMsg("processSubDir(" + base.getInput() 
+                                   + ", " + base.getOutput()
+                                   + ", " + base.getGold()
+                                   + ") some dir does not exist, skipping!");
             return;
         }
 
         File subInputDir = new File(base.getInput());
         // Call worker method to process the individual directory
         //  and get a list of .xsl files to test
-        Vector files = getFilesFromDir(subInputDir, getFileFilter(), embedded);
+        Vector files = getFilesFromDir(subInputDir, getFileFilter());
 
         if ((null == files) || (0 == files.size()))
         {
-            reporter.logStatusMsg("subInputDir(" + base.getInput() 
+            reporter.logStatusMsg("processSubDir(" + base.getInput() 
                                    + ") no files found(1), skipping!");
             return;
         }
@@ -417,7 +414,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
 
         if ((null == datalets) || (0 == datalets.size()))
         {
-            reporter.logWarningMsg("subInputDir(" + base.getInput() 
+            reporter.logWarningMsg("processSubDir(" + base.getInput() 
                                    + ") no tests found(2), skipping!");
             return;
         }
@@ -445,13 +442,11 @@ public class FileTestletDriver extends XSLProcessorTestBase
             // Note: normally, this should never happen, since 
             //  this class normally validates these arguments 
             //  before calling us
-            reporter.checkErr("Testlet or datalets are null/blank, nothing to test!");
+            reporter.checkErr("processFileList: Testlet or datalets are null/blank, nothing to test!");
             return;
         }
 
-        // Put everything else into a testCase
-        //  This is not necessary, but feels a lot nicer to 
-        //  break up large test sets
+        // Put each fileList into a testCase
         reporter.testCaseInit(desc);
 
         // Now just go through the list and process each set
@@ -471,9 +466,8 @@ public class FileTestletDriver extends XSLProcessorTestBase
             catch (Throwable t)
             {
                 // Log any exceptions as fails and keep going
-                //@todo improve the below to output more useful info
-                reporter.checkFail("Datalet num " + ctr + " threw: " + t.toString());
                 reporter.logThrowable(Logger.ERRORMSG, t, "Datalet threw");
+                reporter.checkErr("Datalet num " + ctr + " threw: " + t.toString());
             }
         }  // of while...
         reporter.testCaseClose();
@@ -482,18 +476,17 @@ public class FileTestletDriver extends XSLProcessorTestBase
 
     /**
      * Use the supplied filter on given directory to return a list 
-     * of stylesheet tests to be run.
-     * Uses the normal filter for variations of *.xsl files, and 
-     * also constructs names for any -embedded tests found (which 
-     * may be .xml with xml-stylesheet PI's, not just .xsl)
+     * of tests to be run.
+     * 
+     * The real logic is in the filter, which can be specified as 
+     * an option or by overriding getDefaultFileFilter().
      *
      * @param dir directory to scan
      * @param filter to use on this directory; if null, uses default
-     * @param embeddedFiles special list of embedded files to find
      * @return Vector of local path\filenames of tests to run;
      * the tests themselves will exist; null if error
      */
-    public Vector getFilesFromDir(File dir, FilenameFilter filter, String embeddedFiles)
+    public Vector getFilesFromDir(File dir, FilenameFilter filter)
     {
         // Validate arguments
         if ((null == dir) || (!dir.exists()))
@@ -572,40 +565,69 @@ public class FileTestletDriver extends XSLProcessorTestBase
     /**
      * Construct a FileDatalet with corresponding output, gold files.  
      *
-     * This basically just calculates local path\filenames across 
-     * the three presumably-parallel directory trees of testLocation 
-     * (inputDir), outputDir (outputDir) and goldDir 
-     * (goldDir).  It then stuffs each of these values plus some 
-     * generic info like our testProps into each datalet it creates.
+     * This basically just calls worker methods to construct and 
+     * set options on a datalet to return.
      *
-     * This could be subclassed to provide different gold and 
-     * output extensions or other datalet options.
-     * 
      * @param base FileDatalet denoting directories 
      * input, output, gold
      * @param name bare name of the input file
-     * @return FileDatalets that is fully filled in,
+     * @return FileDatalet that is fully filled in,
      * i.e. output, gold, etc are filled in respectively 
-     * to input
+     * to input and any options are set
      */
     protected FileDatalet buildDatalet(FileDatalet base, String name)
     {
-        FileDatalet d = new FileDatalet(base.getInput() + File.separator + name, 
+        // Worker method to construct paths
+        FileDatalet d = buildDataletPaths(base, name);
+        // Worker method to set any other options, etc.
+        setDataletOptions(d);
+        return d;
+    }
+
+    /**
+     * Construct a FileDatalet with corresponding output, gold files.  
+     *
+     * This worker method just has the logic to construct the 
+     * corresponding output and gold filenames; feel free to subclass.
+     *
+     * This class simply appends .out and .gld to the end of the 
+     * existing names: foo.xml: foo.xml.out, foo.xml.gld.
+     *
+     * @param base FileDatalet denoting directories 
+     * input, output, gold
+     * @param name bare name of the input file
+     * @return FileDatalet that is fully filled in,
+     * i.e. output, gold, etc are filled in respectively 
+     * to input
+     */
+    protected FileDatalet buildDataletPaths(FileDatalet base, String name)
+    {
+        return new FileDatalet(base.getInput() + File.separator + name, 
                 base.getOutput() + File.separator + name + OUT_EXTENSION,
                 base.getGold() + File.separator + name + GLD_EXTENSION);
+    }
 
-        d.setDescription(name);
+    /**
+     * Fillin FileDatalet.setOptions and any other processing.  
+     *
+     * This is designed to be overriden so subclasses can put any 
+     * special items in the datalet's options or do other 
+     * preprocessing of the datalet.
+     *
+     * @param base FileDatalet to apply options, etc. to
+     */
+    protected void setDataletOptions(FileDatalet base)
+    {
+        base.setDescription(base.getInput());
         // Optimization: put in a copy of our fileChecker, so 
         //  that each testlet doesn't have to create it's own
         //  fileCheckers should not store state, so this 
         //  shouldn't affect the testing at all
-        d.setOptions(testProps);
+        base.setOptions(testProps);
         // Note: set our options in the datalet first, then 
         //  put the fileChecker directly into their options
-        d.getOptions().put("fileCheckerImpl", fileChecker);
-        return d;
+        base.getOptions().put("fileCheckerImpl", fileChecker);
     }
-
 
     /** Default FilenameFilter FQCN for directories.   */
     protected String getDefaultDirFilter()
