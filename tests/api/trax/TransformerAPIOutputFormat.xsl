@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<!-- Include all XSLT spec xsl:output attrs -->
 <xsl:output method="xml"
-            omit-xml-declaration="yes" 
-            cdata-section-elements="cdataHere" />
+            version="123.45"
+            encoding="UTF-16"
+            standalone="yes"
+            doctype-public="this-is-doctype-public"
+            doctype-system="this-is-doctype-system"
+            cdata-section-elements="cdataHere"
+            indent="yes"
+            media-type="text/test/xml"
+            omit-xml-declaration="yes" />
 
   <xsl:template match="doc">
     <out>
