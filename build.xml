@@ -461,21 +461,24 @@
     </target>
 
     <target name="smoketest-results-dist" depends="init.test">
+        <property name="tarzip-backref" value="../.."/>
+        <property name="tarzip-fwdref" value="xml-xalan/test"/>
         <!-- tar.gz the automation and batch files, etc. -->
-        <!-- Note the includes location is tied to test.properties smoketest.*.outputDir, etc. -->
-        <tar tarfile="../xalan-smoketest-${DSTAMP}.tar" 
-             includes="xml-xalan/test/smoketest/"
-             basedir="../.." 
-             />
-        <gzip src="../xalan-smoketest-${DSTAMP}.tar" 
-              zipfile="../xalan-smoketest-${DSTAMP}.tar.gz"/>
-        <delete file="../xalan-smoketest-${DSTAMP}.tar"/>
-
-        <!-- Create a cheap .zip file of just the results from the smoketest -->
-        <zip zipfile="../xalan-smoketest-${DSTAMP}.zip" 
-             includes="xml-xalan/test/smoketest/"
-             basedir="../.."
-             />
+        <!-- # smoketest parent output location: used in test.properties/build.xml -->
+        <tar tarfile="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar">
+          <tarfileset dir="${tarzip-backref}">
+            <include name="${tarzip-fwdref}/${smoketest.outputDir}/"/>
+          </tarfileset>
+        </tar>
+        <gzip src="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar" 
+              zipfile="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar.gz"/>
+        <delete file="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar"/>
+              
+        <zip zipfile="${test.build.dir}/xalan-smoketest-${DSTAMP}.zip" >
+          <zipfileset dir="${tarzip-backref}">
+            <include name="${tarzip-fwdref}/${smoketest.outputDir}/"/>
+          </zipfileset>
+        </zip>
     </target>
 
     <!-- ================================================================== -->
@@ -790,41 +793,60 @@
 
     <target name="dist-nodeps" depends="init.build"
         description="Build a simple distribution module, without depends">
-        <echo message="Create .zip/.tar/gz in parent xml-xalan directory" />
-        <!-- Note: I'd rather dump these in the xml-xalan/test/java/build 
-             directory where all the rest of the outputs from the build 
-             go, but for the life of me I can't get excludes to work 
-             properly when doing that from basedir ../..
-        -->
+        <echo message="Create .zip/.tar/gz in ${test.build.dir}" />
+
         <!-- Build .tars, then .gzs, then cleanup .tars before doing .zips -->
+        <!-- Note ../.. paths to ensure archives start with 
+             top-level xml-xalan/test/blah directories
+        -->
+        <property name="tarzip-backref" value="../.."/>
+        <property name="tarzip-fwdref" value="xml-xalan/test"/>
+        
         <!-- tar.gz just the xml/xsl/out test files -->
-        <tar tarfile="../xalan-tests-${DSTAMP}.tar" 
-             includes="xml-xalan/test/tests/"
-             basedir="../.."
-             />
-        <gzip src="../xalan-tests-${DSTAMP}.tar" 
-              zipfile="../xalan-tests-${DSTAMP}.tar.gz"/>
-        <delete file="../xalan-tests-${DSTAMP}.tar"/>
+        <tar tarfile="${test.build.dir}/xalan-tests-${DSTAMP}.tar">
+          <tarfileset dir="${tarzip-backref}">
+            <include name="${tarzip-fwdref}/tests/"/>
+          </tarfileset>
+        </tar>
+        <gzip src="${test.build.dir}/xalan-tests-${DSTAMP}.tar" 
+              zipfile="${test.build.dir}/xalan-tests-${DSTAMP}.tar.gz"/>
+        <delete file="${test.build.dir}/xalan-tests-${DSTAMP}.tar"/>
               
         <!-- tar.gz the automation and batch files, etc. -->
-        <tar tarfile="../xalan-automation-${DSTAMP}.tar" 
-             includes="xml-xalan/test/*.*,xml-xalan/test/java/"
-             basedir="../.." 
-             />
-        <gzip src="../xalan-automation-${DSTAMP}.tar" 
-              zipfile="../xalan-automation-${DSTAMP}.tar.gz"/>
-        <delete file="../xalan-automation-${DSTAMP}.tar"/>
+        <tar tarfile="${test.build.dir}/xalan-automation-${DSTAMP}.tar">
+          <tarfileset dir="${tarzip-backref}">
+            <include name="${tarzip-fwdref}/*.*"/>
+            <include name="${tarzip-fwdref}/${testxsl.jar}"/>
+            <include name="${tarzip-fwdref}/${test.build.dir}/${test.root}"/>
+            <include name="${tarzip-fwdref}/${test.build.docs}"/>
+            <include name="${tarzip-fwdref}/${test.build.apidocs}"/>
+            <include name="${tarzip-fwdref}/java/xdocs/"/>
+            <include name="${tarzip-fwdref}/java/src/"/>
+          </tarfileset>
+        </tar>
+        <gzip src="${test.build.dir}/xalan-automation-${DSTAMP}.tar" 
+              zipfile="${test.build.dir}/xalan-automation-${DSTAMP}.tar.gz"/>
+        <delete file="${test.build.dir}/xalan-automation-${DSTAMP}.tar"/>
 
         <!-- Zip just the xml/xsl/out test files -->
-        <zip zipfile="../xalan-tests-${DSTAMP}.zip" 
-             includes="xml-xalan/test/tests/"
-             basedir="../.."
-             />
+        <zip zipfile="${test.build.dir}/xalan-tests-${DSTAMP}.zip" >
+          <zipfileset dir="${tarzip-backref}">
+            <include name="${tarzip-fwdref}/tests/"/>
+          </zipfileset>
+        </zip>
         <!-- Zip the automation and batch files, etc. -->
-        <zip zipfile="../xalan-automation-${DSTAMP}.zip" 
-             includes="xml-xalan/test/*.*,xml-xalan/test/java/"
-             basedir="../.." 
-             />
+        <zip zipfile="${test.build.dir}/xalan-automation-${DSTAMP}.zip" >
+          <zipfileset dir="${tarzip-backref}">
+            <include name="${tarzip-fwdref}/*.*"/>
+            <include name="${tarzip-fwdref}/${testxsl.jar}"/>
+            <include name="${tarzip-fwdref}/${test.build.dir}/${test.root}"/>
+            <include name="${tarzip-fwdref}/${test.build.docs}"/>
+            <include name="${tarzip-fwdref}/${test.build.apidocs}"/>
+            <include name="${tarzip-fwdref}/java/xdocs/"/>
+            <include name="${tarzip-fwdref}/java/src/"/>
+          </zipfileset>
+        </zip>
+          
     </target>
 
 
