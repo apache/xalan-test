@@ -137,6 +137,30 @@ public class StylesheetDatalet implements Datalet
 
 
     /**
+     * Initialize this datalet from a string, plus a Properties 
+     * block to use as our default options.  
+     * We will parse the command line with whitespace and fill
+     * in our member variables in order:
+     * <pre>inputName, xmlName, outputName, goldName, flavor</pre>, 
+     * if there are too few tokens, remaining variables will default.
+     */
+    public StylesheetDatalet(String args, Properties defaults)
+    {
+        // First set our defaults and our flavor member
+        options = new Properties(defaults);
+        flavor = options.getProperty("flavor", flavor);
+        // Then set all other items from the string, potentially 
+        //  overriding the flavor set above
+        load(args);
+        setDescription("inputName=" + inputName 
+                       + " xmlName=" + xmlName 
+                       + " outputName=" + outputName 
+                       + " goldName=" + goldName 
+                       + " flavor=" + flavor);
+    }
+
+
+    /**
      * Accesor method for a brief description of this Datalet.  
      *
      * @return String describing the specific set of data 

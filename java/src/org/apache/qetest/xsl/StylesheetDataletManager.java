@@ -327,8 +327,9 @@ public abstract class StylesheetDataletManager // provide static services only
             // Skip any lines beginning with # comment char or that are blank
             if ((!line.startsWith(QETEST_COMMENT_CHAR)) && (line.length() > 0))
             {
-                // Create a Datalet and initialize with the line's contents
-                StylesheetDatalet d = new StylesheetDatalet(line);
+                // Create a Datalet and initialize with the line's 
+                //  contents and default properties
+                StylesheetDatalet d = new StylesheetDatalet(line, defaults);
 
                 // Also pass over the global runId, if set
                 d.options.put("runId", defaults.getProperty("runId"));
@@ -460,8 +461,8 @@ public abstract class StylesheetDataletManager // provide static services only
         String line = firstLine;
         StylesheetDatalet d = new StylesheetDatalet();
 
-        // Also pass over the global runId, if set
-        d.options.put("runId", defaults.getProperty("runId"));
+        // Also pass over the default properties as well
+        d.options = new Properties(defaults);
 
         // Parse lines throughout the section to build the datalet
         for (;;)
