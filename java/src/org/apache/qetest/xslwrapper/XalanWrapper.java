@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2001 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,20 +62,23 @@
  */
 package org.apache.qetest.xslwrapper;
 
-import java.util.Vector;
-
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.util.Vector;
 
 // The Xalan (apache) implementation
 import org.apache.xalan.xslt.XSLTProcessor;
 import org.apache.xalan.xslt.XSLTProcessorFactory;
 import org.apache.xalan.xslt.XSLTInputSource;
 import org.apache.xalan.xslt.XSLTResultTarget;
-import org.apache.xalan.xslt.XSLProcessorVersion;
+ // XSLProcessorVersion is not present in the Xalan-J 2.x compatibility layer
+ // import org.apache.xalan.xslt.XSLProcessorVersion;
 
 /**
  * Implementation of a ProcessorWrapper for Xalan 1.x builds.
  * <p>See TraxWrapper for a Xalan 2.x wrapper solution.</p>
+ * <p>Note: Updated to work with either Xalan-J 1.x or with 
+ * Xalan-J 2.x's compatibility layer seamlessly.</p>
  * @author Shane Curcuru
  * @version $Id$
  */
@@ -133,6 +136,12 @@ public class XalanWrapper extends ProcessorWrapper
         return (p);
     }
 
+    /** FQCN of Xalan-J 1.x's version file.   */
+    public static final String XALAN1_VERSION_CLASS = "org.apache.xalan.xslt.XSLProcessorVersion";
+
+    /** FQCN of Xalan-J 2.x's version file, when using the compatibility layer.   */
+    public static final String XALAN2_VERSION_CLASS = "org.apache.xalan.processor.XSLProcessorVersion";
+
     /**
      * Get a description of the wrappered processor.
      * @return info-string describing the processor and possibly it's common options
@@ -147,15 +156,51 @@ public class XalanWrapper extends ProcessorWrapper
         }
         else
         {
-            StringBuffer buf = new StringBuffer(XSLProcessorVersion.PRODUCT);
+            StringBuffer buf = new StringBuffer("No Xalan version info found");
 
-            buf.append(";");
-            buf.append(XSLProcessorVersion.LANGUAGE);
-            buf.append(";");
-            buf.append(XSLProcessorVersion.S_VERSION);
-            buf.append(";");
-            buf.append(processor.getXMLProcessorLiaison());
-
+            // Compatibility with either 1.x or 2.x compatibility layer
+            Class clazz = null;
+            Field f = null;
+            try
+            {
+                clazz = Class.forName(XALAN1_VERSION_CLASS);
+                // Found 1.x, grab it's version fields
+                buf = new StringBuffer();
+                f = clazz.getField("PRODUCT");
+                buf.append(f.get(null));
+                buf.append(";");
+                f = clazz.getField("LANGUAGE");
+                buf.append(f.get(null));
+                buf.append(";");
+                f = clazz.getField("S_VERSION");
+                buf.append(f.get(null));
+                buf.append(";");
+                buf.append(processor.getXMLProcessorLiaison());
+            }
+            catch (Exception e1)
+            {
+                // Can't find 1.x, look for 2.x compat layer
+                try
+                {
+                    clazz = Class.forName(XALAN2_VERSION_CLASS);
+                    // Found 2.x, grab it's version fields
+                    buf = new StringBuffer();
+                    f = clazz.getField("PRODUCT");
+                    buf.append(f.get(null));
+                    buf.append(";");
+                    f = clazz.getField("LANGUAGE");
+                    buf.append(f.get(null));
+                    buf.append(";");
+                    f = clazz.getField("S_VERSION");
+                    buf.append(f.get(null));
+                    buf.append(";");
+                    //@todo find way to figure out parser info too
+                }
+                catch (Exception e2)
+                {
+                    // Can't find 2.x either, just bail
+                }
+            }
             return buf.toString();
         }
     }
@@ -348,7 +393,11 @@ public class XalanWrapper extends ProcessorWrapper
             throw new java.lang.IllegalStateException(
                 "You must call createNewProcessor first!");
 
-        processor.getXMLProcessorLiaison().setIndent(i);
+        // HACK: functionality not present in 2.x compat, 
+        //  just comment out for now: we should really try 
+        //  to dynamically load this for 1.x and/or replace the 
+        //  functionality for 2.x later on
+        //processor.getXMLProcessorLiaison().setIndent(i);
     }
 
     /**
