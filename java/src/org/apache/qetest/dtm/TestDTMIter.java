@@ -111,12 +111,12 @@ public class TestDTMIter extends XSLProcessorTestBase
 
 	public static final String defaultSource=
  		"<?xml version=\"1.0\"?>\n"+
- 		"<Document xmlns:x=\"www.x.com\" a1=\"hello\" a2=\"goodbye\">"+
+ 		"<Document xmlns:d=\"www.d.com\" a1=\"hello\" a2=\"goodbye\">"+
  		"<!-- Default test document -->"+
  		"<?api a1=\"yes\" a2=\"no\"?>"+
- 		"<A><B><C><D><E><F/></E></D></C></B></A>"+
+ 		"<A><!-- A Subtree --><B><C><D><E><F xmlns:f=\"www.f.com\" a1=\"down\" a2=\"up\"/></E></D></C></B></A>"+
  		"<Aa/><Ab/><Ac><Ac1/></Ac>"+
- 		"<Ad xmlns:xx=\"www.xx.com\" xmlns:y=\"www.y.com\" xmlns:z=\"www.z.com\">"+
+ 		"<Ad xmlns:Ad=\"www.Ad.com\" xmlns:y=\"www.y.com\" xmlns:z=\"www.z.com\">"+
  		"<Ad1/></Ad>"+
  		"</Document>";
  
