@@ -513,37 +513,38 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
             }
             // Check if it's a normal .xsl file, or a .xml file
             //  (we assume .xml files are embedded tests!)
+            StylesheetDatalet d = new StylesheetDatalet();
             if (file.endsWith(XML_EXTENSION))
             {
-                StylesheetDatalet d = new StylesheetDatalet();
                 d.xmlName = testLocation.getPath() + File.separator + file;
 
                 String fileNameRoot = file.substring(0, file.indexOf(XML_EXTENSION));
                 d.inputName = null;
                 d.outputName = outLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
                 d.goldName = goldLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
-                d.setDescription(file);
-                v.addElement(d);
             }
             else if (file.endsWith(XSL_EXTENSION))
             {
-                StylesheetDatalet d = new StylesheetDatalet();
                 d.inputName = testLocation.getPath() + File.separator + file;
 
                 String fileNameRoot = file.substring(0, file.indexOf(XSL_EXTENSION));
                 d.xmlName = testLocation.getPath() + File.separator + fileNameRoot + XML_EXTENSION;
                 d.outputName = outLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
                 d.goldName = goldLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
-                d.setDescription(file);
-                v.addElement(d);
             }
             else
             {
                 // Hmmm - I'm not sure what we should do here
                 reporter.logWarningMsg("Unexpected test file found, skipping: " + file);
             }
+            d.setDescription(file);
+            // Also copy over our own testProps as it's 
+            //  options: this allows for future expansion
+            //  of values in the datalet
+            d.options = new Properties(testProps);
+            v.addElement(d);
         }
-        return v; //@todo FIXME
+        return v;
     }
 
 
