@@ -7,7 +7,11 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 16.2 HTML Output Method -->
-  <!-- Purpose: ??? -->
+  <!-- Purpose: The html output method should not output an element 
+                differently from the xml output method unless the 
+                expanded-name of the element has a null namespace URI; an 
+                element whose expanded-name has a non-null namespace URI 
+                should be output as XML.  -->
 
 <xsl:output method="html"/>
 

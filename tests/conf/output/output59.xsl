@@ -7,7 +7,8 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.3 Creating Processing Instructions -->
-  <!-- Purpose: Test creation of a top-level processing-instruction. -->
+  <!-- Purpose: Test creation of a top-level processing-instruction before the 
+                document element. -->
 
 <xsl:template match="/">
  <xsl:processing-instruction name="my-pi">href="book.css" type="text/css"</xsl:processing-instruction>

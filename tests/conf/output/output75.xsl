@@ -1,7 +1,7 @@
 <?xml version="1.0"?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<xsl:output method="xml" indent="yes"/>
+<xsl:output method="xml"/>
 
   <!-- FileName: output75 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
@@ -15,14 +15,14 @@
   <!-- Author: Paul Dick -->
 
 <xsl:template match="doc">
- <xml>
+ <xml><xsl:text>&#10;</xsl:text>
   <out1>
 	<xsl:attribute name="attrib1">
 		<xsl:text disable-output-escaping="no">_&lt;Whoa-No&gt;_</xsl:text>
 	</xsl:attribute>
 	<xsl:attribute name="attrib2">
 		<xsl:value-of select="a" disable-output-escaping="no"/>
-	</xsl:attribute></out1>
+	</xsl:attribute></out1><xsl:text>&#10;</xsl:text>
 
   <!-- This is the error case. It should come out as d-o-e="no" -->
   <out2>
@@ -31,11 +31,11 @@
 	</xsl:attribute>
 	<xsl:attribute name="attrib4">
 		<xsl:value-of select="a" disable-output-escaping="yes"/>
-	</xsl:attribute></out2>
+	</xsl:attribute></out2><xsl:text>&#10;</xsl:text>
 
   <out3>
 	<xsl:value-of select="a" disable-output-escaping="yes"/>
-  </out3>
+  </out3><xsl:text>&#10;</xsl:text>
  </xml>
 </xsl:template>
  

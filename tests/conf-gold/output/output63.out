@@ -1,1 +1,3 @@
-<root><jsp:setProperty xmlns:jsp="http://www.w3.org/jsp" value="blah" property="blah" name="blah"/></root>
+<root>
+<jsp:setProperty xmlns:jsp="http://www.w3.org/jsp" value="blah" property="blah" name="blah"/>
+</root>
