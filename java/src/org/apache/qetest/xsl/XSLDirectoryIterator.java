@@ -1159,37 +1159,14 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
             processorW.reset();
         }
 
-        // Catch SAXExceptions and check if they're expected; restart to be safe
-        catch (SAXException sax)
-        {
-            reporter.logStatusMsg("processSingleFile(" + XSLName
-                                  + ") threw: " + sax.toString());
-
-            int retVal = checkExpectedException(sax, XSLName, OutName);
-
-            createNewProcessor();  // Should be configurable!
-
-            return retVal;
-        }
-
-        // Catch general Exceptions, check if they're expected, and restart
-        catch (Exception e)
-        {
-            reporter.logStatusMsg("processSingleFile(" + XSLName
-                                  + ") threw: " + e.toString());
-
-            int retVal = checkExpectedException(e, XSLName, OutName);
-
-            createNewProcessor();
-
-            return retVal;
-        }
-
+        // Removed: separate (but duplicate) catches for SAXException, Exception
         // Catch any Throwable, check if they're expected, and restart
         catch (Throwable t)
         {
             reporter.logStatusMsg("processSingleFile(" + XSLName
                                   + ") threw: " + t.toString());
+            reporter.logThrowable(reporter.WARNINGMSG, t, 
+                                  "processSingleFile(" + XSLName + ") threw");
 
             int retVal = checkExpectedException(t, XSLName, OutName);
 
@@ -1410,9 +1387,10 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
         {
             if (diagNameMgr == null)
             {
-
                 // Create a new name manager, hardcode the .log extension just because
-                diagNameMgr = new OutputNameManager(diagnostics, ".log");
+                // New: put them in outputDir
+                diagNameMgr = new OutputNameManager(outputDir + File.separator 
+                                                    + diagnostics, ".log");
             }
 
             try

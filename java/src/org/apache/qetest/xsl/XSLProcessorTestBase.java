@@ -326,9 +326,6 @@ public class XSLProcessorTestBase extends FileBasedTest
         reporter.addDefaultLogger();  // add default logger if needed
         reporter.testFileInit(testName, testComment);
 
-        // Fixup some paths to be absolute, see method comments for @todo
-        fixupPaths();
-
         // Create a file-based CheckService for later use
         if (fileChecker == null)
         {
@@ -695,37 +692,6 @@ public class XSLProcessorTestBase extends FileBasedTest
         return "file:///" + tmp;
     }
 
-
-    /**
-     * Worker method to fixup pathing for diagnostics.
-     * @todo - this is a hack, we may not even need it
-     * @author Shane Curcuru
-     */
-    public void fixupPaths()
-    {
-
-        // Convert all dir references to absolute ones, to get around 
-        //  potential problems with relative paths and test harnesses
-        //  that change the current directory
-        // Try getCanonicalPath first; otherwise default to getAbsolutePath()
-        // @todo also implement logFile
-        if (diagnostics != null)
-        {
-            File tempF = new File(diagnostics);
-
-            try
-            {
-                diagnostics = tempF.getCanonicalPath();
-            }
-            catch (IOException ioe1)
-            {
-                diagnostics = tempF.getAbsolutePath();
-            }
-
-            reporter.logTraceMsg(OPT_DIAGNOSTICS + " reset to absolute: "
-                                 + diagnostics);
-        }
-    }
     
     /**
      * Write a "{TestName}.Pass" or "{TestName}.Not.Pass" file 
