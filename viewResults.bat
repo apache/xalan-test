@@ -52,16 +52,24 @@ if "%2" == "" set _OUTNAME=results.html
 if not "%2" == "" set _OUTNAME=%2
 set _XSLNAME=%RESULTSCANNER%
 if "%_XSLNAME%" == "" set _XSLNAME=FailScanner.xsl
-                             
-@REM @todo find OS-independent way to send 'all remaining args' instead of just up to %9
-echo "%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%_XSLNAME%" -out "%_OUTNAME%" %3 %4 %5 %6 %7 %8 %9
-"%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%_XSLNAME%" -out "%_OUTNAME%" %3 %4 %5 %6 %7 %8 %9
+set _PARAMS=
+
+:getparams
+set _PARAMS=%_PARAMS% %3
+shift /3
+if "%3"=="" goto execute
+goto getparams
+
+:execute
+echo "%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%_XSLNAME%" -out "%_OUTNAME%" %_PARAMS%
+"%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%_XSLNAME%" -out "%_OUTNAME%" %_PARAMS%
 
 :done
 @echo %0 complete!
 set TEST_CP=
 set JAVA_EXE=
 set _OUTNAME=
+set _PARAMS=
 set _XSLNAME=
 set PARSER_JAR=
 set JAVA_OPTS=%SAVED_JAVA_OPTS%
