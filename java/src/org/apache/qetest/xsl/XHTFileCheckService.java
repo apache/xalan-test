@@ -262,6 +262,11 @@ public class XHTFileCheckService implements CheckService
         attrs.put("actual", actualFile);
         attrs.put("reference", referenceFile);
         attrs.put("reportedBy", "XHTFileCheckService");
+        try
+        {
+            attrs.put("baseref", System.getProperty("user.dir"));
+        } 
+        catch (Exception e) { /* no-op, ignore */ }
         String elementBody = msg + "(" + id + ") \n" + logs;
         // HACK: escapeString(elementBody) so that it's legal XML
         //  for cases where we have XML output.  This isn't 
