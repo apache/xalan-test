@@ -83,6 +83,11 @@ import java.util.Properties;
  * implementing the process (SAX, DOM, etc.)</p>
  * @author Shane Curcuru
  * @version $Id$
+ * @deprecated Please use TransformWrapper classes instead.
+ * ProcessorWrapper subclasses are being replaced with 
+ * TransformWrapper subclasses over time; the it's a cleaner 
+ * design, is an interface, and provides much better timing data.
+ * @see org.apache.qetest.xslwrapper.TransformWrapper
  */
 public abstract class ProcessorWrapper
 {

@@ -86,6 +86,12 @@ import java.util.Vector;
  * validate error or exception conditions yet.</p>
  * @author shane_curcuru@lotus.com
  * @version $Id$
+ * @deprecated Please use StylesheetTestletDriver instead.
+ * The preferred way to test trees of stylesheets (like the conf 
+ * test) is to use the StylesheetTestletDriver to iterate over the 
+ * testfiles, StylesheetTestlets to provide the testing algorithim, 
+ * and TransformWrappers to interface with the XSLT processor.
+ * @see org.apache.qetest.xsl.StylesheetTestletDriver
  */
 public class MConformanceTest extends XSLDirectoryIterator
 {

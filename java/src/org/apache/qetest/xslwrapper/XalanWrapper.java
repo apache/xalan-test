@@ -81,6 +81,12 @@ import org.apache.xalan.xslt.XSLTResultTarget;
  * Xalan-J 2.x's compatibility layer seamlessly.</p>
  * @author Shane Curcuru
  * @version $Id$
+ * @deprecated Please use TransformWrapper classes instead.
+ * ProcessorWrapper subclasses are being replaced with 
+ * TransformWrapper subclasses over time; when the appropriate 
+ * TransformWrapper flavor for Xalan-J 1.x is available, please
+ * plan on using it.
+ * @see org.apache.qetest.xslwrapper.TransformWrapper
  */
 public class XalanWrapper extends ProcessorWrapper
 {

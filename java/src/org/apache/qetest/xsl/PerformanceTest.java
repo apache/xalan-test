@@ -78,8 +78,17 @@ import java.util.Properties;
  * <p>While the test harness does add a small amount of overhead to the benchmark
  * process, this makes reporting and running the test much easier.</p>
  * @author shane_curcuru@lotus.com
- * @todo improve verification; make calling fileChecker conditional,
+ * //@todo improve verification; make calling fileChecker conditional,
  * perhaps only every 10 iterations or something
+ * @deprecated Please use StylesheetTestletDriver instead.
+ * The preferred way to test trees of stylesheets (like the conf 
+ * test) is to use the StylesheetTestletDriver to iterate over the 
+ * testfiles, StylesheetTestlets to provide the testing algorithim, 
+ * and TransformWrappers to interface with the XSLT processor.
+ * @see org.apache.qetest.xsl.StylesheetTestletDriver
+ * @see org.apache.qetest.xsl.PerformanceTestlet
+ * @see org.apache.qetest.xsl.PerfEverythingTestlet
+ * @see org.apache.qetest.xsl.PerfPreloadTestlet
  */
 public class PerformanceTest extends XSLDirectoryIterator
 {

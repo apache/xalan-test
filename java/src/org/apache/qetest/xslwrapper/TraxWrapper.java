@@ -104,6 +104,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * @todo document how we perform various types of transforms
  * @author Shane Curcuru
  * @version $Id$
+ * @deprecated Please use TransformWrapper classes instead.
+ * ProcessorWrapper subclasses are being replaced with 
+ * TransformWrapper subclasses over time; when the appropriate 
+ * TransformWrapper flavors for Xalan-J 2.x are available, please
+ * plan on using them.
+ * @see org.apache.qetest.xslwrapper.TransformWrapper
+ * @see org.apache.qetest.xslwrapper.TraxFileWrapper
+ * @see org.apache.qetest.xslwrapper.TraxStreamWrapper
+ * @see org.apache.qetest.xslwrapper.TraxSAXWrapper
+ * @see org.apache.qetest.xslwrapper.TraxDOMWrapper
  */
 public class TraxWrapper extends ProcessorWrapper
 {

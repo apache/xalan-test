@@ -77,6 +77,14 @@ import java.util.Properties;
  * the processor's description, we simply use all the default implementations
  * of methods from XSLDirectoryIterator.</p>
  * @author shane_curcuru@lotus.com
+ * @deprecated Please use StylesheetTestletDriver instead.
+ * The preferred way to test trees of stylesheets (like the conf 
+ * test) is to use the StylesheetTestletDriver to iterate over the 
+ * testfiles, StylesheetTestlets to provide the testing algorithim, 
+ * and TransformWrappers to interface with the XSLT processor.
+ * @see org.apache.qetest.xsl.StylesheetTestletDriver
+ * @see org.apache.qetest.xsl.StylesheetTestlet
+ * @see org.apache.qetest.xsl.StylesheetErrorTestlet
  */
 public class ConformanceTest extends XSLDirectoryIterator
 {

@@ -100,6 +100,12 @@ import org.xml.sax.SAXException;
  * @todo improve file discovery - file execution paradigm
  * @author Shane Curcuru
  * @version $Id$
+ * @deprecated Please use StylesheetTestletDriver instead.
+ * The preferred way to test trees of stylesheets (like the conf 
+ * test) is to use the StylesheetTestletDriver to iterate over the 
+ * testfiles, StylesheetTestlets to provide the testing algorithim, 
+ * and TransformWrappers to interface with the XSLT processor.
+ * @see org.apache.qetest.xsl.StylesheetTestletDriver
  */
 public class XSLDirectoryIterator extends XSLProcessorTestBase
 {
