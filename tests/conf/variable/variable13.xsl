@@ -10,19 +10,23 @@
 
 <xsl:param name="chooseTest" select="'ABC'"/>
 
-<xsl:template match="doc">
+<xsl:template match="/">
   <out>
     <xsl:value-of select="$chooseTest"/><xsl:text>_</xsl:text>
-    <xsl:param name="chooseTest">
-      <xsl:choose>
-        <xsl:when test="item='X'">24</xsl:when>
-        <xsl:when test="item='Y'">25</xsl:when>
-        <xsl:when test="item='Z'">26</xsl:when>
-        <xsl:otherwise>32</xsl:otherwise>
-      </xsl:choose>
-    </xsl:param>
-    <xsl:value-of select="$chooseTest"/>
+    <xsl:apply-templates select="doc"/>
   </out>
+</xsl:template>
+
+<xsl:template match="doc">
+  <xsl:param name="chooseTest">
+    <xsl:choose>
+      <xsl:when test="item='X'">24</xsl:when>
+      <xsl:when test="item='Y'">25</xsl:when>
+      <xsl:when test="item='Z'">26</xsl:when>
+      <xsl:otherwise>32</xsl:otherwise>
+    </xsl:choose>
+  </xsl:param>
+  <xsl:value-of select="$chooseTest"/>
 </xsl:template>
 
 </xsl:stylesheet>

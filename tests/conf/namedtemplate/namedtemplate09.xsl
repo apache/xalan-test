@@ -17,8 +17,8 @@
 </xsl:template>
 
 <xsl:template name="tmplt1">
+  <xsl:param name="par1">par1 default data</xsl:param>
   <in1>
-    <xsl:param name="par1">par1 default data</xsl:param>
     <xsl:value-of select="$par1"/>
     <xsl:call-template name="tmplt2">
       <xsl:with-param name="par1" select="1"/>
@@ -27,8 +27,8 @@
 </xsl:template>
 
 <xsl:template name="tmplt2">
+  <xsl:param name="par1">par1 default in tmplt2</xsl:param>
   <in2>
-    <xsl:param name="par1">par1 default in tmplt2</xsl:param>
     <xsl:value-of select="$par1"/>
     <xsl:call-template name="tmplt3">
       <xsl:with-param name="par1" select="2"/>
@@ -37,8 +37,8 @@
 </xsl:template>
 
 <xsl:template name="tmplt3">
+  <xsl:param name="par1">par1 default in tmplt3</xsl:param>
   <in3>
-    <xsl:param name="par1">par1 default in tmplt3</xsl:param>
     <xsl:value-of select="$par1"/>
     <xsl:call-template name="tmplt4">
       <xsl:with-param name="par1" select="3"/>
@@ -47,8 +47,8 @@
 </xsl:template>
 
 <xsl:template name="tmplt4">
+  <xsl:param name="par1">par1 default in tmplt4</xsl:param>
   <in4>
-    <xsl:param name="par1">par1 default in tmplt4</xsl:param>
     <xsl:value-of select="$par1"/>
     <xsl:call-template name="tmplt5">
       <xsl:with-param name="par1" select="4"/>
@@ -57,8 +57,8 @@
 </xsl:template>
 
 <xsl:template name="tmplt5">
+  <xsl:param name="par1">par1 default in tmplt5</xsl:param>
   <in5>
-    <xsl:param name="par1">par1 default in tmplt5</xsl:param>
     <xsl:value-of select="$par1"/>
     <xsl:call-template name="tmplt6">
       <xsl:with-param name="par1" select="5"/>
@@ -67,8 +67,8 @@
 </xsl:template>
 
 <xsl:template name="tmplt6">
+  <xsl:param name="par1">par1 default in tmplt6</xsl:param>
   <in6>
-    <xsl:param name="par1">par1 default in tmplt6</xsl:param>
     <xsl:value-of select="$par1"/><xsl:text> - all the way in</xsl:text>
   </in6>
 </xsl:template>
