@@ -119,7 +119,7 @@ public class XHTComparator
      * two values that were mismatched.  In some cases, this may be 
      * extremely long, so limit how much we output for convenience.
      */
-    private int maxDisplayLen = 511;  // arbitrary length, for convenience
+    protected int maxDisplayLen = 511;  // arbitrary length, for convenience
 
     /**
      * Accessor method for maxDisplayLen.
