@@ -37,16 +37,26 @@
     <property name="test.root" value="/org/apache/qetest"/>
     <property name="test.dir" value="${src.dir}${test.root}"/>
     <property name="build.dir" value="./build"/>
-    <property name="build.docs" value="${build.dir}/apidocs"/>
+    <property name="build.docs" value="${build.dir}/docs"/>
+	<property name="build.apidocs" value="${build.docs}/apidocs"/>
     <!-- // TODO add org.apache.qetest.xalanj2, xalanc1, etc.  -->
 
     <property name="javadocs.packages" 
               value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.xalanj1"/>
 
+    <property name="xdocs.dir" value="./xdocs"/>
+    <property name="xdocs.book" value="${xdocs.dir}/sources/xalantest.xml"/>
+    <property name="xdocs.style" value="${xdocs.dir}/style"/>
+
+    <property name="xalan.xdocs" value="../../xdocs"/> <!--Xalan-J 1 for now -->
+    <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
+    <property name="xalan.generator.styletargz" value="${xalan.xdocs}/xml-site-style.tar.gz"/>
+    <property name="xdocs.generator.styletar" value="${xdocs.dir}/xml-site-style.tar"/>
+
     <!-- Prepare output tree; copy over prebuilt classes -->
     <target name="prepare">
         <mkdir dir="${build.dir}" />
-        <mkdir dir="${build.docs}" />
+        <mkdir dir="${build.apidocs}" />
         <mkdir dir="${build.dir}${test.root}" />
         <!-- Also copy over precompiled external processor wrapper classes -->
         <copy todir="${build.dir}${test.root}/xslwrapper" >
@@ -58,6 +68,13 @@
         
         <tstamp />
     </target>
+	
+	<target name="prepare.docs" depends="prepare">
+	    <!-- get files from xml-site-style.tar.gz-->
+	    <gunzip src="${xalan.generator.styletargz}" dest="${xdocs.generator.styletar}"/>
+        <untar src="${xdocs.generator.styletar}" dest="${xdocs.dir}"/>
+        <delete file="${xdocs.generator.styletar}"/>
+	</target>
 
     <!-- Compile generic qetest reporter; used by all tests; no code dependencies -->
     <target name="compile.reporter" depends="prepare">
@@ -129,7 +146,17 @@
 
     <target name="clean">
         <delete dir="${build.dir}"/>
+		<delete dir="${xdocs.style}"/> <!--prepare.docs creates this tree-->
     </target>
+	
+    <!-- =================================================================== -->
+    <!-- Creates the User's Guide                                            -->
+    <!-- =================================================================== -->
+  <target name="docs" depends="prepare.docs">
+    <java fork="yes" classname="${doc.generator}"> 
+        <arg line="targetDirectory=${build.docs} ${xdocs.book} ${xdocs.style}"/>    
+    </java>
+  </target>
 
     <!-- =================================================================== -->
     <!-- Creates the API documentation                                       -->
@@ -137,7 +164,7 @@
     <target name="javadocs" depends="prepare">
         <javadoc
              sourcepath="${src.dir}"
-             destdir="${build.docs}"
+             destdir="${build.apidocs}"
              packagenames="${javadocs.packages}"
              public="true"
              author="true"
