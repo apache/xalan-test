@@ -679,6 +679,24 @@ public class XSLProcessorTestBase extends FileBasedTest
     //-----------------------------------------------------
 
     /**
+     * Worker method to translate a String filename to URL.  
+     * Note: This method is not necessarily proven to get the 
+     * correct URL for every possible kind of filename.
+     * @param String path\filename of test file
+     * @return URL to pass to SystemId
+     */
+    public static String filenameToURL(String filename)
+    {
+        File f = new File(filename);
+        String tmp = f.getAbsolutePath();
+	    if (File.separatorChar == '\\') {
+	        tmp = tmp.replace('\\', '/');
+	    }
+        return "file:///" + tmp;
+    }
+
+
+    /**
      * Worker method to fixup pathing for diagnostics.
      * @todo - this is a hack, we may not even need it
      * @author Shane Curcuru
