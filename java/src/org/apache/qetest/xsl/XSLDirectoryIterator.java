@@ -691,33 +691,43 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
                                               absOutName))
                     {
                     case PROCESS_OK :
-                        int res = fileChecker.check(reporter,
-                                                    new File(absOutName),
-                                                    new File(absGoldName),
-                                                    xslF.getName()
-                                                    + " output comparison");
-
-                        // ((XLTestReporter)reporter).checkFiles(new File(absOutName), new File(absGoldName), xslF.getName() + " output comparison");
-                        // If we're using an appropriate fileChecker, 
-                        //  get extra info on a fail
-                        if (res == reporter.FAIL_RESULT)
+                        if (!reporter.check(fileChecker, 
+                                            new File(absOutName), 
+                                            new File(absGoldName), 
+                                            xslF.getName() + " output comparison",
+                                            xslF.getName()))
                         {
-                            String tmp = fileChecker.getExtendedInfo();
+                            // If we're using an appropriate fileChecker, 
+                            //  get extra info on a fail, as well as file references to the test file
 
+                            // Report extra info about why it failed
+                            String tmp = fileChecker.getExtendedInfo();
                             if (tmp != null)
                                 reporter.logArbitrary(reporter.INFOMSG, tmp);
                             else
-                                reporter.logTraceMsg(
-                                    "getFileChecker().getExtendedInfo() not available");
+                                reporter.logTraceMsg("getFileChecker().getExtendedInfo() not available");
+
+                            // Log a custom element with all the file refs in it
+                            // Closely related to viewResults.xsl select='fileref"
+                            // This code should be cleaned up and duplicated for 
+                            //  the UNEXPECTED_EXCEPTION case below too!
+                            Hashtable attrs = new Hashtable();
+                            attrs.put("idref", xslF.getName());
+                            attrs.put("inputName", absXSLName);
+                            attrs.put("xmlName", absXMLName);
+                            attrs.put("outputName", absOutName);
+                            attrs.put("goldName", absGoldName);
+                            reporter.logElement(reporter.INFOMSG, "fileref", attrs, "File references for Conformance Test");
                         }
+
                         break;
                     case GOT_EXPECTED_EXCEPTION :
                         reporter.checkPass(xslF.getName()
-                                           + " got expected exception");
+                                           + " got expected exception", xslF.getName());
                         break;
                     case UNEXPECTED_EXCEPTION :
                         reporter.checkFail(xslF.getName()
-                                           + " got unexpected exception");
+                                           + " got unexpected exception", xslF.getName());
                         break;
                     }
                 }  // of if (dotIndex > 0)
@@ -822,33 +832,45 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
                                       fileSet.outputName))
             {
             case PROCESS_OK :
-                int res = fileChecker.check(reporter,
-                                            new File(fileSet.outputName),
-                                            new File(fileSet.goldName),
-                                            xslF.getName()
-                                            + " output comparison");
-
-                // ((XLTestReporter)reporter).checkFiles(new File(fileSet.outputName), new File(fileSet.goldName), xslF.getName() + " output comparison");
-                // If we're using an appropriate fileChecker, 
-                //  get extra info on a fail
-                if (res == reporter.FAIL_RESULT)
+                if (!reporter.check(fileChecker, 
+                                    new File(fileSet.outputName), 
+                                    new File(fileSet.goldName), 
+                                    xslF.getName() + " output comparison",
+                                    xslF.getName()))
                 {
-                    String tmp = fileChecker.getExtendedInfo();
+                    // If we're using an appropriate fileChecker, 
+                    //  get extra info on a fail, as well as file references to the test file
 
+                    // Report extra info about why it failed
+                    String tmp = fileChecker.getExtendedInfo();
                     if (tmp != null)
                         reporter.logArbitrary(reporter.INFOMSG, tmp);
                     else
-                        reporter.logTraceMsg(
-                            "getFileChecker().getExtendedInfo() not available");
+                        reporter.logTraceMsg("getFileChecker().getExtendedInfo() not available");
+
+                    // Log a custom element with all the file refs in it
+                    // Closely related to viewResults.xsl select='fileref"
+                    // This code should be cleaned up and duplicated for 
+                    //  the UNEXPECTED_EXCEPTION case below too!
+                    Hashtable attrs = new Hashtable();
+                    attrs.put("idref", xslF.getName());
+                    attrs.put("inputName", fileSet.inputName);
+                    attrs.put("xmlName", fileSet.xmlName);
+                    attrs.put("outputName", fileSet.outputName);
+                    attrs.put("goldName", fileSet.goldName);
+                    reporter.logElement(reporter.INFOMSG, "fileref", attrs, "File references for Conformance Test");
                 }
+
+
+
                 break;
             case GOT_EXPECTED_EXCEPTION :
                 reporter.checkPass(xslF.getName()
-                                   + " got expected exception");
+                                   + " got expected exception", xslF.getName());
                 break;
             case UNEXPECTED_EXCEPTION :
                 reporter.checkFail(xslF.getName()
-                                   + " got unexpected exception");
+                                   + " got unexpected exception", xslF.getName());
                 break;
             }
         }  // of while...
