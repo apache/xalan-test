@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root xmlns:ped="http://www.test.com">
+<out1/>
+<ped:out2/>
+<ns0:out3 xmlns:ns0="http://www.bdd.com"/>
+</root>

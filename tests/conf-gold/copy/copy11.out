@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root><Out attr1="A1,2-A1,&#10;		   4-B2&#10;		   4-C3&#10;		"/>
+<a level="1">A1,</a><a level="2">2-A1,</a><a xmlns:ped="www.ped.com" level="3">
+		   <b level="4">4-B2</b>
+		   <c level="4">4-C3</c>
+		</a></root>

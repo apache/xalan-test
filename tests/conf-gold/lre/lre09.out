@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns:ped="http://www.tester.com">
+<ped:Out1/>
+<HTML>
+<body>
+<text font="Courier">
+		  What's Up
+		</text>
+</body>
+</HTML>
+</root>

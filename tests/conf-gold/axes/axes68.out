@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<out>Namespaces for docs:
+
+  Namespaces for doc:
+ext=http://somebody.elses.extension,
+
+    Namespaces for section:
+ext=http://somebody.elses.extension,
+foo=http://foo.com,
+
+      Namespaces for inner:
+ext=http://somebody.elses.extension,
+foo=http://foo.com,
+whiz=http://whiz.com/special/page,
+
+    
+  
+</out>

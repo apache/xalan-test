@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<out xmlns:admin="http://administrator.com" xmlns:bdd="http://bdd.lotus.com" xmlns:ped="http://ped.lotus.com">
+  
+
+There are 7 Namespace Nodes.
+ext=http://somebody.elses.extension,
+java=http://xml.apache.org/xslt/java,
+ped=http://tester.com,
+bdd=http://buster.com,
+jad=http://administrator.com,
+OK1=http://ped.lotus.com,
+OK2=http://bdd.lotus.com,
+
+OK1 = http://ped.lotus.com,
+OK2 = http://bdd.lotus.com,
+jad = http://administrator.com
+
+  
+
+There are 0 Namespace Nodes.
+
+
+
+</out>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<out>
+  
+  C-title:,
+  E-title:,
+  
+  R-author:Joe Jones
+  testing-include
+  
+  C-chapters:
+  
+    
+  E-chapter: 
+  1.know xsl
+    
+  E-chapter: 
+  2.love xsl
+  
+</out>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<out>Namespaces for docs:
+
+  Namespaces for doc:
+ext=N5,
+
+    Namespaces for section:
+ext=N5,
+foo=N8,
+
+      Namespaces for inner:
+ext=N5,
+foo=N8,
+whiz=NB,
+
+    
+  
+</out>
