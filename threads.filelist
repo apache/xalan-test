@@ -1,4 +1,4 @@
-# See also threads.properties
+# See also test.properties, harness.threads.* or threads.* section
 # Feel free to edit to run different files; note we do *not* use inputDir, etc.
 # First file is compiled into common Templates object
 #   all remaining files are then spun off onto a thread each
