@@ -13,7 +13,9 @@
 <xsl:output method="xml" indent="no" encoding="UTF-8"/>
 
 <xsl:template match="/">
-  <xsl:apply-templates select="doc" />
+  <out>
+    <xsl:apply-templates select="doc" />
+  </out>
 </xsl:template>
 
 </xsl:stylesheet>
