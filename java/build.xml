@@ -37,8 +37,8 @@
     <property name="debug" value="on"/>
 
     <property name="src.dir" value="./src"/>
-    <property name="test.root" value="/org/apache/qetest"/>
-    <property name="test.dir" value="${src.dir}${test.root}"/>
+    <property name="test.root" value="org/apache/qetest/"/>
+    <property name="test.dir" value="${src.dir}/${test.root}"/>
     <property name="build.dir" value="./build"/>
     <property name="build.docs" value="${build.dir}/docs"/>
 	<property name="build.apidocs" value="${build.docs}/apidocs"/>
@@ -110,10 +110,10 @@
         <echo message="Classpath is ${java.class.path}" />
         <mkdir dir="${build.dir}" />
         <mkdir dir="${build.apidocs}" />
-        <mkdir dir="${build.dir}${test.root}" />
+        <mkdir dir="${build.dir}/${test.root}" />
         <!-- Also copy over precompiled external processor wrapper classes -->
-        <copy todir="${build.dir}${test.root}/xslwrapper" >
-            <fileset dir="${test.dir}/xslwrapper">
+        <copy todir="${build.dir}/${test.root}/xslwrapper" >
+            <fileset dir="${test.dir}xslwrapper">
                 <include name="**/*.class" />
                 <include name="**/*.properties" />
             </fileset>
@@ -135,20 +135,21 @@
     <!-- Common worker targets for all builds                                -->
     <!-- =================================================================== -->
     <target name="compile.reporter" depends="prepare">
-        <javac srcdir="${test.dir}" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
-               includes="*.java" 
+               includes="${test.root}*.java" 
                debug="${debug}" />
     </target>
 
     <!-- Compile Processor-wrapper based tests; must also compile ProcessorWrapper itself -->
     <target name="compile.xsl" depends="compile.reporter">
-        <javac srcdir="${test.dir}/xslwrapper" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
-               includes="ProcessorWrapper.java"
+               includes="${test.root}xslwrapper/ProcessorWrapper.java"
                debug="${debug}" />
-        <javac srcdir="${test.dir}/xsl" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
+               includes="${test.root}xsl/*.java"
                debug="${debug}" 
                classpathref="compiletest.class.path" />
         <!-- Note use of compiletest.class.path above, in the case where 
@@ -164,12 +165,13 @@
     <!-- For Xalan-J 1.x testing, use these targets -->
     <!-- =================================================================== -->
     <target name="compile.xalan1" depends="compile.xsl">
-        <javac srcdir="${test.dir}/xslwrapper" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
-               includes="XalanWrapper.java"
+               includes="${test.root}xslwrapper/XalanWrapper.java"
                debug="${debug}" />
-        <javac srcdir="${test.dir}/xalanj1" 
+        <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
+               includes="${test.root}xalanj1/*.java"
                debug="${debug}" />
     </target>
     <target name="package.xalan1" depends="compile.xalan1"
@@ -189,12 +191,12 @@
          using compat.jar that provides backwards compatibility. -->
     <!-- =================================================================== -->
     <target name="compile.compat1" depends="compile.xsl">
-        <javac srcdir="${test.dir}/xslwrapper" 
+        <javac srcdir="${test.dir}xslwrapper" 
                destdir="${build.dir}" 
                includes="XalanWrapper.java"
                debug="${debug}" 
                classpathref="compattest.class.path" />
-        <javac srcdir="${test.dir}/xalanj1" 
+        <javac srcdir="${test.dir}xalanj1" 
                destdir="${build.dir}" 
                debug="${debug}" 
                classpathref="compattest.class.path" />
@@ -212,7 +214,7 @@
     <!-- =================================================================== -->
     <!-- Just compile any xslwrappers related to trax -->
     <target name="compile.trax.xslwrappers" depends="compile.xsl">
-        <javac srcdir="${test.dir}/xslwrapper" 
+        <javac srcdir="${test.dir}xslwrapper" 
                destdir="${build.dir}" 
                includes="TraxWrapper.java"
                debug="${debug}" 
@@ -222,18 +224,18 @@
     <!-- Compile various TRAX related API tests -->
     <target name="compile.trax" depends="compile.xsl,compile.trax.xslwrappers">
         <echo message="Do just base trax directory first" />
-        <javac srcdir="${test.dir}/trax" 
+        <javac srcdir="${test.dir}trax" 
                destdir="${build.dir}" 
                includes="*.java" 
                debug="${debug}" />
         <echo message="Do [dom|sax|stream] subdirectories as well" />
-        <javac srcdir="${test.dir}/trax/stream" 
+        <javac srcdir="${test.dir}trax/stream" 
                destdir="${build.dir}" 
                debug="${debug}" />
-        <javac srcdir="${test.dir}/trax/dom" 
+        <javac srcdir="${test.dir}trax/dom" 
                destdir="${build.dir}" 
                debug="${debug}" />
-        <javac srcdir="${test.dir}/trax/sax" 
+        <javac srcdir="${test.dir}trax/sax" 
                destdir="${build.dir}" 
                debug="${debug}" />
     </target>
@@ -300,7 +302,7 @@
         <property name="results.html" value="${results.dir}/Minitest.html" />
         <property name="results.marker" value="${results.dir}/Minitest.Pass" />
         <echo message=" [minitest] Compile the Minitest." />
-        <javac srcdir="${test.dir}/trax" 
+        <javac srcdir="${test.dir}trax" 
                destdir="${build.dir}" 
                includes="Minitest.java"
                debug="${debug}" 
@@ -477,7 +479,7 @@
         <property name="examplestest-results.html" value="${examplestest-results.dir}/ExamplesTest.html" />
         <property name="examplestest-results.marker" value="${examplestest-results.dir}/ExamplesTest.Pass" />
         <echo message=" [examplestest] Compile the ExamplesTest." />
-        <javac srcdir="${test.dir}/trax" 
+        <javac srcdir="${test.dir}trax" 
                destdir="${build.dir}" 
                includes="ExamplesTest.java"
                debug="${debug}" 
@@ -546,7 +548,7 @@
          (You may be better off compiling other wrappers by hand, and then simply 
          checking in their .class files instead) -->
     <target name="compile.xslwrapper.wrappers" depends="prepare">
-        <javac srcdir="${test.dir}/xslwrapper" 
+        <javac srcdir="${test.dir}xslwrapper" 
                 destdir="${build.dir}" 
                 debug="${debug}" />
     </target>
