@@ -82,6 +82,7 @@ import java.util.Vector;
  * <ul>initializes all members from FileBasedTest, plus
  * <li>category</li>
  * <li>excludes</li>
+ * <li>embedded - special case: tests with no .xsl file (embedded stylesheets)</li>
  * <li>liaison</li>
  * <li>flavor</li>
  * <li>diagnostics</li>
@@ -108,15 +109,18 @@ public class XSLProcessorTestBase extends FileBasedTest
                 + "    -" + OPT_CATEGORY
                 + "  <name of single subdir within testDir to run>\n"
                 + "    -" + OPT_EXCLUDES
-                + "  <list;of;specific file.xsl tests to skip>\n" + "    -"
-                + OPT_LIAISON + "   <liaisonClassName>\n" + "    -"
-                + OPT_FLAVOR
+                + "  <list;of;specific file.xsl tests to skip>\n" 
+                + "    -" + OPT_EMBEDDED
+                + "  <list;of;specific file.xml embedded tests to run>\n" 
+                + "    -" + OPT_LIAISON 
+                + "   <liaisonClassName>\n" 
+                + "    -" + OPT_FLAVOR
                 + "    <xalan|lotusxsl|xt|etc... - which kind of Processor to test>\n"
                 + "    -" + OPT_DIAGNOSTICS
-                + "  <root filename for diagnostics output>\n" + "    -"
-                + OPT_NOREUSE
-                + "   (will force recreate processor each time)\n" + "    -"
-                + OPT_PRECOMPILE
+                + "  <root filename for diagnostics output>\n" 
+                + "    -" + OPT_NOREUSE
+                + "   (will force recreate processor each time)\n" 
+                + "    -" + OPT_PRECOMPILE
                 + " (will use precompiled stylesheet, if applicable)\n"
                 + "    -" + OPT_NOERRTEST
                 + "  (will skip running 'err' tests, if applicable)\n"
@@ -229,6 +233,15 @@ public class XSLProcessorTestBase extends FileBasedTest
 
     /** NEEDSDOC Field excludes          */
     protected String excludes = null;
+
+    /**
+     * Parameter: Are there any embedded stylesheets in XML files?
+     * <p>Default: null (no special tests; otherwise specify semicolon delimited list like 'axes01.xml;bool99.xml').</p>
+     */
+    public static final String OPT_EMBEDDED = "embedded";
+
+    /** NEEDSDOC Field embedded          */
+    protected String embedded = null;
 
     /**
      * Default constructor - initialize testName, Comment.
@@ -390,10 +403,15 @@ public class XSLProcessorTestBase extends FileBasedTest
         if (excludes != null)
             testProps.put(OPT_EXCLUDES, excludes);
 
-        diagnostics = props.getProperty(OPT_EXCLUDES, diagnostics);
+        embedded = props.getProperty(OPT_EMBEDDED, embedded);
+
+        if (embedded != null)
+            testProps.put(OPT_EMBEDDED, embedded);
+
+        diagnostics = props.getProperty(OPT_DIAGNOSTICS, diagnostics);
 
         if (diagnostics != null)
-            testProps.put(OPT_EXCLUDES, diagnostics);
+            testProps.put(OPT_DIAGNOSTICS, diagnostics);
 
         String prec = props.getProperty(OPT_PRECOMPILE);
 
@@ -594,6 +612,23 @@ public class XSLProcessorTestBase extends FileBasedTest
                 excludes = args[i];
 
                 testProps.put(OPT_EXCLUDES, excludes);
+
+                continue;
+            }
+
+            if (args[i].equalsIgnoreCase(optPrefix + OPT_EMBEDDED))
+            {
+                if (++i >= nArgs)
+                {
+                    System.out.println("ERROR: must supply arg for: "
+                                       + optPrefix + OPT_EMBEDDED);
+
+                    return false;
+                }
+
+                embedded = args[i];
+
+                testProps.put(OPT_EMBEDDED, embedded);
 
                 continue;
             }

@@ -534,6 +534,17 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
             return;
         }
 
+        // Process any XML-only tests (where there is no XSL stylesheet file)
+        if ((embedded != null) && (embedded.length() > 1))  // Arbitrary check for non-null, non-blank string
+        {
+            // HACK: this structure is cheap - this should either be 
+            //  integrated into the fileList stuff, or should be read 
+            //  from each .xsl file as part of it's comments (even 
+            //  if the .xsl file shouldn't be used in the test
+            // @todo optimize to only call when dir name is somehow 
+            //  contained in embedded member var
+            processEmbeddedFiles(dirs[0], dirs[1], dirs[2]);
+        }
         // Set a default filter (<name>*.xsl where <name>=<dir>) only if not already set
         if (filter == null)
         {
@@ -709,26 +720,36 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
 
                             // Log a custom element with all the file refs in it
                             // Closely related to viewResults.xsl select='fileref"
-                            // This code should be cleaned up and duplicated for 
-                            //  the UNEXPECTED_EXCEPTION case below too!
                             Hashtable attrs = new Hashtable();
                             attrs.put("idref", xslF.getName());
                             attrs.put("inputName", absXSLName);
                             attrs.put("xmlName", absXMLName);
                             attrs.put("outputName", absOutName);
                             attrs.put("goldName", absGoldName);
-                            reporter.logElement(reporter.INFOMSG, "fileref", attrs, "File references for Conformance Test");
+                            reporter.logElement(Logger.STATUSMSG, "fileref", attrs, "File references for Conformance Test");
                         }
-
                         break;
+
                     case GOT_EXPECTED_EXCEPTION :
                         reporter.checkPass(xslF.getName()
                                            + " got expected exception", xslF.getName());
                         break;
+
                     case UNEXPECTED_EXCEPTION :
                         reporter.checkFail(xslF.getName()
                                            + " got unexpected exception", xslF.getName());
+                        Hashtable attrs = new Hashtable();
+                        attrs.put("idref", xslF.getName());
+                        attrs.put("inputName", absXSLName);
+                        attrs.put("xmlName", absXMLName);
+                        attrs.put("outputName", absOutName);
+                        attrs.put("goldName", absGoldName);
+                        reporter.logElement(Logger.STATUSMSG, "fileref", attrs, "File references for Conformance Test");
                         break;
+
+                    default:
+                        // This should never happen
+                        reporter.logErrorMsg("Unexpected return value from processEmbeddedFile!");
                     }
                 }  // of if (dotIndex > 0)
                 else
@@ -749,7 +770,181 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
         overallFilesProcessed += dirFilesProcessed;
     }
 
-    // HEY - need a quintuple: xml, xsl, out, gold, options
+    /**
+     * Run only the special embedded files here.
+     * HACK: this should be integrated with the fileList 
+     * processing somehow.
+     * @todo documentation
+     */
+    public void processEmbeddedFiles(File testDirectory, File outDirectory, File goldDirectory)
+    {
+        // See if we might have any files to process (optimization)
+        if ((embedded == null) || (embedded.length() < 1))
+        {
+            reporter.logErrorMsg("processEmbeddedFiles() with no embedded files, returning!");
+            return;
+        }
+        
+        // Don't continue if there are no files who's names contain our dir (optimization)
+        if (embedded.indexOf(testDirectory.getName()) < 0)
+        {
+            reporter.logInfoMsg("processEmbeddedFiles() in other directory, returning");
+            return;
+        }
+        // OK, presumably we have an embedded file in the current dir, 
+        //  go process just that .xml file
+        StringTokenizer st = new StringTokenizer(embedded, ";");    // @todo resource ;
+        while (st.hasMoreTokens())
+        {
+            String xmlFilename = st.nextToken();
+            // Check if it's in our dir
+            if (!(xmlFilename.startsWith(testDirectory.getName())))
+            {
+                reporter.logTraceMsg("embedded item " + xmlFilename + " not in dir " + testDirectory.getName());
+                continue;
+            }
+            // Presumably the file is in our directory, so test it
+            reporter.logTraceMsg("Now testing embedded item " + xmlFilename);
+
+            // Construct XML filename, output filename, gold filename
+            int dotIndex = xmlFilename.indexOf('.');
+            if (dotIndex > 0)
+            {
+                // Construct the various inputs to the processor, based on embedded filename
+                String rootFileName = xmlFilename.substring(0, dotIndex);
+                // No need for stylesheet name!
+                String absXMLName = null;
+                try
+                {
+                    absXMLName = testDirectory.getCanonicalPath()
+                                 + File.separatorChar + rootFileName
+                                 + xmlExtension;
+                }
+                catch (IOException ioe2)
+                {
+                    absXMLName = testDirectory.getAbsolutePath()
+                                 + File.separatorChar + rootFileName
+                                 + xmlExtension;
+                }
+                if (outDirectory == null)
+                {
+
+                    // Provide some sort of default TODO is this the best cross-platform default?
+                    outDirectory = new File("\badOutDir");
+                    reporter.logErrorMsg(
+                        "outDir(" + outDirectory
+                        + ") is bad - resetting to \badOutDir");
+                }
+
+                String absOutName = null;
+                try
+                {
+                    absOutName = outDirectory.getCanonicalPath()
+                                 + File.separatorChar + rootFileName
+                                 + outExtension;
+                }
+                catch (IOException ioe3)
+                {
+                    absOutName = outDirectory.getAbsolutePath()
+                                 + File.separatorChar + rootFileName
+                                 + outExtension;
+                }
+
+                if (goldDirectory == null)
+                {
+
+                    // Provide some sort of default
+                    goldDirectory = new File("\badGoldDir");
+                    reporter.logErrorMsg(
+                        "goldDir(" + goldDirectory
+                        + ") is bad - resetting to \badGoldDir");
+                }
+                String absGoldName = null;
+                try
+                {
+                    absGoldName = goldDirectory.getCanonicalPath()
+                                  + File.separatorChar + rootFileName
+                                  + outExtension;
+                }
+                catch (IOException ioe3)
+                {
+                    absGoldName = goldDirectory.getAbsolutePath()
+                                  + File.separatorChar + rootFileName
+                                  + outExtension;
+                }
+
+                // Sanity check - see if file exists
+                File xmlF = new File(absXMLName);
+
+                if (xmlF.exists())
+                {
+                    reporter.logTraceMsg("About to test embedded:"
+                                         + xmlF.getName() + " into:"
+                                         + absOutName);
+                }
+                else
+                {
+                    reporter.logWarningMsg("Files may not exist:"
+                                           + absXMLName);
+                }
+
+                // Actually run the xml file with embedded stylesheet through the processor
+                switch (processEmbeddedFile(absXMLName, absOutName))
+                {
+                case PROCESS_OK :
+                    if (!reporter.check(fileChecker, 
+                                        new File(absOutName), 
+                                        new File(absGoldName), 
+                                        xmlF.getName() + " output comparison",
+                                        xmlF.getName()))
+                    {
+                        // If we're using an appropriate fileChecker, 
+                        //  get extra info on a fail, as well as file references to the test file
+
+                        // Report extra info about why it failed
+                        String tmp = fileChecker.getExtendedInfo();
+                        if (tmp != null)
+                            reporter.logArbitrary(reporter.INFOMSG, tmp);
+                        else
+                            reporter.logTraceMsg("getFileChecker().getExtendedInfo() not available");
+
+                        // Log a custom element with all the file refs in it
+                        // Closely related to viewResults.xsl select='fileref"
+                        Hashtable attrs = new Hashtable();
+                        attrs.put("idref", xmlF.getName());
+                        attrs.put("xmlName", absXMLName);
+                        attrs.put("outputName", absOutName);
+                        attrs.put("goldName", absGoldName);
+                        reporter.logElement(Logger.STATUSMSG, "fileref", attrs, "File references for Conformance Test");
+                    }
+
+                    break;
+                // Currently can't have EXPECTED_EXCEPTION from embedded files
+                case UNEXPECTED_EXCEPTION :
+                    reporter.checkFail(xmlF.getName()
+                                       + " got unexpected exception", xmlF.getName());
+                    Hashtable attrs = new Hashtable();
+                    attrs.put("idref", xmlF.getName());
+                    attrs.put("xmlName", absXMLName);
+                    attrs.put("outputName", absOutName);
+                    attrs.put("goldName", absGoldName);
+                    reporter.logElement(Logger.STATUSMSG, "fileref", attrs, "File references for Conformance Test");
+                    break;
+                
+                default:
+                    // This should never happen
+                    reporter.logErrorMsg("Unexpected return value from processEmbeddedFile!");
+                }
+            }  // of if (dotIndex > 0)
+            else
+            {
+                reporter.logWarningMsg("Problem with embedded filename: "
+                                       + xmlFilename);
+            }
+
+        } // of while
+    }
+
 
     /**
      * Run a list of specific files through the processor; virtually stateless.
@@ -850,28 +1045,38 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
 
                     // Log a custom element with all the file refs in it
                     // Closely related to viewResults.xsl select='fileref"
-                    // This code should be cleaned up and duplicated for 
-                    //  the UNEXPECTED_EXCEPTION case below too!
                     Hashtable attrs = new Hashtable();
                     attrs.put("idref", xslF.getName());
                     attrs.put("inputName", fileSet.inputName);
                     attrs.put("xmlName", fileSet.xmlName);
                     attrs.put("outputName", fileSet.outputName);
                     attrs.put("goldName", fileSet.goldName);
-                    reporter.logElement(reporter.INFOMSG, "fileref", attrs, "File references for Conformance Test");
+                    reporter.logElement(Logger.STATUSMSG, "fileref", attrs, "File references for Conformance Test");
                 }
-
-
-
                 break;
+
             case GOT_EXPECTED_EXCEPTION :
                 reporter.checkPass(xslF.getName()
                                    + " got expected exception", xslF.getName());
                 break;
+
             case UNEXPECTED_EXCEPTION :
                 reporter.checkFail(xslF.getName()
                                    + " got unexpected exception", xslF.getName());
+                // Log a custom element with all the file refs in it
+                // Closely related to viewResults.xsl select='fileref"
+                Hashtable attrs = new Hashtable();
+                attrs.put("idref", xslF.getName());
+                attrs.put("inputName", fileSet.inputName);
+                attrs.put("xmlName", fileSet.xmlName);
+                attrs.put("outputName", fileSet.outputName);
+                attrs.put("goldName", fileSet.goldName);
+                reporter.logElement(Logger.STATUSMSG, "fileref", attrs, "File references for Conformance Test");
                 break;
+
+            default:
+                // This should never happen
+                reporter.logErrorMsg("Unexpected return value from processSingleFile!");
             }
         }  // of while...
 
@@ -993,6 +1198,85 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
             createNewProcessor();
 
             return retVal;
+        }
+
+        return PROCESS_OK;
+    }
+
+    /**
+     * Run an xml file with embedded stylesheet through the processor.
+     * @param XMLName path\filename of XML data file with embedded xsl
+     * @param OutName path\filename of desired output file
+     * @return int status - pass, fail, or unexpected exception
+     */
+    public int processEmbeddedFile(String XMLName, String OutName)
+    {
+        long fileTime = ProcessorWrapper.ERROR;
+        try
+        {
+            // Reset the indent level each time, to ensure the process uses it (it may get reset() below)
+            if (indentLevel > NO_INDENT)
+            {
+                reporter.logTraceMsg("processEmbeddedFile() set indent "
+                                     + indentLevel);
+                processorW.setIndent(indentLevel);
+            }
+
+            // Force filerefs to be URI's if needed
+            if (useURI)
+            {
+                // Use this static convenience method; returns a URL; convert to String via toExternalForm()
+                XMLName = getURLFromString(XMLName, null).toExternalForm();
+            }
+            fileTime = processorW.processEmbeddedToFile(XMLName, OutName);
+
+            if (fileTime != ProcessorWrapper.ERROR)
+            {
+                dirTime += fileTime;
+                dirFilesProcessed++;
+                reporter.logTraceMsg("processEmbeddedFile(" + XMLName
+                                     + ") no exceptions; time " + fileTime);
+            }
+            else
+            {
+                // Do not increment performance counters if there's an error
+                reporter.logWarningMsg("processEmbeddedFile(" + XMLName
+                                       + ") returned ERROR code!");
+            }
+            processorW.reset();
+        }
+
+        // Catch SAXExceptions and check if they're expected; restart to be safe
+        catch (SAXException sax)
+        {
+            reporter.logStatusMsg("processEmbeddedFile(" + XMLName
+                                  + ") threw: " + sax.toString());
+            reporter.logThrowable(Logger.STATUSMSG, sax, 
+                                  "processEmbeddedFile(" + XMLName + ") threw");
+            createNewProcessor();  // Should be configurable!
+            return UNEXPECTED_EXCEPTION;
+        }
+
+        // Catch general Exceptions, check if they're expected, and restart
+        catch (Exception e)
+        {
+            reporter.logStatusMsg("processEmbeddedFile(" + XMLName
+                                  + ") threw: " + e.toString());
+            reporter.logThrowable(Logger.STATUSMSG, e, 
+                                  "processEmbeddedFile(" + XMLName + ") threw");
+            createNewProcessor();  // Should be configurable!
+            return UNEXPECTED_EXCEPTION;
+        }
+
+        // Catch any Throwable, check if they're expected, and restart
+        catch (Throwable t)
+        {
+            reporter.logStatusMsg("processEmbeddedFile(" + XMLName
+                                  + ") threw: " + t.toString());
+            reporter.logThrowable(Logger.STATUSMSG, t, 
+                                  "processEmbeddedFile(" + XMLName + ") threw");
+            createNewProcessor();  // Should be configurable!
+            return UNEXPECTED_EXCEPTION;
         }
 
         return PROCESS_OK;
