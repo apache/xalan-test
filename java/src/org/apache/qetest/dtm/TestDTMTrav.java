@@ -960,7 +960,7 @@ void writeClose(FileOutputStream fos, StringBuffer buf)
 	// Write results and close output file.
 	try
 	{
-		fos.write(buf.toString().getBytes());
+               fos.write(buf.toString().getBytes("UTF-8"));
 		fos.close();
 	}
 

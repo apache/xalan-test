@@ -77,7 +77,8 @@ import javax.xml.transform.stream.*;
 // java classes
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -551,8 +552,8 @@ public class ParameterTest extends FileBasedTest
 
         try
         {
-            FileReader fr = new FileReader(f);
-            BufferedReader br = new BufferedReader(fr);
+            InputStreamReader is = new InputStreamReader(new FileInputStream(f), "UTF-8");
+            BufferedReader br = new BufferedReader(is);
 
             for (;;)
             {

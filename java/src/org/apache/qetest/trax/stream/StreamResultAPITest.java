@@ -85,6 +85,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.io.StringWriter;
@@ -287,7 +288,7 @@ public class StreamResultAPITest extends FileBasedTest
                 reporter.logArbitrary(reporter.TRACEMSG, "baos was: " + baos.toString());
                 reporter.logArbitrary(reporter.TRACEMSG, "ps(baos2) was: " + baos2.toString());
             }
-            writeFileAndValidate(baos.toString(), outputFileInfo.goldName);
+            writeFileAndValidate(baos.toString("UTF-8"), outputFileInfo.goldName);
         }
         catch (Throwable t)
         {
@@ -387,7 +388,8 @@ public class StreamResultAPITest extends FileBasedTest
     {
         try
         {
-            FileWriter fw = new FileWriter(outNames.nextName());
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            OutputStreamWriter fw = new OutputStreamWriter(fos, "UTF-8");
             fw.write(data);
             fw.close();
             // Explicitly ask that Validation be turned off, since 

@@ -58,7 +58,8 @@
 package org.apache.qetest;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.io.File;
 import java.util.Properties;
 
@@ -135,9 +136,11 @@ public class LinebyLineCheckService implements CheckService
 
         try
         {
+            FileInputStream in_act = new FileInputStream(act);
+            FileInputStream in_exp = new FileInputStream(exp);
 			// Create necessary I/O objects
-            FileReader fra = new FileReader(act);
-			FileReader fre = new FileReader(exp);
+            InputStreamReader fra = new InputStreamReader(in_act, "UTF-8");
+                       InputStreamReader fre = new InputStreamReader(in_exp, "UTF-8");
 
             BufferedReader bra = new BufferedReader(fra);
 			BufferedReader bre = new BufferedReader(fre);
