@@ -134,44 +134,54 @@ static final String[] TYPENAME=
       DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       DTM dtm=manager.getDTM(source, true, null, false, true);
 
-	  // Get the root node and then the first child.
-	  int dtmRoot = dtm.getDocument();
-	  int child = dtm.getFirstChild(dtmRoot);
-	  int sndChild = dtm.getFirstChild(child);
+	  // Get the Document node and then the first child.
+	  int dtmRoot = dtm.getDocument();			// #document
+	  int child = dtm.getFirstChild(dtmRoot);	// <Document>
+	  int sndChild = dtm.getFirstChild(child);	// <A>
       
+
 	  // Get a Iterator for CHILD:: axis and set startNode <Document>
       DTMAxisIterator iter = dtm.getAxisIterator(Axis.CHILD);
       iter.setStartNode(child);
 
 	  System.out.println("#### First Iterator for <Document>\n");			   
-	  printNode(dtm, iter, child, " ");
 	  // Iterate the axis and print out node info.
       for (int nextNode = iter.next(); DTM.NULL != nextNode;
               nextNode = iter.next())
 		  printNode(dtm, iter, nextNode, " ");
 
+
 	  // Get a second Iterator of Descendants, and get the last node.	  
 	  DTMAxisIterator iter2 = dtm.getAxisIterator(Axis.DESCENDANT);
 	  iter2.setStartNode(sndChild);
 
-
+	  System.out.println("VARIOUS NODES USED:\n\ndtmRoot=" +dtm.getNodeName(dtmRoot)+"  "+
+						 "child="+dtm.getNodeName(child)+"  "+
+						 "2ndChild="+dtm.getNodeName(sndChild)+"\n\n");
 	  System.out.println("#### Second Iterator\n");
-	  printNode(dtm, iter, sndChild, " ");
 	  // Iterate the axis and print out node info.
+	  int lastNode= 0;
       for (int nextNode = iter2.next(); DTM.NULL != nextNode;
               nextNode = iter2.next())
-		  printNode(dtm, iter2, nextNode, " ");
-	  int lastNode = iter2.getLast();
-
+		  {
+		  	printNode(dtm, iter2, nextNode, " ");
+			lastNode = nextNode;
+			System.out.println("****** lastNode="+dtm.getNodeName(lastNode));
+		  }
+	  //lastNode = iter2.getLast();	 // Uncomment for Bugzilla 7885.
 
 	  // Get a third itertor of Ancestors starting from the last descendant
-	  // of pervious iterator.
+	  // of previous iterator, i.e. lastNode.
 	  DTMAxisIterator revIter = dtm.getAxisIterator(Axis.ANCESTOR);
 	  revIter.setStartNode(lastNode);
 
+	  System.out.println("VARIOUS NODES USED:\n\ndtmRoot=" +dtm.getNodeName(dtmRoot)+"  "+
+						 "child="+dtm.getNodeName(child)+"  "+
+						 "2ndChild="+dtm.getNodeName(sndChild)+"  "+
+						 "lastNode="+dtm.getNodeName(lastNode)+"\n\n");  
 	  System.out.println("#### Third Iterator\n");
-	  printNode(dtm, iter, lastNode, " ");
 	  // Iterate the axis and print out node info.
+	  // The output of this loop is what Bugzilla 7886 is all about.
       for (int nextNode = revIter.next(); DTM.NULL != nextNode;
               nextNode = revIter.next())
 		  printNode(dtm, revIter, nextNode, " ");
@@ -214,7 +224,7 @@ static final String[] TYPENAME=
 			   "\tIterator Info: "+
 			   " StartNode= "+"\""+iter.getStartNode()+"\""+
 			   " Postion="+"\""+iter.getPosition()+"\""+
-			   " LastNode="+"\""+iter.getLast()+"\""+
+			   //" LastNode="+"\""+iter.getLast()+"\""+
 			   " Reverse Axis? = "+"\""+iter.isReverse()+"\""+
 
 		       "\n"+
