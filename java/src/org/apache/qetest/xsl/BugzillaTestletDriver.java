@@ -399,8 +399,12 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
         final String USER_DIR = "user.dir";
         try
         {
-            String cacheDir = System.getProperty(USER_DIR);
+            // Note: we must actually keep a cloned copy of the 
+            //  whole system properties block to replace later 
+            //  in case a Bugzilla testlet changes any other 
+            //  properties during it's execution
             Properties p = System.getProperties();
+            Properties cacheProps = (Properties)p.clone();
             // This should, I hope, properly get the correct path 
             //  for what the inputDir would be, whether it's a 
             //  relative or absolute path from where we are now
@@ -419,9 +423,8 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
             // Now just execute the Testlet from here
             t.execute(d);
 
-            // Replace the user.dir to be polite!
-            p.put(USER_DIR, cacheDir);
-            System.setProperties(p);
+            // Replace the system properties to be polite!
+            System.setProperties(cacheProps);
         } 
         catch (SecurityException se)
         {
