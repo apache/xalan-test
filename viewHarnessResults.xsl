@@ -4,13 +4,20 @@
     xmlns:lxslt="http://xml.apache.org/xslt"
     xmlns:redirect="org.apache.xalan.lib.Redirect"
     extension-element-prefixes="redirect">
-  <xsl:output method="html"/>
 
 <!-- FileName: viewHarnessResults.xsl -->
 <!-- Author: shane_curcuru@lotus.com -->
 <!-- Purpose: Viewer for multiple XSLTestHarness results put into simple HTML pages -->
 <!-- Usage: ...Process -in HarnessResults.xml -xsl MultiViewResults.xsl ... -->
 <!-- Where: you've run XSLTestHarness over a number of files -->
+
+<!-- ======================================================= -->
+<!-- Include the main results viewer for individual result files -->
+<!-- Note: depends on being in the same directory -->
+<xsl:import href="viewResults.xsl"/>
+
+<!-- HTML output specifically; move after import due to Xalan-J 1.x restriction -->
+<xsl:output method="html"/>
 
 <!-- Explicitly declare the redirect extension -->
 <lxslt:component prefix="redirect" elements="write open close" functions="">
@@ -20,11 +27,6 @@
 <!-- ======================================================= -->
 <!-- Output mini-summary filename, used in redirect calls in viewResults -->
 <xsl:param name="summaryfile">HarnessSummary.xml</xsl:param>
-
-<!-- ======================================================= -->
-<!-- Include the main results viewer for individual result files -->
-<!-- Note: depends on being in the same directory -->
-<xsl:import href="viewResults.xsl"/>
 
 <!-- ================================== -->
 <!-- Main template: output an HTML page -->
