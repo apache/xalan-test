@@ -126,6 +126,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
     /** TransformerAPIOutputFormat.xsl used for set/getOutputFormat related tests  */
     protected XSLTestfileInfo outputFormatTest = new XSLTestfileInfo();
 
+    /** Just goldName for outputFormatTest with UTF-8 */
+    protected String outputFormatTestUTF8 = null;
+
     /** Known outputFormat values from TransformerAPIOutputFormat.xsl  */
     public static final String METHOD_VALUE = "xml";
     public static final String VERSION_VALUE ="123.45";
@@ -196,9 +199,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
         String goldBasePath = goldDir + File.separator + TRAX_SUBDIR
                               + File.separator;
 
-        simpleTest.xmlName = testBasePath + "TransformerAPIParam.xml";
-        simpleTest.inputName = testBasePath + "TransformerAPIParam.xsl";
-        simpleTest.goldName = goldBasePath + "TransformerAPIParam.out";
+        simpleTest.xmlName = testBasePath + "identity.xml";
+        simpleTest.inputName = testBasePath + "identity.xsl";
+        simpleTest.goldName = goldBasePath + "identity.out";
 
         paramTest.xmlName = testBasePath + "TransformerAPIParam.xml";
         paramTest.inputName = testBasePath + "TransformerAPIParam.xsl";
@@ -206,7 +209,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
         
         outputFormatTest.xmlName = testBasePath + "TransformerAPIOutputFormat.xml";
         outputFormatTest.inputName = testBasePath + "TransformerAPIOutputFormat.xsl";
-        outputFormatTest.goldName = goldBasePath + "TransformerAPIOutputFormat.out";
+        outputFormatTest.goldName = goldBasePath + "TransformerAPIOutputFormatUTF16.out";
+        outputFormatTestUTF8 = goldBasePath + "TransformerAPIOutputFormatUTF8.out";
 
         // Cache trax system property
         saveXSLTProp = System.getProperty(TRAX_PROCESSOR_XSLT);
@@ -312,7 +316,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             tmp = identityTransformer.getParameter("foo");
             if (tmp == null)
             {
-                reporter.checkAmbiguous("@todo set/getParameter on identity transform returns null, what should it do?");
+                reporter.checkFail("identityTransformer set/getParameter is:" + tmp);
             }
             else
             {
@@ -445,10 +449,11 @@ public class TransformerAPITest extends XSLProcessorTestBase
         try
         {
             transformer = templates.newTransformer();
-            transformer.setParameter(PARAM1S, "test-param-1s");
-            transformer.setParameter(PARAM1N, "test-param-1n");
+            transformer.setParameter(PARAM1S, "'test-param-1s'"); // note single quotes
+            transformer.setParameter(PARAM1N, new Integer(1234));
             // Verify basic params actually affect transformation
-            if (doTransform(templates.newTransformer(), 
+            //   Use the transformer we set the params onto above!
+            if (doTransform(transformer,
                             new StreamSource(paramTest.xmlName), 
                             new StreamResult(new FileOutputStream(outNames.nextName()))))
             {
@@ -458,12 +463,12 @@ public class TransformerAPITest extends XSLProcessorTestBase
                                   new File(paramTest.goldName), 
                                   "transform with param1s,param1n into: " + outNames.currentName());
             }
-            String gotParam = (String)transformer.getParameter(PARAM1S);
-            reporter.check(gotParam, "test-param-1s", 
-                           PARAM1S + " is still set after transform to ?" + gotParam + "?");
-            gotParam = (String)transformer.getParameter(PARAM1N);
-            reporter.check(gotParam, "test-param-1n", 
-                           PARAM1N + " is still set after transform to ?" + gotParam + "?");
+            String gotStr = (String)transformer.getParameter(PARAM1S);
+            reporter.check(gotStr, "'test-param-1s'", 
+                           PARAM1S + " is still set after transform to ?" + gotStr + "?");
+            Integer gotInt = (Integer)transformer.getParameter(PARAM1N);
+            reporter.checkInt(gotInt.intValue(), 1234, 
+                           PARAM1N + " is still set after transform to ?" + gotInt + "?");
         } 
         catch (Exception e)
         {
@@ -510,7 +515,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
         try
         {
             // See what the default 'identity' transform has by default
-            Properties identityProps = identityTransformer.getOutputProperties();
+            Properties identityProps = identityTransformer.getOutputProperties(); // SPR SCUU4RXQYH throws npe
             reporter.logHashtable(reporter.STATUSMSG, identityProps, 
                                   "default identityTransformer.getOutputProperties()");
 
@@ -522,7 +527,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with identity output properties");
+            reporter.checkFail("Problem with identity output properties", "SCUU4RXQYH");
             reporter.logThrowable(reporter.ERRORMSG, e,
                                   "Problem with identity output properties");
         }
@@ -536,46 +541,55 @@ public class TransformerAPITest extends XSLProcessorTestBase
 
             // See what we have by default, from our testfile
             outputTransformer = outputTemplates.newTransformer();
-            Properties outProps = outputTransformer.getOutputProperties();
-            reporter.logHashtable(reporter.STATUSMSG, outProps, 
-                                  "default outputTransformer.getOutputProperties()");
-
-            // Validate the two have the same properties (which they 
-            //  should, since we just got the templates now)
-            for (Enumeration enum = tmpltProps.propertyNames();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            try
             {
-                String key = (String)enum.nextElement();
-                String value = tmpltProps.getProperty(key);
-                reporter.check(value, outProps.getProperty(key), 
-                               "Template, transformer identical outProp: " + key);
-            }
+                // Inner try-catch
+                Properties outProps = outputTransformer.getOutputProperties(); // SPR SCUU4RXQYH throws npe
+                reporter.logHashtable(reporter.STATUSMSG, outProps, 
+                                      "default outputTransformer.getOutputProperties()");
+
+                // Validate the two have the same properties (which they 
+                //  should, since we just got the templates now)
+                for (Enumeration enum = tmpltProps.propertyNames();
+                        enum.hasMoreElements(); /* no increment portion */ )
+                {
+                    String key = (String)enum.nextElement();
+                    String value = tmpltProps.getProperty(key);
+                    reporter.check(value, outProps.getProperty(key), 
+                                   "Template, transformer identical outProp: " + key);
+                }
             
-            // Validate known output properties from our testfile
-            // @todo validate these are all correct, and can be detected here
-            String knownOutputProps[][] =
-            {
-                { OutputKeys.METHOD, METHOD_VALUE },
-                { OutputKeys.VERSION, VERSION_VALUE },
-                { OutputKeys.ENCODING, ENCODING_VALUE },
-                { OutputKeys.STANDALONE, STANDALONE_VALUE },
-                { OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC_VALUE }, // SPR SCUU4R3JRR - not returned
-                { OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM_VALUE }, // SPR SCUU4R3JRR - not returned
-                { OutputKeys.CDATA_SECTION_ELEMENTS, CDATA_SECTION_ELEMENTS_VALUE }, // SPR SCUU4R3JRR - not returned
-                { OutputKeys.INDENT, INDENT_VALUE },
-                { OutputKeys.MEDIA_TYPE, MEDIA_TYPE_VALUE },
-                { OutputKeys.OMIT_XML_DECLARATION, OMIT_XML_DECLARATION_VALUE }
-            };
+                // Validate known output properties from our testfile
+                String knownOutputProps[][] =
+                {
+                    { OutputKeys.METHOD, METHOD_VALUE },
+                    { OutputKeys.VERSION, VERSION_VALUE },
+                    { OutputKeys.ENCODING, ENCODING_VALUE },
+                    { OutputKeys.STANDALONE, STANDALONE_VALUE },
+                    { OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC_VALUE }, // SPR SCUU4R3JRR - not returned
+                    { OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM_VALUE }, // SPR SCUU4R3JRR - not returned
+                    { OutputKeys.CDATA_SECTION_ELEMENTS, CDATA_SECTION_ELEMENTS_VALUE }, // SPR SCUU4R3JRR - not returned
+                    { OutputKeys.INDENT, INDENT_VALUE },
+                    { OutputKeys.MEDIA_TYPE, MEDIA_TYPE_VALUE },
+                    { OutputKeys.OMIT_XML_DECLARATION, OMIT_XML_DECLARATION_VALUE }
+                };
 
-            for (int i = 0; i < knownOutputProps.length; i++)
+                for (int i = 0; i < knownOutputProps.length; i++)
+                {
+                    String item = outProps.getProperty(knownOutputProps[i][0]);
+                    reporter.check(item, knownOutputProps[i][1], 
+                                   "Known prop(1) " + knownOutputProps[i][0] 
+                                   + " is: ?" + item + "?");
+                }
+                reporter.logStatusMsg("@todo validate getting individual properties");
+            }
+            catch (Exception e)
             {
-                String item = outProps.getProperty(knownOutputProps[i][0]);
-                reporter.check(item, knownOutputProps[i][1], 
-                               "Known prop(1) " + knownOutputProps[i][0] 
-                               + " is: ?" + item + "?");
+                reporter.checkFail("Problem with set/get output properties(1)", "SCUU4RXQYH");
+                reporter.logThrowable(reporter.ERRORMSG, e, "Problem with set/get output properties(1)");
             }
 
-            // Try doing a transform, to get some output
+            // Try doing a transform (will be UTF-16), to get some output
             if (doTransform(outputTransformer, 
                             new StreamSource(outputFormatTest.xmlName), 
                             new StreamResult(new FileOutputStream(outNames.nextName()))))
@@ -584,13 +598,36 @@ public class TransformerAPITest extends XSLProcessorTestBase
                 fileChecker.check(reporter, 
                                   new File(outNames.currentName()), 
                                   new File(outputFormatTest.goldName), 
-                                  "transform(1) outputParams into: " + outNames.currentName());
+                                  "transform(UTF-16,1) outputParams into: " + outNames.currentName());
             }
+
+            // Change a single property (makes for simpler encoding output!)
+            outputTransformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            String encoding = outputTransformer.getOutputProperty(OutputKeys.ENCODING);
+            reporter.check(encoding, "UTF-8", "outputTransformer set/getOutputProperty value to ?" + encoding + "?");
+            // Try doing another transform (will be UTF-8), to get some output
+            // Verify that other output properties stay the same
+            if (doTransform(outputTransformer, 
+                            new StreamSource(outputFormatTest.xmlName), 
+                            new StreamResult(new FileOutputStream(outNames.nextName()))))
+            {
+                // @todo should update goldFile!
+                fileChecker.check(reporter, 
+                                  new File(outNames.currentName()), 
+                                  new File(outputFormatTestUTF8), 
+                                  "transform(UTF-8) outputParams into: " + outNames.currentName());
+            }
+            // Try getting the whole block and logging it out, just to see what's there
+            Properties moreOutProps = outputTransformer.getOutputProperties();
+            reporter.logHashtable(reporter.STATUSMSG, moreOutProps, 
+                                  "After several transforms getOutputProperties()");
 
             try
             {   // Inner try-catch
                 // Simple set/getOutputProperty
-                String tmp = outputTransformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION); // SPR SCUU4R3JZ7 - throws npe
+                outputTransformer = outputTemplates.newTransformer();
+                String tmp = outputTransformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION); // SPR SCUU4RXR6E
+                    // SPR SCUU4R3JZ7 - throws npe
                 reporter.logTraceMsg(OutputKeys.OMIT_XML_DECLARATION + " is currently: " + tmp);
                 outputTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
                 tmp = outputTransformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION);
@@ -598,15 +635,16 @@ public class TransformerAPITest extends XSLProcessorTestBase
             }
             catch (Exception e)
             {
-                reporter.logThrowable(reporter.ERRORMSG, e,
-                                      "Problem with set/get output properties(1)");
+                reporter.checkFail("Problem with set/get output properties(2)", "SCUU4RXR6E");
+                reporter.logThrowable(reporter.ERRORMSG, e, "Problem with set/get output properties(2)");
             }
             try
             {   // Inner try-catch
                 // Try getting the whole properties block, so we can see what it thinks it has
+                outputTransformer = outputTemplates.newTransformer();
                 Properties newOutProps = outputTransformer.getOutputProperties();
                 reporter.logHashtable(reporter.STATUSMSG, newOutProps, 
-                                      "after transform getOutputProperties()");
+                                      "Another getOutputProperties()");
 
                 // Simple set/getOutputProperty
                 String tmp = outputTransformer.getOutputProperty(OutputKeys.ENCODING);
@@ -618,7 +656,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             catch (Exception e)
             {
                 reporter.logThrowable(reporter.ERRORMSG, e,
-                                      "Problem with set/get output properties(2)");
+                                      "Problem with set/get output property(3)");
             }
 
             // OutputKeys.METHOD = xml|html|text|qname-but-not-ncname
@@ -633,11 +671,11 @@ public class TransformerAPITest extends XSLProcessorTestBase
             // OutputKeys.MEDIA_TYPE = qnames
             // OutputKeys.CDATA_SECTION_ELEMENTS = qnames
 
-            reporter.checkAmbiguous("@todo Cover setOutputProperties(Properties oformat)");
+            reporter.logStatusMsg("@todo Cover setOutputProperties(Properties oformat)");
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with set/get output properties");
+            reporter.checkFail("Problem with set/get output properties(0)");
             reporter.logThrowable(reporter.ERRORMSG, e,
                                   "Problem with set/get output properties(0)");
         }
@@ -714,7 +752,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             reporter.checkErr("Coverage of get/setErrorListener threw: " + t.toString());
             reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setErrorListener threw:");
         }
-        reporter.checkAmbiguous("@todo feature testing for ErrorListener");
+        reporter.logStatusMsg("@todo feature testing for ErrorListener");
 
         try
         {
@@ -738,7 +776,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             }
             reporter.logTraceMsg("myURIres.getCounterString = " + myURIResolver.getCounterString());
 
-            reporter.checkAmbiguous("@todo basic URIResolver functionality test (i.e. does it get used in a transform)");
+            reporter.logStatusMsg("@todo basic URIResolver functionality test (i.e. does it get used in a transform)");
         }
         catch (Exception e)
         {
