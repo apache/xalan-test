@@ -33,11 +33,38 @@
             <xsl:attribute name="href">#<xsl:value-of select="$linkname"/></xsl:attribute>
             <xsl:value-of select="$linkname"/>
           </xsl:element>
+          <xsl:call-template name="miniStatusTable" />
           <br/>
       </xsl:for-each>
       <xsl:apply-templates/>
     </body>
   </html>
+</xsl:template>
+
+<!-- For each bad file, pre-read summary -->
+<xsl:template name="miniStatusTable">
+  <!-- Note this entire template is quite inefficient, since it 
+        forces an extra loading of the status doc that will be 
+        loaded again later on, but it works for now.
+  -->
+  <!-- Read in the teststatus file we found and get it's info -->
+  <xsl:variable name="statusfilename" select="concat(../@href, '/', @href)"/>
+  <xsl:variable name="status" select="document($statusfilename)/teststatus"/>
+  <xsl:text> P: </xsl:text>
+  <xsl:value-of select="$status/@Pass-cases"/><xsl:text>/</xsl:text>
+  <xsl:value-of select="$status/@Pass-checks"/><xsl:text>, </xsl:text>
+  <xsl:text>F: </xsl:text>
+  <xsl:value-of select="$status/@Fail-cases"/><xsl:text>/</xsl:text>
+  <xsl:value-of select="$status/@Fail-checks"/><xsl:text>, </xsl:text>
+  <xsl:text>E: </xsl:text>
+  <xsl:value-of select="$status/@Errr-cases"/><xsl:text>/</xsl:text>
+  <xsl:value-of select="$status/@Errr-checks"/><xsl:text>, </xsl:text>
+  <xsl:text>A: </xsl:text>
+  <xsl:value-of select="$status/@Ambg-cases"/><xsl:text>/</xsl:text>
+  <xsl:value-of select="$status/@Ambg-checks"/><xsl:text>, </xsl:text>
+  <xsl:text>I: </xsl:text>
+  <xsl:value-of select="$status/@Incp-cases"/>
+
 </xsl:template>
 
 <!-- For each directory full of results found, print out a summary -->
@@ -54,7 +81,11 @@
   </xsl:apply-templates>
 </xsl:template>
 
-<!-- Just list names of good result files (passing), nothing else -->
+<!-- Just list names of good result files (passing/ambg), nothing else -->
+<xsl:template match="teststatus[@status = $goodResult][starts-with(@href, 'Ambg')]">
+  <b><xsl:value-of select="@href"/></b><xsl:text> </xsl:text>
+</xsl:template>
+
 <xsl:template match="teststatus[@status = $goodResult]">
   <xsl:value-of select="@href"/><xsl:text> </xsl:text>
 </xsl:template>
