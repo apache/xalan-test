@@ -128,8 +128,9 @@ public class PrefixResolverAPITest extends XSLProcessorTestBase
         "xmlns:" + XMLDOC_PREFIXES[2][0] + "=\"" + XMLDOC_PREFIXES[2][1] + "\" " + "\n" + 
         ">" + "\n" + 
         "<pre:element elementAttr=\"elementAttrVal\" elementAttrNS=\"pre:elementAttrValNS\" xml:lang=\"en\">" + "\n" + 
-        "    <pre:subElement subElementAttr=\"subElementAttrVal\" xmlns:" + XMLDOC_PREFIXES[3][0] + "=\"" + XMLDOC_PREFIXES[3][1] + "\" subElementAttrNS=\"other:subElementAttrValNS\"/>" + "\n" + 
-        "    <pre:subSubElement />" + "\n" + 
+        "    <pre:subElement subElementAttr=\"subElementAttrVal\" xmlns:" + XMLDOC_PREFIXES[3][0] + "=\"" + XMLDOC_PREFIXES[3][1] + "\" subElementAttrNS=\"other:subElementAttrValNS\">" + "\n" + 
+        "        <pre:subSubElement />" + "\n" + 
+        "    </pre:subElement>" + "\n" + 
         "</pre:element>" + "\n" + 
         "</pre:document>" ;
 
