@@ -120,16 +120,16 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     protected OutputNameManager outNames;
 
     /** Identity transform - simple test.  */
-    protected XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+    protected TraxDatalet testFileInfo = new TraxDatalet();
 
     /**  RootTemplate: simple stylesheet with xsl:template select="/".  */
-    protected XSLTestfileInfo testFileInfo2 = new XSLTestfileInfo();
+    protected TraxDatalet testFileInfo2 = new TraxDatalet();
 
     /**  Another simple test for manual debugging.  */
-    protected XSLTestfileInfo testFileInfo3 = new XSLTestfileInfo();
+    protected TraxDatalet testFileInfo3 = new TraxDatalet();
 
     /**  Another simple test for manual debugging.  */
-    protected XSLTestfileInfo testFileInfo4 = new XSLTestfileInfo();
+    protected TraxDatalet testFileInfo4 = new TraxDatalet();
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String X2J_SUBDIR = "xalanj2";
@@ -164,26 +164,18 @@ public class TransformStateAPITest extends XSLProcessorTestBase
         outNames = new OutputNameManager(outputDir + File.separator + X2J_SUBDIR
                                          + File.separator + testName, ".out");
 
-        String testBasePath = inputDir 
-                              + File.separator 
-                              + X2J_SUBDIR
-                              + File.separator;
-        String goldBasePath = goldDir 
-                              + File.separator 
-                              + X2J_SUBDIR
-                              + File.separator;
+        testFileInfo.setDescription("Identity transform");
+        testFileInfo.setNames(inputDir + File.separator + X2J_SUBDIR, "identity");
+        testFileInfo.goldName = goldDir + File.separator + X2J_SUBDIR + File.separator + "identity.out";
 
-        testFileInfo.inputName = testBasePath + "identity.xsl";
-        testFileInfo.xmlName = testBasePath + "identity.xml";
+        testFileInfo2.setDescription("TransformStateAPITest");
+        testFileInfo2.setNames(inputDir + File.separator + X2J_SUBDIR, "TransformStateAPITest");
 
-        testFileInfo3.inputName = testBasePath + "RootTemplate.xsl";
-        testFileInfo3.xmlName = testBasePath + "RootTemplate.xml";
+        testFileInfo3.setDescription("RootTemplate");
+        testFileInfo3.setNames(inputDir + File.separator + X2J_SUBDIR, "RootTemplate");
 
-        testFileInfo2.inputName = testBasePath + "TransformStateAPITest.xsl";
-        testFileInfo2.xmlName = testBasePath + "TransformStateAPITest.xml";
-
-        testFileInfo4.inputName = testBasePath + "URIResolverTest.xsl";
-        testFileInfo4.xmlName = testBasePath + "URIResolverTest.xml";
+        testFileInfo4.setDescription("URIResolverTest"); // Note in different dir
+        testFileInfo4.setNames(inputDir + File.separator + "trax", "URIResolverTest");
 
         return true;
     }
@@ -198,8 +190,8 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Quick smoketest of TransformState");
         reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
-        doTransform(QetestUtils.filenameToURL(testFileInfo.inputName), 
-                    QetestUtils.filenameToURL(testFileInfo.xmlName), 
+        doTransform(testFileInfo.getXSLSource(), 
+                    testFileInfo.getXMLSource(), 
                     null);
 
         //@todo: add specific validation for selected trace elements in specific stylesheets
@@ -217,8 +209,8 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Quick smoketest of TransformState");
         reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
-        doTransform(QetestUtils.filenameToURL(testFileInfo2.inputName), 
-                    QetestUtils.filenameToURL(testFileInfo2.xmlName), 
+        doTransform(testFileInfo2.getXSLSource(), 
+                    testFileInfo2.getXMLSource(), 
                     null);
 
         //@todo: add specific validation for selected trace elements in specific stylesheets
@@ -236,8 +228,8 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Quick smoketest of TransformState");
         reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
-        doTransform(QetestUtils.filenameToURL(testFileInfo3.inputName), 
-                    QetestUtils.filenameToURL(testFileInfo3.xmlName), 
+        doTransform(testFileInfo3.getXSLSource(), 
+                    testFileInfo3.getXMLSource(), 
                     null);
 
         //@todo: add specific validation for selected trace elements in specific stylesheets
@@ -255,8 +247,8 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Quick smoketest of TransformState");
         reporter.logWarningMsg("Note: limited validation: partly just a crash test so far.");
-        doTransform(QetestUtils.filenameToURL(testFileInfo4.inputName), 
-                    QetestUtils.filenameToURL(testFileInfo4.xmlName), 
+        doTransform(testFileInfo4.getXSLSource(), 
+                    testFileInfo4.getXMLSource(), 
                     null);
 
         //@todo: add specific validation for selected trace elements in specific stylesheets
@@ -266,20 +258,19 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     }
 
     /** Cheap-o worker method to do transform with us as output handler.  */
-    protected void doTransform(String inputURL, String xmlURL, String options)
+    protected void doTransform(Source xslSource, Source xmlSource, String options)
     {
         try
         {
             TransformerFactory factory = TransformerFactory.newInstance();
             reporter.logInfoMsg("---- doTransform:" + options); // options otherwise currently unused
-            reporter.logTraceMsg("---- About to newTransformer " + inputURL);
-            Transformer transformer = factory.newTransformer(new StreamSource(inputURL));
-            reporter.logTraceMsg("---- About to transform " + xmlURL + " into: SAXResult(this-no disk output)");
-            transformer.transform(new StreamSource(xmlURL),
+            reporter.logTraceMsg("---- About to newTransformer " + xslSource.getSystemId());
+            Transformer transformer = factory.newTransformer(xslSource);
+            reporter.logTraceMsg("---- About to transform " + xmlSource.getSystemId() + " into: SAXResult(this-no disk output)");
+            transformer.transform(xmlSource,
                                   new SAXResult(this)); // use us to handle result
             reporter.logInfoMsg("---- Afterwards, this.transformState=" + transformState);
             transformState = null; // just in case
-            
         }
         catch (TransformerException te)
         {
