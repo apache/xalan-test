@@ -144,6 +144,12 @@ public class ExamplesTest extends XSLProcessorTestBase
      */
     protected OutputNameManager outNames;
 
+    /**
+     * Provides nextName(), currentName() functionality for tests 
+     * that may produce any number of output files, for the gold files
+     */
+    protected OutputNameManager goldNames;
+
     /** Sample test stylesheet to use for transformations, includes gold file.  */
     protected XSLTestfileInfo fooFile = new XSLTestfileInfo();
 
@@ -157,26 +163,28 @@ public class ExamplesTest extends XSLProcessorTestBase
     protected String foo3File;
 
     /** Sample gold files used for specific transforms - with params.  */
-    protected String param1GoldName;
+    // protected String param1GoldName;
 
     /** Sample gold files used for specific transforms - with params and output format.  */
-    protected String param2GoldName;
+    // protected String param2GoldName;
 
     /** Sample gold files used for specific transforms - with output format.  */
-    protected String outputGoldName;
+    // protected String outputGoldName;
 
     /** Sample gold files used for specific transforms - ContentHandler.  */
-    protected String sax2GoldName;
+    // protected String sax2GoldName;
 
     /** Sample gold files used for specific transforms - XMLFilter/Reader.  */
-    protected String saxGoldName;
+    // protected String saxGoldName;
 
     /** Gold file used for tests we haven't validated the correct results of yet.  */
-    protected String NOT_DEFINED;
+    // protected String NOT_DEFINED;
 
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_SUBDIR = "trax";
+    
+    /** Subdirectory prefix for gold files, for use in each of the tests. */
 
 
     /** Just initialize test name, comment, numTestCases. */
@@ -215,6 +223,9 @@ public class ExamplesTest extends XSLProcessorTestBase
                               + File.separator 
                               + TRAX_SUBDIR
                               + File.separator;
+        
+        goldNames = new OutputNameManager(goldBasePath
+                                         + File.separator + testName, ".out");
 
         reporter.logTraceMsg("NOTE! This file is very sensitive to pathing issues!");
         fooFile.inputName = swapSlash(testBasePath + "xsl/foo.xsl");
@@ -228,12 +239,12 @@ public class ExamplesTest extends XSLProcessorTestBase
 
         foo3File = swapSlash(testBasePath + "xsl/foo3.xsl");
 
-        param1GoldName = goldBasePath + "param1.out";
-        param2GoldName = goldBasePath + "param2.out";
-        outputGoldName = goldBasePath + "output.out";
-        saxGoldName = goldBasePath + "fooSAX.out";
-        sax2GoldName = goldBasePath + "fooSAX2.out";
-        NOT_DEFINED = goldBasePath + "need-validated-output-file-here.out";
+        // param1GoldName = goldBasePath + "param1.out";
+        // param2GoldName = goldBasePath + "param2.out";
+        // outputGoldName = goldBasePath + "output.out";
+        // saxGoldName = goldBasePath + "fooSAX.out";
+        // sax2GoldName = goldBasePath + "fooSAX2.out";
+        // NOT_DEFINED = goldBasePath + "need-validated-output-file-here.out";
         return true;
     }
 
@@ -332,8 +343,10 @@ public class ExamplesTest extends XSLProcessorTestBase
         transformer.transform( new StreamSource(filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        System.out.println("fooFile.goldName: "+fooFile.goldName);
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(goldNames.nextName()),                
+                          // new File(fooFile.goldName),
                           "exampleSimple1 fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -366,7 +379,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                                new StreamResult(new File(outNames.nextName())));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(goldNames.nextName()),                
+                          // new File(fooFile.goldName),
                           "exampleSimple2 fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -406,7 +420,8 @@ public class ExamplesTest extends XSLProcessorTestBase
         transformer.transform( xmlSource, new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(goldNames.nextName()),                
+                          // new File(fooFile.goldName),
                           "exampleFromStream fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -449,7 +464,8 @@ public class ExamplesTest extends XSLProcessorTestBase
         transformer.transform( xmlSource, new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(goldNames.nextName()),                
+                          // new File(fooFile.goldName),
                           "exampleFromReader fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -487,7 +503,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                               new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(goldNames.nextName()),                
+                          // new File(fooFile.goldName),
                           "exampleUseTemplatesObj(1) fileChecker of:" + outNames.currentName());
     
         reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID2));
@@ -495,7 +512,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                               new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(bazFile.goldName),
+                          new File(goldNames.nextName()),                
+                          // new File(bazFile.goldName),
                           "exampleUseTemplatesObj(2) fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -572,7 +590,8 @@ public class ExamplesTest extends XSLProcessorTestBase
 
           reporter.logTraceMsg("Note: See SPR SCUU4RZT78 for discussion as to why this output is different than XMLReader/XMLFilter");
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(sax2GoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(sax2GoldName),
                           "exampleContentHandlerToContentHandler fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -614,7 +633,8 @@ public class ExamplesTest extends XSLProcessorTestBase
           reader.parse(new InputSource(filenameToURL(sourceID)));
 
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(saxGoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(saxGoldName),
                           "exampleXMLReader fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -690,7 +710,8 @@ public class ExamplesTest extends XSLProcessorTestBase
         filter.parse(new InputSource(filenameToURL(sourceID)));
 
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(saxGoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(saxGoldName),
                           "exampleXMLFilter fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -781,7 +802,8 @@ public class ExamplesTest extends XSLProcessorTestBase
           reporter.logTraceMsg("filter3.parse(new InputSource(" + filenameToURL(sourceID));
             filter3.parse(new InputSource(filenameToURL(sourceID)));
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(NOT_DEFINED),
+                          new File(goldNames.nextName()),                
+                          // new File(NOT_DEFINED),
                           "exampleXMLFilterChain fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -839,9 +861,10 @@ public class ExamplesTest extends XSLProcessorTestBase
           serializer.transform(new DOMSource(outNode), new StreamResult(outNames.nextName()));
           reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
 
-        reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
+        // reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(NOT_DEFINED),    // @todo validate the output
+                          new File(goldNames.nextName()),                
+                          // new File(NOT_DEFINED),    // @todo validate the output
                           "exampleDOM2DOM fileChecker of:" + outNames.currentName());
           return outNode;
     } 
@@ -876,7 +899,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(param1GoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(param1GoldName),
                           "exampleParam(1) fileChecker of:" + outNames.currentName());
     
     
@@ -886,7 +910,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(outputGoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(outputGoldName),
                           "exampleParam(2) fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -922,7 +947,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(param1GoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(param1GoldName),
                           "exampleTransformerReuse(1) fileChecker of:" + outNames.currentName());
 
         transformer.setParameter("a-param",
@@ -935,7 +961,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(param2GoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(param2GoldName),
                           "exampleTransformerReuse(2) fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -968,7 +995,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(outputGoldName),
+                          new File(goldNames.nextName()),                
+                          // new File(outputGoldName),
                           "exampleOutputProperties fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -1013,7 +1041,8 @@ public class ExamplesTest extends XSLProcessorTestBase
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(goldNames.nextName()),                
+                          // new File(fooFile.goldName),
                           "exampleUseAssociated fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -1089,13 +1118,14 @@ public class ExamplesTest extends XSLProcessorTestBase
           //    This serializes to outNames.nextName()
           exampleSerializeNode(outNode);
 
-        reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
+        // reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
         // @todo TEST UPDATE validate this output
         //  Note: 05-Dec-00 output seems to be bad: has 
         //  duplicate xmlns:foo="http://apache.org/foo" decls 
         // in the foo:document element!
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(NOT_DEFINED),
+                          new File(goldNames.nextName()),                
+                          // new File(NOT_DEFINED),
                           "exampleContentHandler2DOM fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -1153,9 +1183,10 @@ public class ExamplesTest extends XSLProcessorTestBase
         serializer.transform(new DOMSource(doc), 
                              new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
-        reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
+        // reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(NOT_DEFINED),
+                          new File(goldNames.nextName()),                
+                          // new File(NOT_DEFINED),
                           "exampleAsSerializer fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
