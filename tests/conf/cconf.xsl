@@ -1,7 +1,7 @@
 <?xml version="1.0"?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<xsl:output method="html"/>
+<xsl:output method="html" doctype-public="-//W3C//DTD HTML 4.0 Transitional//EN"/>
 <xsl:param name="testfile" select="'No_file'"/>
 
 <xsl:variable name="Results" select="document($testfile)"/>
@@ -63,12 +63,16 @@
 			<td><xsl:value-of select="@reason"/></td>
 			</tr>
 			<tr>
-			<td align="center">Actual:</td>
-			<td><xsl:value-of select="act"/></td>
+			<td align="center">At Node:</td>
+			<td><xsl:value-of select="@atNode"/></td>
 			</tr>
 			<tr>
 			<td align="center">Expected:</td>
 			<td><xsl:value-of select="exp"/></td>
+			</tr>
+			<tr>
+			<td align="center">Actual:</td>
+			<td><xsl:value-of select="act"/></td>
 			</tr>
 			<tr>
 			<td align="center">links</td>
