@@ -84,6 +84,19 @@
         <pathelement path="${prepend.class.path}" />
         <pathelement path="${java.class.path}" />
     </path>
+
+    <!-- Temporary hack to compile XSLTC tests until we find a better way -->
+    <path id="xsltc.class.path">
+        <pathelement path="${xalan.build.dir}/xsltc.jar" />
+        <pathelement path="${xalan.bin.dir}/BCEL.jar" />
+        <pathelement path="${xalan.bin.dir}/JLex.jar" />
+        <pathelement path="${xalan.bin.dir}/java_cup.jar" />
+        <pathelement path="${xalan.bin.dir}/runtime.jar" />
+        <pathelement path="${xalan.bin.dir}/xml.jar" />
+        <pathelement path="${xalan.bin.dir}/crimson.jar" />
+        <pathelement path="${java.class.path}" />
+    </path>
+
     <!-- Used when compiling Xalan-J 1.x tests explicitly against
          Xalan-J 2.x with it's compat.jar 
     -->
@@ -264,7 +277,7 @@
     </target>
 
     <!-- =================================================================== -->
-    <!-- For Xalan-J 2.x testing, use these targets                          -->
+    <!-- For Xalan-J 2.x or JAXP/TRAX testing, use these targets             -->
     <!-- =================================================================== -->
     <!-- Just compile any xslwrappers related to trax: note naming 
          convention of Trax*Wrapper -->
@@ -310,8 +323,16 @@
          focusing most Xalan-J 2.x testing just on the TRAX or 
          javax.xml.transform interface.  Later on, we should also 
          separately test the other Xalan-J 2.x API's! -->
-    <target name="compile.xalan2" depends="compile.trax"></target>
-    <target name="package.xalan2" depends="package.trax"
+    <!-- Compile various TRAX related API tests -->
+    <target name="compile.xalan2" depends="compile.trax">
+        <echo message="Do justXalan-J 2.x specific tests" />
+        <javac srcdir="${src.dir}" 
+               destdir="${build.dir}" 
+               includes="${test.root}xalanj2/*.java"
+               debug="${debug}"
+               classpathref="compiletest.class.path" />
+    </target>
+    <target name="package.xalan2" depends="compile.xalan2,package.trax"
             description="Build testxsl.jar for testing Xalan-J 2.x" ></target>
 
     <!-- Call this target to compile and run the minitest against 
@@ -651,5 +672,36 @@
                </doclet>             
         </javadoc>
     </target>
+
+
+
+    <!-- =================================================================== -->
+    <!-- For temporary XSLTC testing, use these targets                          -->
+    <!-- =================================================================== -->
+    <!-- Just compile any xslwrappers related to XSLTC: note naming 
+         convention of Xsltc*Wrapper -->
+    <target name="compile.xsltc.xslwrappers" depends="compile.xsl">
+        <javac srcdir="${src.dir}" 
+               destdir="${build.dir}" 
+               includes="${test.root}xslwrapper/Xsltc*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
+               debug="${debug}"
+               classpathref="xsltc.class.path" />
+    </target>
+
+    <!-- Compile various XSLTC related API tests -->
+    <target name="compile.xsltc" depends="compile.xsl,compile.xsltc.xslwrappers">
+        <javac srcdir="${src.dir}" 
+               destdir="${build.dir}" 
+               includes="${test.root}xsltc/*.java"
+               debug="${debug}"
+               classpathref="xsltc.class.path" />
+    </target>
+    <target name="package.xsltc" depends="compile.xsltc"
+            description="Build testxsl.jar for testing XSLTC-only classes" >
+        <jar jarfile="${build.dir}/${testxsl.jar.name}" 
+             basedir="${build.dir}" 
+             includes="**/*.class,**/*.properties" />
+    </target>
+
 
 </project>
