@@ -213,11 +213,13 @@ patch may pass all these tests and fail others, but those cases should be rare.<
     <anchor name="credits"/>
     <s2 title="Credits for the tests">
       <ul>
-        <li><jump href="mailto:shane_curcuru@lotus.com">Shane Curcuru</jump></li>
-        <li><jump href="mailto:paul_dick@lotus.com">Paul Dick</jump></li>
-        <li><jump href="mailto:David_Marston@lotus.com">David Marston</jump></li>
+        <li><jump href="mailto:shane_curcuru@us.ibm.com">Shane Curcuru</jump></li>
+        <li><jump href="mailto:paul_dick@us.ibm.com">Paul Dick</jump></li>
+        <li><jump href="mailto:David_Marston@us.ibm.com">David Marston</jump></li>
+        <li><jump href="mailto:tom.amiro@east.sun.com">Tom Amiro</jump></li>
         <li><jump href="mailto:garyp@firstech.com">Gary L Peskin</jump></li>
         <li>Many other <jump href="http://xml.apache.org/mail.html">xalan-dev</jump> subscribers</li>
+        <li>Test cases written by Carmelo Montanez at <jump href="http://www.nist.gov/xml/">NIST</jump> for general use</li>
         <li>Many other helpers who we still need to credit! Sorry!</li>
       </ul>
     </s2>
