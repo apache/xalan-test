@@ -204,15 +204,13 @@
   <TR>
     <TD><xsl:value-of select="@idref"/></TD>
     <TD>
-      <xsl:value-of select="@desc"/>
-      <xsl:text> avgparsexsl: </xsl:text><xsl:value-of select="@avgparsexsl"/>
-      <xsl:text> singletransform: </xsl:text><xsl:value-of select="@singletransform"/>
-      <xsl:text> unparsedxml: </xsl:text><xsl:value-of select="@unparsedxml"/>
-      <xsl:text> parsexsl: </xsl:text><xsl:value-of select="@parsexsl"/>
-      <xsl:text> avgetoe: </xsl:text><xsl:value-of select="@avgetoe"/>
-      <xsl:text> avgunparsedxml: </xsl:text><xsl:value-of select="@avgunparsedxml"/>
-      <xsl:text> etoe: </xsl:text><xsl:value-of select="@etoe"/>
-      <xsl:text> iterations: </xsl:text><xsl:value-of select="@iterations"/>
+      <xsl:variable name="perfattrs" select="'avgparsexsl singletransform unparsedxml parsexsl avgetoe avgunparsedxml etoe OVERALL XSLREAD XSLBUILD XMLREAD XMLBUILD TRANSFORM RESULTWRITE FIRSTLATENCY'"/>
+      <xsl:for-each select="attribute::*">
+      <xsl:sort select="name()"/>
+        <xsl:if test="contains($perfattrs, name())">
+          <xsl:text> </xsl:text><xsl:value-of select="name()"/><xsl:text>=</xsl:text><xsl:value-of select="."/>
+        </xsl:if>
+      </xsl:for-each>
     </TD>
   </TR>
 </xsl:template>
@@ -227,6 +225,10 @@
   <TR>
     <TD><xsl:text>[</xsl:text><xsl:value-of select="@idref"/><xsl:text>] </xsl:text></TD>
     <TD>
+      <!-- //@todo NOTE: use new StylesheetTestlet-output baseref as 
+           the start of each href attr, but only if it's relative
+           (i.e. if the @inputName, etc. is absolute, leave it alone)
+      -->
       <xsl:element name="a">
         <xsl:attribute name="href"><xsl:value-of select="@inputName"/></xsl:attribute>
         <xsl:text>xsl</xsl:text>
