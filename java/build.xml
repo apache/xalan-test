@@ -165,11 +165,9 @@
         <javac srcdir="${test.dir}/trax/dom" 
                destdir="${build.dir}" 
                debug="${debug}" />
-        <!-- @todo add in some SAX tests and compile them!
-        <javac srcdir="${test.dir}/trax/dom" 
+        <javac srcdir="${test.dir}/trax/sax" 
                destdir="${build.dir}" 
                debug="${debug}" />
-        -->
     </target>
     <target name="package.trax" depends="compile.trax"
             description="Build testxsl.jar for testing Xalan-J 2.x" >
