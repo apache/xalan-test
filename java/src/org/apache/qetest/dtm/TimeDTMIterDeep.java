@@ -60,22 +60,16 @@ package org.apache.qetest.dtm;
 import org.apache.qetest.*;
 import org.apache.qetest.xsl.*;
 import org.apache.qetest.dtm.*;
+import org.apache.xml.dtm.*;
 
 // java classes
 import java.io.File;
-import java.io.StringReader;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
 // Needed SAX, DOM, JAXP, Xalan classes
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-
-import org.apache.xml.dtm.*;
-import org.apache.xml.dtm.ref.*;
-import org.apache.xpath.objects.XMLStringFactoryImpl;
 
 
 public class TimeDTMIterDeep extends XSLProcessorTestBase
@@ -97,7 +91,6 @@ public class TimeDTMIterDeep extends XSLProcessorTestBase
     public static final String DTM_SUBDIR = "dtm";
 	public static final String TIME_Prefix = "TimeID_";
 
-	int[] metric = {0};
 	int   lastNode;
 	String lastNodeName;
 
@@ -169,11 +162,11 @@ public boolean testCase1()
 	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
 	int DNode = dtm.getFirstChild(dtmRoot);			// <Doc>
 	String DNodeName = dtm.getNodeName(DNode);
-	int[] rtData = {0,0,0};		// returns Traversal time, last node, number of nodes traversed 
+	int[] rtData = {0,0,0};		// returns Iteration time, last node, number of nodes traversed 
 
-	// Get a traverser for Descendant:: axis.
+	// Get a iterator for Descendant:: axis.
 	buf.append("\n\tSTARTING from: "+ DNodeName);
-	QeDtmUtils.timeAxis(dtm, Axis.DESCENDANT, DNode, rtData);
+	QeDtmUtils.timeAxisIterator(dtm, Axis.DESCENDANT, DNode, rtData);
 	buf.append("\n\tTime="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 	
 	// Write results and close output file.
@@ -203,11 +196,11 @@ public boolean testCase2()
 	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
 	int DNode = dtm.getFirstChild(dtmRoot);			// <Doc>
 	String DNodeName = dtm.getNodeName(DNode);
-	int[] rtData = {0,0,0};		// returns Traversal time, last node, number of nodes traversed 
+	int[] rtData = {0,0,0};		// returns Iteration time, last node, number of nodes traversed 
 
-	// Get a traverser for Descendant:: axis.
+	// Get a iterator for Descendant:: axis.
 	buf.append("\n\tSTARTING from: "+ DNodeName);
-	QeDtmUtils.timeAxis(dtm, Axis.DESCENDANTORSELF, DNode, rtData);
+	QeDtmUtils.timeAxisIterator(dtm, Axis.DESCENDANTORSELF, DNode, rtData);
 	buf.append("\n\tTime="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 	lastNode = rtData[1];
 	lastNodeName = dtm.getNodeName(lastNode);
@@ -234,10 +227,10 @@ public boolean testCase3()
 	buf.append("\nAxis is ANCESTOR");
 	DTM dtm = QeDtmUtils.createDTM(0, QeDtmUtils.deepFile, buf);
 	buf.append("\n\tSTARTING from: "+ lastNodeName);
-	int[] rtData = {0,0,0};		// returns Traversal time, last node, number of nodes traversed 
+	int[] rtData = {0,0,0};		// returns Iteration time, last node, number of nodes traversed 
 
-	// Get a traverser for ANCESTOR:: axis.
-	QeDtmUtils.timeAxis(dtm, Axis.ANCESTOR, lastNode, rtData);
+	// Get a iterator for ANCESTOR:: axis.
+	QeDtmUtils.timeAxisIterator(dtm, Axis.ANCESTOR, lastNode, rtData);
 	buf.append("\n\tTime="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 	
 	// Write results and close output file.
@@ -261,11 +254,11 @@ public boolean testCase4()
 
 	buf.append("\nAxis is ANCESTOR-or-Self");
 	DTM dtm = QeDtmUtils.createDTM(0, QeDtmUtils.deepFile, buf);
-	int[] rtData = {0,0,0};		// returns Traversal time, last node, number of nodes traversed 
+	int[] rtData = {0,0,0};		// returns Iteration time, last node, number of nodes traversed 
 
-	// Get a traverser for ANCESTORORSELF:: axis.
+	// Get a iterator for ANCESTORORSELF:: axis.
 	buf.append("\n\tSTARTING from: "+ lastNodeName);
-	QeDtmUtils.timeAxis(dtm, Axis.ANCESTORORSELF, lastNode, rtData);
+	QeDtmUtils.timeAxisIterator(dtm, Axis.ANCESTORORSELF, lastNode, rtData);
 	buf.append("\n\tTime="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 	
 	// Write results and close output file.
