@@ -388,11 +388,11 @@
     <!-- ================================================================== -->
     <target name="smoketest" 
             description="Run the Xalan-J 2.x Smoketest"
-            depends="minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
+            depends="minitest-execute,extensions.classes,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
     </target>
     <target name="smoketest.dev" 
             description="Run the Xalan-J 2.x Smoketest with dependencies"
-            depends="jar,extensions.classes,minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
+            depends="jar,minitest-execute,extensions.classes,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
         <!-- This compiles the minimum to run the smoketests, runs them, 
              and creates distros just of the results and existing tree, 
              without actually running the docs - this is to ensure that 
@@ -401,7 +401,7 @@
     </target>
     <target name="smoketest.gump" 
             description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies"
-            depends="jar,extensions.classes,minitest-execute,smoketest-execute,smoketest-results-dist,dist-nodeps,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
+            depends="jar,minitest-execute,extensions.classes,smoketest-execute,smoketest-results-dist,dist-nodeps,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
         <!-- This compiles the minimum to run the smoketests, runs them, 
              and creates distros just of the results and existing tree, 
              without actually running the docs - this is to ensure that 
