@@ -72,6 +72,7 @@ import java.io.StringWriter;
 
 /**
  * Uses an XML/HTML/Text diff comparator to check or diff two files.
+ * @see #check(Reporter reporter, Object actual, Object reference, String msg, String id)
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
  */
@@ -86,9 +87,7 @@ public class XHTFileCheckService implements CheckService
 
     /**
      * Compare two objects for equivalence, and return appropriate result.
-     * Implementers should provide the details of their "equals"
-     * algorithim in getCheckMethod().
-     * Note that the order of actual, reference is usually important
+     * Note that the order of actual, reference is important
      * important in determining the result.
      * <li>Typically:
      * <ul>any unexpected Exceptions thrown -> ERRR_RESULT</ul>
@@ -97,6 +96,18 @@ public class XHTFileCheckService implements CheckService
      * <ul>actual is equivalent to reference -> PASS_RESULT</ul>
      * <ul>actual is not equivalent to reference -> FAIL_RESULT</ul>
      * </li>
+     * Equvalence is first checked by parsing both files as XML to 
+     * a DOM; if that has problems, we parse as HTML to a DOM; if 
+     * that has problems, we create a DOM with a single text node 
+     * after reading the file as text.  We then compare the two DOM 
+     * trees for equivalence. Note that in XML mode differences in 
+     * the XML header itself (i.e. standalone=no/yes) are not caught,
+     * and will still report a pass (this is a defect in our 
+     * comparison method).
+     * Side effect: every call to check() fills some additional 
+     * info about how the check() call was processed which is then 
+     * returned from getExtendedInfo() - this happens no matter what 
+     * the result of the check() call was.
      *
      * @param reporter to dump any output messages to
      * @param actual (current) Object to check
@@ -110,6 +121,10 @@ public class XHTFileCheckService implements CheckService
     public int check(Reporter reporter, Object actual, Object reference,
                      String msg, String id)
     {
+        // Create our 'extended info' stuff now, so it will 
+        //  always reflect the most recent call to this method
+        sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
 
         if (!((actual instanceof File) & (reference instanceof File)))
         {
@@ -117,7 +132,10 @@ public class XHTFileCheckService implements CheckService
             // Must have File objects to continue
             reporter.checkErr("XHTFileCheckService only takes files, with: "
                               + msg, id);
-
+            pw.println("XHTFileCheckService only takes files, with: " + msg);
+            pw.println("   actual: " + actual);
+            pw.println("reference: " + reference);
+            pw.flush();
             return reporter.ERRR_RESULT;
         }
 
@@ -128,7 +146,8 @@ public class XHTFileCheckService implements CheckService
         if ((!actualFile.exists()) || (actualFile.length() == 0))
         {
             reporter.checkFail(msg, id);
-
+            pw.println("actual(" + actualFile.toString() + ") did not exist or was 0 len");
+            pw.flush();
             return reporter.FAIL_RESULT;
         }
 
@@ -136,17 +155,13 @@ public class XHTFileCheckService implements CheckService
         if ((!referenceFile.exists()) || (referenceFile.length() == 0))
         {
             reporter.checkAmbiguous(msg, id);
-
+            pw.println("reference(" + referenceFile.toString() + ") did not exist or was 0 len");
+            pw.flush();
             return Reporter.AMBG_RESULT;
         }
 
-        sw = new StringWriter();
-
-        PrintWriter pw = new PrintWriter(sw);
         boolean warning[] = new boolean[1];  // TODO: should use this!
-
         warning[0] = false;
-
         boolean isEqual = false;
 
         try
@@ -157,28 +172,28 @@ public class XHTFileCheckService implements CheckService
                                          actualFile.getCanonicalPath(), pw,
                                          warning);
 
-            // Side effect: fills in sw with info about the comparison
+            // Side effect: fills in pw/sw with info about the comparison
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
-            pw.println("comparator threw: " + e.toString());
-
+            // Add any exception info to pw/sw
+            pw.println("XHTFileCheckService threw: " + t.toString());
+            t.printStackTrace(pw);
             isEqual = false;
         }
 
-        pw.flush();
-
         if (!isEqual)
         {
-
             // We fail, obviously!
             reporter.checkFail(msg, id);
+            pw.println("XHTFileCheckService files were not equal");
+            pw.flush();
 
             return Reporter.FAIL_RESULT;
         }
         else if (warning[0])
         {
-            pw.println("comparator whitespace diff warning!");
+            pw.println("XHTFileCheckService whitespace diff warning!");
             pw.flush();
             reporter.checkFail(msg, id);
 
@@ -187,6 +202,8 @@ public class XHTFileCheckService implements CheckService
         else
         {
             reporter.checkPass(msg, id);
+            pw.println("XHTFileCheckService files were equal");
+            pw.flush();
 
             return Reporter.PASS_RESULT;
         }
@@ -195,6 +212,7 @@ public class XHTFileCheckService implements CheckService
     /**
      * Compare two objects for equivalence, and return appropriate result.
      *
+     * @see #check(Reporter reporter, Object actual, Object reference, String msg, String id)
      * @param reporter to dump any output messages to
      * @param actual (current) File to check
      * @param reference (gold, or expected) File to check against
@@ -210,8 +228,13 @@ public class XHTFileCheckService implements CheckService
     }
 
     /**
-     * Gets extended information about the last checkFiles call.
-     * @return String describing any additional info about the last two files that were checked
+     * Gets extended information about the last check call.
+     * This info is filled in for every call to check() with brief
+     * descriptions of what happened; will return 
+     * <code>XHTFileCheckService-no-info-available</code> if 
+     * check() has never been called.
+     * @return String describing any additional info about the 
+     * last two files that were checked
      */
     public String getExtendedInfo()
     {
@@ -224,8 +247,7 @@ public class XHTFileCheckService implements CheckService
 
     /**
      * Description of algorithim used to check file equivalence.  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @return basic description of how we compare files
      */
     public String getDescription()
     {
