@@ -110,7 +110,7 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public StylesheetReuseTest()
     {
-        numTestCases = 3;  // REPLACE_num
+        numTestCases = 4;  // REPLACE_num
         testName = "StylesheetReuseTest";
         testComment = "Testing various cases of stylesheet re-use";
     }
@@ -143,11 +143,11 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
 
         testFileInfo.inputName = filenameToURL(testBasePath + "StylesheetReuseTest1.xsl");
         testFileInfo.xmlName = filenameToURL(testBasePath + "StylesheetReuseTest1.xml");
-        testFileInfo.goldName = filenameToURL(goldBasePath + "StylesheetReuseTest1.out");
+        testFileInfo.goldName = goldBasePath + "StylesheetReuseTest1.out";
 
         otherFileInfo.inputName = filenameToURL(testBasePath + "ParamTest1.xsl");
         otherFileInfo.xmlName = filenameToURL(testBasePath + "ParamTest1.xml");
-        otherFileInfo.goldName = filenameToURL(goldBasePath + "ParamTest1.out");
+        otherFileInfo.goldName = goldBasePath + "ParamTest1.out";
         
         return true;
     }
@@ -467,6 +467,75 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
                               "setStylesheet(secondone) transform into: " + outNames.currentName());
             if (result == Logger.FAIL_RESULT)
                 reporter.logInfoMsg("setStylesheet(secondone) transform failure reason:" + fileChecker.getExtendedInfo());
+        } 
+        catch (Throwable t)
+        {
+            reporter.checkErr("Testcase threw: " + t.toString());
+            reporter.logThrowable(Logger.ERRORMSG, t, "Testcase threw");
+        }
+        reporter.testCaseClose();
+        return true;
+    }
+
+    /**
+     * Re-using one stylesheet multiple times, simple case.
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Re-using one stylesheet multiple times, simple case");
+        reporter.logTraceMsg("testCase4 is a simplified copy of testCase1 for Xalan-J 2.x compat.jar testing");
+        XSLTEngineImpl processor = null;
+        try
+        {
+            if ((liaison == null) || ("".equals(liaison)))
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessor();
+            }
+            else
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
+            }
+            int result = Logger.INCP_RESULT;
+            // Create one stylesheet
+            reporter.logTraceMsg("xslSrc = new XSLTInputSource(" + testFileInfo.inputName + ")");
+            XSLTInputSource xslSrc = new XSLTInputSource(testFileInfo.inputName);
+            reporter.logTraceMsg("stylesheetRoot = processor.processStylesheet(xslSrc)");
+            StylesheetRoot stylesheetRoot = processor.processStylesheet(xslSrc);
+
+            // Set this stylesheet into the processor
+            reporter.logTraceMsg("processor.setStylesheet(stylesheetRoot)");
+            processor.setStylesheet(stylesheetRoot);
+            reporter.logInfoMsg("processor.process(" + testFileInfo.xmlName 
+                                 + ", null, target)");
+            processor.process(new XSLTInputSource(testFileInfo.xmlName), 
+                              null,
+                              new XSLTResultTarget(outNames.nextName()));
+            result = fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(testFileInfo.goldName), 
+                              "processor.process(xml, null, target) transform into: " + outNames.currentName());
+            if (result != Logger.PASS_RESULT)
+                reporter.logInfoMsg("processor.process(xml, null, target) transform failure reason:" + fileChecker.getExtendedInfo());
+
+            // Reset, explicitly set the stylesheet to the same one, 
+            //  and process again, but with a different stylesheet 
+            //  specified in the process call
+            reporter.logTraceMsg("processor.reset()");
+            processor.reset();
+            reporter.logTraceMsg("processor.setStylesheet(stylesheetRoot)");
+            processor.setStylesheet(stylesheetRoot);
+            reporter.logTraceMsg("processor.process(" + otherFileInfo.xmlName 
+                                 + ", " + otherFileInfo.xmlName + ", target)");
+            processor.process(new XSLTInputSource(otherFileInfo.xmlName), 
+                              new XSLTInputSource(otherFileInfo.inputName),
+                              new XSLTResultTarget(outNames.nextName()));
+            result = fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(otherFileInfo.goldName), 
+                              "processor.process(xml, other_xsl, target) transform into: " + outNames.currentName());
+            if (result != Logger.PASS_RESULT)
+                reporter.logInfoMsg("processor.process(xml, other_xsl, target) transform failure reason:" + fileChecker.getExtendedInfo());
         } 
         catch (Throwable t)
         {
