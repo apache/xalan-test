@@ -730,34 +730,66 @@ public class XSLProcessorTestBase extends FileBasedTest
     /**
      * Write a "{TestName}.Pass" or "{TestName}.Not.Pass" file 
      * according to whether or not the overall test passed.
+     * But: Don't write this file if we're a Minitest, since 
+     * Minitests already output a better format of a status 
+     * file already in doTestFileClose (which is where this 
+     * kind of functionality probably belongs anyway).
+     * -- Subject to change! --
+     * @author scott_boag@lotus.com
      */
     protected void createStatusFile()
     {
-      System.out.println("reporter: "+reporter);
-      if(null != reporter)
-      {
-        String testName = this.getTestName();
-        File resultsFile = new File(testProps.getProperty("logFile"));
-        File passfile = new File(resultsFile.getParent(), testName+".Pass");
-        File failfile = new File(resultsFile.getParent(), testName+".Not.Pass");
-        if(passfile.exists())
-          passfile.delete();
-        if(failfile.exists())
-          failfile.delete();
-        
-        File statusfile = reporter.didPass() ? passfile : failfile;                 
-        try
+        if(null != reporter)
         {
-          java.io.FileOutputStream fio = new java.io.FileOutputStream(statusfile);
-          fio.write(0);
-          fio.close();
-        }
-        catch(Exception e)
-        {
-          System.out.println("Can't write: "+statusfile.toString());
-        }
-      }
+            String testName = this.getTestName();
+            if ("Minitest".equalsIgnoreCase(testName))
+            {
+                reporter.logWarningMsg("Note! Minitests write their own status files!");
+                return;                
+            }
+            File resultsFile = new File(testProps.getProperty("logFile"));
+            // Note we can either have pass/notpass, or we can 
+            //  use the full set of test status values from 
+            //  Logger.java: pass/fail/errr/incp/ambg
+            File passfile = new File(resultsFile.getParent(), testName + "." + Logger.PASS);
+            File failfile = new File(resultsFile.getParent(), testName + ".Not." + Logger.PASS);
+            if(passfile.exists())
+                passfile.delete();
+            if(failfile.exists())
+                failfile.delete();
 
+            // didPass returns pass/fail in a different manner 
+            //  than is used elsewhere in the tests.  We need to 
+            //  decide on a common way to do this everywhere.
+            //  See Logger's javadoc for PASS_RESULT, INCP_RESULT, etc.
+            // the only potential difficulty (for minitest, etc. use)
+            //  is ambiguous results, which are neither passes 
+            //  nor fails
+            // File statusfile = reporter.didPass() ? passfile : failfile;                 
+            File statusfile = null;
+            if (reporter.getCurrentFileResult() == Logger.PASS_RESULT)
+                statusfile = passfile;
+            else
+                statusfile = failfile;
+
+            try
+            {
+                java.io.FileOutputStream fio = new java.io.FileOutputStream(statusfile);
+                fio.write(0);   // We should really write something more meaningful here
+                fio.close();
+            }
+            catch(Exception e)
+            {
+                // Note: System.out/.err should *only* *ever* be 
+                //  used in places where a reporter is not available
+                // System.out.println("Can't write: "+statusfile.toString());
+                reporter.logCriticalMsg("Can't write: " + statusfile.toString());
+            }
+        }
+        else
+        {
+            System.err.println("ERROR! createStatusFile has no reporter, can't work!");
+        }
     }
 
     /**
@@ -798,6 +830,9 @@ public class XSLProcessorTestBase extends FileBasedTest
         testProps.put(MAIN_CMDLINE, args);
         runTest(testProps);
         
+        // Note that this is only called if run from the command
+        //  line directly, and is not called when executed from 
+        //  XSLTestHarness (which calls runTest directly)
         createStatusFile();
     }
 
