@@ -141,13 +141,13 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
                               + XALANJ1_SUBDIR
                               + File.separator;
 
-        testFileInfo.inputName = testBasePath + "StylesheetReuseTest1.xsl";
-        testFileInfo.xmlName = testBasePath + "StylesheetReuseTest1.xml";
-        testFileInfo.goldName = goldBasePath + "StylesheetReuseTest1.out";
+        testFileInfo.inputName = filenameToURL(testBasePath + "StylesheetReuseTest1.xsl");
+        testFileInfo.xmlName = filenameToURL(testBasePath + "StylesheetReuseTest1.xml");
+        testFileInfo.goldName = filenameToURL(goldBasePath + "StylesheetReuseTest1.out");
 
-        otherFileInfo.inputName = testBasePath + "ParamTest1.xsl";
-        otherFileInfo.xmlName = testBasePath + "ParamTest1.xml";
-        otherFileInfo.goldName = goldBasePath + "ParamTest1.out";
+        otherFileInfo.inputName = filenameToURL(testBasePath + "ParamTest1.xsl");
+        otherFileInfo.xmlName = filenameToURL(testBasePath + "ParamTest1.xml");
+        otherFileInfo.goldName = filenameToURL(goldBasePath + "ParamTest1.out");
         
         return true;
     }
@@ -171,16 +171,6 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
             {
                 processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
             }
-        }
-        catch (Exception e)
-        {
-            reporter.checkErr("Could not create processor, threw: " + e.toString());
-            reporter.logThrowable(Logger.ERRORMSG, e, "Could not create processor");
-            return false;
-        }        
-
-        try
-        {
             int result = Logger.INCP_RESULT;
             // Create one stylesheet
             XSLTInputSource xslSrc = new XSLTInputSource(testFileInfo.inputName);
@@ -189,7 +179,7 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
             // This should have implicitly set the stylesheet in the processor
             // Verify you can do a process now
             reporter.logTraceMsg("About to process1(" + testFileInfo.xmlName 
-                                 + ", " + testFileInfo.xmlName + ",...)");
+                                 + ", implicit:" + testFileInfo.inputName + ",...)");
             processor.process(new XSLTInputSource(testFileInfo.xmlName), 
                               null,
                               new XSLTResultTarget(outNames.nextName()));
@@ -198,14 +188,50 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
                               new File(testFileInfo.goldName), 
                               "processStylesheet(1) implicit transform into: " + outNames.currentName());
             if (result == Logger.FAIL_RESULT)
-                reporter.logInfoMsg("processStylesheet implicit transform failure reason:" + fileChecker.getExtendedInfo());
+                reporter.logInfoMsg("processStylesheet(1) implicit transform failure reason:" + fileChecker.getExtendedInfo());
+        }
+        catch (Exception e)
+        {
+            reporter.checkFail("processStylesheet(1) implicit transform threw: " + e.toString());
+            reporter.logThrowable(Logger.ERRORMSG, e, "processStylesheet(1) implicit transform threw");
+        }        
+
+        try
+        {
+            if ((liaison == null) || ("".equals(liaison)))
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessor();
+            }
+            else
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
+            }
+            int result = Logger.INCP_RESULT;
+            // Create one stylesheet
+            XSLTInputSource xslSrc = new XSLTInputSource(testFileInfo.inputName);
+            StylesheetRoot stylesheetRoot = processor.processStylesheet(xslSrc);
+
+            // Set this stylesheet into the processor
+            processor.setStylesheet(stylesheetRoot);
+            reporter.logTraceMsg("About to process2(" + testFileInfo.xmlName 
+                                 + ", set:" + testFileInfo.inputName + ",...)");
+            processor.process(new XSLTInputSource(testFileInfo.xmlName), 
+                              null,
+                              new XSLTResultTarget(outNames.nextName()));
+            result = fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(testFileInfo.goldName), 
+                              "processStylesheet(2) set transform into: " + outNames.currentName());
+            if (result == Logger.FAIL_RESULT)
+                reporter.logInfoMsg("processStylesheet(2) set transform failure reason:" + fileChecker.getExtendedInfo());
+
 
             // Reset, explicitly set the stylesheet to the same one, 
             //  and process again
             processor.reset();
             processor.setStylesheet(stylesheetRoot);
-            reporter.logTraceMsg("About to process2(" + testFileInfo.xmlName 
-                                 + ", " + testFileInfo.xmlName + ",...)");
+            reporter.logTraceMsg("About to process3(" + testFileInfo.xmlName 
+                                 + ", " + testFileInfo.inputName + ",...)");
             processor.process(new XSLTInputSource(testFileInfo.xmlName), 
                               null,
                               new XSLTResultTarget(outNames.nextName()));
@@ -298,8 +324,9 @@ public class StylesheetReuseTest extends XSLProcessorTestBase
             XSLTInputSource otherXslSrc = new XSLTInputSource(otherFileInfo.inputName);
             StylesheetRoot otherStylesheetRoot = processor.processStylesheet(otherXslSrc);
 
-            // This should have implicitly set the other stylesheet in the processor
-            // Verify you can do a process now
+            // Explicitly set the stylesheet (this is necessary when 
+            //  testing with the 2.x compat.jar)
+            processor.setStylesheet(otherStylesheetRoot);
             reporter.logTraceMsg("About to process1(" + otherFileInfo.xmlName 
                                  + ", " + otherFileInfo.xmlName + ",...)");
             processor.process(new XSLTInputSource(otherFileInfo.xmlName), 
