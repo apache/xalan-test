@@ -563,32 +563,32 @@
         <property name="alltest.contrib.resultDir" value="${alltest.resultDir}/contrib" />
         <echo message="About to execute contrib tests with all flavors, results into ${alltest.contrib.resultDir}/..." />
 
-        <antcall target="conf">
+        <antcall target="contrib">
             <param name="contrib.flavor" value="trax.systemId"/>
             <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/systemId"/>
             <param name="contrib.logFile" value="${alltest.contrib.resultDir}/systemId/results.xml"/>
         </antcall>
-        <antcall target="conf">
+        <antcall target="contrib">
             <param name="contrib.flavor" value="trax.file"/>
             <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/file"/>
             <param name="contrib.logFile" value="${alltest.contrib.resultDir}/file/results.xml"/>
         </antcall>
-        <antcall target="conf">
+        <antcall target="contrib">
             <param name="contrib.flavor" value="trax.dom"/>
             <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/dom"/>
             <param name="contrib.logFile" value="${alltest.contrib.resultDir}/dom/results.xml"/>
         </antcall>
-        <antcall target="conf">
+        <antcall target="contrib">
             <param name="contrib.flavor" value="trax.sax"/>
             <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/sax"/>
             <param name="contrib.logFile" value="${alltest.contrib.resultDir}/sax/results.xml"/>
         </antcall>
-        <antcall target="conf">
+        <antcall target="contrib">
             <param name="contrib.flavor" value="trax.localPath"/>
             <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/localPath"/>
             <param name="contrib.logFile" value="${alltest.contrib.resultDir}/localPath/results.xml"/>
         </antcall>
-        <antcall target="conf">
+        <antcall target="contrib">
             <param name="contrib.flavor" value="trax.stream"/>
             <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/stream"/>
             <param name="contrib.logFile" value="${alltest.contrib.resultDir}/stream/results.xml"/>
