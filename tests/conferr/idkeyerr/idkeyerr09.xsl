@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test for invalid value of use attribute in xsl:key. -->
   <!-- ExpectedException: invalid use expression -->
+  <!-- ExpectedException: A location path was expected, but the following token was encountered:  + -->
 
 <xsl:output indent="yes"/>
 

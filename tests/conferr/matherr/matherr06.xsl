@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of number() with too many arguments. -->
   <!-- ExpectedException: number() has too many arguments. -->
-  <!-- ExpectedException: FuncNumber only allows 1 arguments -->
+  <!-- ExpectedException: FuncNumber only allows 0 or 1 arguments -->
 
 <xsl:template match="/">
   <out>

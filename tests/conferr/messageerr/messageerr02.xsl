@@ -8,6 +8,7 @@
   <!-- Purpose: Illegal value "duh" on terminate option -->                
   <!-- Creator: David Marston -->
   <!-- ExpectedException: Value for terminate should equal yes or no -->
+  <!-- ExpectedException: Illegal value: duh used for boolean attribute: terminate -->
 
 <xsl:template match="/">
   <xsl:message terminate="duh">This message came from the MESSAGEerr02 test.</xsl:message>

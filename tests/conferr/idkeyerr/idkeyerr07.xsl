@@ -8,6 +8,8 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test for invalid value of name attribute in xsl:key. -->
   <!-- ExpectedException: name contains invalid characters -->
+  <!-- ExpectedException: Illegal value: + used for QNAME attribute: name -->
+  
 
 <xsl:output indent="yes"/>
 
