@@ -502,100 +502,38 @@
     <!-- Run tests: A whole bunch of tests - used before posting builds, etc-->
     <!-- ================================================================== -->
     <target name="alltest" 
-            description="Run nearly *all* available Xalan-J 2.x tests"
-            depends="all,alltest-execute">
+            description="Run nearly *all* available Xalan-J 2.x tests with defaults"
+            depends="all,alltest.other,alltest.conf,alltest.contrib">
         <!-- Currently don't bother checking results, -pass, -notpass -->
     </target>
-    <target name="allfeaturetest" 
+    <target name="alltest.features" 
             description="Re-Run nearly *all* available Xalan-J 2.x tests with setAttribute features set"
-            depends="all">
-        <antcall target="alltest-execute">
-            <param name="alltest.resultDir" value="results-alltest-inctrue"/>
+            depends="all,alltest.other">
+        <antcall target="alltest.conf">
+            <param name="alltest.resultDir" value="results-alltest/inctrue"/>
             <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/incremental" value="true"/>
         </antcall>
-        <antcall target="alltest-execute">
-            <param name="alltest.resultDir" value="results-alltest-optfalse"/>
+        <antcall target="alltest.conf">
+            <param name="alltest.resultDir" value="results-alltest/optfalse"/>
+            <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/optimize" value="false"/>
+        </antcall>
+        <antcall target="alltest.contrib">
+            <param name="alltest.resultDir" value="results-alltest/inctrue"/>
+            <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/incremental" value="true"/>
+        </antcall>
+        <antcall target="alltest.contrib">
+            <param name="alltest.resultDir" value="results-alltest/optfalse"/>
             <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/optimize" value="false"/>
         </antcall>
     </target>
 
-
-    <!-- Subject to change.  Currently a placeholder to simply 
-         execute a list of the different flavors/types of conf 
-         and other tests all in one target.
-     -->
-    <target name="alltest-execute">
+    <target name="alltest.other">
         <property name="alltest.resultDir" value="results-alltest" />
-        <echo message="About to execute LOTS of tests, results into ${alltest.resultDir}/..." />
+        <echo message="About to execute various API, extensions, bugzilla tests, results under ${alltest.resultDir}/..." />
         <!-- Run all individual API tests through the harness -->
         <antcall target="harness">
             <param name="api.outputDir" value="${alltest.resultDir}/harness"/>
             <param name="api.logFile" value="${alltest.resultDir}/harness/results.xml"/>
-        </antcall>
-        <!-- Run full conf test with each major available flavor into 
-             specific output directories; note any user options will 
-             override for all test calls.
-             Also exclude the currently failing tests in the 
-             smoketest if use.excludes is set.
-        -->
-        <condition property="conf.excludes" value="${smoketest.conf.excludes}">
-            <equals arg1="${use.excludes}" arg2="true" />
-        </condition>
-
-        <antcall target="conf">
-            <param name="conf.flavor" value="trax.systemId"/>
-            <param name="conf.excludes" value="${conf.excludes}"/>
-            <param name="conf.outputDir" value="${alltest.resultDir}/systemId"/>
-            <param name="conf.logFile" value="${alltest.resultDir}/systemId/results.xml"/>
-        </antcall>
-        <antcall target="conf">
-            <param name="conf.flavor" value="trax.file"/>
-            <param name="conf.excludes" value="${conf.excludes}"/>
-            <param name="conf.outputDir" value="${alltest.resultDir}/file"/>
-            <param name="conf.logFile" value="${alltest.resultDir}/file/results.xml"/>
-        </antcall>
-        <antcall target="conf">
-            <param name="conf.flavor" value="trax.dom"/>
-            <!-- Note DOM always has additional exclusions -->
-            <param name="conf.excludes" value="${trax.dom.excludes};${conf.excludes}"/>
-            <param name="conf.outputDir" value="${alltest.resultDir}/dom"/>
-            <param name="conf.logFile" value="${alltest.resultDir}/dom/results.xml"/>
-        </antcall>
-        <antcall target="conf">
-            <param name="conf.flavor" value="trax.sax"/>
-            <param name="conf.excludes" value="${conf.excludes}"/>
-            <param name="conf.outputDir" value="${alltest.resultDir}/sax"/>
-            <param name="conf.logFile" value="${alltest.resultDir}/sax/results.xml"/>
-        </antcall>
-        <antcall target="conf">
-            <param name="conf.flavor" value="trax.localPath"/>
-            <param name="conf.excludes" value="${conf.excludes}"/>
-            <param name="conf.outputDir" value="${alltest.resultDir}/localPath"/>
-            <param name="conf.logFile" value="${alltest.resultDir}/localPath/results.xml"/>
-        </antcall>
-        <antcall target="conf">
-            <param name="conf.flavor" value="trax.stream"/>
-            <param name="conf.excludes" value="${conf.excludes}"/>
-            <param name="conf.outputDir" value="${alltest.resultDir}/stream"/>
-            <param name="conf.logFile" value="${alltest.resultDir}/stream/results.xml"/>
-        </antcall>
-        <antcall target="conferr">
-            <param name="conferr.flavor" value="trax.systemId"/>
-            <param name="conferr.outputDir" value="${alltest.resultDir}/conferr"/>
-            <param name="conferr.logFile" value="${alltest.resultDir}/conferr/results.xml"/>
-            <!-- Note that conferr doesn't currently use gold files, 
-                 but we need to set the goldDir anyway for convenience
-            --> 
-            <param name="conferr.goldDir" value="${alltest.resultDir}/conferr-gold"/>
-        </antcall>
-        <!-- Run various other sets of conf-like tests -->
-        <antcall target="perf">
-            <param name="perf.outputDir" value="${alltest.resultDir}/perf"/>
-            <param name="perf.logFile" value="${alltest.resultDir}/perf/results.xml"/>
-        </antcall>
-        <antcall target="contrib">
-            <param name="contrib.outputDir" value="${alltest.resultDir}/contrib"/>
-            <param name="contrib.logFile" value="${alltest.resultDir}/contrib/results.xml"/>
         </antcall>
         <!-- Run other misc tests -->
         <antcall target="extensions">
@@ -605,6 +543,125 @@
         <antcall target="bugzilla">
             <param name="bugzilla.outputDir" value="${alltest.resultDir}/bugzilla"/>
             <param name="bugzilla.logFile" value="${alltest.resultDir}/bugzilla/results.xml"/>
+        </antcall>
+        <!-- Run the threading tests once -->
+        <antcall target="threads">
+            <param name="threads.outputDir" value="${alltest.resultDir}/threads"/>
+            <param name="threads.logFile" value="${alltest.resultDir}/threads/results.xml"/>
+        </antcall>
+        <!-- Run the perf tests just with streams, which gives best perf data -->
+        <antcall target="perf">
+            <param name="contrib.flavor" value="trax.stream"/>
+            <param name="perf.outputDir" value="${alltest.resultDir}/perf"/>
+            <param name="perf.logFile" value="${alltest.resultDir}/perf/results.xml"/>
+        </antcall>
+        
+    </target>
+
+    <target name="alltest.contrib">
+        <property name="alltest.resultDir" value="results-alltest" />
+        <property name="alltest.contrib.resultDir" value="${alltest.resultDir}/contrib" />
+        <echo message="About to execute contrib tests with all flavors, results into ${alltest.contrib.resultDir}/..." />
+
+        <antcall target="conf">
+            <param name="contrib.flavor" value="trax.systemId"/>
+            <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/systemId"/>
+            <param name="contrib.logFile" value="${alltest.contrib.resultDir}/systemId/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="contrib.flavor" value="trax.file"/>
+            <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/file"/>
+            <param name="contrib.logFile" value="${alltest.contrib.resultDir}/file/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="contrib.flavor" value="trax.dom"/>
+            <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/dom"/>
+            <param name="contrib.logFile" value="${alltest.contrib.resultDir}/dom/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="contrib.flavor" value="trax.sax"/>
+            <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/sax"/>
+            <param name="contrib.logFile" value="${alltest.contrib.resultDir}/sax/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="contrib.flavor" value="trax.localPath"/>
+            <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/localPath"/>
+            <param name="contrib.logFile" value="${alltest.contrib.resultDir}/localPath/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="contrib.flavor" value="trax.stream"/>
+            <param name="contrib.outputDir" value="${alltest.contrib.resultDir}/stream"/>
+            <param name="contrib.logFile" value="${alltest.contrib.resultDir}/stream/results.xml"/>
+        </antcall>
+    </target>
+
+    <target name="alltest.conf">
+        <property name="alltest.resultDir" value="results-alltest" />
+        <property name="alltest.conf.resultDir" value="${alltest.resultDir}/conf" />
+        <echo message="About to execute conf tests with all flavors, results into ${alltest.conf.resultDir}/..." />
+        <!-- Run full conf test with each major available flavor into 
+             specific output directories; note any user options will 
+             override for all test calls.
+             Also exclude the currently failing tests in the 
+             smoketest if use.excludes is set.
+        -->
+        <condition property="conf.excludes" value="${smoketest.conf.excludes}">
+            <equals arg1="${use.excludes}" arg2="true" />
+        </condition>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.systemId"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
+            <param name="conf.outputDir" value="${alltest.conf.resultDir}/systemId"/>
+            <param name="conf.logFile" value="${alltest.conf.resultDir}/systemId/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.file"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
+            <param name="conf.outputDir" value="${alltest.conf.resultDir}/file"/>
+            <param name="conf.logFile" value="${alltest.conf.resultDir}/file/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.dom"/>
+            <!-- Note DOM always has additional exclusions in conf tests-->
+            <param name="conf.excludes" value="${trax.dom.excludes};${conf.excludes}"/>
+            <param name="conf.outputDir" value="${alltest.conf.resultDir}/dom"/>
+            <param name="conf.logFile" value="${alltest.conf.resultDir}/dom/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.sax"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
+            <param name="conf.outputDir" value="${alltest.conf.resultDir}/sax"/>
+            <param name="conf.logFile" value="${alltest.conf.resultDir}/sax/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.localPath"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
+            <param name="conf.outputDir" value="${alltest.conf.resultDir}/localPath"/>
+            <param name="conf.logFile" value="${alltest.conf.resultDir}/localPath/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.stream"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
+            <param name="conf.outputDir" value="${alltest.conf.resultDir}/stream"/>
+            <param name="conf.logFile" value="${alltest.conf.resultDir}/stream/results.xml"/>
+        </antcall>
+        <!-- we should really run conferr with each flavor -->
+        <antcall target="conferr">
+            <param name="conferr.flavor" value="trax.systemId"/>
+            <param name="conferr.outputDir" value="${alltest.conf.resultDir}/conferr"/>
+            <param name="conferr.logFile" value="${alltest.conf.resultDir}/conferr/results.xml"/>
+            <!-- Note that conferr doesn't currently use gold files, 
+                 but we need to set the goldDir anyway for convenience
+            --> 
+            <param name="conferr.goldDir" value="${alltest.conf.resultDir}/conferr-gold"/>
+        </antcall>
+        <!-- To be updated: also use at least one run of ErrorHandlerTestlet -->
+        <antcall target="conf">
+            <param name="conf.testlet" value="org.apache.qetest.xsl.ErrorHandlerTestlet"/>
+            <param name="conf.flavor" value="trax.stream"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
+            <param name="conf.outputDir" value="${alltest.conf.resultDir}/streamEH"/>
+            <param name="conf.logFile" value="${alltest.conf.resultDir}/streamEH/results.xml"/>
         </antcall>
     </target>
 
