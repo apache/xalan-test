@@ -14,7 +14,7 @@
 <!-- FileName: FailScanner.xsl -->
 <!-- Author: shane_curcuru@us.ibm.com -->
 <!-- Purpose: Simple viewer for org.apache.qetest.XMLFileLogger
-     logFile failing-only results put into simple HTML pages -->
+     logFile failing-only results put into simple HTML pages updates coming -->
 
 <!-- Include constant definitions for results file elements, 
      attributes, and values, copied from relevant Java code -->
