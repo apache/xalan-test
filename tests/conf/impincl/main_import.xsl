@@ -7,8 +7,7 @@
 <!-- Section: 2.6.2 Stylesheet Import -->
 <!-- Creator: Vikranth Reddy (vreddy@covigo.com) -->
 <!-- Purpose: Test of import (going up directory tree) using ..\main_import.xsl -->
-<!--          This is the last file in the import chain. Main xsl file is in -->
-<!--          xmanual/redirect/subdir  -->
+<!--          This is the last file in the import chain.  -->
 
 <xsl:template match="test">
 In ImpIncl: <xsl:value-of select="."/>
