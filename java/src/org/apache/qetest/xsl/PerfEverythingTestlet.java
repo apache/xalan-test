@@ -62,9 +62,12 @@
  */
 package org.apache.qetest.xsl;
 import org.apache.qetest.*;
-import org.apache.qetest.xslwrapper.ProcessorWrapper;
+import org.apache.qetest.xslwrapper.TransformWrapper;
+import org.apache.qetest.xslwrapper.TransformWrapperFactory;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Hashtable;
 
 /**
@@ -138,6 +141,10 @@ public class PerfEverythingTestlet extends TestletImpl
             logger.checkErr("Incorrect Datalet type provided, threw:" + e.toString());
             return;
         }
+        logger.logMsg(Logger.STATUSMSG, "About to test: " 
+                      + (null == datalet.inputName
+                         ? datalet.xmlName
+                         : datalet.inputName));
         
         // Cleanup outName only if asked to - delete the file on disk
         if ("true".equalsIgnoreCase(datalet.options.getProperty("deleteOutFile")))
@@ -160,6 +167,7 @@ public class PerfEverythingTestlet extends TestletImpl
         // Setup: Save options from the datalet in convenience variables
         int iterations = 10;
         boolean preload = true;
+        boolean runtimeGC = false;
         try
         {
             iterations = Integer.parseInt(datalet.options.getProperty("iterations"));
@@ -168,6 +176,11 @@ public class PerfEverythingTestlet extends TestletImpl
         try
         {
             preload = (new Boolean(datalet.options.getProperty("preload"))).booleanValue();
+        }
+        catch (Exception e) { /* no-op, leave as default */ }
+        try
+        {
+            runtimeGC = (new Boolean(datalet.options.getProperty("runtimeGC"))).booleanValue();
         }
         catch (Exception e) { /* no-op, leave as default */ }
 
@@ -180,104 +193,88 @@ public class PerfEverythingTestlet extends TestletImpl
         long unparsedxml = 0L;   // First stylesheet process during iterations
         long avgunparsedxml = 0L;// Average of stylesheet process during iterations
 
-        // Setup: Store local copies of XSL, XML references for 
-        //  potential change to URLs            
-        String inputName = datalet.inputName;
-        String xmlName = datalet.xmlName;
-        if (datalet.useURL)
-        {
-            // inputName may not exist if it's an embedded test
-            if (null != inputName)
-                inputName = QetestUtils.filenameToURL(inputName);
-            xmlName = QetestUtils.filenameToURL(xmlName);
-        }
-        // try...catch around entire performance operation
+        // Create a new TransformWrapper of appropriate flavor
+        //  null arg is unused liaison for TransformWrapper
+        //@todo allow user to pass in pre-created 
+        //  TransformWrapper so we don't have lots of objects 
+        //  created and destroyed for every file
+        TransformWrapper transformWrapper = null;
         try
         {
-            // Setup: Create a new ProcessorWrapper of appropriate flavor
-            ProcessorWrapper processorWrapper = ProcessorWrapper.getWrapper(datalet.flavor);
-            if (null == processorWrapper.createNewProcessor(null))
+            transformWrapper = TransformWrapperFactory.newWrapper(datalet.flavor);
+            transformWrapper.newProcessor(null);
+        }
+        catch (Throwable t)
+        {
+            logThrowable(t, getDescription() + " newWrapper/newProcessor threw");
+            logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
+            return;
+        }
+
+        // Test our supplied file in multiple ways, logging performance data
+        try
+        {
+            // Setup: Store local copies of XSL, XML references for 
+            //  potential change to URLs            
+            String inputName = datalet.inputName;
+            String xmlName = datalet.xmlName;
+            if (datalet.useURL)
             {
-                logger.checkErr("ERROR: could not create processorWrapper, aborting.");
-                return;
+                // inputName may not exist if it's an embedded test
+                if (null != inputName)
+                    inputName = QetestUtils.filenameToURL(inputName);
+                xmlName = QetestUtils.filenameToURL(xmlName);
             }
             logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + inputName
                           + " xmlName=" + xmlName + " outputName=" + datalet.outputName
                           + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor
                           + " iterations=" + iterations + " preload=" + preload
                           + " algorithim=" + getDescription());
+
             //@todo make various logMemory calls optional
-            logMemory(true, true);
+            logMemory(runtimeGC, true);
 
             // Measure(singletransform): Very first Preload end-to-end transform
-            singletransform = processorWrapper.processToFile(xmlName, inputName,
+            long[] times = null;
+            times = transformWrapper.transform(xmlName, inputName,
                                                 datalet.outputName);
-            logMemory(true, false);
-            if (singletransform == ProcessorWrapper.ERROR)
-            {
-                logger.checkFail("ERROR: Preload0 error with:" + datalet.inputName);
-                return;
-            }
+            singletransform = times[TransformWrapper.IDX_OVERALL];
+            logMemory(runtimeGC, false);
 
             // Measure(parsexsl): once: first preprocess
-            parsexsl = processorWrapper.preProcessStylesheet(inputName);
-            logMemory(true, false);
-            if (parsexsl == ProcessorWrapper.ERROR)
-            {
-                logger.checkFail("ERROR: Preload1 error with:" + datalet.inputName);
-                return;
-            }
+            times = transformWrapper.buildStylesheet(inputName);
+            parsexsl = times[TransformWrapper.IDX_OVERALL];
+            logMemory(runtimeGC, false);
+
             // Measure(unparsedxml): once: first process
-            unparsedxml = processorWrapper.processToFile(xmlName, datalet.outputName);
-            logMemory(true, false);
-            if (unparsedxml == ProcessorWrapper.ERROR)
-            {
-                logger.checkFail("ERROR: Preload2 error with:" + datalet.inputName);
-                return;
-            }
+            times = transformWrapper.transformWithStylesheet(xmlName, datalet.outputName);
+            unparsedxml = times[TransformWrapper.IDX_OVERALL];
+            logMemory(runtimeGC, false);
 
             for (int ctr = 1; ctr <= iterations; ctr++)
             {
                 // Measure(avgparsexsl): average preprocess
-                long preprocessTime = processorWrapper.preProcessStylesheet(inputName);
-                logMemory(true, false);
-                if (preprocessTime == ProcessorWrapper.ERROR)
-                {
-                    logger.checkFail("ERROR: PreprocessLoop1 error iter(" + ctr + ") with:" + datalet.inputName);
-                    return;
-                }
-                avgparsexsl += preprocessTime;
+                times = transformWrapper.buildStylesheet(inputName);
+                avgparsexsl += times[TransformWrapper.IDX_OVERALL];
+                logMemory(runtimeGC, false);
 
                 // Measure(avgunparsedxml): average process
-                long processTime = processorWrapper.processToFile(xmlName, datalet.outputName);
-                logMemory(true, false);
-                if (processTime == ProcessorWrapper.ERROR)
-                {
-                    logger.checkFail("ERROR: PreprocessLoop2 error iter(" + ctr + ") with:" + datalet.inputName);
-                    return;
-                }
-                avgunparsedxml += processTime;
+                times = transformWrapper.transformWithStylesheet(xmlName, datalet.outputName);
+                avgunparsedxml += times[TransformWrapper.IDX_OVERALL];
+                logMemory(runtimeGC, false);
             }
 
             // Measure(etoe): once: first full process
-            etoe = processorWrapper.processToFile(xmlName, inputName, datalet.outputName);
-            logMemory(true, true);
-            if (etoe == ProcessorWrapper.ERROR)
-            {
-                logger.checkFail("ERROR: Process error with:" + datalet.inputName);
-                return;
-            }
+            times = transformWrapper.transform(xmlName, inputName, datalet.outputName);
+            etoe = times[TransformWrapper.IDX_OVERALL];
+            logMemory(runtimeGC, true);
+
             for (int ctr = 1; ctr <= iterations; ctr++)
             {
                 // Measure(avgetoe): average full process
-                long retVal = processorWrapper.processToFile(xmlName, inputName, datalet.outputName);
-                logMemory(true, false);
-                if (retVal == ProcessorWrapper.ERROR)
-                {
-                    logger.checkFail("ERROR: ProcessLoop error iter(" + ctr + ") with:" + datalet.inputName);
-                    return;
-                }
-                avgetoe += retVal;
+                times = transformWrapper.transform(xmlName, inputName, datalet.outputName);
+                avgetoe += times[TransformWrapper.IDX_OVERALL];
+                logMemory(runtimeGC, false);
             }
 
             // Log special performance element with our timing
@@ -287,7 +284,7 @@ public class PerfEverythingTestlet extends TestletImpl
             //  stylesheets can compare different test runs
             attrs.put("UniqRunid", datalet.options.getProperty("runId", "runId;none"));
             // processor is the 'flavor' of processor we're testing
-            attrs.put("processor", processorWrapper.getDescription());
+            attrs.put("processor", transformWrapper.getDescription());
             // idref is the individual filename
             attrs.put("idref", (new File(datalet.inputName)).getName());
             // inputName is the actual name we gave to the processor
@@ -302,29 +299,32 @@ public class PerfEverythingTestlet extends TestletImpl
             attrs.put("avgunparsedxml", new Long(avgunparsedxml / iterations)); // Average of stylesheet process during iterations
 
             logger.logElement(Logger.STATUSMSG, "perf", attrs, "PItr;");
+
+            // If we get here, attempt to validate the contents of 
+            //  the last outputFile created
+            CheckService fileChecker = (CheckService)datalet.options.get("fileCheckerImpl");
+            // Supply default value
+            if (null == fileChecker)
+                fileChecker = new XHTFileCheckService();
+            if (Logger.PASS_RESULT
+                != fileChecker.check(logger,
+                                     new File(datalet.outputName), 
+                                     new File(datalet.goldName), 
+                                     getDescription() + ", " + datalet.getDescription())
+               )
+                logger.logMsg(Logger.WARNINGMSG, "Failure reason: " + fileChecker.getExtendedInfo());
         }
         // try...catch around entire performance operation
         catch (Throwable t)
         {
-            logger.checkErr("PerfEverythingTestlet with:" + datalet.inputName
-                                 + " threw: " + t.toString());
             java.io.StringWriter sw = new java.io.StringWriter();
             java.io.PrintWriter pw = new java.io.PrintWriter(sw);
             t.printStackTrace(pw);
             logger.logArbitrary(Logger.ERRORMSG, sw.toString());
+            logger.checkErr("PerfEverythingTestlet with:" + datalet.inputName
+                                 + " threw: " + t.toString());
             return;
         }
-
-        // If we get here, attempt to validate the contents of 
-        //  the last outputFile created
-        CheckService fileChecker = new XHTFileCheckService();
-        if (Logger.PASS_RESULT
-            != fileChecker.check(logger,
-                                 new File(datalet.outputName), 
-                                 new File(datalet.goldName), 
-                                 getDescription() + ", " + datalet.getDescription())
-           )
-            logger.logMsg(Logger.WARNINGMSG, "Failure reason: " + fileChecker.getExtendedInfo());
 
         //@todo Should we attempt to cleanup anything else here?
         //  We've had problems running this testlet over large 
@@ -352,5 +352,22 @@ public class PerfEverythingTestlet extends TestletImpl
         }
     }
 
+
+    /**
+     * Logs out throwable.toString() and stack trace to our Logger.
+     * //@todo Copied from Reporter; should probably be moved into Logger.
+     * @param throwable thrown throwable/exception to log out.
+     * @param msg description of the throwable.
+     */
+    protected void logThrowable(Throwable throwable, String msg)
+    {
+        StringWriter sWriter = new StringWriter();
+        sWriter.write(msg + "\n");
+
+        PrintWriter pWriter = new PrintWriter(sWriter);
+        throwable.printStackTrace(pWriter);
+
+        logger.logArbitrary(Logger.STATUSMSG, sWriter.toString());
+    }
 }  // end of class PerfEverythingTestlet
 
