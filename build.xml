@@ -266,6 +266,23 @@
     </target>
 
     <!-- ================================================================== -->
+    <!-- Run tests: the ThreadedTestletDriver on threads.filelist           -->
+    <!-- ================================================================== -->
+    <target name="threads" description="Run ThreadedTestletDriver on threads.filelist"
+        depends="init.test">
+        <!-- Set special threaded test driver and filelist, user may override -->
+        <property name="testClass" value="org.apache.qetest.xsl.ThreadedTestletDriver" />
+        <echo message="Executing Xalan threads test: ${testClass}" />
+        <property name="testType" value="threads." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="api.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" />
+    </target>
+
+
+    <!-- ================================================================== -->
     <!-- Run tests: a specific named API test                               -->
     <!-- ================================================================== -->
     <target name="api" description="Run a specific API test"
