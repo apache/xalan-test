@@ -261,7 +261,8 @@ public class TransformerHandlerAPITest extends XSLProcessorTestBase
             reporter.checkObject(tHandler.getSystemId(), null, "realTransformer.set/getSystemId API coverage to null");
 
             // setResult API coverage
-            Result unusedResult = new StreamResult(outNames.currentName()); // currentName is probably _0
+            Result unusedResult = new StreamResult(outNames.nextName()); // use nextName() instead of currentName()
+            reporter.logInfoMsg("new StreamResult(" + outNames.currentName() + ")");
             tHandler.setResult(unusedResult);
             reporter.checkPass("Crash test: realTransformer.setResult appears to have worked");
             reporter.logStatusMsg("Note that we can't verify setResult since there's no getResult!");
