@@ -50,7 +50,11 @@
     <property name="xdocs.book" value="${xdocs.dir}/sources/xalantest.xml"/>
     <property name="xdocs.style" value="${xdocs.dir}/style"/>
 
-    <property name="xalan.xdocs" value="../../xdocs"/> <!--Xalan-J 1 for now -->
+    <!--Xalan-J 2 -->
+    <property name="xalan.xdocs" value="../../java/xdocs"/>
+    <property name="xalan.bin.dir" value="../../java/bin"/> 
+    <property name="xalan.build.dir" value="../../java/build"/> 
+ 
     <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
     <property name="xalan.generator.styletargz" value="${xalan.xdocs}/xml-site-style.tar.gz"/>
     <property name="xdocs.generator.styletar" value="${xdocs.dir}/xml-site-style.tar"/>
@@ -590,18 +594,23 @@
     <!-- =================================================================== -->
     <target name="javadocs" depends="prepare"
             description="Build the Javadocs for tests">
+            
+        <!-- Ant 1.2 ignores destdir arg if doclet is set, so must send to doclet in doclet subelement-->    
         <javadoc
+             classpath="${java.class.path};${xalan.build.dir}/xalan.jar"
              sourcepath="${src.dir}"
-             destdir="${build.apidocs}"
              packagenames="${javadocs.packages}"
-             public="true"
+             protected="true"
              author="true"
              version="true"
              use="true"
              windowtitle="${Name}" 
              doctitle="${Name}"
-             bottom="${copyright}"
-        />
+             bottom="${copyright}">
+               <doclet name="xalanjdoc.Standard" path="${xalan.bin.dir}/xalan2jdoc.jar">
+                  <param name="-d" value="${build.apidocs}"/>
+               </doclet>             
+        </javadoc>
     </target>
 
 </project>
