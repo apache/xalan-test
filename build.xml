@@ -287,7 +287,7 @@
             <param name="testClass" value="org.apache.qetest.trax.Minitest"/>
             <param name="testType" value="minitest."/>
         </antcall>
-        <available file="${minitest.passfile}" property="minitest-passed" />
+        <available file="${minitest.passFile}" property="minitest-passed" />
     </target>
     <target name="minitest-notpass" unless="minitest-passed">
         <echo message=" [minitest] ERROR! The Minitest failed!" />
