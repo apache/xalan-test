@@ -166,12 +166,10 @@ public static DTM createDTM(int method, String theSource, StringBuffer buf)
 	// Create DTM and generate initial context
 	if (method == 1)
 	{
-		//System.out.print("StringReader required");
 		source = new StreamSource(new StringReader(theSource));
 	}
 	else 
 	{
-		//System.out.print("StringReader NOT required");
 		source=new StreamSource(theSource);
 	}
 
@@ -284,6 +282,7 @@ public static String getNodeInfo(DTM dtm, int nodeHandle, String indent)
 		       "\tValue=" + vq + value + vq	+ "\n"
 		       ); 
 	}
+	
 	return buf;
 }
 
