@@ -287,7 +287,7 @@ public class StreamResultAPITest extends XSLProcessorTestBase
                 reporter.logArbitrary(reporter.TRACEMSG, "baos was: " + baos.toString());
                 reporter.logArbitrary(reporter.TRACEMSG, "ps(baos2) was: " + baos2.toString());
             }
-            reporter.checkAmbiguous("@todo also verify one against a real gold file");
+            writeFileAndValidate(baos.toString(), outputFileInfo.goldName);
         }
         catch (Throwable t)
         {
@@ -316,15 +316,13 @@ public class StreamResultAPITest extends XSLProcessorTestBase
                 reporter.logArbitrary(reporter.TRACEMSG, "sw was: " + sw.toString());
                 reporter.logArbitrary(reporter.TRACEMSG, "cw was: " + cw.toString());
             }
-            reporter.checkAmbiguous("@todo also verify one against a real gold file");
+            writeFileAndValidate(sw.toString(), outputFileInfo.goldName);
         }
         catch (Throwable t)
         {
             reporter.checkFail("Problem with transform-streams(2)");
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(2)");
         }
-
-        reporter.checkAmbiguous("@todo do transform when setting systemId on Results");
 
         try
         {
@@ -359,6 +357,16 @@ public class StreamResultAPITest extends XSLProcessorTestBase
                 reporter.logArbitrary(reporter.TRACEMSG, "sw1 w/out systemId was: " + sw1.toString());
                 reporter.logArbitrary(reporter.TRACEMSG, "sw2 w/ systemId was: " + sw2.toString());
             }
+            writeFileAndValidate(sw1.toString(), outputFileInfo.goldName);
+            reporter.logInfoMsg("@todo we should update XHTComparator for bogus systemId's like we have in this test");
+            // @todo we should update XHTComparator for bogus systemId's like we have in this test
+            // Note that using XHTFileCheckService, it always compares our 
+            //  outputs using [text] since the XML parser usually throws:
+            //  warning;org.xml.sax.SAXParseException: File "file:/E:/builds/xml-xalan/test/tests/api-gold/trax/stream/this-is-doctype-system" not found.
+            if (reporter.getLoggingLevel() >= Reporter.TRACEMSG)
+            {
+                reporter.logArbitrary(reporter.TRACEMSG, fileChecker.getExtendedInfo());
+            }
         }
         catch (Throwable t)
         {
@@ -369,6 +377,31 @@ public class StreamResultAPITest extends XSLProcessorTestBase
         reporter.testCaseClose();
         return true;
     }
+
+
+    /**
+     * Worker method to dump a string to a file and validate it.  
+     * @return true if OK, false otherwise
+     */
+    public void writeFileAndValidate(String data, String goldFile)
+    {
+        try
+        {
+            FileWriter fw = new FileWriter(outNames.nextName());
+            fw.write(data);
+            fw.close();
+            fileChecker.check(reporter, 
+                              new File(outNames.currentName()), 
+                              new File(goldFile),
+                              "writeStringToFile() checking: " + outNames.currentName());
+        }
+        catch (Exception e)
+        {
+            reporter.checkFail("writeStringToFile() threw: " + e.toString());
+            reporter.logThrowable(Reporter.ERRORMSG, e, "writeStringToFile() threw");
+        }
+    }
+
 
     /**
      * Convenience method to print out usage information - update if needed.  
