@@ -50,10 +50,11 @@ public class Bugzilla1283 extends TestletImpl
         }
         catch (Exception e)
         {
-            logger.checkPass("Transform properly had fatalError and threw: " + e.toString());
             logger.logThrowable(Logger.ERRORMSG, e, "Transform properly had fatalError and threw");
+            logger.checkPass("Transform properly had fatalError and threw: " + e.toString());
         }
-        logger.checkAmbiguous("Bug occours now: system hangs");
+        logger.logMsg(Logger.CRITICALMSG, "Bug occours now: system hangs");
+        logger.checkPass("if we got here, we didn't hang!");
     }
 
     /**
