@@ -309,7 +309,7 @@ public class XSLProcessorTestBase extends FileBasedTest
         //  so it can use the same values in initialization
         // A Reporter will auto-initialize from the values
         //  in the properties block
-        setReporter(new Reporter(p));
+        setReporter(new Reporter(testProps));
         reporter.addDefaultLogger();  // add default logger if needed
         reporter.testFileInit(testName, testComment);
 
