@@ -12,6 +12,7 @@
 <xsl:strip-space elements="*"/>
 
 <xsl:template match="//a[@id='36']">
+<out>
    <xsl:text>matched on node </xsl:text>
    <xsl:value-of select="./@id"/>
    <xsl:text>: </xsl:text>
@@ -71,7 +72,7 @@
       <xsl:with-param name="nodeList" select="attribute::*" />
       <xsl:with-param name="axisName" select="'attribute::*'" />
    </xsl:call-template>
-
+</out>
 </xsl:template>
 
 <xsl:template name="displayNodes">

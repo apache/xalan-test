@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-matched on node 36: 
+<out>matched on node 36: 
      Axis: parent::*:  22,
      Axis: following::*:  37,38,23,39,3A,46,56,3B,24,3C,3D,3E,
      Axis: following-sibling::*:  37,38,
@@ -10,4 +10,4 @@ matched on node 36:
      Axis: descendant-or-self::*:  36,42,51,43,52,44,53,45,54,55,
      Axis: ancestor::*:  11,22,
      Axis: ancestor-or-self::*:  11,22,36,
-     Axis: attribute::*:  id : 36,a1 : 1,a2 : 2,
+     Axis: attribute::*:  id : 36,a1 : 1,a2 : 2,</out>
