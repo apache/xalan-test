@@ -9,7 +9,7 @@
 
 <xsl:template match="doc">
   <out>
-    <xsl:value-of select="system-property('xsl:version')"/>
+    <xsl:value-of select="substring(system-property('xsl:version'), 1, 1)"/>
   </out>
 </xsl:template>
  

@@ -2,6 +2,6 @@
 
 <root xmlns:ped="http://www.test.com">
 <out1/>
-<ped:out2/>
-<ns0:out3 xmlns:ns0="http://www.bdd.com"/>
+<out2 xmlns="http://www.test.com"/>
+<out3 xmlns="http://www.bdd.com"/>
 </root>

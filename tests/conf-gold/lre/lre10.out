@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root xmlns:ped="http://www.ped.com">
-<ped:Out1/>
+<Out1 xmlns="http://www.ped.com"/>
 <Out2/>
-<ns0:Out3 xmlns:ns0="http://www.bdd.com"/>
+<Out3 xmlns="http://www.bdd.com"/>
 </root>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <out xmlns:anamespace="foo.com">
 <p>
-<anamespace:test/>
+<test xmlns="foo.com"/>
 </p>
 <p>
-<ns0:test xmlns:ns0="baz.com"/>
-<ns1:foo xmlns:ns1="baz.com"/>
+<test xmlns="baz.com"/>
+<foo xmlns="baz.com"/>
 </p>
 </out>
