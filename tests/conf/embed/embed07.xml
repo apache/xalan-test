@@ -1,6 +1,17 @@
 <?xml version="1.0"?> 
 <?xml-stylesheet type="text/xsl" href="#style1"?>
+<!DOCTYPE doc [
+<!ELEMENT doc (xsl:transform | body)*>
 
+<!ELEMENT body ANY>
+
+<!ELEMENT xsl:transform ANY>
+<!ATTLIST xsl:transform 
+		  id ID #REQUIRED
+		  xmlns:xsl CDATA #FIXED "http://www.w3.org/1999/XSL/Transform"
+		  version NMTOKEN #REQUIRED>
+
+]>
 <doc>
 <xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
                id="style1">
