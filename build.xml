@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
-/**
- * test.xml
- * Ant 1.4.1+ build script for compiling and running Xalan-J tests.  
- * 
- * Note that this is a slightly unusual Ant build.xml file, since we 
- * support both compiling/packaging the Xalan-J tests themselves, as 
- * well as a number of targets designed to execute the tests once 
- * they're built.
- *
- * In general the compilation targets (i.e. ones that compile the 
- * test classes themselves) do list their dependencies explicitly.
- * Targets that serve to execute tests do not normally list any 
- * dependencies - users must manually 'build jar' first.
- *
- * @author shane_curcuru@lotus.com
- * @see build.bat
- */
--->
-
 <project name="testxsl" default="jar" basedir=".">
+<description>
+build.xml:$Revision$
+Ant 1.4.1+ build script for compiling and running Xalan-J tests.  
+
+Note that this is a slightly unusual Ant build.xml file, since we 
+support both compiling/packaging the Xalan-J tests themselves, as 
+well as a number of targets designed to execute the tests once 
+they're built.
+
+In general the compilation targets (i.e. ones that compile the 
+test classes themselves) do list their dependencies explicitly.
+Targets that serve to execute tests do not normally list any 
+dependencies - users must manually 'build jar' first.
+
+@author shane_curcuru@lotus.com
+@see build.bat
+
+</description>
 
 <!-- Note: A number of property names may seem a little odd.  I've 
      explicitly tried to reduce property name collisions between 
@@ -43,7 +41,7 @@
    -->
     <property environment="ENV" />
 
-    <property name="year" value="2000-2001"/>
+    <property name="year" value="2000-2002"/>
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -201,17 +199,16 @@
     <!-- Initialize: setup for compiling, doc building, running tests       -->
     <!-- ================================================================== -->
     <target name="init.test"
-        description="Prepare timestamp, echo JARDIR for debugging">
-        <!-- Note this is case-sensitive, even on Windows! -->
-        <echo message="Your ==JARDIR== is set to ==${ENV.JARDIR}==" />
-        <echo message="Using parserjar ${parserjar}" />
+        description="Prepare timestamp, echo version for debugging">
+        <echo message="Using parserjar ${parserjar} build.xml:$Revision$" />
         <tstamp />
-        <!-- Note this is used when styling results files from tests to html. -->
-        <available classname="org.apache.tools.ant.taskdefs.optional.XalanLiaison" property="xalan-liaison" />
     </target>
 
     <target name="init.build" depends="init.test"
         description="Prepare build output tree, copy prebuilts">
+        <!-- Note this is case-sensitive, even on Windows! -->
+        <!-- Note JARDIR support should probably be removed, since it's a maintenance hassle Jul-02 -sc -->
+        <echo message="Your ==JARDIR== is set to ==${ENV.JARDIR}==" />
         <echo message="JVM Classpath is ${java.class.path}" />
         <mkdir dir="${test.build.dir}" />
         <mkdir dir="${test.build.dir}/${test.root}" />
@@ -258,7 +255,7 @@
             <param name="scan.outputDir" value="${conf.outputDir}"/>
         </antcall>
     </target>
-    <target name="conf.dom" description="Run TestletDriver over conf with DOMs">
+    <target name="conf.dom" description="Run TestletDriver over conf with DOM excludes">
         <antcall target="conf">
             <param name="conf.excludes" value="${trax.dom.excludes}"/>
             <param name="conf.flavor" value="trax.dom"/>
@@ -269,7 +266,7 @@
             <param name="testClass" value="org.apache.qetest.xsl.StylesheetDriver" />
         </antcall>
     </target>
-    <target name="conf.xsltc.dom" description="Run TestletDriver over conf with DOMs">
+    <target name="conf.xsltc.dom" description="Run TestletDriver over conf with DOM excludes">
         <antcall target="conf.xsltc">
             <param name="conf.xsltc.excludes" value="${trax.dom.excludes}"/>
             <param name="conf.xsltc.flavor" value="trax.dom"/>
@@ -282,7 +279,6 @@
     <!-- ================================================================== -->
     <target name="conferr" description="Run TestletDriver over the conferr negative test tree"
         depends="init.test">
-        <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan conf test: ${testClass}" />
         <property name="testType" value="conferr." />
@@ -301,7 +297,6 @@
     <!-- ================================================================== -->
     <target name="perf" description="Run TestletDriver over the perf tree"
         depends="init.test">
-        <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan perf test: ${testClass}" />
         <property name="testType" value="perf." />
@@ -320,7 +315,6 @@
     <!-- ================================================================== -->
     <target name="contrib" description="Run TestletDriver over the contrib tree"
         depends="init.test">
-        <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan contrib test: ${testClass}" />
         <property name="testType" value="contrib." />
@@ -372,13 +366,16 @@
     <!-- ================================================================== -->
     <!-- Run tests: Run all available API tests                             -->
     <!-- ================================================================== -->
-    <target name="harness" description="Run all available API tests">
+    <target name="harness" description="Run all listed API harness.tests">
         <antcall target="api">
             <param name="testClass" value="org.apache.qetest.xsl.XSLTestHarness"/>
             <param name="qetest.tests" value="${harness.tests}"/>
             <!-- Below line is in case we run ThreadedTestletDriver -->
             <param name="qetest.testlet" value="${harness.threads.testlet}"/>
             <param name="qetest.fileList" value="${harness.threads.fileList}"/>
+        </antcall>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${api.outputDir}"/>
         </antcall>
     </target>
 
@@ -387,8 +384,7 @@
     <!-- ================================================================== -->
     <target name="bugzilla" description="Run all Bugzilla Testlets and tests to regress bugs"
         depends="init.test">
-        <echo message="Run all Bugzilla Testlets and tests to regress bugs" />
-        <!-- Set the default conformance test driver, user may override -->
+        <echo message="Executing Xalan Bugzilla Testlets and tests to regress bugs" />
         <property name="testClass" value="org.apache.qetest.xsl.BugzillaTestletDriver" />
         <property name="testType" value="bugzilla." />
         <xalantest test="${testClass}"
@@ -404,7 +400,7 @@
     <!-- ================================================================== -->
     <target name="extensions" description="Run various extensions tests using driver"
         depends="init.test">
-        <echo message="Run various extensions tests using driver" />
+        <echo message="Executing Xalan various extensions tests using driver" />
         <!-- Set the default conformance test driver, user may 
              override; note test.properties:extensions.testlet= 
         -->
@@ -550,29 +546,36 @@
     <target name="alltest" 
             description="Run nearly *all* available Xalan-J 2.x tests with defaults"
             depends="all,alltest.other,alltest.conf,alltest.contrib">
-        <!-- Currently don't bother checking results, -pass, -notpass -->
+        <!-- Ensure that one last scan gets run of the whole output set
+             (Note that when we call sub-targets, some of our subdirs 
+             may have had sub-scans done as well) -->
+        <antcall target="scan">
+            <param name="scan.outputDir" value="results-alltest"/>
+        </antcall>
+
     </target>
     <target name="alltest.features" 
             description="Re-Run nearly *all* available Xalan-J 2.x tests with setAttribute features set"
             depends="all,alltest.other">
+        <property name="alltest.resultDir" value="results-alltest" />
         <antcall target="alltest.conf">
-            <param name="alltest.resultDir" value="results-alltest/inctrue"/>
+            <param name="alltest.resultDir" value="${alltest.resultDir}/inctrue"/>
             <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/incremental" value="true"/>
         </antcall>
         <antcall target="alltest.conf">
-            <param name="alltest.resultDir" value="results-alltest/optfalse"/>
+            <param name="alltest.resultDir" value="${alltest.resultDir}/optfalse"/>
             <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/optimize" value="false"/>
         </antcall>
         <antcall target="alltest.contrib">
-            <param name="alltest.resultDir" value="results-alltest/inctrue"/>
+            <param name="alltest.resultDir" value="${alltest.resultDir}/inctrue"/>
             <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/incremental" value="true"/>
         </antcall>
         <antcall target="alltest.contrib">
-            <param name="alltest.resultDir" value="results-alltest/optfalse"/>
+            <param name="alltest.resultDir" value="${alltest.resultDir}/optfalse"/>
             <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/optimize" value="false"/>
         </antcall>
         <antcall target="scan">
-            <param name="scan.outputDir" value="results-alltest"/>
+            <param name="scan.outputDir" value="${alltest.resultDir}"/>
         </antcall>
     </target>
 
@@ -764,7 +767,6 @@
     <target name="compile.xsl" depends="compile.qetest"
         description="Compile TransformWrapper and associated classes">
         <!-- This javac has no dependencies -->
-        <!-- @deprecated ProcessorWrapper.java to be removed! -->
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xslwrapper/TransformWrapperHelper.java,${test.root}xslwrapper/TransformWrapper.java,${test.root}xslwrapper/TransformWrapperFactory.java"
@@ -875,10 +877,11 @@
     <target name="distclean" depends="clean"
         description="Clean everything, including most test results!" >
         <delete dir="${alltest.resultDir}" />
-        <delete dir="${apitest.outputDir}" />
-        <delete dir="${conftest.outputDir}" />
-        <delete dir="${perftest.outputDir}" />
+        <delete dir="${api.outputDir}" />
+        <delete dir="${conf.outputDir}" />
+        <delete dir="${perf.outputDir}" />
         <delete dir="${contrib.outputDir}" />
+        <delete dir="${smoketest.outputDir}" />
     </target>
 
     <target name="clean"
@@ -928,7 +931,7 @@
                <group title="QETEST Independent Framework" packages="org.apache.qetest"/>
                <group title="Xalan Framework and Base tests" packages="org.apache.qetest.xsl:org.apache.qetest.xslwrapper"/>
                <group title="JAXP/TrAX Generic Tests" packages="org.apache.qetest.trax:org.apache.qetest.trax.dom:org.apache.qetest.trax.sax:org.apache.qetest.trax.stream:"/>
-               <group title="Xalan-J 2.x Specific Tests" packages="org.apache.qetest.xalanj2"/>
+               <group title="Xalan-J 2.x Specific Tests" packages="org.apache.qetest.xalanj2:org.apache.qetest.xsltc:org.apache.qetest.dtm"/>
         </javadoc>
     </target>
 
@@ -1024,6 +1027,7 @@
 
     <target name="export" depends="jar"
         description="Build a very simple export of just the important sources">
+        <!-- Note that Shane has external dependencies on this target -->
         <!-- Zip only the sources used in the plain 'jar' target -->
         <zip zipfile="${test.build.dir}/testxsl-src-${DSTAMP}.zip" >
           <zipfileset dir="java">
