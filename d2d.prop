@@ -5,11 +5,12 @@
 
 #---- Choose locations: where to find files, where to log to
 # testDir is where root of test xml/xsl files are
-inputDir=\\xml-xalan\\test\\tests\\conf
 # inputDir=\\xml-xalan\\test\\tests\\temp
+# inputDir=\\xml-xalan\\test\\tests\\conf
+inputDir=.\\tests\\conf
 
 # goldDir is where the 'gold' files to check against live
-goldDir=\\xml-xalan\\test\\tests\\conf-gold
+goldDir=\\user\\dtm\\xml-xalan\\test\\tests\\conf-gold
 
 # outDir is where we put the actual output files and any logs or error dumps
 outputDir=.\\results-d2d
