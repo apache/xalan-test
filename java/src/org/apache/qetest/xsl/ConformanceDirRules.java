@@ -60,10 +60,12 @@ import java.io.FilenameFilter;
 import java.io.File;
 
 import java.util.Hashtable;
+import java.util.StringTokenizer;
 
 /**
  * Returns directories that are either on an inclusion list, or
  * just ones that don't begin with [x|X], or are 'CVS'.
+ * Rudimentary multiple inclusion dirs are now supported.
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
@@ -76,7 +78,7 @@ public class ConformanceDirRules implements FilenameFilter
     /**
      * Initialize with a case-sensitive Hash of directory names to include.  
      *
-     * NEEDSDOC @param iDirs
+     * @param iDirs hash of inclusion dirs
      */
     public ConformanceDirRules(Hashtable iDirs)
     {
@@ -84,9 +86,9 @@ public class ConformanceDirRules implements FilenameFilter
     }
 
     /**
-     * Initialize with a case-insensitive String directory name to include.  
+     * Initialize with a case-insensitive String directory name(s) to include.  
      *
-     * NEEDSDOC @param incDir
+     * @param incDir semicolon-delimited string of inclusion dir(s)
      */
     public ConformanceDirRules(String incDir)
     {
@@ -107,7 +109,7 @@ public class ConformanceDirRules implements FilenameFilter
     /**
      * Accessor methods for case-sensitive Hash of directory names to include.  
      *
-     * NEEDSDOC @param iDirs
+     * @param iDirs hash of inclusion dirs
      */
     public void setIncludeDirs(Hashtable iDirs)
     {
@@ -121,7 +123,7 @@ public class ConformanceDirRules implements FilenameFilter
     /**
      * Accessor methods for case-sensitive Hash of directory names to include.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return clone of our hash of inclusion dirs
      */
     public Hashtable getIncludeDirs()
     {
@@ -141,7 +143,7 @@ public class ConformanceDirRules implements FilenameFilter
     /**
      * Accessor method to set a case-insensitive String directory name to include.  
      *
-     * NEEDSDOC @param incDir
+     * @param incDir semicolon-delimited string of inclusion dir(s)
      */
     public void setIncludeDirs(String incDir)
     {
@@ -153,8 +155,8 @@ public class ConformanceDirRules implements FilenameFilter
      * <p><b>Note:</b> simply uses .toUpperCase() and .toLowerCase() on the input string;
      * does not do full case-checking on the entire string!</p>
      *
-     * NEEDSDOC @param incDir
-     * NEEDSDOC @param caseSensitive
+     * @param incDir semicolon-delimited string of inclusion dir(s)
+     * @param caseSensitive - should be obvious, shouldn't it?
      */
     public void setIncludeDirs(String incDir, boolean caseSensitive)
     {
@@ -164,12 +166,17 @@ public class ConformanceDirRules implements FilenameFilter
             includeDirs = null;
             includeDirs = new Hashtable();
 
-            includeDirs.put(incDir, "");
-
-            if (!caseSensitive)
+            StringTokenizer st = new StringTokenizer(incDir, ";");
+            while (st.hasMoreTokens())
             {
-                includeDirs.put(incDir.toUpperCase(), "");
-                includeDirs.put(incDir.toLowerCase(), "");
+                String tmp = st.nextToken();
+                // Value in hash is ignored
+                includeDirs.put(tmp, Boolean.TRUE);
+                if (!caseSensitive)
+                {
+                    includeDirs.put(tmp.toUpperCase(), Boolean.TRUE);
+                    includeDirs.put(tmp.toLowerCase(), Boolean.TRUE);
+                }
             }
         }
         else
