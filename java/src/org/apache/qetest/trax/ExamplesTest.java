@@ -147,6 +147,8 @@ public class ExamplesTest extends XSLProcessorTestBase
     /**
      * Provides nextName(), currentName() functionality for tests 
      * that may produce any number of output files, for the gold files
+     * NOTE: Gold names must match the test cases in order, and 
+     * must match the checked-in gold files ExamplesTest*.out!
      */
     protected OutputNameManager goldNames;
 
@@ -177,16 +179,9 @@ public class ExamplesTest extends XSLProcessorTestBase
     /** Sample gold files used for specific transforms - XMLFilter/Reader.  */
     // protected String saxGoldName;
 
-    /** Gold file used for tests we haven't validated the correct results of yet.  */
-    // protected String NOT_DEFINED;
-
-
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_SUBDIR = "trax";
     
-    /** Subdirectory prefix for gold files, for use in each of the tests. */
-
-
     /** Just initialize test name, comment, numTestCases. */
     public ExamplesTest()
     {
@@ -230,10 +225,8 @@ public class ExamplesTest extends XSLProcessorTestBase
         reporter.logTraceMsg("NOTE! This file is very sensitive to pathing issues!");
         fooFile.inputName = swapSlash(testBasePath + "xsl/foo.xsl");
         fooFile.xmlName = swapSlash(testBasePath + "xml/foo.xml");
-        fooFile.goldName = goldBasePath + "foo.out";
 
         bazFile.xmlName = swapSlash(testBasePath + "xml/baz.xml");
-        bazFile.goldName = goldBasePath + "baz.out";
 
         foo2File = swapSlash(testBasePath + "xsl/foo2.xsl");
 
@@ -244,7 +237,6 @@ public class ExamplesTest extends XSLProcessorTestBase
         // outputGoldName = goldBasePath + "output.out";
         // saxGoldName = goldBasePath + "fooSAX.out";
         // sax2GoldName = goldBasePath + "fooSAX2.out";
-        // NOT_DEFINED = goldBasePath + "need-validated-output-file-here.out";
         return true;
     }
 
@@ -269,52 +261,54 @@ public class ExamplesTest extends XSLProcessorTestBase
 
         // Note: the tests must be used with the same input files, 
         //  since they hard-code the gold files within the methods
-        reporter.logStatusMsg("exampleSimple1(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        String tmpFooNames = fooFile.xmlName + ", " + fooFile.inputName;
+        reporter.logStatusMsg("exampleSimple1(" + tmpFooNames + ")");
         exampleSimple1(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleSimple2(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleSimple2(" + tmpFooNames + ")");
         exampleSimple2(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleFromStream(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleFromStream(" + tmpFooNames + ")");
         exampleFromStream(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleFromReader(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleFromReader(" + tmpFooNames + ")");
         exampleFromReader(fooFile.xmlName, fooFile.inputName);
 
         reporter.logStatusMsg("exampleUseTemplatesObj(" + fooFile.xmlName + ", " + bazFile.xmlName + ", " + fooFile.inputName + ")");
         exampleUseTemplatesObj(fooFile.xmlName, bazFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName)");
+        reporter.logStatusMsg("exampleContentHandlerToContentHandler(" + tmpFooNames + ")");
         exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleXMLReader(fooFile.xmlName, fooFile.inputName)");
+        reporter.logStatusMsg("exampleXMLReader(" + tmpFooNames + ")");
         exampleXMLReader(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleXMLFilter(fooFile.xmlName, fooFile.inputName)");
+        reporter.logStatusMsg("exampleXMLFilter(" + tmpFooNames + ")");
         exampleXMLFilter(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleXMLFilterChain(fooFile.xmlName, fooFile.inputName, foo2File, foo3File)");
+        reporter.logStatusMsg("exampleXMLFilterChain(" + tmpFooNames 
+                              + ", " + foo2File + ", " + foo3File + ")");
         exampleXMLFilterChain(fooFile.xmlName, fooFile.inputName, foo2File, foo3File);
 
-        reporter.logStatusMsg("exampleDOM2DOM(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleDOM2DOM(" + tmpFooNames + ")");
         exampleDOM2DOM(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleParam(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleParam(" + tmpFooNames + ")");
         exampleParam(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleTransformerReuse(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleTransformerReuse(" + tmpFooNames + ")");
         exampleTransformerReuse(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleOutputProperties(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleOutputProperties(" + tmpFooNames + ")");
         exampleOutputProperties(fooFile.xmlName, fooFile.inputName);
 
         reporter.logStatusMsg("exampleUseAssociated(" + fooFile.xmlName +")");
         exampleUseAssociated(fooFile.xmlName);
 
-        reporter.logStatusMsg("exampleContentHandler2DOM(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleContentHandler2DOM(" + tmpFooNames + ")");
         exampleContentHandler2DOM(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logStatusMsg("exampleAsSerializer(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
+        reporter.logStatusMsg("exampleAsSerializer(" + tmpFooNames + ")");
         exampleAsSerializer(fooFile.xmlName, fooFile.inputName);
 
         reporter.testCaseClose();
@@ -333,21 +327,20 @@ public class ExamplesTest extends XSLProcessorTestBase
         TransformerFactory tfactory = TransformerFactory.newInstance();
     
         // Create a transformer for the stylesheet.
-        reporter.logTraceMsg("newTransformer(new StreamSource(" + filenameToURL(xslID));
+        reporter.logTraceMsg("newTransformer(new StreamSource(" + QetestUtils.filenameToURL(xslID));
         Transformer transformer 
-          = tfactory.newTransformer(new StreamSource(filenameToURL(xslID)));
+          = tfactory.newTransformer(new StreamSource(QetestUtils.filenameToURL(xslID)));
         // No need to setSystemId, the transformer can get it from the URL
     
         // Transform the source XML to System.out.
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID));
-        transformer.transform( new StreamSource(filenameToURL(sourceID)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID));
+        transformer.transform( new StreamSource(QetestUtils.filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         String goldname = goldNames.nextName();
         System.out.println("fooFile.goldName: "+goldname);
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldname),                
-                          // new File(fooFile.goldName),
                           "exampleSimple1 fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -369,7 +362,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         TransformerFactory tfactory = TransformerFactory.newInstance();
     
         // Create a transformer for the stylesheet.
-        reporter.logTraceMsg("newTransformer(new StreamSource(" + filenameToURL(xslID));
+        reporter.logTraceMsg("newTransformer(new StreamSource(" + QetestUtils.filenameToURL(xslID));
         Transformer transformer 
           = tfactory.newTransformer(new StreamSource(new File(xslID)));
         // No need to setSystemId, the transformer can get it from the File
@@ -378,10 +371,9 @@ public class ExamplesTest extends XSLProcessorTestBase
         reporter.logTraceMsg("new StreamSource(new File(" + sourceID);
         transformer.transform( new StreamSource(new File(sourceID)),
                                new StreamResult(new File(outNames.nextName())));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(fooFile.goldName),
                           "exampleSimple2 fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -406,7 +398,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         InputStream xslIS = new BufferedInputStream(new FileInputStream(xslID));
         StreamSource xslSource = new StreamSource(xslIS);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xslSource.setSystemId(filenameToURL(xslID));
+        xslSource.setSystemId(QetestUtils.filenameToURL(xslID));
 
         // Create a transformer for the stylesheet.
         Transformer transformer = tfactory.newTransformer(xslSource);
@@ -415,14 +407,13 @@ public class ExamplesTest extends XSLProcessorTestBase
         InputStream xmlIS = new BufferedInputStream(new FileInputStream(sourceID));
         StreamSource xmlSource = new StreamSource(xmlIS);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xmlSource.setSystemId(filenameToURL(sourceID));
+        xmlSource.setSystemId(QetestUtils.filenameToURL(sourceID));
     
         // Transform the source XML to System.out.
         transformer.transform( xmlSource, new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(fooFile.goldName),
                           "exampleFromStream fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -449,7 +440,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         Reader xslReader = new BufferedReader(new FileReader(xslID));
         StreamSource xslSource = new StreamSource(xslReader);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xslSource.setSystemId(filenameToURL(xslID));
+        xslSource.setSystemId(QetestUtils.filenameToURL(xslID));
 
         // Create a transformer for the stylesheet.
         Transformer transformer = tfactory.newTransformer(xslSource);
@@ -459,14 +450,13 @@ public class ExamplesTest extends XSLProcessorTestBase
         Reader xmlReader = new BufferedReader(new FileReader(sourceID));
         StreamSource xmlSource = new StreamSource(xmlReader);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
-        xmlSource.setSystemId(filenameToURL(sourceID));
+        xmlSource.setSystemId(QetestUtils.filenameToURL(sourceID));
     
         // Transform the source XML to System.out.
         transformer.transform( xmlSource, new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(fooFile.goldName),
                           "exampleFromReader fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -491,30 +481,28 @@ public class ExamplesTest extends XSLProcessorTestBase
     
         // Create a templates object, which is the processed, 
         // thread-safe representation of the stylesheet.
-        reporter.logTraceMsg("newTemplates(new StreamSource(" + filenameToURL(xslID));
-        Templates templates = tfactory.newTemplates(new StreamSource(filenameToURL(xslID)));
+        reporter.logTraceMsg("newTemplates(new StreamSource(" + QetestUtils.filenameToURL(xslID));
+        Templates templates = tfactory.newTemplates(new StreamSource(QetestUtils.filenameToURL(xslID)));
 
         // Illustrate the fact that you can make multiple transformers 
         // from the same template.
         Transformer transformer1 = templates.newTransformer();
         Transformer transformer2 = templates.newTransformer();
     
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID1));
-        transformer1.transform(new StreamSource(filenameToURL(sourceID1)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID1));
+        transformer1.transform(new StreamSource(QetestUtils.filenameToURL(sourceID1)),
                               new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(fooFile.goldName),
                           "exampleUseTemplatesObj(1) fileChecker of:" + outNames.currentName());
     
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID2));
-        transformer2.transform(new StreamSource(filenameToURL(sourceID2)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID2));
+        transformer2.transform(new StreamSource(QetestUtils.filenameToURL(sourceID2)),
                               new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(bazFile.goldName),
                           "exampleUseTemplatesObj(2) fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -546,16 +534,16 @@ public class ExamplesTest extends XSLProcessorTestBase
           
           // A TransformerHandler is a ContentHandler that will listen for 
           // SAX events, and transform them to the result.
-          reporter.logTraceMsg("newTransformerHandler(new StreamSource(" + filenameToURL(xslID));
+          reporter.logTraceMsg("newTransformerHandler(new StreamSource(" + QetestUtils.filenameToURL(xslID));
           TransformerHandler handler 
-            = stfactory.newTransformerHandler(new StreamSource(filenameToURL(xslID)));
+            = stfactory.newTransformerHandler(new StreamSource(QetestUtils.filenameToURL(xslID)));
 
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
                                   (OutputProperties.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());
           serializer.setOutputStream(fos);
-          reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
+          reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());
           
           Result result = new SAXResult(serializer.asContentHandler());
 
@@ -587,14 +575,13 @@ public class ExamplesTest extends XSLProcessorTestBase
           reader.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
           
           // Parse the source XML, and send the parse events to the TransformerHandler.
-          reporter.logTraceMsg("reader.parse(" + filenameToURL(sourceID));
-          reader.parse(filenameToURL(sourceID));
+          reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(sourceID));
+          reader.parse(QetestUtils.filenameToURL(sourceID));
           fos.close();
 
           reporter.logTraceMsg("Note: See SPR SCUU4RZT78 for discussion as to why this output is different than XMLReader/XMLFilter");
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(sax2GoldName),
                           "exampleContentHandlerToContentHandler fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -620,26 +607,25 @@ public class ExamplesTest extends XSLProcessorTestBase
             reporter.logErrorMsg("exampleXMLReader:Processor does not support SAX");
             return;
         }
-          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + filenameToURL(xslID));
+          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + QetestUtils.filenameToURL(xslID));
           XMLReader reader 
-            = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(filenameToURL(xslID)));
+            = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(QetestUtils.filenameToURL(xslID)));
           
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
                                   (OutputProperties.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());                        
           serializer.setOutputStream(fos);
-          reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
+          reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());
       
           reader.setContentHandler(serializer.asContentHandler());
 
-          reporter.logTraceMsg("reader.parse(new InputSource(" + filenameToURL(sourceID));
-          reader.parse(new InputSource(filenameToURL(sourceID)));
+          reporter.logTraceMsg("reader.parse(new InputSource(" + QetestUtils.filenameToURL(sourceID));
+          reader.parse(new InputSource(QetestUtils.filenameToURL(sourceID)));
           fos.close();
 
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(saxGoldName),
                           "exampleXMLReader fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -686,7 +672,7 @@ public class ExamplesTest extends XSLProcessorTestBase
                                   (OutputProperties.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());
           serializer.setOutputStream(fos);
-          reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
+          reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());
           reader.setContentHandler(serializer.asContentHandler());
 
         try
@@ -703,23 +689,22 @@ public class ExamplesTest extends XSLProcessorTestBase
           // TODO: User diagnostics.
         }
 
-        reporter.logTraceMsg("newXMLFilter(new StreamSource(" + filenameToURL(xslID));
+        reporter.logTraceMsg("newXMLFilter(new StreamSource(" + QetestUtils.filenameToURL(xslID));
         XMLFilter filter 
-          = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(filenameToURL(xslID)));
+          = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(QetestUtils.filenameToURL(xslID)));
 
         filter.setParent(reader);
 
         // Now, when you call transformer.parse, it will set itself as 
         // the content handler for the parser object (it's "parent"), and 
         // will then call the parse method on the parser.
-          reporter.logTraceMsg("filter.parse(new InputSource(" + filenameToURL(sourceID));
-        filter.parse(new InputSource(filenameToURL(sourceID)));
+          reporter.logTraceMsg("filter.parse(new InputSource(" + QetestUtils.filenameToURL(sourceID));
+        filter.parse(new InputSource(QetestUtils.filenameToURL(sourceID)));
         
         fos.close();
 
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(saxGoldName),
                           "exampleXMLFilter fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -741,7 +726,7 @@ public class ExamplesTest extends XSLProcessorTestBase
     {
         TransformerFactory tfactory = TransformerFactory.newInstance();
     
-        Templates stylesheet1 = tfactory.newTemplates(new StreamSource(filenameToURL(xslID_1)));
+        Templates stylesheet1 = tfactory.newTemplates(new StreamSource(QetestUtils.filenameToURL(xslID_1)));
         Transformer transformer1 = stylesheet1.newTransformer();
     
          // If one success, assume all will succeed.
@@ -770,14 +755,14 @@ public class ExamplesTest extends XSLProcessorTestBase
           }
           if( reader==null ) reader = XMLReaderFactory.createXMLReader();
 
-          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + filenameToURL(xslID_1));
-          XMLFilter filter1 = stf.newXMLFilter(new StreamSource(filenameToURL(xslID_1)));
+          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + QetestUtils.filenameToURL(xslID_1));
+          XMLFilter filter1 = stf.newXMLFilter(new StreamSource(QetestUtils.filenameToURL(xslID_1)));
 
-          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + filenameToURL(xslID_2));
-          XMLFilter filter2 = stf.newXMLFilter(new StreamSource(filenameToURL(xslID_2)));
+          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + QetestUtils.filenameToURL(xslID_2));
+          XMLFilter filter2 = stf.newXMLFilter(new StreamSource(QetestUtils.filenameToURL(xslID_2)));
 
-          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + filenameToURL(xslID_3));
-          XMLFilter filter3 = stf.newXMLFilter(new StreamSource(filenameToURL(xslID_3)));
+          reporter.logTraceMsg("newXMLFilter(new StreamSource(" + QetestUtils.filenameToURL(xslID_3));
+          XMLFilter filter3 = stf.newXMLFilter(new StreamSource(QetestUtils.filenameToURL(xslID_3)));
 
           if (null == filter1) // If one success, assume all were success.
           {
@@ -799,7 +784,7 @@ public class ExamplesTest extends XSLProcessorTestBase
                                   (OutputProperties.getDefaultMethodProperties("xml"));
           FileOutputStream fos = new FileOutputStream(outNames.nextName());
           serializer.setOutputStream(fos);
-          reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
+          reporter.logStatusMsg("Test-output-to: new FileOutputStream(" + outNames.currentName());
           filter3.setContentHandler(serializer.asContentHandler());
 
             // Now, when you call transformer3 to parse, it will set  
@@ -808,12 +793,11 @@ public class ExamplesTest extends XSLProcessorTestBase
             // content handler for transform1, and call transform1.parse, 
             // which will set itself as the content listener for the 
             // SAX parser, and call parser.parse(new InputSource(fooFile.xmlName)).
-          reporter.logTraceMsg("filter3.parse(new InputSource(" + filenameToURL(sourceID));
-            filter3.parse(new InputSource(filenameToURL(sourceID)));
+          reporter.logTraceMsg("filter3.parse(new InputSource(" + QetestUtils.filenameToURL(sourceID));
+            filter3.parse(new InputSource(QetestUtils.filenameToURL(sourceID)));
             fos.close();
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(NOT_DEFINED),
                           "exampleXMLFilterChain fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -847,13 +831,13 @@ public class ExamplesTest extends XSLProcessorTestBase
             dfactory.setNamespaceAware(true);
             DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
             org.w3c.dom.Document outNode = docBuilder.newDocument();
-            reporter.logTraceMsg("docBuilder.parse(new InputSource(" + filenameToURL(xslID));
-            Node doc = docBuilder.parse(new InputSource(filenameToURL(xslID)));
+            reporter.logTraceMsg("docBuilder.parse(new InputSource(" + QetestUtils.filenameToURL(xslID));
+            Node doc = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(xslID)));
      
             DOMSource dsource = new DOMSource(doc);
             // If we don't do this, the transformer won't know how to 
             // resolve relative URLs in the stylesheet.
-            dsource.setSystemId(filenameToURL(xslID));
+            dsource.setSystemId(QetestUtils.filenameToURL(xslID));
 
             templates = tfactory.newTemplates(dsource);
           }
@@ -862,19 +846,17 @@ public class ExamplesTest extends XSLProcessorTestBase
           DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
           DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
           org.w3c.dom.Document outNode = docBuilder.newDocument();
-          reporter.logTraceMsg("docBuilder.parse(new InputSource(" + filenameToURL(sourceID));
-          Node doc = docBuilder.parse(new InputSource(filenameToURL(sourceID)));
+          reporter.logTraceMsg("docBuilder.parse(new InputSource(" + QetestUtils.filenameToURL(sourceID));
+          Node doc = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(sourceID)));
 
           transformer.transform(new DOMSource(doc), new DOMResult(outNode));
           
           Transformer serializer = tfactory.newTransformer();
           serializer.transform(new DOMSource(outNode), new StreamResult(outNames.nextName()));
-          reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+          reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
 
-        // reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(NOT_DEFINED),    // @todo validate the output
                           "exampleDOM2DOM fileChecker of:" + outNames.currentName());
           return outNode;
     } 
@@ -897,31 +879,29 @@ public class ExamplesTest extends XSLProcessorTestBase
     try
     {
         TransformerFactory tfactory = TransformerFactory.newInstance();
-        reporter.logTraceMsg("newTemplates(new StreamSource(" + filenameToURL(xslID));
-        Templates templates = tfactory.newTemplates(new StreamSource(filenameToURL(xslID)));
+        reporter.logTraceMsg("newTemplates(new StreamSource(" + QetestUtils.filenameToURL(xslID));
+        Templates templates = tfactory.newTemplates(new StreamSource(QetestUtils.filenameToURL(xslID)));
         Transformer transformer1 = templates.newTransformer();
         Transformer transformer2 = templates.newTransformer();
 
         transformer1.setParameter("a-param",
                                   "hello to you!");
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID));
-        transformer1.transform(new StreamSource(filenameToURL(sourceID)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID));
+        transformer1.transform(new StreamSource(QetestUtils.filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(param1GoldName),
                           "exampleParam(1) fileChecker of:" + outNames.currentName());
     
     
         transformer2.setOutputProperty(OutputKeys.INDENT, "yes");
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID));
-        transformer2.transform(new StreamSource(filenameToURL(sourceID)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID));
+        transformer2.transform(new StreamSource(QetestUtils.filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(outputGoldName),
                           "exampleParam(2) fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -937,28 +917,26 @@ public class ExamplesTest extends XSLProcessorTestBase
    */
   public void exampleTransformerReuse(String sourceID, String xslID)
   {
-    reporter.logCriticalMsg("********* exampleTransformerReuse");
     try
     {
         // Create a transform factory instance.
         TransformerFactory tfactory = TransformerFactory.newInstance();
     
         // Create a transformer for the stylesheet.
-        reporter.logTraceMsg("newTemplates(new StreamSource(" + filenameToURL(xslID));
+        reporter.logTraceMsg("newTemplates(new StreamSource(" + QetestUtils.filenameToURL(xslID));
         Transformer transformer 
-          = tfactory.newTransformer(new StreamSource(filenameToURL(xslID)));
+          = tfactory.newTransformer(new StreamSource(QetestUtils.filenameToURL(xslID)));
     
         transformer.setParameter("a-param",
                                   "hello to you!");
     
         // Transform the source XML to System.out.
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID));
-        transformer.transform( new StreamSource(filenameToURL(sourceID)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID));
+        transformer.transform( new StreamSource(QetestUtils.filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(param1GoldName),
                           "exampleTransformerReuse(1) fileChecker of:" + outNames.currentName());
 
         transformer.setParameter("a-param",
@@ -966,13 +944,12 @@ public class ExamplesTest extends XSLProcessorTestBase
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
         // Transform the source XML to System.out.
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID));
-        transformer.transform( new StreamSource(filenameToURL(sourceID)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID));
+        transformer.transform( new StreamSource(QetestUtils.filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(param2GoldName),
                           "exampleTransformerReuse(2) fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -980,7 +957,6 @@ public class ExamplesTest extends XSLProcessorTestBase
         reporter.checkFail("exampleTransformerReuse threw: " + t.toString());
         reporter.logThrowable(reporter.ERRORMSG, t, "exampleTransformerReuse threw");
     }
-    reporter.logCriticalMsg("********* end exampleTransformerReuse");
   }
 
   /**
@@ -991,8 +967,8 @@ public class ExamplesTest extends XSLProcessorTestBase
     try
     {
         TransformerFactory tfactory = TransformerFactory.newInstance();
-        reporter.logTraceMsg("newTemplates(new StreamSource(" + filenameToURL(xslID));
-        Templates templates = tfactory.newTemplates(new StreamSource(filenameToURL(xslID)));
+        reporter.logTraceMsg("newTemplates(new StreamSource(" + QetestUtils.filenameToURL(xslID));
+        Templates templates = tfactory.newTemplates(new StreamSource(QetestUtils.filenameToURL(xslID)));
         Properties oprops = templates.getOutputProperties();
 
         oprops.put(OutputKeys.INDENT, "yes");
@@ -1000,13 +976,12 @@ public class ExamplesTest extends XSLProcessorTestBase
         Transformer transformer = templates.newTransformer();
 
         transformer.setOutputProperties(oprops);
-        reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID));
-        transformer.transform(new StreamSource(filenameToURL(sourceID)),
+        reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID));
+        transformer.transform(new StreamSource(QetestUtils.filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(outputGoldName),
                           "exampleOutputProperties fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -1034,9 +1009,9 @@ public class ExamplesTest extends XSLProcessorTestBase
             return;
         }
           SAXTransformerFactory stf = ((SAXTransformerFactory) tfactory);
-          reporter.logTraceMsg("getAssociatedStylesheet(new StreamSource(" + filenameToURL(sourceID));
+          reporter.logTraceMsg("getAssociatedStylesheet(new StreamSource(" + QetestUtils.filenameToURL(sourceID));
           Source sources =
-            stf.getAssociatedStylesheet(new StreamSource(filenameToURL(sourceID)),
+            stf.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(sourceID)),
               null, null, null);
 
           if(null == sources)
@@ -1046,13 +1021,12 @@ public class ExamplesTest extends XSLProcessorTestBase
           }
             Transformer transformer = tfactory.newTransformer(sources);
 
-            reporter.logTraceMsg("new StreamSource(" + filenameToURL(sourceID));
-            transformer.transform(new StreamSource(filenameToURL(sourceID)),
+            reporter.logTraceMsg("new StreamSource(" + QetestUtils.filenameToURL(sourceID));
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(fooFile.goldName),
                           "exampleUseAssociated fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -1090,9 +1064,9 @@ public class ExamplesTest extends XSLProcessorTestBase
           
           // Create a ContentHandler that can liston to SAX events 
           // and transform the output to DOM nodes.
-          reporter.logTraceMsg("newTransformerHandler(new StreamSource(" + filenameToURL(xslID));
+          reporter.logTraceMsg("newTransformerHandler(new StreamSource(" + QetestUtils.filenameToURL(xslID));
           TransformerHandler handler 
-            = sfactory.newTransformerHandler(new StreamSource(filenameToURL(xslID)));
+            = sfactory.newTransformerHandler(new StreamSource(QetestUtils.filenameToURL(xslID)));
           handler.setResult(new DOMResult(outNode));
           
           // Create a reader and set it's ContentHandler to be the 
@@ -1121,21 +1095,15 @@ public class ExamplesTest extends XSLProcessorTestBase
           
           // Send the SAX events from the parser to the transformer,
           // and thus to the DOM tree.
-          reporter.logTraceMsg("reader.parse(" + filenameToURL(sourceID));
-          reader.parse(filenameToURL(sourceID));
+          reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(sourceID));
+          reader.parse(QetestUtils.filenameToURL(sourceID));
           
           // Serialize the node for diagnosis.
           //    This serializes to outNames.nextName()
           exampleSerializeNode(outNode);
 
-        // reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
-        // @todo TEST UPDATE validate this output
-        //  Note: 05-Dec-00 output seems to be bad: has 
-        //  duplicate xmlns:foo="http://apache.org/foo" decls 
-        // in the foo:document element!
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(NOT_DEFINED),
                           "exampleContentHandler2DOM fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -1162,7 +1130,7 @@ public class ExamplesTest extends XSLProcessorTestBase
     serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
     serializer.transform(new DOMSource(node), 
                          new StreamResult(outNames.nextName()));
-    reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
+    reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
                     // TEST UPDATE - Caller must validate outNames.currentName()
   }  
   
@@ -1177,8 +1145,8 @@ public class ExamplesTest extends XSLProcessorTestBase
         DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
         org.w3c.dom.Document outNode = docBuilder.newDocument();
-        reporter.logTraceMsg("docBuilder.parse(new InputSource(" + filenameToURL(sourceID));
-        Node doc = docBuilder.parse(new InputSource(filenameToURL(sourceID)));
+        reporter.logTraceMsg("docBuilder.parse(new InputSource(" + QetestUtils.filenameToURL(sourceID));
+        Node doc = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(sourceID)));
 
         TransformerFactory tfactory = TransformerFactory.newInstance(); 
     
@@ -1192,11 +1160,9 @@ public class ExamplesTest extends XSLProcessorTestBase
         serializer.setOutputProperties(oprops);
         serializer.transform(new DOMSource(doc), 
                              new StreamResult(outNames.nextName()));
-        reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
-        // reporter.logCriticalMsg("@todo TEST UPDATE validate this output:" + outNames.currentName());
+        reporter.logStatusMsg("Test-output-to: new StreamResult(" + outNames.currentName());
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
-                          // new File(NOT_DEFINED),
                           "exampleAsSerializer fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
