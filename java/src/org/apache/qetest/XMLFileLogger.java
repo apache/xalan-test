@@ -1036,7 +1036,11 @@ public class XMLFileLogger implements Logger
      */
     protected String escapeString(String source)  // protected void printEscaped( String source )
     {
-
+        // Check for null; just return null (callers shouldn't care)
+        if (source == null)
+        {
+            return null;
+        }
         StringBuffer sb = new StringBuffer();
         final int n = source.length();
 
