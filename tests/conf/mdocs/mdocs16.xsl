@@ -15,10 +15,12 @@
 <xsl:param name="terms" select="document('terms.xml')"/>
 
 <xsl:template match="/">
+<out>
   <xsl:call-template name="gentext">
     <xsl:with-param name="key" select="'TableofContents'"/>
     <xsl:with-param name="lang" select="'en'"/>
   </xsl:call-template>
+</out>
 </xsl:template>
 
 <xsl:template name="gentext">
