@@ -7,6 +7,7 @@
   <!-- Section: 7.1.1 Literal Result Elements-->
   <!-- Purpose: Try to put out literal output without a template. -->
   <!-- ExpectedException: Illegal characters in xsl:stylesheet -->
+  <!-- ExpectedException: Non-whitespace text is not allowed in this position in the stylesheet -->
 
 Data
 

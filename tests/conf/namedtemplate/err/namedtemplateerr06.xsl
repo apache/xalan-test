@@ -7,7 +7,7 @@
   <!-- Section: 6 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to do call-template without its name attribute. -->
-  <!-- ExpectedException: ??? -->
+  <!-- ExpectedException: xsl:call-template requires attribute: name -->
 
 <xsl:template match="doc">
   <out>

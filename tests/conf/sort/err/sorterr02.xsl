@@ -7,7 +7,7 @@
   <!-- Section: 10 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Incorrect value for order attribute on sort. -->
-  <!-- ExpectedException: -->
+  <!-- ExpectedException: Sorting order must be "ascending" or "descending" -->
 
 <xsl:template match="doc">
   <out>

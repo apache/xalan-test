@@ -7,7 +7,7 @@
   <!-- Section: 9.1 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test xsl:if that has an empty "test" attribute. -->
-  <!-- ExpectedException: xsl:if must have a test attribute -->
+  <!-- ExpectedException: Empty expression -->
 
 <xsl:template match="/">
   <out>

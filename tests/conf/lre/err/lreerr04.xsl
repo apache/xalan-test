@@ -9,6 +9,7 @@
   <!-- Creator: Paul Dick -->
   <!-- Purpose: Test error reporting if required attribute of xsl:attribute
        is not specified.-->
+  <!-- ExpectedException: xsl:attribute requires attribute: name -->
 
 <xsl:template match="doc">
   <xsl:element name="test">

@@ -6,7 +6,7 @@
   <!-- Section: 9.1 -->
   <!-- Purpose: Test of incorrect use of | where 'or' was intended. -->
   <!-- Creator: David Marston -->
-  <!-- ExpectedException: ??? -->
+  <!-- ExpectedException: invalid token: | -->
   
 <xsl:template match="Family">
   <out>

@@ -8,9 +8,7 @@
   <!-- Section: 7.1.1 Literal Result Elements -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test missing attribute in namespace-alias. -->
-  <!-- ExpectedException: XSLT: Missing namespace URI for specified prefix -->
-  <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: Missing namespace URI for specified prefix -->
-  <!-- ExpectedException: Missing namespace URI for specified prefix -->
+  <!-- ExpectedException: xsl:namespace-alias requires attribute: stylesheet-prefix -->
 
 <xsl:namespace-alias result-prefix="xsl"/>
 

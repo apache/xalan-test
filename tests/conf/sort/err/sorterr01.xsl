@@ -7,7 +7,7 @@
   <!-- Section: 10 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Undefined value for data-type attribute on sort. -->
-  <!-- ExpectedException: -->
+  <!-- ExpectedException: Sorting data-type must be "text" or "number" -->
 
 <xsl:template match="doc">
   <out>

@@ -7,7 +7,7 @@
   <!-- Section: 10 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: When can't sort on primary key, should not sort at all. Raise warning? -->
-  <!-- ExpectedException: ??? -->
+  <!-- ExpectedException: Sort nodes not found. Will use document order. -->
 
 <xsl:key name="MonthNum" match="monthtab/entry/number" use="../name" />
 

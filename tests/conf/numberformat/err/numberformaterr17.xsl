@@ -7,7 +7,7 @@
   <!-- Section: 12.3 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Set one-character attribute minus-sign too large in decimal-format. -->
-  <!-- ExpectedException: Invalid attribute on xsl:decimal-format. -->
+  <!-- ExpectedException: An XSLT attribute of type T_CHAR must be only 1 character -->
 
 <xsl:decimal-format minus-sign="toobig" />
 

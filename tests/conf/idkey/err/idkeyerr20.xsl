@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Section: 12.2 -->
   <!-- Purpose: Test for xsl:key that uses key() on a different keyspace in its match attribute. -->
+  <!-- ExpectedException: recursive key() calls are not allowed -->
 
 <xsl:key name="allowdiv" match="div" use="@allow"/>
 <xsl:key name="titles" match="key('allowdiv','yes')" use="title"/>

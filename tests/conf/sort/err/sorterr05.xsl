@@ -7,7 +7,7 @@
   <!-- Section: 10 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to put a child node inside xsl:sort. -->
-  <!-- ExpectedException: -->
+  <!-- ExpectedException: xsl:comment is not allowed in this position in the stylesheet -->
 
 <xsl:template match="doc">
   <out>

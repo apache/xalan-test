@@ -7,7 +7,7 @@
   <!-- Section: 9.1 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test xsl:if that has bad content in "test" attribute. -->
-  <!-- ExpectedException: ? -->
+  <!-- ExpectedException: Invalid token -->
 
 <xsl:template match="/">
   <out>

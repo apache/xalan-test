@@ -8,6 +8,7 @@
   <!-- Creator: Paul Dick -->
   <!-- Purpose: Special case of concat() with one argument.
        Strictly speaking, this should fail just like STRerr14. -->
+  <!-- ExpectedException: concat() requires two or more arguments -->
 
 <xsl:template match="doc">
   <out>

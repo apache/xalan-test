@@ -11,6 +11,7 @@
   <!-- Creator: Paul Dick -->
   <!-- Purpose: Test error reporting if required attribute of xsl:element 
        is not specified.-->
+  <!-- ExpectedException: xsl:element requires attribute: name -->
 
 <xsl:template match="doc">
   <xsl:element/>

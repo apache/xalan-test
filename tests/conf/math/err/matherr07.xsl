@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of sum() with too many arguments. -->
   <!-- ExpectedException: sum() has too many arguments. -->
+  <!-- ExpectedException: sum only allows 1 argument -->
 
 <xsl:template match="/">
   <out>

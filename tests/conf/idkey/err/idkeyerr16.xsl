@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'generate-id()' with multiple arguments. Should generate
        an error. Should test for zero, or one argument.  -->
-  <!-- ExpectedException: ??? -->
+  <!-- ExpectedException: generate-id only allows 1 argument -->
 
 <xsl:template match="doc">
   <out>

@@ -7,7 +7,7 @@
   <!-- Section: 9.2 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test xsl:when "test" having null content. -->
-  <!-- ExpectedException: xsl:when must have a 'test' attribute -->
+  <!-- ExpectedException: Empty expression -->
 
 <xsl:template match="doc">
   <out>

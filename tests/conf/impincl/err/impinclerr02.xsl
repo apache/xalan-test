@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: It is an error if apply-imports is instantiated when the current
        template rule is null, i.e. from within a xsl:for-each loop. -->
-  <!-- ExpectedException   -->
+  <!-- ExpectedException: Attempt to use apply-imports without current template rule -->
 
 <xsl:import href="k.xsl"/>
 

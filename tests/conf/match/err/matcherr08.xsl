@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test for error when xsl:template has neither match nor name, but has a mode. -->
   <!-- ExpectedException: XSL Error: xsl:template must have a match attribute if it has a mode. -->
+  <!-- ExpectedException: xsl:template must have a name or match attribute (or both). -->
 
 <xsl:template match="letters">
   <out>
