@@ -9,8 +9,8 @@
   <!-- Purpose: Test of basic Import & Include functionality over the network. -->
 
 <!-- xsl:import href="http://www.oucs.ox.ac.uk/stylesheets/teihtml-param.xsl"/ -->
-<xsl:import href="http://spitfire.lotus.com/Testsuite/Stylesheets/t12imp.xsl"/>
-<xsl:include href="http://spitfire.lotus.com/Testsuite/Stylesheets/t12inc.xsl"/>
+<xsl:import href="http://xrt11.lotus.com/testsuite/stylesheets/t12imp.xsl"/>
+<xsl:include href="http://xrt11.lotus.com/testsuite/stylesheets/t12inc.xsl"/>
 
 <xsl:template match="root-tag">
  <out>
