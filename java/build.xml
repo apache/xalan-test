@@ -123,13 +123,14 @@
                destdir="${build.dir}" 
                includes="TraxWrapper.java"
                debug="${debug}" />
-        <!-- Exclude files that haven't caught up to new TRAX api changes -sc -->
         <javac srcdir="${test.dir}/trax" 
                destdir="${build.dir}" 
-               excludes="ProcessorAPITest.java,ResultAPITest.java"
                debug="${debug}" />
-        <!-- Do [dom|sax|stream] subdirectories as well -->
+        <echo message="Do [dom|sax|stream] subdirectories as well" />
         <javac srcdir="${test.dir}/trax/stream" 
+               destdir="${build.dir}" 
+               debug="${debug}" />
+        <javac srcdir="${test.dir}/trax/dom" 
                destdir="${build.dir}" 
                debug="${debug}" />
     </target>
