@@ -22,12 +22,15 @@
      Note, however, that pre-compiled .class files are already checked in 
      for some other wrappers. -->
 
+    <!-- Note the name property may be overwritten when external 
+         build.xml scripts call us via <ant>, thus creating a 
+         differently-named output jar instead of 'testxsl' -->
     <property name="name" value="testxsl"/>
+    <property name="testxsl.jar" value="${name}.jar"/>
     <property name="Name" value="Testxsl"/>
     <property name="version" value="3.0"/>
     <property name="year" value="2000"/>
     <property name="copyright" value="Copyright &#169; ${year} The Apache Software Foundation.  All rights reserved."/>
-    <property name="testxsl.jar" value="${name}.jar"/>
 
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -39,8 +42,6 @@
     <property name="build.dir" value="./build"/>
     <property name="build.docs" value="${build.dir}/docs"/>
 	<property name="build.apidocs" value="${build.docs}/apidocs"/>
-    <!-- // TODO add org.apache.qetest.xalanj2, xalanc1, etc.  -->
-
     <property name="javadocs.packages" 
               value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.trax.dom,org.apache.qetest.trax.stream,org.apache.qetest.xalanj1"/>
 
@@ -52,6 +53,21 @@
     <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
     <property name="xalan.generator.styletargz" value="${xalan.xdocs}/xml-site-style.tar.gz"/>
     <property name="xdocs.generator.styletar" value="${xdocs.dir}/xml-site-style.tar"/>
+
+    <!-- For Minitest use, we need additional classpaths to add 
+         the xalan.jar and related files on-the-fly. 
+         External build.xml files may pass in new values for the 
+         below prepend.class.path property when calling us with <ant> -->
+    <property name="prepend.class.path" value="" />
+    <path id="compiletest.class.path">
+        <pathelement path="${prepend.class.path}" />
+        <pathelement path="${java.class.path}" />
+    </path>
+    <path id="runminitest.class.path">
+        <pathelement path="${build.dir}/${testxsl.jar}" />
+        <pathelement path="${prepend.class.path}" />
+        <pathelement path="${java.class.path}" />
+    </path>
 
     <!-- Prepare output tree; copy over prebuilt classes -->
     <target name="prepare">
@@ -77,7 +93,9 @@
         <delete file="${xdocs.generator.styletar}"/>
 	</target>
 
-    <!-- Compile generic qetest reporter; used by all tests; no code dependencies -->
+    <!-- =================================================================== -->
+    <!-- Common worker targets for all builds                                -->
+    <!-- =================================================================== -->
     <target name="compile.reporter" depends="prepare">
         <javac srcdir="${test.dir}" 
                destdir="${build.dir}" 
@@ -93,7 +111,10 @@
                debug="${debug}" />
         <javac srcdir="${test.dir}/xsl" 
                destdir="${build.dir}" 
-               debug="${debug}" />
+               debug="${debug}" 
+               classpathref="compiletest.class.path" />
+        <!-- Note use of compiletest.class.path above, in the case where 
+             external build.xml scripts call us -->
     </target>
     <target name="package.xsl" depends="compile.xsl">
         <jar jarfile="${build.dir}/${testxsl.jar}" 
@@ -101,7 +122,9 @@
              includes="**/*.class,**/*.properties" />
     </target>
 
+    <!-- =================================================================== -->
     <!-- For Xalan-J 1.x testing, use these targets -->
+    <!-- =================================================================== -->
     <target name="compile.xalan1" depends="compile.xsl">
         <javac srcdir="${test.dir}/xslwrapper" 
                destdir="${build.dir}" 
@@ -111,13 +134,20 @@
                destdir="${build.dir}" 
                debug="${debug}" />
     </target>
-    <target name="package.xalan1" depends="compile.xalan1">
+    <target name="package.xalan1" depends="compile.xalan1"
+            description="Build testxsl.jar for testing Xalan-J 1.x" >
         <jar jarfile="${build.dir}/${testxsl.jar}" 
              basedir="${build.dir}" 
              includes="**/*.class,**/*.properties" />
     </target>
+    <!-- See comments for target minitest.xalan2 -->
+    <target name="minitest.xalan1" depends="minitest-xalan1,minitest-report,minitest-not-pass,minitest-pass" 
+            description="Run the Minitest for Xalan-J 1.x">
+    </target>
 
-    <!-- For TRAX interface-only testing, use these targets -->
+    <!-- =================================================================== -->
+    <!-- For Xalan-J 2.x testing, use these targets                          -->
+    <!-- =================================================================== -->
     <target name="compile.trax" depends="compile.xsl">
         <javac srcdir="${test.dir}/xslwrapper" 
                destdir="${build.dir}" 
@@ -133,8 +163,14 @@
         <javac srcdir="${test.dir}/trax/dom" 
                destdir="${build.dir}" 
                debug="${debug}" />
+        <!-- @todo add in some SAX tests and compile them!
+        <javac srcdir="${test.dir}/trax/dom" 
+               destdir="${build.dir}" 
+               debug="${debug}" />
+        -->
     </target>
-    <target name="package.trax" depends="compile.trax">
+    <target name="package.trax" depends="compile.trax"
+            description="Build testxsl.jar for testing Xalan-J 2.x" >
         <jar jarfile="${build.dir}/${testxsl.jar}" 
              basedir="${build.dir}" 
              includes="**/*.class,**/*.properties" />
@@ -144,8 +180,117 @@
          javax.xml.transform interface.  Later on, we should also 
          separately test the other Xalan-J 2.x API's! -->
     <target name="compile.xalan2" depends="compile.trax"></target>
-    <target name="package.xalan2" depends="package.trax"></target>
+    <target name="package.xalan2" depends="package.trax"
+            description="Build testxsl.jar for testing Xalan-J 2.x" ></target>
 
+    <!-- Call this target to compile and run the minitest against 
+         a Xalan-J 2.x build you've built in the same xml-xalan tree.
+         The logic is like so:
+         - user or external file calls this target
+         - dependencies are executed in order:
+           - depends:minitest-xalan2 runs
+             - minitest compiled, jar'd, and run
+             - <available...> checks for the Minitest.Pass file that 
+               the minitest only writes out if it passed
+             - we (attempt) to style the result xml into html
+           - depends:minitest-not-pass runs, but only if 
+             minitest-passed is *not* set; it echos out 
+             a brief message and then <fail...>s the build
+           - depends:minitest-pass runs, but only if 
+             minitest-passed *is* set; it echos out 
+             a brief message and returns
+         This is the best I can figure out do to with Ant's sometimes
+         quirky way of doing targets, but it does work fine.
+    -->     
+    <target name="minitest.xalan2" depends="minitest-xalan2,minitest-report,minitest-not-pass,minitest-pass" 
+            description="Run the Minitest for Xalan-J 2.x">
+    </target>
+
+
+    <!-- =================================================================== -->
+    <!-- Worker targets to compile and run the minitest                      -->
+    <!-- =================================================================== -->
+    <target name="minitest-xalan1" depends="compile.xsl"> 
+        <echo message=" [minitest] SORRY! minitest.xalan1 is not implemented yet!" />
+    </target>
+    <target name="minitest-xalan2" depends="compile.xsl">
+        <property name="results.dir" value="../results-minitest" />
+        <property name="results.xml" value="${results.dir}/Minitest.xml" />
+        <property name="results.html" value="${results.dir}/Minitest.html" />
+        <property name="results.marker" value="${results.dir}/Minitest.Pass" />
+        <property name="tests.root" value="../tests" />
+        <echo message=" [minitest] Compile the Minitest: ${prepend.class.path}:${java.class.path}" />
+        <javac srcdir="${test.dir}/trax" 
+               destdir="${build.dir}" 
+               includes="Minitest.java"
+               debug="${debug}" 
+               classpathref="compiletest.class.path" />
+
+        <echo message=" [minitest] Jar the Minitest" />
+        <jar jarfile="${build.dir}/${testxsl.jar}" 
+             basedir="${build.dir}" 
+             includes="**/*.class,**/*.properties" />
+
+        <!-- Note that while the echo line below prints out the classpath 
+             used for running the minitest with mixed / and \ characters, 
+             the classpathref below correctly switches to the proper 
+             path and file separators for your current platform. -->
+        <echo message=" [minitest] Run the Minitest: ${build.dir}/${testxsl.jar}:${prepend.class.path}:${java.class.path}" />
+        <java classname="org.apache.qetest.trax.Minitest"
+              classpathref="runminitest.class.path"
+              fork="yes"
+              failonerror="no">
+            <!-- I can't get this to work without the fork="yes" statement 
+                 above - if we are called from a build.xml that just jar'd
+                 a xalan.jar, we get a wacky error trying to call any 
+                 Xalan API's (can't unpack the jar file).
+                 I think because I'm trying to change the classpath 
+                 to include the xalan.jar that our calling build.xml may 
+                 have just created in this same Ant session, and I bet 
+                 the classloader gets confused somehow.
+                 Hints, anyone?
+            -->
+            <arg value="-inputDir" />
+            <arg path="${tests.root}/api" />
+            <arg value="-goldDir" />
+            <arg path="${tests.root}/api-gold" />
+            <arg value="-outputDir" />
+            <arg path="${results.dir}" />
+            <arg value="-logFile" />
+            <arg path="${results.xml}" />
+            <arg value="-loggingLevel" />
+            <arg value="99" />
+        </java>
+        <!-- Set properties for running other targets -->
+        <available file="${results.marker}" property="minitest-passed" />
+        <available classname="org.apache.tools.ant.taskdefs.optional.XalanLiaison" property="minitest-style" />
+    </target>
+
+    <!-- Common worker targets for other minitest targets to call -->
+    <target name="minitest-report" if="minitest-style">
+        <echo message=" [minitest] Create Minitest report" />
+        <!-- I also can't get the style task to work, even after putting 
+             the optional.jar in various locations and/or explicitly adding 
+             it to the classpath in build.bat.  More hints, anyone?
+        -->
+        <style processor="xalan"
+               style="../viewResults.xsl"
+               basedir="${results.dir}"
+               destdir="${results.dir}"
+               includes="Minitest.xml" />
+    </target>
+    <target name="minitest-pass" if="minitest-passed">
+        <echo message=" [minitest] CONGRATULATIONS! The Minitest passed!" />
+        <echo message=" [minitest] See details in ${results.html}" />
+    </target>
+    <!-- Note: avoid the use of 'fail' in the target name, in case 
+         any log-grepping tools are searching for this -->
+    <target name="minitest-not-pass" unless="minitest-passed">
+        <echo message=" [minitest] ERROR! The Minitest failed!" />
+        <echo message=" [minitest] See details in ${results.xml} or ${results.html}" />
+        <echo message=" [minitest] Please fix any Minitest problems before checking in!" />
+        <fail message="Please fix any Minitest problems before checking in!" />
+    </target>
 
     <!-- All wrappers; requires competitor's jars in the classpath, as appropriate
          (You may be better off compiling other wrappers by hand, and then simply 
@@ -164,7 +309,8 @@
     <!-- =================================================================== -->
     <!-- Creates the User's Guide                                            -->
     <!-- =================================================================== -->
-  <target name="docs" depends="prepare.docs">
+    <target name="docs" depends="prepare.docs"
+            description="Build the framework/overview docs for tests">
     <!-- Note: temporarily add the Xalan-J 1.x version of stylebook to classpath 
          this needs more work, since we can build docs with either Xalan 1 or 2, 
          but the matching version of stylebook needs to go with the xalan.jar -->
@@ -180,7 +326,8 @@
     <!-- =================================================================== -->
     <!-- Creates the API documentation                                       -->
     <!-- =================================================================== -->
-    <target name="javadocs" depends="prepare">
+    <target name="javadocs" depends="prepare"
+            description="Build the Javadocs for tests">
         <javadoc
              sourcepath="${src.dir}"
              destdir="${build.apidocs}"
