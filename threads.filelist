@@ -1,0 +1,14 @@
+# See also threads.properties
+# Feel free to edit to run different files; note we do *not* use inputDir, etc.
+# First file is compiled into common Templates object
+#   all remaining files are then spun off onto a thread each
+# Lines must be qualified path/filenames whitespace separated like:
+# path/inputName path/xmlName path/outputName path/goldName flavor [optional options]
+
+# This file is used as a Templates across all threads
+tests/api/trax/identity.xsl tests/api/trax/identity.xml results-threads/identity-shared.out tests/api-gold/trax/identity.out trax
+
+# These files are each processed in their own thread
+tests/api/Minitest.xsl            tests/api/Minitest.xml            results-threads/Minitest1.out  tests/api-gold/Minitest-xalanj2.out    trax iterations 5
+tests/api/trax/dom/DOMImpIncl.xsl tests/api/trax/dom/DOMImpIncl.xml results-threads/DOMImpIncl.out tests/api-gold/trax/dom/DOMImpIncl.out trax.dom 
+tests/conf/copy/copy01.xsl        tests/conf/copy/copy01.xml        results-threads/copy01.out     tests/conf-gold/copy/copy01.out        trax.dom
