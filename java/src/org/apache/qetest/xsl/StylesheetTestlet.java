@@ -65,6 +65,7 @@ package org.apache.qetest.xsl;
 import org.apache.qetest.CheckService;
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
+import org.apache.qetest.QetestFactory;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.TestletImpl;
 import org.apache.qetest.xslwrapper.TransformWrapper;
@@ -79,7 +80,7 @@ import java.util.Hashtable;
 /**
  * Testlet for conformance testing of xsl stylesheet files.
  *
- * This class provides the testing algorithim used for verifying 
+ * This class provides the default algorithim used for verifying 
  * Xalan's conformance to the XSLT spec.  It works in conjunction 
  * with StylesheetTestletDriver, which supplies the logic for 
  * choosing the testfiles to iterate over, and with 
@@ -87,6 +88,9 @@ import java.util.Hashtable;
  * method-independent way to process files (i.e. different 
  * flavors of TransformWrapper may be different products, as well 
  * as different processing models, like SAX, DOM or Streams).
+ *
+ * This class is broken up into common worker methods to make 
+ * subclassing easier for alternate testing algoritims.
  *
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
@@ -117,6 +121,7 @@ public class StylesheetTestlet extends TestletImpl
      */
     public void execute(Datalet d)
 	{
+        // Ensure we have the correct kind of datalet
         StylesheetDatalet datalet = null;
         try
         {
@@ -127,6 +132,35 @@ public class StylesheetTestlet extends TestletImpl
             logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue with " + d);
             return;
         }
+
+        // Perform any other general setup needed
+        testletInit(datalet);
+        try
+        {
+            // Get a TransformWrapper of the appropriate flavor
+            TransformWrapper transformWrapper = getTransformWrapper(datalet);
+            // Transform our supplied input file...
+            testDatalet(datalet, transformWrapper);
+            transformWrapper = null;
+            // ...and compare with gold data
+            checkDatalet(datalet);
+        }
+        // Handle any exceptions from the testing
+        catch (Throwable t)
+        {
+            handleException(datalet, t);
+            return;
+        }
+	}
+
+
+    /** 
+     * Worker method to perform any pre-processing needed.  
+     *
+     * @param datalet to test with
+     */
+    protected void testletInit(StylesheetDatalet datalet)
+    {
         //@todo validate our Datalet - ensure it has valid 
         //  and/or existing files available.
 
@@ -145,15 +179,19 @@ public class StylesheetTestlet extends TestletImpl
             {
                 logger.logMsg(Logger.WARNINGMSG, "Deleting OutFile of::" + datalet.outputName
                                        + " threw: " + se.toString());
-                // But continue anyways...
             }
         }
+    }
 
-        // Create a new TransformWrapper of appropriate flavor
-        //  null arg is unused liaison for TransformWrapper
-        //@todo allow user to pass in pre-created 
-        //  TransformWrapper so we don't have lots of objects 
-        //  created and destroyed for every file
+
+    /** 
+     * Worker method to get a TransformWrapper.  
+     *
+     * @param datalet to test with
+     * @return TransformWrapper to use with this datalet
+     */
+    protected TransformWrapper getTransformWrapper(StylesheetDatalet datalet)
+    {
         TransformWrapper transformWrapper = null;
         try
         {
@@ -169,28 +207,16 @@ public class StylesheetTestlet extends TestletImpl
         {
             logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " newWrapper/newProcessor threw");
             logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
-            return;
+            return null;
         }
-
-        // Transform our supplied input file, and compare with gold
-        try
-        {
-            testDatalet(datalet, transformWrapper);
-        }
-        // Handle any exceptions from the testing
-        catch (Throwable t)
-        {
-            handleException(datalet, t);
-            return;
-        }
-	}
+        return transformWrapper;
+    }
 
 
     /** 
      * Worker method to actually perform the transform.  
      *
-     * Logs out applicable info; attempts to perform transformation; 
-     * and if sucessful, validates output file.
+     * Logs out applicable info; attempts to perform transformation.
      *
      * @param datalet to test with
      * @param transformWrapper to have perform the transform
@@ -220,18 +246,31 @@ public class StylesheetTestlet extends TestletImpl
             long[] times = transformWrapper.transform(datalet.xmlName, datalet.inputName, datalet.outputName);
             retVal = times[TransformWrapper.IDX_OVERALL];
         }
+    }
 
-        // If we get here, attempt to validate the contents of 
-        //  the last outputFile created
+
+    /** 
+     * Worker method to validate output file with gold.  
+     *
+     * Logs out applicable info while validating output file.
+     *
+     * @param datalet to test with
+     * @throws allows any underlying exception to be thrown
+     */
+    protected void checkDatalet(StylesheetDatalet datalet)
+            throws Exception
+    {
+        // See if the datalet already has a fileChecker to use...
         CheckService fileChecker = (CheckService)datalet.options.get("fileCheckerImpl");
-        // Supply default value
+        // ...if not, construct a default one with attributes
         if (null == fileChecker)
-            fileChecker = new XHTFileCheckService();
-        // Apply any testing options to the fileChecker
-        // Note: for the overall conformance test case, this is 
-        //  a bit inefficient, but we don't necessarily know if 
-        //  the checkService has already been setup or not    
-        fileChecker.applyAttributes(datalet.options);    
+        {
+            fileChecker = QetestFactory.newCheckService(logger, QetestFactory.TYPE_FILES);
+            // Apply any testing options to the fileChecker
+            fileChecker.applyAttributes(datalet.options);    
+        }
+
+        // Validate the file            
         if (Logger.PASS_RESULT
             != fileChecker.check(logger,
                                  new File(datalet.outputName), 
@@ -250,8 +289,6 @@ public class StylesheetTestlet extends TestletImpl
             attrs.put("outputName", datalet.outputName);
             attrs.put("goldName", datalet.goldName);
             logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance test file references");
-            // No longer need to log failure reason, this kind 
-            //  of functionality should be kept in checkServices
         }
     }
 
@@ -270,7 +307,7 @@ public class StylesheetTestlet extends TestletImpl
         // Put the logThrowable first, so it appears before 
         //  the Fail record, and gets color-coded
         logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " " + datalet.getDescription());
-        logger.checkFail(getDescription() + " " + datalet.getDescription() 
+        logger.checkErr(getDescription() + " " + datalet.getDescription() 
                          + " threw: " + t.toString());
     }
 }  // end of class StylesheetTestlet
