@@ -8,7 +8,7 @@
   <!-- Creator: Paul Dick -->
   <!-- Purpose: Nest imports and includes using relative paths. -->
 
-<xsl:import href="fragments\ss2.xsl"/>
+<xsl:import href="fragments/ss2.xsl"/>
 
 <xsl:template match="/">
   <out>

@@ -8,6 +8,6 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of importing a basic stylesheet involving matching. -->
 
-<xsl:import href="fragments\imp16all.xsl"/>
+<xsl:import href="fragments/imp16all.xsl"/>
 
 </xsl:stylesheet>

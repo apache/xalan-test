@@ -12,6 +12,6 @@
 <!-- <xsl:key name="id" use="@id" match="LAMBDA"/> -->
 <!-- <xsl:key name="annid" use="@of" match="Annotation"/> -->
 
-<xsl:import href="fragments\imp17all.xsl"/>
+<xsl:import href="fragments/imp17all.xsl"/>
 
 </xsl:stylesheet>
