@@ -68,6 +68,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -384,13 +385,13 @@ public class XSLProcessorTestBase extends FileBasedTest
 
     /**
      * Set our instance variables from a Properties file.
-     * Calls super.initializeFromProperties() to get defaults.
-     * @author Shane Curcuru
-     * @param Properties block to set name=value pairs from
+     * Simply clones the Properties block into our testProps;
+     * and then explicitly sets known instance variables.
      *
-     * NEEDSDOC @param props
+     * //@todo improve error checking, if needed
+     * @param props Properties block to initialize our internal 
+     * state from: mainly our common parameters/options 
      * @return status - true if OK, false if error.
-     * @todo improve error checking, if needed
      */
     public boolean initializeFromProperties(Properties props)
     {
@@ -398,49 +399,37 @@ public class XSLProcessorTestBase extends FileBasedTest
         debugPrintln("XSLProcessorTestBase.initializeFromProperties(" + props
                      + ")");
 
+        // Get any superclass' default processing
         boolean b = super.initializeFromProperties(props);
 
+        // Copy over all properties into our local block
+        //  this is a little unusual, but it does allow users 
+        //  to set any new sort of properties via the properties 
+        //  file, and we'll pick it up - that way this class doesn't
+        //  have to get updated when we have new properties
+        for (Enumeration enum = props.propertyNames();
+                enum.hasMoreElements(); /* no increment portion */ )
+        {
+            Object key = enum.nextElement();
+
+            testProps.put(key, props.get(key));
+        }
+
+        // Now set any convenience instance variables based on 
+        //  values set from the properties block
         category = props.getProperty(OPT_CATEGORY, category);
-
-        if (category != null)
-            testProps.put(OPT_CATEGORY, category);
-
         liaison = props.getProperty(OPT_LIAISON, liaison);
-
-        if (liaison != null)
-            testProps.put(OPT_LIAISON, liaison);
-
         flavor = props.getProperty(OPT_FLAVOR, flavor);
-
-        if (flavor != null)
-            testProps.put(OPT_FLAVOR, flavor);
-
         fileCheckerName = props.getProperty(OPT_FILECHECKER, fileCheckerName);
-
-        if (fileCheckerName != null)
-            testProps.put(OPT_FILECHECKER, fileCheckerName);
-
         excludes = props.getProperty(OPT_EXCLUDES, excludes);
-
-        if (excludes != null)
-            testProps.put(OPT_EXCLUDES, excludes);
-
         embedded = props.getProperty(OPT_EMBEDDED, embedded);
-
-        if (embedded != null)
-            testProps.put(OPT_EMBEDDED, embedded);
-
         diagnostics = props.getProperty(OPT_DIAGNOSTICS, diagnostics);
 
-        if (diagnostics != null)
-            testProps.put(OPT_DIAGNOSTICS, diagnostics);
-
         String prec = props.getProperty(OPT_PRECOMPILE);
-
         if ((prec != null) && prec.equalsIgnoreCase("true"))
         {
             precompile = true;
-
+            // Default the value in properties block too
             testProps.put(OPT_PRECOMPILE, "true");
         }
 
@@ -449,7 +438,7 @@ public class XSLProcessorTestBase extends FileBasedTest
         if ((noet != null) && noet.equalsIgnoreCase("true"))
         {
             noErrTest = true;
-
+            // Default the value in properties block too
             testProps.put(OPT_NOERRTEST, "true");
         }
 
@@ -458,7 +447,7 @@ public class XSLProcessorTestBase extends FileBasedTest
         if ((uURI != null) && uURI.equalsIgnoreCase("false"))
         {
             useURI = false;
-
+            // Default the value in properties block too
             testProps.put(OPT_USEURI, "false");
         }
 
@@ -693,7 +682,7 @@ public class XSLProcessorTestBase extends FileBasedTest
         }
 
         // Be sure to ask our superclass to read it's options as well!
-        return super.initializeFromArray(args, false);
+        return super.initializeFromArray(args, true);
     }
 
     //-----------------------------------------------------
@@ -818,7 +807,15 @@ public class XSLProcessorTestBase extends FileBasedTest
 
         // Also pass along the command line, in case someone has 
         //  specific code that's counting on this
-        testProps.put(MAIN_CMDLINE, args);
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < args.length; i++)
+        {
+            buf.append(args[i]);
+            buf.append(' ');
+        }
+        testProps.put(MAIN_CMDLINE, buf.toString());
+
+        // Actually go and execute the test
         runTest(testProps);
         
         // Note that this is only called if run from the command
