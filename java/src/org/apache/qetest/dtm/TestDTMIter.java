@@ -245,7 +245,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase1"); 
         reporter.testCaseClose();
@@ -281,7 +282,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase2"); 
 
@@ -318,7 +320,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase3"); 
 
@@ -355,7 +358,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase4"); 
 
@@ -391,10 +395,12 @@ public class TestDTMIter extends XSLProcessorTestBase
 		// Write results and close output file.
 		writeClose(fos, buf);
 
-        // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
-        							new File(gold),
-        							"Testcase5"); 
+
+	    // Verify results		
+	    LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+	    myfilechecker.check(reporter, new File(outNames.currentName()),
+	        						  new File(gold),
+	        						  "Testcase5");
 
         reporter.testCaseClose();
         return true;
@@ -429,7 +435,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase6"); 
         reporter.testCaseClose();
@@ -465,7 +472,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase7"); 
         reporter.testCaseClose();
@@ -503,7 +511,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase8"); 
         reporter.testCaseClose();
@@ -540,7 +549,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase9"); 
         reporter.testCaseClose();
@@ -579,7 +589,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase10"); 
         reporter.testCaseClose();
@@ -617,10 +628,12 @@ public class TestDTMIter extends XSLProcessorTestBase
 		// Write results and close output file.
 		writeClose(fos, buf);
 
-        // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
-        							new File(gold),
-        							"Testcase11"); 
+	    // Verify results		
+	    LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+	    myfilechecker.check(reporter, new File(outNames.currentName()),
+	        						  new File(gold),
+	        						  "Testcase11");        							
+        							 
         reporter.testCaseClose();
         return true;
     }
@@ -655,7 +668,8 @@ public class TestDTMIter extends XSLProcessorTestBase
 		writeClose(fos, buf);
 
         // Verify results
-        fileChecker.check(reporter, new File(outNames.currentName()),
+		LinebyLineCheckService myfilechecker = new LinebyLineCheckService();
+        myfilechecker.check(reporter, new File(outNames.currentName()),
         							new File(gold),
         							"Testcase12"); 
         reporter.testCaseClose();
