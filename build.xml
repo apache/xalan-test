@@ -718,6 +718,59 @@ dependencies - users must manually 'build jar' first.
         </antcall>
     </target>
 
+    <target name="alltest.conf.xsltc">
+        <property name="alltest.xsltc.resultDir" value="results-alltest.xsltc" />
+        <property name="alltest.conf.xsltc.resultDir" value="${alltest.xsltc.resultDir}/conf" />
+        <echo message="About to execute xsltc.conf tests with all flavors, results into ${alltest.conf.xsltc.resultDir}/..." />
+        <!-- Run full conf test with each major available flavor into 
+             specific output directories; note any user options will 
+             override for all test calls.
+             Also exclude the currently failing tests in the 
+             smoketest if use.excludes is set.
+        -->
+        <condition property="conf.xsltc.excludes" value="${smoketest.conf.xsltc.excludes}">
+            <equals arg1="${use.excludes}" arg2="true" />
+        </condition>
+        <antcall target="conf.xsltc">
+            <param name="conf.xsltc.flavor" value="trax.systemId"/>
+            <param name="conf.xsltc.excludes" value="${conf.xsltc.excludes}"/>
+            <param name="conf.xsltc.outputDir" value="${alltest.conf.xsltc.resultDir}/systemId"/>
+            <param name="conf.xsltc.logFile" value="${alltest.conf.xsltc.resultDir}/systemId/results.xml"/>
+        </antcall>
+        <antcall target="conf.xsltc">
+            <param name="conf.xsltc.flavor" value="trax.file"/>
+            <param name="conf.xsltc.excludes" value="${conf.xsltc.excludes}"/>
+            <param name="conf.xsltc.outputDir" value="${alltest.conf.xsltc.resultDir}/file"/>
+            <param name="conf.xsltc.logFile" value="${alltest.conf.xsltc.resultDir}/file/results.xml"/>
+        </antcall>
+        <antcall target="conf.xsltc">
+            <param name="conf.xsltc.flavor" value="trax.dom"/>
+            <!-- Note DOM always has additional exclusions in conf tests-->
+            <param name="conf.xsltc.excludes" value="${trax.dom.excludes};${conf.xsltc.excludes}"/>
+            <param name="conf.xsltc.outputDir" value="${alltest.conf.xsltc.resultDir}/dom"/>
+            <param name="conf.xsltc.logFile" value="${alltest.conf.xsltc.resultDir}/dom/results.xml"/>
+        </antcall>
+        <antcall target="conf.xsltc">
+            <param name="conf.xsltc.flavor" value="trax.sax"/>
+            <param name="conf.xsltc.excludes" value="${conf.xsltc.excludes}"/>
+            <param name="conf.xsltc.outputDir" value="${alltest.conf.xsltc.resultDir}/sax"/>
+            <param name="conf.xsltc.logFile" value="${alltest.conf.xsltc.resultDir}/sax/results.xml"/>
+        </antcall>
+        <antcall target="conf.xsltc">
+            <param name="conf.xsltc.flavor" value="trax.localPath"/>
+            <param name="conf.xsltc.excludes" value="${conf.xsltc.excludes}"/>
+            <param name="conf.xsltc.outputDir" value="${alltest.conf.xsltc.resultDir}/localPath"/>
+            <param name="conf.xsltc.logFile" value="${alltest.conf.xsltc.resultDir}/localPath/results.xml"/>
+        </antcall>
+        <antcall target="conf.xsltc">
+            <param name="conf.xsltc.flavor" value="trax.stream"/>
+            <param name="conf.xsltc.excludes" value="${conf.xsltc.excludes}"/>
+            <param name="conf.xsltc.outputDir" value="${alltest.conf.xsltc.resultDir}/stream"/>
+            <param name="conf.xsltc.logFile" value="${alltest.conf.xsltc.resultDir}/stream/results.xml"/>
+        </antcall>
+    </target>
+
+
     <target name="test"
         depends="alltest"
         description="Alias for alltest">
