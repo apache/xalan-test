@@ -91,7 +91,12 @@
                destdir="${build.dir}" 
                includes="ProcessorWrapper.java"
                debug="${debug}" />
+    <!-- Sun testing: add
+               excludes="XHTComparator.java,XHTFileCheckService.java"
+         to the below javac element 
+         -sc 17-Nov-00  -->
         <javac srcdir="${test.dir}/xsl" 
+               excludes="XHTComparator.java,XHTFileCheckService.java"
                destdir="${build.dir}" 
                debug="${debug}" />
     </target>
@@ -162,6 +167,8 @@
     <!-- Note: temporarily add the Xalan-J 1.x version of stylebook to classpath 
          this needs more work, since we can build docs with either Xalan 1 or 2, 
          but the matching version of stylebook needs to go with the xalan.jar -->
+    <echo message="java.class.path = ${java.class.path}" />
+    <echo message="xalan.xdocs = ${xalan.xdocs}/stylebook-1.0-b2.jar" />
     <java fork="yes" classname="${doc.generator}"> 
         <classpath>
             <pathelement location="${xalan.xdocs}/stylebook-1.0-b2.jar" />

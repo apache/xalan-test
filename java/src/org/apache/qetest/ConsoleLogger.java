@@ -350,6 +350,13 @@ public class ConsoleLogger implements Logger
     public void logElement(int level, String element, Hashtable attrs,
                            Object msg)
     {
+        if ((element == null)
+           || (attrs == null))
+        {
+            // Bail if either element name or attr list is null
+            // Note: we should really handle this case more elegantly
+            return;
+        }
 
         indent();
         outStream.println(sIndent + element);
@@ -365,7 +372,8 @@ public class ConsoleLogger implements Logger
         }
 
         outdent();
-        outStream.println(sIndent + msg.toString());
+        if (msg != null)
+            outStream.println(sIndent + msg.toString());
         outdent();
     }
 
