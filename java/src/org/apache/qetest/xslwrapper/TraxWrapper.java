@@ -72,26 +72,19 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 
-// Needed SAX classes
+// Needed SAX and DOM classes
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-
-// A generic TRaX-compliant wrapper
-// NOTE: package name subject to change!
-import org.apache.trax.Processor;
-import org.apache.trax.Result;
-import org.apache.trax.Templates;
-import org.apache.trax.Transformer;
-import org.apache.trax.TransformException;
-import org.apache.serialize.SerializerFactory;
-import org.apache.serialize.Serializer;
-import org.apache.serialize.OutputFormat;
-
 import org.w3c.dom.Node;
 
+// javax parsers and trax imports
+import javax.xml.transform.*;
+import javax.xml.transform.sax.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -113,15 +106,12 @@ public class TraxWrapper extends ProcessorWrapper
     public TraxWrapper(){}
 
     /** Reference to current processor - TRaX flavor - convenience method. */
-    protected org.apache.trax.Processor processor = null;
+    protected javax.xml.transform.TransformerFactory processor = null;
 
     /**
-     * NEEDSDOC Method getTraxProcessor 
-     *
-     *
-     * NEEDSDOC (getTraxProcessor) @return
+     * @return reference to underlying TransformerFactory
      */
-    public org.apache.trax.Processor getTraxProcessor()
+    public javax.xml.transform.TransformerFactory getTraxProcessor()
     {
         return (processor);
     }
@@ -203,22 +193,15 @@ public class TraxWrapper extends ProcessorWrapper
     }
     ;
 
-    /** Constants for system properties, etc.. */
-    public static final String TRAX_PROCESSOR = "trax.processor";
-
-    /** NEEDSDOC Field XSLT          */
-    public static final String XSLT = "xslt";
-
     /** NEEDSDOC Field TRAX_PROCESSOR_XSLT          */
-    public static final String TRAX_PROCESSOR_XSLT = TRAX_PROCESSOR + "."
-                                                         + XSLT;
+    public static final String TRAX_PROCESSOR_XSLT = "javax.xml.transform.TransformerFactory";
 
     /** NEEDSDOC Field ORG_XML_SAX_DRIVER          */
     public static final String ORG_XML_SAX_DRIVER = "org.xml.sax.driver";
 
     /** NEEDSDOC Field DEFAULT_PROCESSOR          */
     public static final String DEFAULT_PROCESSOR =
-        "org.apache.xalan.processor.StylesheetProcessor";
+        "org.apache.xalan.processor.TransformerFactoryImpl";
 
     /** NEEDSDOC Field DEFAULT_PARSER          */
     public static final String DEFAULT_PARSER =
@@ -286,8 +269,8 @@ public class TraxWrapper extends ProcessorWrapper
             transformType = DEFAULT_TYPE;
         }
 
-        // Get a processor of 'xslt' stuff (i.e. Xalan)
-        processor = Processor.newInstance(XSLT);
+        // Get a factory of 'xslt' stuff (i.e. Xalan)
+        processor = TransformerFactory.newInstance();
         p = (Object) processor;
 
         // Return here; will be null if error or exception raised
@@ -350,67 +333,41 @@ public class TraxWrapper extends ProcessorWrapper
         // Declare variables ahead of time to minimize latency
         long startTime = 0;
         long xmlTime = 0;
-        long xslTime = 0;
 
-        // Create trax-specific sources
-        InputSource xsl = new InputSource(xslStylesheet);
-        InputSource xml = new InputSource(xmlSource);
+        // Create trax-specific sources - only as needed!
 
         // May throw IOException
         // Note: use OutputStream derivative, not Writer derivative, so that 
         //  the processor can properly control the output encoding!
         FileOutputStream resultStream = new FileOutputStream(resultFile);
 
-        // Begin timing just the stylesheet creation
-        startTime = System.currentTimeMillis();
-
-        // Read and compile the stylesheet
-        Templates templates = processor.process(xsl);
-
-        xslTime = System.currentTimeMillis() - startTime;
+        // Read and compile the stylesheet - only as needed!
 
         switch (transformType)
         {
 
         // Each case does timing just on the transformation
+        // @todo check for ERROR return from underlying operations!
         case FILE_TO_FILE_TYPE :
             startTime = System.currentTimeMillis();
 
-            Transformer transformer = templates.newTransformer();
-
+            // Default method of building the stylesheet
+            Transformer transformer = processor.newTransformer(new StreamSource(xslStylesheet));
+            // Apply any parameters needed (note: may affect timing 
+            //  data slightly with method call and Properties lookup)
             applyParams(transformer, params);
-            transformer.transform(xml, new Result(resultStream));
+            // Transform the XML document into the output stream
+            transformer.transform(new StreamSource(xmlSource), new StreamResult(resultStream));
 
             xmlTime = System.currentTimeMillis() - startTime;
             break;
+
         case DOM_TO_DOM_TYPE :
-            xmlTime = transformDOM2DOM(templates, xml, resultStream);
+            xmlTime = processDOMToDOM(xmlSource, xslStylesheet, resultStream);
             break;
-        case SAX_TO_SAX_TYPE :
-            xmlTime = transformSAX2SAX(templates, xml, resultStream);
-            break;
-        case SAX_TO_STREAM_TYPE :
-            xmlTime = transformSAX2Stream(templates, xml, resultStream);
-            break;
-        case DOM_TO_STREAM_TYPE :
-            throw new java.lang.IllegalStateException("bad transformType("
-                                                      + transformType
-                                                      + ") for: "
-                                                      + TRAX_WRAPPER_TYPE);
 
-        // break;
-        case STREAM_TO_DOM_TYPE :
-            throw new java.lang.IllegalStateException("bad transformType("
-                                                      + transformType
-                                                      + ") for: "
-                                                      + TRAX_WRAPPER_TYPE);
-
-        // break;
-        case AS_XML_FILTER_TYPE :
-            xmlTime = transformAsXMLFilter(templates, xml, resultStream);
-            break;
         default :
-            throw new java.lang.IllegalStateException("bad transformType("
+            throw new java.lang.IllegalStateException("bad/unimplemented transformType("
                                                       + transformType
                                                       + ") for: "
                                                       + TRAX_WRAPPER_TYPE);
@@ -419,235 +376,73 @@ public class TraxWrapper extends ProcessorWrapper
         // Force output stream closed, just in case
         resultStream.close();
 
-        // Return the sum of stylesheet create + transform time
-        return (xslTime + xmlTime);
+        // Return the timing data
+        return (xmlTime);
     }
 
-    /**
-     * Transform an xml document using SAX.
-     *
-     * NEEDSDOC @param templates
-     * NEEDSDOC @param xml
-     * NEEDSDOC @param out
-     * @return milliseconds process time took
-     *
-     * @throws IOException
-     * @throws SAXException
-     * @throws TransformException
-     */
-    private long transformSAX2SAX(
-            Templates templates, InputSource xml, OutputStream out)
-                throws TransformException, SAXException, IOException
-    {
-
-        long startTime = 0;
-        Transformer transformer = templates.newTransformer();
-
-        applyParams(transformer, params);
-
-        OutputFormat format = templates.getOutputFormat();
-        Serializer serializer = SerializerFactory.getSerializer(format);
-
-        serializer.setOutputStream(out);
-        transformer.setContentHandler(serializer.asContentHandler());
-        transformer.setProperty("http://xml.apache.org/xslt/sourcebase",
-                                xml.getSystemId());
-
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-
-        reader.setFeature("http://xml.org/sax/features/namespace-prefixes",
-                          true);
-        reader.setFeature("http://apache.org/xml/features/validation/dynamic",
-                          true);
-
-        ContentHandler chandler = transformer.getInputContentHandler();
-
-        reader.setContentHandler(chandler);
-
-        if (chandler instanceof org.xml.sax.ext.LexicalHandler)
-            reader.setProperty(
-                "http://xml.org/sax/properties/lexical-handler", chandler);
-        else
-            reader.setProperty(
-                "http://xml.org/sax/properties/lexical-handler", null);
-
-        // Only time the actual parsing (transforming)
-        startTime = System.currentTimeMillis();
-
-        reader.parse(xml);
-
-        return (System.currentTimeMillis() - startTime);
-    }
 
     /**
-     * Transform an xml document using SAX to a stream (then write separately.
-     *
-     * NEEDSDOC @param templates
-     * NEEDSDOC @param xml
-     * NEEDSDOC @param out
+     * Perform the transform from a DOM to a DOM (then serialize).
+     * @todo EVALUATE TIMING: right now, we time everything, 
+     * all DOM building and transforms (but not serialization)
+     * @param xmlSource name of source XML file
+     * @param xslStylesheet name of stylesheet XSL file
+     * @param resultFile name of output file, presumably XML
      * @return milliseconds process time took
+     * @exception Exception may be thrown by underlying operation
      *
-     * @throws IOException
-     * @throws SAXException
-     * @throws TransformException
+     * @throws java.lang.Exception
      */
-    private long transformSAX2Stream(
-            Templates templates, InputSource xml, OutputStream out)
-                throws TransformException, SAXException, IOException
+    protected long processDOMToDOM(
+            String xmlSource, String xslStylesheet, OutputStream resultStream)
+                throws java.lang.Exception  // Cover all exception cases
     {
+        if (!processor.getFeature(Features.DOM))
+        {
+            // If DOMs are not supported, then bail
+            return ERROR;
 
-        long startTime = 0;
+        }
+        long endTime = 0;
+        long startTime = System.currentTimeMillis();
+
+        // Parse in the stylesheet into a DOM
+        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+        dfactory.setNamespaceAware(true);
+        DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+        Node xslDoc = docBuilder.parse(new InputSource(xslStylesheet));
+
+        // Create a DOMSource to encapsulate the xsl DOM
+        DOMSource dsource = new DOMSource(xslDoc);
+        // If we don't do this, the transformer won't know how to 
+        // resolve relative URLs in the stylesheet.
+        dsource.setBaseID(xslStylesheet);
+
+        // Build a stylesheet from the DOMSource
+        Templates templates = processor.newTemplates(dsource);
         Transformer transformer = templates.newTransformer();
 
+        // Parse in the xml data into a DOM
+        dfactory = DocumentBuilderFactory.newInstance();
+        docBuilder = dfactory.newDocumentBuilder();
+        Node xmlDoc = docBuilder.parse(new InputSource(xmlSource));
+
+        // Prepare a result and transform it into a DOM
+        org.w3c.dom.Document outNode = docBuilder.newDocument();
         applyParams(transformer, params);
+        transformer.transform(new DOMSource(xmlDoc), 
+                              new DOMResult(outNode));
+        // Stop timing now
+        endTime = System.currentTimeMillis();
 
-        OutputFormat format = templates.getOutputFormat();
-        Serializer serializer = SerializerFactory.getSerializer(format);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();  // ???? How best to do this?
-
-        serializer.setOutputStream(baos);
-        transformer.setContentHandler(serializer.asContentHandler());
-        transformer.setProperty("http://xml.apache.org/xslt/sourcebase",
-                                xml.getSystemId());
-
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-
-        reader.setFeature("http://xml.org/sax/features/namespace-prefixes",
-                          true);
-        reader.setFeature("http://apache.org/xml/features/validation/dynamic",
-                          true);
-
-        ContentHandler chandler = transformer.getInputContentHandler();
-
-        reader.setContentHandler(chandler);
-
-        if (chandler instanceof org.xml.sax.ext.LexicalHandler)
-            reader.setProperty(
-                "http://xml.org/sax/properties/lexical-handler", chandler);
-        else
-            reader.setProperty(
-                "http://xml.org/sax/properties/lexical-handler", null);
-
-        // Only time the actual parsing (transforming)
-        startTime = System.currentTimeMillis();
-
-        reader.parse(xml);
-
-        long endTime = System.currentTimeMillis();
-
-        // Now actually write the output to disk
-        out.write(baos.toByteArray());
-        out.flush();  // Should we close() as well?
+        // Now serialize output to disk with identity transformer
+        Transformer serializer = processor.newTransformer();
+        serializer.transform(new DOMSource(outNode), 
+                             new StreamResult(resultStream));
 
         return (endTime - startTime);
     }
 
-    /**
-     * Transform an xml document using .
-     *
-     * NEEDSDOC @param templates
-     * NEEDSDOC @param xml
-     * NEEDSDOC @param out
-     * @return milliseconds process time took
-     *
-     * @throws IOException
-     * @throws SAXException
-     * @throws TransformException
-     */
-    private long transformAsXMLFilter(
-            Templates templates, InputSource xml, OutputStream out)
-                throws TransformException, SAXException, IOException
-    {
-
-        long startTime = 0;
-        Transformer transformer = templates.newTransformer();
-
-        applyParams(transformer, params);
-
-        // Set the result handling to be a serialization to out
-        OutputFormat format = templates.getOutputFormat();
-        Serializer serializer = SerializerFactory.getSerializer(format);
-
-        serializer.setOutputStream(out);
-        transformer.setContentHandler(serializer.asContentHandler());
-
-        // The transformer will use a SAX parser as it's reader.        
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-
-        transformer.setParent(reader);
-
-        // Now, when you call transformer.parse, it will set itself as 
-        // the content handler for the parser object (it's "parent"), and 
-        // will then call the parse method on the parser.
-        // Only time the actual parsing (transforming)
-        startTime = System.currentTimeMillis();
-
-        transformer.parse(xml);
-
-        return (System.currentTimeMillis() - startTime);
-    }
-
-    /**
-     * Transform an xml document using DOMs.
-     *
-     * NEEDSDOC @param templates
-     * NEEDSDOC @param xml
-     * NEEDSDOC @param out
-     * @return milliseconds process time took
-     *
-     * @throws Exception
-     */
-    private long transformDOM2DOM(
-            Templates templates, InputSource xml, OutputStream out)
-                throws Exception  // Just cover all cases, since we don't care which kind gets thrown
-    {
-
-        long startTime = 0;
-
-        if (!processor.getFeature("http://xml.org/trax/features/dom/input"))
-        {
-            throw new org.xml.sax.SAXNotSupportedException(
-                "DOM node processing not supported!");
-        }
-
-        DocumentBuilderFactory dfactory =
-            DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
-
-        /**
-         *   NOTE: this part should really be done as a DOM, but it doesn't
-         *   fit with our model - a big TODO for later on
-         * // Parse in the stylesheet
-         * Node xslDoc = docBuilder.parse(new InputSource(xslID));
-         *
-         * // Create the template from the DOM of the stylesheet
-         * Templates templates = processor.processFromNode(xslDoc);
-         */
-
-        // Here, time the parsing of the XML doc, the transformation, 
-        //  and the serialization: this seems equivalent to what we 
-        //  time in the other methods
-        startTime = System.currentTimeMillis();
-
-        // Parse the XML data document the same way
-        Node xmlDoc = docBuilder.parse(xml);
-
-        // Run the transformation from the DOM nodes
-        org.w3c.dom.Document outNode = docBuilder.newDocument();
-        Transformer transformer = templates.newTransformer();
-
-        applyParams(transformer, params);
-        transformer.transformNode(xmlDoc, new Result(outNode));
-
-        // Use the serializers to output the result to disk
-        OutputFormat format = templates.getOutputFormat();
-        Serializer serializer = SerializerFactory.getSerializer(format);
-
-        serializer.setOutputStream(out);
-        serializer.asDOMSerializer().serialize(outNode);
-
-        return (System.currentTimeMillis() - startTime);
-    }
 
     /**
      * Preprocess a stylesheet and set it into the processor, based on string inputs.
@@ -672,13 +467,13 @@ public class TraxWrapper extends ProcessorWrapper
         long endTime = 0;
 
         // Create trax-specific sources
-        InputSource xsl = new InputSource(xslStylesheet);
+        Source xsl = new StreamSource(xslStylesheet);
 
         // Begin timing the whole process
         startTime = System.currentTimeMillis();
 
         // Read and compile the stylesheet
-        savedStylesheet = processor.process(xsl);
+        savedStylesheet = processor.newTemplates(xsl);
         endTime = System.currentTimeMillis();
         stylesheetReady = true;
 
@@ -708,9 +503,6 @@ public class TraxWrapper extends ProcessorWrapper
         long startTime = 0;
         long endTime = 0;
 
-        // Create trax-specific sources
-        InputSource xml = new InputSource(xmlSource);
-
         // May throw IOException
         FileOutputStream resultStream = new FileOutputStream(resultFile);
 
@@ -723,7 +515,7 @@ public class TraxWrapper extends ProcessorWrapper
         startTime = System.currentTimeMillis();
 
         // HACK: this should work off of transformType as well!
-        transformer.transform(xml, new Result(resultStream));
+        transformer.transform(new StreamSource(xmlSource), new StreamResult(resultStream));
 
         endTime = System.currentTimeMillis();
 
@@ -788,8 +580,8 @@ public class TraxWrapper extends ProcessorWrapper
     /**
      * Set a String name=value param in the processor, if applicable.  
      *
-     * NEEDSDOC @param key
-     * NEEDSDOC @param expression
+     * @param key name of the parameter, encoded for TRAX
+     * @param expression value of the parameter
      */
     public void setStylesheetParam(String key, String expression)
     {
@@ -834,8 +626,10 @@ public class TraxWrapper extends ProcessorWrapper
     /**
      * Apply our set of parameters to a transformer.  
      *
-     * NEEDSDOC @param t
-     * NEEDSDOC @param h
+     * @todo update to munge TRAX-encoded {namespace}'s as needed
+     * @todo should we call t.setParameters(Properties) instead?
+     * @param t transformer to set parameters on
+     * @param h hash of paramName=paramVal objects
      */
     protected void applyParams(Transformer t, Hashtable h)
     {
@@ -848,8 +642,8 @@ public class TraxWrapper extends ProcessorWrapper
         {
             Object key = enum.nextElement();
 
-            t.setParameter(key.toString(), null /* namespace TBD */,
-                           h.get(key));
+            // @todo update to munge TRAX-encoded {namespace}'s as needed
+            t.setParameter(key.toString(), h.get(key));
         }
     }
 
