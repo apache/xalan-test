@@ -259,19 +259,12 @@ private DOMImpl getDOM(String xmldocname)
 	for (int itNode = axis.next(); DOM.NULL != itNode;
               itNode = axis.next())
 	{ 
-		System.out.print("\nNode Name: " + dom.getNodeName(itNode)+" "+
-						 "Node Type: \""+dom.getType(itNode)+"\" "+
-						 "Node Position: "+axis.getPosition());
+		System.out.print("\n Name: " + dom.getNodeName(itNode)+" "+
+						 " Type: \""+dom.getType(itNode)+"\" "+
+						 " Position: "+axis.getPosition());
 		if (dom.getType(itNode) != 1)
-		System.out.print(" Node Value: \""+dom.getElementValue(itNode)+"\""); 
+		System.out.print(" Value: \""+dom.getElementValue(itNode)+"\""); 
 	}
-
-	//System.out.println("NodeName is " + dom.getLocalName(axis.next()));
-
-	//System.out.println("Last node is " + axis.getLast());
-	//System.out.println("Next node is " + axis.next());
-	//System.out.println("Last node is " + axis.getLast());
-	//System.out.println("Position node is " + axis.getPosition());
 
     return dom;
 }
