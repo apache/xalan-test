@@ -267,12 +267,16 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
             DOMSource blankXSLDOM = new DOMSource();
             reporter.logTraceMsg("About to newTemplates(blankXSLDOM)");
             Templates blankTemplates = factory.newTemplates(blankXSLDOM); // SPR SCUU4R5JYZ throws npe; 0b29CVS now returns null
-            reporter.check((blankTemplates != null), true, "factory.newTemplates(blankXSLDOM) is non-null");
+            if (blankTemplates != null) // Use if so we can pass id to checkPass/Fail calls
+                reporter.checkPass("factory.newTemplates(blankXSLDOM) is non-null", "SCUU4R5JYZ");
+            else
+                reporter.checkFail("factory.newTemplates(blankXSLDOM) is non-null", "SCUU4R5JYZ");
+
             reporter.checkObject(blankXSLDOM.getNode(), null, "blankXSLDOM is still empty");
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with blankXSLDOM(1)");
+            reporter.checkFail("Problem with blankXSLDOM(1)", "SCUU4R5JYZ");
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with blankXSLDOM(1)");
         }
         try
@@ -286,7 +290,7 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with blankXSLDOM(2)");
+            reporter.checkFail("Problem with blankXSLDOM(2)", "SCUU4R5JYZ");
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with blankXSLDOM(2)");
         }
 
@@ -323,7 +327,7 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with transform(doms 1)");
+            reporter.checkFail("Problem with transform(doms 1)", "SCUU4R5KLL");
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform(doms 1)");
         }
         try
