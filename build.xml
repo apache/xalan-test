@@ -800,21 +800,26 @@
                classpathref="compiletest.class.path" />
     </target>
 
-    <!-- Note: this target must not depend on XSLTC!
-         Obviously now that we're writing XSLTC-specific API tests, 
-         we'll need a target for those separately. -sc
-    -->
     <target name="compile" depends="compile.trax">
         <echo message="Compile Xalan-J 2.x specific tests" />
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xalanj2/*.java,${test.root}dtm/*.java"
-               excludes="${test.root}dtm/xsltcDocCode.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
     </target>
 
-    <target name="jar" depends="compile"
+	<!-- Target for XSLTC-specific API tests.  -->
+    <target name="xsltc.tests" depends="compile">
+        <echo message="Compile XSLTC specific tests" />
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
+               includes="${test.root}xsltc/*.java"
+               debug="${debug}"
+               classpathref="compiletest.class.path" />
+    </target>
+
+    <target name="jar" depends="compile,xsltc.tests"
         description="Build testxsl.jar with all available tests">
         <jar jarfile="${testxsl.jar}" 
              basedir="${test.build.dir}" 
