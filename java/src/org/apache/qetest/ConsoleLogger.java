@@ -467,7 +467,10 @@ public class ConsoleLogger implements Logger
      */
     public void checkPass(String comment, String id)
     {
-        outStream.println(sIndent + "PASS!  (" + id + ") " + comment);
+        if (id != null)
+            outStream.println(sIndent + "PASS!  (" + id + ") " + comment);
+        else
+            outStream.println(sIndent + "PASS!  " + comment);
     }
 
     /**
@@ -478,7 +481,10 @@ public class ConsoleLogger implements Logger
      */
     public void checkAmbiguous(String comment, String id)
     {
-        outStream.println(sIndent + "AMBG   (" + id + ") " + comment);
+        if (id != null)
+            outStream.println(sIndent + "AMBG   (" + id + ") " + comment);
+        else
+            outStream.println(sIndent + "AMBG   " + comment);
     }
 
     /**
@@ -489,7 +495,10 @@ public class ConsoleLogger implements Logger
      */
     public void checkFail(String comment, String id)
     {
-        outStream.println(sIndent + "FAIL!  (" + id + ") " + comment);
+        if (id != null)
+            outStream.println(sIndent + "FAIL!  (" + id + ") " + comment);
+        else
+            outStream.println(sIndent + "FAIL!  " + comment);
     }
 
     /**
@@ -500,7 +509,10 @@ public class ConsoleLogger implements Logger
      */
     public void checkErr(String comment, String id)
     {
-        outStream.println(sIndent + "ERROR  (" + id + ") " + comment);
+        if (id != null)
+            outStream.println(sIndent + "ERROR  (" + id + ") " + comment);
+        else
+            outStream.println(sIndent + "ERROR  " + comment);
     }
 }  // end of class ConsoleLogger
 
