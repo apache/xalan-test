@@ -128,7 +128,7 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     public static final String X2J_SUBDIR = "xalanj2";
 
     /** Level that various TransformState logging should use.  */
-    protected int traceLoggingLevel = Logger.INFOMSG;
+    protected int traceLoggingLevel = Logger.INFOMSG - 1;
 
     /** Just initialize test name, comment, numTestCases. */
     public TransformStateAPITest()
@@ -194,6 +194,9 @@ public class TransformStateAPITest extends XSLProcessorTestBase
             reporter.logWarningMsg("---- About to process " + QetestUtils.filenameToURL(testFileInfo.inputName));
             transformer.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo.xmlName)),
                                   new SAXResult(this)); // use us to handle result
+            // Reset our transformState after each transform
+            transformState = null;
+
             Transformer transformer2 = factory.newTransformer(new StreamSource(QetestUtils.filenameToURL(testFileInfo2.inputName)));
             reporter.logWarningMsg("---- About to process " + QetestUtils.filenameToURL(testFileInfo2.inputName));
             transformer2.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo2.xmlName)),
@@ -211,6 +214,7 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     }
 
 
+    ////////////////// partially Implement LoggingHandler ////////////////// 
     /** Cheap-o string representation of last event we got.  */
     protected String lastItem = LoggingHandler.NOTHING_HANDLED;
 
@@ -241,12 +245,10 @@ public class TransformStateAPITest extends XSLProcessorTestBase
             reporter.logTraceMsg("TS null for:" + event + value);
             return;
         }
-        // Experimenting: which info is reported where? What's most useful to validate on?
-        reporter.logMsg(traceLoggingLevel, event 
-                     + getCurrentElementInfo(ts) + " is processing: " 
-                     + getCurrentNodeInfo(ts, value));
         reporter.logArbitrary(traceLoggingLevel, event 
-                     + getTransformStateDump(ts));
+                + "L" + ts.getCurrentTemplate().getLineNumber()
+                + "C" + ts.getCurrentTemplate().getColumnNumber() + "\n"
+                + getTransformStateDump(ts));
         //@todo: implement validation service for this stuff
         //  focus on what tooling/debugging clients will want to see
     }
@@ -288,158 +290,29 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     {
         StringBuffer buf = new StringBuffer();
         ElemTemplateElement elem = ts.getCurrentElement(); // may be actual or default template
-        buf.append("getCurrentElement:" + getElemTemplateElementDump(elem) + "\n");
+        buf.append("getCurrentElement:" + XalanDumper.dump(elem, XalanDumper.DUMP_DEFAULT) + "\n");
 
         ElemTemplate currentTempl = ts.getCurrentTemplate(); // Actual current template
-        buf.append("getCurrentTemplate:" + getElemTemplateDump(currentTempl) + "\n");
+        buf.append("getCurrentTemplate:" + XalanDumper.dump(currentTempl, XalanDumper.DUMP_DEFAULT) + "\n");
 
         ElemTemplate matchTempl = ts.getMatchedTemplate(); // Actual matched template
-        buf.append("getMatchedTemplate:" + getElemTemplateDump(matchTempl) + "\n");
+        if (matchTempl != currentTempl)
+            buf.append("getMatchedTemplate:" + XalanDumper.dump(matchTempl, XalanDumper.DUMP_DEFAULT) + "\n");
 
         Node n = ts.getCurrentNode();   // current context node in source tree
-        buf.append("getCurrentNode:" + n + "\n"); // TBD
+        buf.append("getCurrentNode:" + XalanDumper.dump(n, XalanDumper.DUMP_DEFAULT) + "\n");
 
         Node matchedNode = ts.getMatchedNode(); // node in source matched via getMatchedTemplate
-        buf.append("getMatchedNode:" + matchedNode + "\n"); // TBD
+        buf.append("getMatchedNode:" + XalanDumper.dump(matchedNode, XalanDumper.DUMP_DEFAULT) + "\n");
 
         NodeIterator contextNodeList = ts.getContextNodeList(); // current context node list
-        buf.append("getContextNodeList:" + contextNodeList + "\n"); // TBD
+        buf.append("getContextNodeList:" + contextNodeList + "\n");
 
         Transformer transformer = ts.getTransformer(); // current transformer working
         buf.append("getTransformer:" + transformer + "\n"); // TBD
         return buf.toString();
     }
 
-    /**
-     * Utility method to dump data from an ElemTemplate.  
-     * @return String describing various bits of the state
-     */
-    protected String getElemTemplateDump(ElemTemplate et)
-    {
-        StringBuffer buf = new StringBuffer("ElemTemplateDump;");
-        if (null == et)
-            return buf.toString();
-        buf.append("\n    getNodeName:" + et.getNodeName() + ";");
-        buf.append("\n    getStylesheet:" + et.getStylesheet() + ";");
-        buf.append("\n    getSystemId:" + et.getSystemId() + ";");
-        buf.append("\n    getPublicId:" + et.getPublicId() + ";");
-        QName qname = et.getName();
-        if (null != qname)
-            buf.append("\n    getName:" + qname.toString() + ";");
-        else
-            buf.append("\n    getName:NULL;");
-        qname = et.getMode();
-        if (null != qname)
-            buf.append("\n    getMode:" + qname.toString() + ";");
-        else
-            buf.append("\n    getMode:NULL;");
-
-        XPath xpath = et.getMatch();
-        if (null != xpath)
-            buf.append("\n    getMatch:" + xpath.getPatternString() + ";");
-        else
-            buf.append("\n    getMatch:NULL;");
-
-        buf.append("\n    getPriority:" + et.getPriority() + ";");
-        return buf.toString();
-    }
-    /**
-     * Utility method to dump data from an ElemTemplateElement.  
-     * @return String describing various bits of the state
-     */
-    protected String getElemTemplateElementDump(ElemTemplateElement et)
-    {
-        StringBuffer buf = new StringBuffer("ElemTemplateElementDump;");
-        if (null == et)
-            return buf.toString();
-        buf.append("\n    getNodeName:" + et.getNodeName() + ";");
-        buf.append("\n    getStylesheet:" + et.getStylesheet() + ";");
-        buf.append("\n    getSystemId:" + et.getSystemId() + ";");
-        buf.append("\n    getPublicId:" + et.getPublicId() + ";");
-        buf.append("\n    getLength:" + et.getLength() + ";");
-        buf.append("\n    getLineNumber:" + et.getLineNumber() + ";");
-        buf.append("\n    getColumnNumber:" + et.getColumnNumber() + ";");
-
-        return buf.toString();
-    }
-
-    /**
-     * Utility method to gather data about current node.  
-     * @return String describing node
-     */
-    protected String getCurrentNodeInfo(TransformState ts, String x)
-    {
-        StringBuffer buf = new StringBuffer();
-        Node n = ts.getCurrentNode();
-        if(null != n)
-        {
-            buf.append(n.getNodeName());
-            if(Node.TEXT_NODE == n.getNodeType())
-            {
-                buf.append("[");
-                buf.append(n.getNodeValue());
-                buf.append("]");
-            }
-        }
-        else
-            buf.append("[NULL-NODE]");
-
-        if (null != x)            
-            buf.append("[value:" + x + "]");
-
-        return buf.toString();
-    }
-
-    /**
-     * Utility method to gather data about current element in xsl.  
-     * @return String describing element
-     */
-    protected String getCurrentElementInfo(TransformState ts)
-    {
-        StringBuffer buf = new StringBuffer();
-        ElemTemplateElement templ = ts.getCurrentElement();
-
-        if(null != templ)
-        {
-            // Note for user if it's an LRE or an xsl element
-            if(templ instanceof ElemLiteralResult)
-                buf.append("LRE:");
-            else
-                buf.append("xsl:");
-
-            buf.append(templ.getNodeName());
-            buf.append(", line# "+templ.getLineNumber());
-            buf.append(", col# "+templ.getColumnNumber());
-            try
-            {
-                Class cl = ((Object)templ).getClass();
-                Method getSelect = cl.getMethod("getSelect", null);
-                if(null != getSelect)
-                {
-                    buf.append(", select='");
-                    XPath xpath = (XPath)getSelect.invoke(templ, null);
-                    buf.append(xpath.getPatternString()+"'");
-                }
-            }
-            catch(java.lang.reflect.InvocationTargetException ite)
-            {
-                // no-op: just don't put in the select info for these items
-                // buf.append("(threw: InvocationTargetException)");
-            }
-            catch(IllegalAccessException iae)
-            {
-                // no-op
-            }
-            catch(NoSuchMethodException nsme)
-            {
-                // no-op
-            }
-        }
-        else
-            buf.append("[NULL-ELEMENT]");
-
-        return buf.toString();
-    }
 
     //-----------------------------------------------------------
     //---- Implement the ContentHandler interface
@@ -462,8 +335,11 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     public void setDocumentLocator (Locator locator)
     {
         // Note: this implies this class is !not! threadsafe
-        setLastItem("setDocumentLocator");
         ourLocator = locator; // future use
+        if (null != locator)
+            setLastItem("setDocumentLocator.getSystemId():" + locator.getSystemId());
+        else
+            setLastItem("setDocumentLocator:NULL");
         reporter.logMsg(traceLoggingLevel, getLast());
     }
 
@@ -498,7 +374,7 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     public void startPrefixMapping (String prefix, String uri)
         throws SAXException
     {
-        setLastItem("startPrefixMapping: " + ", " + uri);
+        setLastItem("startPrefixMapping: " + prefix + ", " + uri);
         reporter.logMsg(traceLoggingLevel, getLast());
     }
 
@@ -514,12 +390,12 @@ public class TransformStateAPITest extends XSLProcessorTestBase
 
     /** Implement ContentHandler.startElement.  */
     public void startElement (String namespaceURI, String localName,
-                                                        String qName, Attributes atts)
+                              String qName, Attributes atts)
         throws SAXException
     {
         StringBuffer buf = new StringBuffer();
         buf.append(namespaceURI + ", " 
-                   + namespaceURI + ", " + qName);
+                   + localName + ", " + qName + ";");
                    
         int n = atts.getLength();
         for(int i = 0; i < n; i++)
@@ -536,7 +412,7 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     public void endElement (String namespaceURI, String localName, String qName)
         throws SAXException
     {
-        setLastItem(END_ELEMENT + namespaceURI + ", " + namespaceURI + ", " + qName);
+        setLastItem(END_ELEMENT + namespaceURI + ", " + localName + ", " + qName);
 
         validateTransformState(transformState, END_ELEMENT, null);
     }
