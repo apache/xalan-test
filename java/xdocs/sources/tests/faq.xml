@@ -5,9 +5,11 @@
 
   <s2 title="In progress">
     <p>We need to start a FAQ for testing Xalan, unfortunately the faq doctype 
-    doesn't properly work in this tree, so I'm using an s1/s2 doc instead temporarily.</p>
+    doesn't properly work in this tree, so I'm using an s1/s2 doc instead temporarily.
+    Some topics include:</p>
 <ul>
 <li><link anchor="viewresults">Pretty-printing results</link></li>
+<li><link anchor="debug">Run tests in a debugger, etc.</link></li>
 </ul>
   </s2>
   <s2 title="Prepare to run tests">
@@ -79,6 +81,9 @@
     <li><source>java -classpath blah org.apache.xalan.xslt.Process -in results-perf/results.xml -xsl PerfScanner.xsl -out results-perf/PerfReport.html</source><br/><br/></li>
     <li><source>build alltest</source><br/>
     (Creates a <b>LOT</b> of results in results-alltest/**)<br/></li>
+    <li><source>build scan</source><br/>
+    (Runs ResultScanner by default on results-alltest/**)<br/></li>
+    <li><source>build scan -Dscan.outputDir=results-perf</source>  etc.<br/></li>
     <li><source>java -classpath blah;testxsl.jar org.apache.qetest.xsl.ResultScanner results-alltest</source><br/>
     (This uses ResultScanner.xsl to style <b>all</b> results in the whole tree under 
     results-alltest into a single ResultReport.html in the current directory; it currently 
@@ -103,6 +108,7 @@
     run properly using SAX, DOM, streams, whatever)<br/></li>
     </ul>
   </s2>
+
   <s2 title="Run all API tests">
     <ul>
     <li><source>build api -DtestClass=TransformerAPITest</source><br/></li>
@@ -112,6 +118,7 @@
     prefix the name of the option with conf,api,perf,etc.<br/><br/></li>
     </ul>
   </s2>
+
   <s2 title="Run a LOT tests">
     <ul>
     <li><source>build alltest</source> (runs all,alltest.other,alltest.conf,alltest.contrib)<br/></li>
@@ -125,4 +132,27 @@
     </ul>
   </s2>
 
+  <anchor name="debug"/>
+  <s2 title="Debug the tests">
+    <p>It's quite simple to run the tests standalone, without using Ant - this is 
+    suitable for running in your debugger or what-not (or in environments where 
+    you feel that the overhead of running Ant might interfere with the test).</p>
+    <p>Normally, we have the build.bat/.sh files and the Ant script build.xml 
+    manage parsing the command line and setting up the CLASSPATH and options for 
+    running tests.  However all tests can be run on the command line, and will 
+    accept options in either a -load file.properties block, or on the command line itself.</p>
+    <ul>
+    <li><source>debugapi.bat org.apache.qetest.trax.TransformerAPITest</source><br/>
+    Runs just one API test without using Ant; edit debugapi.properties to 
+    change parameters passed to the test.<br/></li>
+    <li><source>debugconf.bat [options]</source><br/>
+    Runs a set of conf/ stylesheet tests using the normal StylesheetTestletDriver; 
+    see debugconf.properties for settable options.  Note that this method does not 
+    directly support 'conf.one' to run only a <b>single</b> test.<br/></li>
+    <li>Setup everything manually.  Minimal setup is: CLASSPATH has 
+    xalan.jar;xercesImpl.jar;xml-apis.jar;testxsl.jar, command line parameters or 
+    -load file.properties includes other test properties, like inputDir, goldDir, 
+    outputDir, logFile, etc.</li>
+    </ul>
+  </s2>
 </s1>
