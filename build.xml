@@ -588,7 +588,8 @@
         </antcall>
         <!-- Run the perf tests just with streams, which gives best perf data -->
         <antcall target="perf">
-            <param name="contrib.flavor" value="trax.stream"/>
+            <param name="perf.flavor" value="trax.stream"/>
+			<param name="perf.fileList" value="perf.filelist"/>
             <param name="perf.outputDir" value="${alltest.resultDir}/perf"/>
             <param name="perf.logFile" value="${alltest.resultDir}/perf/results.xml"/>
         </antcall>
