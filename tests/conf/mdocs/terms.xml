@@ -1,5 +1,7 @@
 <?xml version='1.0'?>
 <table>
+  <!-- FileName: terms.xml -->
+  <!-- Purpose: To be referenced by tests such as mdocs16 -->
 <expand>
   <gentext key="TableofContents" text="TOC"/>
   <gentext key="tableofcontents" text="TOC"/>
