@@ -313,7 +313,7 @@ public class ThreadedTestletDriver extends StylesheetTestletDriver
         if (null == cachedTestletClazz)
         {
             cachedTestletClazz = QetestUtils.testClassForName(testlet, 
-                                                              testPackages,
+                                                              QetestUtils.defaultPackages,
                                                               defaultTestlet);
         }
         try

@@ -142,12 +142,6 @@ public class PerformanceTest extends XSLDirectoryIterator
      */
     public boolean doTestFileInit(Properties p)
     {
-
-        // HACK Explicitly set diagnostics to null
-        //  If we leave it set, then this will affect the processorWrapper
-        //  and that may affect different processors differently
-        diagnostics = null;
-
         // Read in our additional options from properties block (XLTest should have set this)
         String tmp;
 
@@ -234,11 +228,6 @@ public class PerformanceTest extends XSLDirectoryIterator
 
         try
         {
-
-            // Force filerefs to be URI's if needed; Note that this may affect other processors besides xerces badly
-            if (useURI)
-            {
-
                 // Use this static convenience method; returns a URL; convert to String via toExternalForm()
                 // Note: we should consider caching the original strings first, 
                 //  in case we later on have a use for them instead of the URI'd format
@@ -249,7 +238,6 @@ public class PerformanceTest extends XSLDirectoryIterator
                 //  we do NOT want to convert those.  Subject to change, however.
                 reporter.logTraceMsg("processSingleFile() useURI: "
                                      + XSLName);
-            }
 
             // TODO replicate ProcessorBenchmark.benchmarkPreprocess()
             // TODO cleanup outName - delete the file on disk

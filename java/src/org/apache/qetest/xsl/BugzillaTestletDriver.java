@@ -477,7 +477,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
     {
         // Find a Testlet class to use
         Class clazz = QetestUtils.testClassForName("org.apache.qetest.xsl.BugzillaFileRules", 
-                                                   testPackages,
+                                                   QetestUtils.defaultPackages,
                                                    defaultFileFilter);
         try
         {
