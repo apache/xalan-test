@@ -76,7 +76,7 @@ import java.util.StringTokenizer;
 //-------------------------------------------------------------------------
 
 /**
- * Utility to run multiple XSLProcessorTestBase objects in a row.  
+ * Utility to run multiple FileBasedTest objects in a row.  
  * <p>Generally run from the command line and passed a list 
  * of tests to execute, the XSLTestHarness will run each test in 
  * order, saving the results of each test for reporting later.</p>
@@ -99,12 +99,12 @@ public class XSLTestHarness
  */
     public String usage()
     {
-        XSLProcessorTestBase tmp = new XSLProcessorTestBase();
+        FileBasedTest tmp = new FileBasedTest();
         return ("XSLTestHarness - execute multiple Tests in sequence and log results:\n"
                 + "    Usage: java XSLTestHarness [-load] properties.prop\n"
                 + "    Reads in all options from a Properties file:\n"
                 + "    " + OPT_TESTS + "=semicolon;delimited;list;of FQCNs tests to run\n"
-                + "    Most other options (in prop file only) are identical to XSLProcessorTestBase:\n"
+                + "    Most other options (in prop file only) are identical to FileBasedTest:\n"
                 + tmp.usage()
                 );
     }
@@ -116,7 +116,7 @@ public class XSLTestHarness
      * TestClassNames to execute, in order; assumes all are in the 
      * org.apache.qetest. as base package currently (subject to change)</li>
      * <li>logFile=LogFileName - name of output XML file to store harness 
-     * log data in (passed to Reporter; constant in XSLProcessorTestBase.java)</li>
+     * log data in (passed to Reporter; constant in FileBasedTest.java)</li>
      * <li>inputDir=path\\to\\tests - where the tests should find data</li>
      * <li>outputDir=path\\to\\output - where the tests should send output and results</li>
      * <li>goldDir=path\\to\\golds - where the tests should find gold files</li>
@@ -366,14 +366,14 @@ public class XSLTestHarness
 
 
     /**
-     * Run a single XSLProcessorTestBase and report it's results.  
+     * Run a single FileBasedTest and report it's results.  
      * <p>Uses our class field reporter to dump our results to, also 
      * creates a separate reporter for the test to use.</p>
      * <p>See the code for the specific initialization we custom-craft for 
      * each individual test.  Basically we clone our harnessProps, update the 
      * logFile and outputDir per test, and create a testReporter, then use these 
      * to initialize the test before we call runTest on it.</p>
-     * @param testName FQCN of the test to execute; must be instanceof XSLProcessorTestBase
+     * @param testName FQCN of the test to execute; must be instanceof FileBasedTest
      * @param hProps property block to use as initializer
      * @return the pass/fail return from runTest(), which is not necessarily 
      *         the same as what we're going to log as the test's result
@@ -425,11 +425,11 @@ public class XSLTestHarness
 
         // Validate we can instantiate the test object itself
         reporter.logTraceMsg("About to newInstance(" + testName + ")");
-        XSLProcessorTestBase test = null;
+        FileBasedTest test = null;
         try
         {
             Class testClass = Class.forName(testName);
-            test = (XSLProcessorTestBase)testClass.newInstance();
+            test = (FileBasedTest)testClass.newInstance();
         }
         catch (Exception e1)
         {
