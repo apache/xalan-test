@@ -104,7 +104,7 @@ static final String[] TYPENAME=
   	System.out.println("\nHELLO THERE AND WELCOME TO THE WACKY WORLD OF ITERATORS \n");
     try
     {
-		// Pick our input source
+	    // Pick our input source
 		Source source=null;
 		if(argv.length<1)
 		{
@@ -288,6 +288,8 @@ static final String[] TYPENAME=
 	  //lastNode = iter.getLast();	 // Uncomment for Bugzilla 7885.
       lastNodeName = dtm.getNodeName(lastNode);
 	  
+	  // The output from Ancestor and Ancestor-or-self is the topic
+	  // of Bugzilla 7886
 	  // Get iterator for ANCESTOR:: Axis
 	  iter = dtm.getAxisIterator(Axis.ANCESTOR);
 	  iter.setStartNode(lastNode);
@@ -316,7 +318,6 @@ static final String[] TYPENAME=
 	  System.out.println("\n#### ALL from "+"<"+lastNodeName+">, Reverse Axis:" + iter.isReverse());	   
 
 	  // Iterate the axis and print out node info.
-	  // The output of this loop is what Bugzilla 7886 is all about.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
 		  printNode(dtm, iter, itNode, " ");
