@@ -81,11 +81,14 @@ public abstract class QetestUtils
      * flavors of URLs at all.
      *
      * If the name is null, return null.
-     * If the name starts with file:///, we just return that.
+     * If the name starts with a common URI scheme (namely the ones 
+     * found in the examples of RFC2396), then simply return the 
+     * name as-is (the assumption is that it's already a URL)
      * Otherwise we attempt (cheaply) to convert to a file:/// URL.
      * 
      * @param String local path\filename of a file
-     * @return a file:/// URL, or null if error
+     * @return a file:/// URL, the same string if it appears to 
+     * already be a URL, or null if error
      */
     public static String filenameToURL(String filename)
     {
@@ -93,9 +96,15 @@ public abstract class QetestUtils
         if (null == filename)
             return null;
 
-        // Don't translate a string that already looks like 
-        //  a file: URL
-        if (filename.startsWith("file:///"))
+        // Don't translate a string that already looks like a URL
+        if (filename.startsWith("file:")
+            || filename.startsWith("http:")
+            || filename.startsWith("ftp:")
+            || filename.startsWith("gopher:")
+            || filename.startsWith("mailto:")
+            || filename.startsWith("news:")
+            || filename.startsWith("telnet:")
+           )
             return filename;
 
         File f = new File(filename);
@@ -117,7 +126,14 @@ public abstract class QetestUtils
 	        tmp = tmp.replace('\\', '/');
 	    }
         // Note the presumption that it's a file reference
-        return "file:///" + tmp;
+        // Attempt to not add too many extra slashes on the 
+        //  front if it already starts with a slash
+        //@todo evaluate if this is really correct!
+        if (filename.startsWith("/"))
+            return "file://" + tmp;
+        else
+            return "file:///" + tmp;
+
     }
 
 

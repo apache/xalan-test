@@ -90,12 +90,8 @@ import java.util.Properties;
  * Implementation of TransformWrapper that uses the TrAX API and 
  * uses SAXSource/SAXResult whenever possible.
  *
- * <p>This implementation separates the process of reading xml and xsl 
- * files from disk into byte arrays out from the time processing of 
- * a new StreamSource(byte[]) takes to build a stylesheet.
- * It also separates the time of performing the transformation 
- * to a StreamResult(byte[]) from the time spent simply sending 
- * the byte[] through a FileOutputStream to disk.</p>
+ * <p>This implementation uses SAX to build the stylesheet and 
+ * to perform the transformation.</p>
  * 
  * <p><b>Important!</b>  The underlying System property of 
  * javax.xml.transform.TransformerFactory will determine the actual 
@@ -135,11 +131,11 @@ public class TraxSAXWrapper extends TransformWrapperHelper
     /**
      * Get a general description of this wrapper itself.
      *
-     * @return Uses TrAX to perform transforms from StreamSource(systemId)
+     * @return Uses TrAX to perform transforms from SAXSource(systemId)
      */
     public String getDescription()
     {
-        return "Uses TrAX to perform transforms from StreamSource(stream)";
+        return "Uses TrAX to perform transforms from SAXSource(stream)";
     }
 
 
@@ -246,7 +242,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
 
         // Timed: read/build Templates from StreamSource
         startTime = System.currentTimeMillis();
-        xslReader.parse(xslName);
+        xslReader.parse(QetestUtils.filenameToURL(xslName));
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Get the Templates object from the ContentHandler.
@@ -258,7 +254,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         // Create a ContentHandler to handle parsing of the XML
         TransformerHandler stylesheetHandler = saxFactory.newTransformerHandler(templates);
         // Also set systemId to the stylesheet
-        stylesheetHandler.setSystemId(xslName);
+        stylesheetHandler.setSystemId(QetestUtils.filenameToURL(xslName));
 
         // Apply any parameters needed
         applyParameters(stylesheetHandler.getTransformer());
@@ -315,7 +311,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
 
         // Timed: Parse the XML input document and do transform
         startTime = System.currentTimeMillis();
-        xmlReader.parse(xmlName);
+        xmlReader.parse(QetestUtils.filenameToURL(xmlName));
         transform = System.currentTimeMillis() - startTime;
 
         // Timed: writeResults from the byte array
@@ -377,11 +373,11 @@ public class TraxSAXWrapper extends TransformWrapperHelper
 
         // Timed: read/build Templates from StreamSource
         startTime = System.currentTimeMillis();
-        xslReader.parse(xslName);
+        xslReader.parse(QetestUtils.filenameToURL(xslName));
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Also set systemId to the stylesheet
-        templatesHandler.setSystemId(xslName);
+        templatesHandler.setSystemId(QetestUtils.filenameToURL(xslName));
 
         // Get the Templates object from the ContentHandler.
         builtTemplates = templatesHandler.getTemplates();
@@ -494,7 +490,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
 
         // Timed: Parse the XML input document and do transform
         startTime = System.currentTimeMillis();
-        xmlReader.parse(xmlName);
+        xmlReader.parse(QetestUtils.filenameToURL(xmlName));
         transform = System.currentTimeMillis() - startTime;
 
         // Timed: writeResults from the byte array

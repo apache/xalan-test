@@ -57,49 +57,34 @@
 package org.apache.qetest.xslwrapper;
 import org.apache.qetest.QetestUtils;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 
 import java.util.Hashtable;
 import java.util.Properties;
 
 /**
  * Implementation of TransformWrapper that uses the TrAX API and 
- * uses DOMs for it's sources.
+ * uses systemId URL's for it's sources.
  *
- * This implementation records separate times for xslRead (time to 
- * parse the xsl and build a DOM) and xslBuild (time to take the 
- * DOMSource object until it's built the templates); xmlRead (time 
- * to parse the xml and build a DOM).  Note xmlBuild is not timed 
- * since it's not easily measureable in TrAX.
- * The transform time is just the time to create the DOMResult 
- * object; the resultsWrite is the separate time it takes to 
- * serialize that to disk.
+ * This is the most common usage:
+ * transformer = factory.newTransformer(new StreamSource(xslURL));
+ * transformer.transform(new StreamSource(xmlURL), new StreamResult(resultFileName));
  *
  * <b>Important!</b>  The underlying System property of 
  * javax.xml.transform.TransformerFactory will determine the actual 
  * TrAX implementation used.  This value will be reported out in 
  * our getProcessorInfo() method.
  * 
- * //@todo add in checks for factory.getFeature(DOMSource.FEATURE)
- * 
  * @author Shane Curcuru
  * @version $Id$
  */
-public class TraxDOMWrapper extends TransformWrapperHelper
+public class TraxSystemIdWrapper extends TransformWrapperHelper
 {
 
     /**
@@ -123,11 +108,11 @@ public class TraxDOMWrapper extends TransformWrapperHelper
     /**
      * Get a general description of this wrapper itself.
      *
-     * @return Uses TrAX to perform transforms from DOMSource(node)
+     * @return Uses TrAX to perform transforms from StreamSource(systemId)
      */
     public String getDescription()
     {
-        return "Uses TrAX to perform transforms from DOMSource(node)";
+        return "Uses TrAX to perform transforms from StreamSource(systemId)";
     }
 
 
@@ -143,7 +128,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
     public Properties getProcessorInfo()
     {
         Properties p = TraxWrapperUtils.getTraxInfo();
-        p.put("traxwrapper.method", "dom");
+        p.put("traxwrapper.method", "systemId");
         p.put("traxwrapper.desc", getDescription());
         return p;
     }
@@ -172,11 +157,11 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         //@todo do we need to do any other cleanup?
         reset(false);
         factory = TransformerFactory.newInstance();
-        // Verify the factory supports DOM!
-        if (!(factory.getFeature(DOMSource.FEATURE)
-              && factory.getFeature(DOMResult.FEATURE)))
+        // Verify the factory supports Streams!
+        if (!(factory.getFeature(StreamSource.FEATURE)
+              && factory.getFeature(StreamResult.FEATURE)))
         {   
-            throw new TransformerConfigurationException("TraxDOMWrapper.newProcessor: factory does not support DOM!");
+            throw new TransformerConfigurationException("TraxSystemIdWrapper.newProcessor: factory does not support Streams!");
         }
         return (Object)factory;
     }
@@ -194,8 +179,8 @@ public class TraxDOMWrapper extends TransformWrapperHelper
      * @param xslName local path\filename of XSL stylesheet to use
      * @param resultName local path\filename to put result in
      *
-     * @return array of longs denoting timing of all parts of 
-     * our operation
+     * @return array of longs denoting timing of only these parts of 
+     * our operation: IDX_OVERALL, IDX_XSLBUILD, IDX_TRANSFORM
      *
      * @throws Exception any underlying exceptions from the 
      * wrappered processor are simply allowed to propagate; throws 
@@ -207,71 +192,28 @@ public class TraxDOMWrapper extends TransformWrapperHelper
     {
         preventFootShooting();
         long startTime = 0;
-        long xslRead = 0;
         long xslBuild = 0;
-        long xmlRead = 0;
         long transform = 0;
-        long resultWrite = 0;
-   
-        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
-        dfactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
-
-        // Timed: read xsl into a DOM
+        
+        // Timed: read/build xsl from a URL
         startTime = System.currentTimeMillis();
-        Node xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(xslName)));
-        xslRead = System.currentTimeMillis() - startTime;
-
-        // Untimed: create DOMSource and setSystemId
-        DOMSource xslSource = new DOMSource(xslNode);
-        xslSource.setSystemId(QetestUtils.filenameToURL(xslName));
-
-        // Timed: build Transformer from DOMSource
-        startTime = System.currentTimeMillis();
-        Transformer transformer = factory.newTransformer(xslSource);
+        Transformer transformer = factory.newTransformer(
+                new StreamSource(QetestUtils.filenameToURL(xslName)));
         xslBuild = System.currentTimeMillis() - startTime;
 
-        // Timed: read xml into a DOM
-        startTime = System.currentTimeMillis();
-        Node xmlNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(xmlName)));
-        xmlRead = System.currentTimeMillis() - startTime;
-
-        // Untimed: create DOMSource and setSystemId
-        DOMSource xmlSource = new DOMSource(xmlNode);
-        xmlSource.setSystemId(QetestUtils.filenameToURL(xmlName));
-
-        // Untimed: create DOMResult
-        Document outNode = docBuilder.newDocument();
-        DOMResult domResult = new DOMResult(outNode);
-        
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
-        // Timed: build xml (so to speak) and transform
+        // Timed: read/build xml, transform, and write results
         startTime = System.currentTimeMillis();
-        transformer.transform(xmlSource, domResult);
+        transformer.transform(new StreamSource(QetestUtils.filenameToURL(xmlName)), 
+                              new StreamResult(resultName));
         transform = System.currentTimeMillis() - startTime;
 
-        // Untimed: prepare serializer with outputProperties 
-        //  from the stylesheet
-        Transformer resultSerializer = factory.newTransformer();
-        Properties serializationProps = transformer.getOutputProperties();
-        resultSerializer.setOutputProperties(serializationProps);
-        
-        // Timed: writeResults from the DOMResult
-        startTime = System.currentTimeMillis();
-        resultSerializer.transform(new DOMSource(outNode), 
-                             new StreamResult(resultName));
-        resultWrite = System.currentTimeMillis() - startTime;
-
         long[] times = getTimeArray();
-        times[IDX_OVERALL] = xslRead + xslBuild + xmlRead 
-                             + transform + resultWrite;
-        times[IDX_XSLREAD] = xslRead;
+        times[IDX_OVERALL] = xslBuild + transform;
         times[IDX_XSLBUILD] = xslBuild;
-        times[IDX_XMLREAD] = xmlRead;
         times[IDX_TRANSFORM] = transform;
-        times[IDX_RESULTWRITE] = resultWrite;
         return times;
     }
 
@@ -293,7 +235,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
      * @param xslName local path\filename of XSL stylesheet to use
      *
      * @return array of longs denoting timing of only these parts of 
-     * our operation: IDX_OVERALL, IDX_XSLREAD, IDX_XSLBUILD
+     * our operation: IDX_OVERALL, IDX_XSLBUILD
      *
      * @throws Exception any underlying exceptions from the 
      * wrappered processor are simply allowed to propagate; throws 
@@ -306,32 +248,17 @@ public class TraxDOMWrapper extends TransformWrapperHelper
     {
         preventFootShooting();
         long startTime = 0;
-        long xslRead = 0;
         long xslBuild = 0;
         
-        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
-        dfactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
-
-        // Timed: read xsl into a DOM
+        // Timed: read/build xsl from a URL
         startTime = System.currentTimeMillis();
-        Node xslNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(xslName)));
-        xslRead = System.currentTimeMillis() - startTime;
-
-        // Untimed: create DOMSource and setSystemId
-        DOMSource xslSource = new DOMSource(xslNode);
-        xslSource.setSystemId(QetestUtils.filenameToURL(xslName));
-
-        // Timed: build Templates from DOMSource
-        startTime = System.currentTimeMillis();
-        builtTemplates = factory.newTemplates(xslSource);
+        builtTemplates = factory.newTemplates(
+                new StreamSource(QetestUtils.filenameToURL(xslName)));
         xslBuild = System.currentTimeMillis() - startTime;
-
         m_stylesheetReady = true;
 
         long[] times = getTimeArray();
-        times[IDX_OVERALL] = xslRead + xslBuild;
-        times[IDX_XSLREAD] = xslRead;
+        times[IDX_OVERALL] = xslBuild;
         times[IDX_XSLBUILD] = xslBuild;
         return times;
     }
@@ -350,8 +277,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
      * @param resultName local path\filename to put result in
      *
      * @return array of longs denoting timing of only these parts of 
-     * our operation: IDX_OVERALL, IDX_XMLREAD, 
-     * IDX_TRANSFORM, IDX_RESULTWRITE
+     * our operation: IDX_OVERALL, IDX_XSLBUILD, IDX_TRANSFORM
      *
      * @throws Exception any underlying exceptions from the 
      * wrappered processor are simply allowed to propagate; throws 
@@ -369,55 +295,23 @@ public class TraxDOMWrapper extends TransformWrapperHelper
 
         preventFootShooting();
         long startTime = 0;
-        long xmlRead = 0;
         long transform = 0;
-        long resultWrite = 0;
         
-        // Untimed: get Transformer from Templates
+        // UNTimed: get Transformer from Templates
         Transformer transformer = builtTemplates.newTransformer();
 
-        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
-        dfactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
-
-         // Timed: read xml into a DOM
-        startTime = System.currentTimeMillis();
-        Node xmlNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(xmlName)));
-        xmlRead = System.currentTimeMillis() - startTime;
-
-        // Untimed: create DOMSource and setSystemId
-        DOMSource xmlSource = new DOMSource(xmlNode);
-        xmlSource.setSystemId(QetestUtils.filenameToURL(xmlName));
-
-        // Untimed: create DOMResult
-        Document outNode = docBuilder.newDocument();
-        DOMResult domResult = new DOMResult(outNode);
-        
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
-        // Timed: build xml (so to speak) and transform
+        // Timed: read/build xml, transform, and write results
         startTime = System.currentTimeMillis();
-        transformer.transform(xmlSource, domResult);
+        transformer.transform(new StreamSource(QetestUtils.filenameToURL(xmlName)), 
+                              new StreamResult(resultName));
         transform = System.currentTimeMillis() - startTime;
 
-        // Untimed: prepare serializer with outputProperties 
-        //  from the stylesheet
-        Transformer resultSerializer = factory.newTransformer();
-        Properties serializationProps = transformer.getOutputProperties();
-        resultSerializer.setOutputProperties(serializationProps);
-        
-        // Timed: writeResults from the DOMResult
-        startTime = System.currentTimeMillis();
-        resultSerializer.transform(new DOMSource(outNode), 
-                             new StreamResult(resultName));
-        resultWrite = System.currentTimeMillis() - startTime;
-
         long[] times = getTimeArray();
-        times[IDX_OVERALL] = xmlRead + transform + resultWrite;
-        times[IDX_XMLREAD] = xmlRead;
+        times[IDX_OVERALL] = transform;
         times[IDX_TRANSFORM] = transform;
-        times[IDX_RESULTWRITE] = resultWrite;
         return times;
     }
 
@@ -437,8 +331,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
      * @return array of longs denoting timing of only these parts of 
      * our operation: IDX_OVERALL, IDX_XSLREAD (time to find XSL
      * reference from the xml-stylesheet PI), IDX_XSLBUILD, (time 
-     * to then build the Transformer therefrom), IDX_TRANSFORM, 
-     * and IDX_RESULTWRITE
+     * to then build the Transformer therefrom), IDX_TRANSFORM
      *
      * @throws Exception any underlying exceptions from the 
      * wrappered processor are simply allowed to propagate; throws 
@@ -448,69 +341,37 @@ public class TraxDOMWrapper extends TransformWrapperHelper
     public long[] transformEmbedded(String xmlName, String resultName)
         throws Exception
     {
+        preventFootShooting();
         long startTime = 0;
         long xslRead = 0;
         long xslBuild = 0;
-        long xmlRead = 0;
         long transform = 0;
-        long resultWrite = 0;
-   
-        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
-        dfactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
-
-        // Timed: read xml into a DOM
-        startTime = System.currentTimeMillis();
-        Node xmlNode = docBuilder.parse(new InputSource(QetestUtils.filenameToURL(xmlName)));
-        xmlRead = System.currentTimeMillis() - startTime;
-
-        // Untimed: create DOMSource and setSystemId
-        DOMSource xmlSource = new DOMSource(xmlNode);
-        xmlSource.setSystemId(QetestUtils.filenameToURL(xmlName));
-
+        
         // Timed: readxsl from the xml document
         startTime = System.currentTimeMillis();
-        Source xslSource = factory.getAssociatedStylesheet(xmlSource, 
-                                                           null, null, null);
+        Source xslSource = factory.getAssociatedStylesheet(new StreamSource(QetestUtils.filenameToURL(xmlName)), 
+                                                              null, null, null);
         xslRead = System.currentTimeMillis() - startTime;
 
-        // Timed: build Transformer from Source
+        // Timed: build xsl from a URL
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
         xslBuild = System.currentTimeMillis() - startTime;
 
-        // Untimed: create DOMResult
-        Document outNode = docBuilder.newDocument();
-        DOMResult domResult = new DOMResult(outNode);
-        
         // Untimed: Apply any parameters needed
         applyParameters(transformer);
 
-        // Timed: build xml (so to speak) and transform
+        // Timed: read/build xml, transform, and write results
         startTime = System.currentTimeMillis();
-        transformer.transform(xmlSource, domResult);
+        transformer.transform(new StreamSource(QetestUtils.filenameToURL(xmlName)), 
+                              new StreamResult(resultName));
         transform = System.currentTimeMillis() - startTime;
 
-        // Untimed: prepare serializer with outputProperties 
-        //  from the stylesheet
-        Transformer resultSerializer = factory.newTransformer();
-        Properties serializationProps = transformer.getOutputProperties();
-        resultSerializer.setOutputProperties(serializationProps);
-        
-        // Timed: writeResults from the DOMResult
-        startTime = System.currentTimeMillis();
-        resultSerializer.transform(new DOMSource(outNode), 
-                             new StreamResult(resultName));
-        resultWrite = System.currentTimeMillis() - startTime;
-
         long[] times = getTimeArray();
-        times[IDX_OVERALL] = xslRead + xslBuild + xmlRead 
-                             + transform + resultWrite;
+        times[IDX_OVERALL] = xslRead + xslBuild + transform;
         times[IDX_XSLREAD] = xslRead;
         times[IDX_XSLBUILD] = xslBuild;
-        times[IDX_XMLREAD] = xmlRead;
         times[IDX_TRANSFORM] = transform;
-        times[IDX_RESULTWRITE] = resultWrite;
         return times;
     }
 

@@ -60,16 +60,22 @@ import org.apache.qetest.QetestUtils;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import java.io.File;
 import java.util.Hashtable;
 import java.util.Properties;
 
 /**
  * Implementation of TransformWrapper that uses the TrAX API and 
  * uses files for it's sources.
+ *
+ * This is the second most common usage:
+ * transformer = factory.newTransformer(new StreamSource(new File(xslName)));
+ * transformer.transform(new StreamSource(new File(xmlName)), new StreamResult(resultFileName));
  *
  * <b>Important!</b>  The underlying System property of 
  * javax.xml.transform.TransformerFactory will determine the actual 
@@ -107,7 +113,7 @@ public class TraxFileWrapper extends TransformWrapperHelper
      */
     public String getDescription()
     {
-        return "Uses TrAX to perform transforms from StreamSource(systemId)";
+        return "Uses TrAX to perform transforms from StreamSource(new File(filename))";
     }
 
 
@@ -123,7 +129,7 @@ public class TraxFileWrapper extends TransformWrapperHelper
     public Properties getProcessorInfo()
     {
         Properties p = TraxWrapperUtils.getTraxInfo();
-        p.put("traxwrapper.method", "dom");
+        p.put("traxwrapper.method", "file");
         p.put("traxwrapper.desc", getDescription());
         return p;
     }
@@ -152,6 +158,12 @@ public class TraxFileWrapper extends TransformWrapperHelper
         //@todo do we need to do any other cleanup?
         reset(false);
         factory = TransformerFactory.newInstance();
+        // Verify the factory supports Streams!
+        if (!(factory.getFeature(StreamSource.FEATURE)
+              && factory.getFeature(StreamResult.FEATURE)))
+        {   
+            throw new TransformerConfigurationException("TraxFileWrapper.newProcessor: factory does not support Streams!");
+        }
         return (Object)factory;
     }
 
@@ -186,7 +198,7 @@ public class TraxFileWrapper extends TransformWrapperHelper
         
         // Timed: read/build xsl from a URL
         startTime = System.currentTimeMillis();
-        Transformer transformer = factory.newTransformer(new StreamSource(xslName));
+        Transformer transformer = factory.newTransformer(new StreamSource(new File(xslName)));
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Untimed: Apply any parameters needed
@@ -194,7 +206,7 @@ public class TraxFileWrapper extends TransformWrapperHelper
 
         // Timed: read/build xml, transform, and write results
         startTime = System.currentTimeMillis();
-        transformer.transform(new StreamSource(xmlName), new StreamResult(resultName));
+        transformer.transform(new StreamSource(new File(xmlName)), new StreamResult(resultName));
         transform = System.currentTimeMillis() - startTime;
 
         long[] times = getTimeArray();
@@ -239,7 +251,7 @@ public class TraxFileWrapper extends TransformWrapperHelper
         
         // Timed: read/build xsl from a URL
         startTime = System.currentTimeMillis();
-        builtTemplates = factory.newTemplates(new StreamSource(xslName));
+        builtTemplates = factory.newTemplates(new StreamSource(new File(xslName)));
         xslBuild = System.currentTimeMillis() - startTime;
         m_stylesheetReady = true;
 
@@ -291,7 +303,8 @@ public class TraxFileWrapper extends TransformWrapperHelper
 
         // Timed: read/build xml, transform, and write results
         startTime = System.currentTimeMillis();
-        transformer.transform(new StreamSource(xmlName), new StreamResult(resultName));
+        transformer.transform(new StreamSource(new File(xmlName)), 
+                              new StreamResult(resultName));
         transform = System.currentTimeMillis() - startTime;
 
         long[] times = getTimeArray();
@@ -334,7 +347,7 @@ public class TraxFileWrapper extends TransformWrapperHelper
         
         // Timed: readxsl from the xml document
         startTime = System.currentTimeMillis();
-        Source xslSource = factory.getAssociatedStylesheet(new StreamSource(xmlName), 
+        Source xslSource = factory.getAssociatedStylesheet(new StreamSource(new File(xmlName)), 
                                                               null, null, null);
         xslRead = System.currentTimeMillis() - startTime;
 
@@ -348,7 +361,8 @@ public class TraxFileWrapper extends TransformWrapperHelper
 
         // Timed: read/build xml, transform, and write results
         startTime = System.currentTimeMillis();
-        transformer.transform(new StreamSource(xmlName), new StreamResult(resultName));
+        transformer.transform(new StreamSource(new File(xmlName)), 
+                              new StreamResult(resultName));
         transform = System.currentTimeMillis() - startTime;
 
         long[] times = getTimeArray();

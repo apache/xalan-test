@@ -194,18 +194,10 @@ public class StylesheetErrorTestlet extends TestletImpl
         // Read in expectedExecption from datalet or stylesheet file
         Vector expectedException = getExpectedException(datalet);
 
-        // Store local copies of XSL, XML references for 
-        //  potential change to URLs            
+        // Store local copies of XSL, XML references to avoid 
+        //  potential for changing datalet            
         String inputName = datalet.inputName;
         String xmlName = datalet.xmlName;
-        if (datalet.useURL)
-        {
-            // inputName may not exist if it's an embedded test
-            if (null != inputName)
-                inputName = QetestUtils.filenameToURL(inputName);
-            if (null != xmlName)
-                xmlName = QetestUtils.filenameToURL(xmlName);
-        }
 
         //@todo Should we log a custom logElement here instead?
         // Be sure to log everything before we start the test!

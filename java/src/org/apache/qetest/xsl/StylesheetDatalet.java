@@ -92,15 +92,6 @@ public class StylesheetDatalet implements Datalet
     public String flavor = "trax"; //@todo should be ProcessorWrapper.DEFAULT_FLAVOR
 
     /** 
-     * If we should force any local path\filenames to URLs.  
-     * Note: This is not really the best place for this, but 
-     * since it works with Xerces and Crimson and Xalan, it's 
-     * good enough for now.  
-     * Not currently settable by user; default:true
-     */
-    public boolean useURL = true;
-
-    /** 
      * Generic placeholder for any additional options.  
      * I'm still undecided if I like this idea or not.  
      * This allows StylesheetDatalets to support additional kinds 

@@ -163,17 +163,11 @@ public class PerformanceTestlet extends TestletImpl
                 return;
             }
 
-            // Store local copies of XSL, XML references for 
-            //  potential change to URLs            
+            // Store local copies of XSL, XML references to avoid 
+            //  potential for changing datalet            
             String inputName = datalet.inputName;
             String xmlName = datalet.xmlName;
-            if (datalet.useURL)
-            {
-                // inputName may not exist if it's an embedded test
-                if (null != inputName)
-                    inputName = QetestUtils.filenameToURL(inputName);
-                xmlName = QetestUtils.filenameToURL(xmlName);
-            }
+
             logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + inputName
                           + " xmlName=" + xmlName + " outputName=" + datalet.outputName
                           + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor
