@@ -9,7 +9,7 @@
 @echo   Assumes you're in xml-xalan/test
 @echo   JAVA_OPTS Will be passed to java.exe or jview.exe
 @echo   EXTRA_CP Will be prepended to the classpath (changed Jan-01)
-@echo   END_PKG Will be the subpackage name after org.apache.qetest
+@echo   uses QetestUtils 'launcher' utility to find test class
 @echo   Special: first arg= -jview: Run Microsoft's jview instead of java
 @echo   Special: first arg= -crimson: Use crimson.jar instead of xerces.jar
 @echo Common args include (from the java file, ignore first two "ERROR" lines): 
@@ -87,26 +87,19 @@ if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%
 @REM  testing easier, since compat.jar gets added at head of classpath
 if not "%EXTRA_CP%" == "" set TEST_CP=%EXTRA_CP%;%TEST_CP%
 
-@REM Wrappers use END_PKG to switch around the end of the 
-@REM    packagename; if not set, default it to most common package
-if '%END_PKG%' == '' set END_PKG=xsl
-
-@REM Assume it's a bare classname to run with extra args
-@REM Note we hackishly force in .END_PKG. here, which is not a great 
-@REM    idea - we should really allow users to pass a single arg 
-@REM    that's the lastpkg.ClassName
-echo "%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1  %2 %3 %4 %5 %6 %7 %8 %9
-"%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1  %2 %3 %4 %5 %6 %7 %8 %9
+@REM Use the QetestUtils 'launcher' to run the test
+echo "%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.QetestUtils %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.QetestUtils %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 :done
 @echo %0 complete!
 set TEST_CP=
 set JAVA_EXE=
 set CMDCP=
+set PARSER_JAR=
 set _PARSER_JAR=
 set _XALAN_JAR=
 set _BSF_JAR=
 set _JS_JAR=
 set JAVA_OPTS=%SAVED_JAVA_OPTS%
-if '%END_PKG%' == 'xsl' set END_PKG=
 :end
