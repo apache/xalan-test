@@ -184,6 +184,13 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
             {   // The rest of this test relies on SAX
                 reporter.logErrorMsg("SAX*.FEATURE not supported! Some tests may be invalid!");
             }
+
+            if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
+                  && tf.getFeature(SAXTransformerFactory.FEATURE_XMLFILTER))) {
+                // The rest of this test relies on SAXTransformerFactory
+                reporter.logErrorMsg("SAXTransformerFactory.FEATURE* not "
+                                     +"supported!  Some tests may be invalid!");
+            }
         }
         catch (Throwable t)
         {
