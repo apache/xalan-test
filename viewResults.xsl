@@ -1,5 +1,9 @@
 <?xml version="1.0"?> 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    version="1.0"
+    xmlns:lxslt="http://xml.apache.org/xslt"
+    xmlns:redirect="org.apache.xalan.lib.Redirect"
+    extension-element-prefixes="redirect">
   <xsl:output method="html"/>
 
 <!-- FileName: viewResults.xsl -->
@@ -10,6 +14,12 @@
 <!-- Include constant definitions for results file elements, 
      attributes, and values, copied from relevant Java code -->
 <xsl:include href="resultsConstants.xsl"/>
+
+<!-- Explicitly declare the redirect extension -->
+<lxslt:component prefix="redirect" elements="write open close" functions="">
+  <lxslt:script lang="javaclass" src="org.apache.xalan.lib.Redirect"/>
+</lxslt:component>  
+
 
 <!-- ======================================================= -->
 <!-- INPUT PARAMETERS can be set from external command lines -->
@@ -30,6 +40,9 @@
 <!-- Cheap color background for errors, fails, and messages likely related thereto -->
 <xsl:param name="errfailcolor">red</xsl:param>
 <xsl:param name="knownfailcolor">pink</xsl:param>
+
+<!-- File to redirect mini-summary to -->
+<xsl:param name="summaryfile">summary_.xml</xsl:param>
 
 <!-- ================================== -->
 <!-- Main template-standalone: output an HTML page -->
@@ -319,6 +332,14 @@
 
 <xsl:template name="restable">
   <xsl:param name="linkname" select="none"/>
+    <!-- Note this is horribly inefficent, but it gets the job done.
+         I'd welcome any optimizations for this stylesheet!
+    -->
+  <xsl:variable name="passcount" select="count(//checkresult[@result=$PASS])"/>
+  <xsl:variable name="failcount" select="count(//checkresult[@result=$FAIL])"/>
+  <xsl:variable name="errrcount" select="count(//checkresult[@result=$ERRR])"/>
+  <xsl:variable name="ambgcount" select="count(//checkresult[@result=$AMBG])"/>
+  <xsl:variable name="incpcount" select="count(//checkresult[@result=$INCP])"/>
   <TABLE FRAME="box" BORDER="1" CELLPADDING="2" WIDTH="80%">
   <TR>
     <TD>
@@ -343,36 +364,54 @@
     <TD><xsl:text>Pass</xsl:text></TD>
     <TD><xsl:value-of select="./statistic[@desc='passCount[CASES]']/longval"/></TD>
     <TD><xsl:value-of select="statistic[@desc='passCount[CHECKS]']/longval"/></TD>
-    <!-- Note this is horribly inefficent, but it gets the job done.
-         I'd welcome any optimizations for this stylesheet!
-    -->
-    <TD><xsl:value-of select="count(//checkresult[@result=$PASS])"/></TD>
+    <TD><xsl:value-of select="$passcount"/></TD>
   </TR>
   <TR>
     <TD><B><xsl:text>Fail</xsl:text></B></TD>
     <TD><xsl:value-of select="./statistic[@desc='failCount[CASES]']/longval"/></TD>
     <TD><xsl:value-of select="statistic[@desc='failCount[CHECKS]']/longval"/></TD>
-    <TD><xsl:value-of select="count(//checkresult[@result=$FAIL])"/></TD>
+    <TD><xsl:value-of select="$failcount"/></TD>
   </TR>
   <TR>
     <TD><I><xsl:text>Error</xsl:text></I></TD>
     <TD><xsl:value-of select="./statistic[@desc='errrCount[CASES]']/longval"/></TD>
     <TD><xsl:value-of select="statistic[@desc='errrCount[CHECKS]']/longval"/></TD>
-    <TD><xsl:value-of select="count(//checkresult[@result=$ERRR])"/></TD>
+    <TD><xsl:value-of select="$errrcount"/></TD>
   </TR>
   <TR>
     <TD><I><xsl:text>Ambiguous</xsl:text></I></TD>
     <TD><xsl:value-of select="./statistic[@desc='ambgCount[CASES]']/longval"/></TD>
     <TD><xsl:value-of select="statistic[@desc='ambgCount[CHECKS]']/longval"/></TD>
-    <TD><xsl:value-of select="count(//checkresult[@result=$AMBG])"/></TD>
+    <TD><xsl:value-of select="$ambgcount"/></TD>
   </TR>
   <TR>
     <TD><I><xsl:text>Incomplete</xsl:text></I></TD>
     <TD><xsl:value-of select="./statistic[@desc='incpCount[CASES]']/longval"/></TD>
     <TD><xsl:value-of select="statistic[@desc='incpCount[CHECKS]']/longval"/></TD>
-    <TD><xsl:value-of select="count(//checkresult[@result=$INCP])"/></TD>
+    <TD><xsl:value-of select="$incpcount"/></TD>
   </TR>
   </TABLE><BR/>
+    <redirect:write select="$summaryfile" file="viewResults-redirected-output.xml">
+      <xsl:element name="summary">
+        <xsl:attribute name="filename"><xsl:value-of select="$linkname"/></xsl:attribute>
+        <xsl:if test="$passcount">
+          <xsl:text>P:</xsl:text><xsl:value-of select="$passcount"/>
+        </xsl:if>
+        <xsl:if test="$failcount">
+          <xsl:text>, F:</xsl:text><xsl:value-of select="$failcount"/>
+        </xsl:if>
+        <xsl:if test="$errrcount">
+          <xsl:text>, E:</xsl:text><xsl:value-of select="$errrcount"/>
+        </xsl:if>
+        <xsl:if test="$ambgcount">
+          <xsl:text>, A:</xsl:text><xsl:value-of select="$ambgcount"/>
+        </xsl:if>
+        <xsl:if test="$incpcount">
+          <xsl:text>, I:</xsl:text><xsl:value-of select="$incpcount"/>
+        </xsl:if>
+      </xsl:element>
+    </redirect:write>
+
 </xsl:template>
 
 <!-- Override default text node processing, so statistics, arbitrary messages, and other stuff is skipped -->

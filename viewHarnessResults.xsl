@@ -1,13 +1,25 @@
 <?xml version="1.0"?> 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    version="1.0"
+    xmlns:lxslt="http://xml.apache.org/xslt"
+    xmlns:redirect="org.apache.xalan.lib.Redirect"
+    extension-element-prefixes="redirect">
   <xsl:output method="html"/>
 
 <!-- FileName: viewHarnessResults.xsl -->
 <!-- Author: shane_curcuru@lotus.com -->
 <!-- Purpose: Viewer for multiple XSLTestHarness results put into simple HTML pages -->
 <!-- Usage: ...Process -in HarnessResults.xml -xsl MultiViewResults.xsl ... -->
-<!-- Where: you've run XSLTestHarness over a number of files
--->
+<!-- Where: you've run XSLTestHarness over a number of files -->
+
+<!-- Explicitly declare the redirect extension -->
+<lxslt:component prefix="redirect" elements="write open close" functions="">
+  <lxslt:script lang="javaclass" src="org.apache.xalan.lib.Redirect"/>
+</lxslt:component>  
+
+<!-- ======================================================= -->
+<!-- Output mini-summary filename, used in redirect calls in viewResults -->
+<xsl:param name="summaryfile">HarnessSummary.xml</xsl:param>
 
 <!-- ======================================================= -->
 <!-- Include the main results viewer for individual result files -->
@@ -53,7 +65,22 @@
     <a name="harness-properties"><xsl:text>Harness-level System Properties:</xsl:text></a>
     <xsl:apply-templates select="hashtable"></xsl:apply-templates>
     <H3><xsl:text>Individual resultfile(s) follow:</xsl:text></H3>
-    <xsl:apply-templates select="testcase/resultsfile/@fileRef"></xsl:apply-templates>
+    <!-- Before processing any files, open up a summary file to 
+         output a mini-summary of results to. -->
+    <redirect:open select="$summaryfile" file="viewResults-redirected-output.xml"/>
+      <redirect:write select="$summaryfile" file="viewResults-redirected-output.xml">
+        <xsl:text disable-output-escaping="yes">&lt;?xml version="1.0"?>&#10;</xsl:text>
+        <xsl:text disable-output-escaping="yes">&lt;resultsfile logfile="</xsl:text>
+        <xsl:value-of select="$summaryfile"/>
+        <xsl:text disable-output-escaping="yes">">&#10;</xsl:text>
+      </redirect:write>
+
+        <xsl:apply-templates select="testcase/resultsfile/@fileRef"></xsl:apply-templates>
+
+      <redirect:write select="$summaryfile" file="viewResults-redirected-output.xml">
+        <xsl:text disable-output-escaping="yes">&#10;&lt;/resultsfile></xsl:text>
+      </redirect:write>
+    <redirect:close select="$summaryfile" file="viewResults-redirected-output.xml"/>
 
   </BODY>
   </HTML>
