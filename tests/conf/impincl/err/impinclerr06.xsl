@@ -11,6 +11,7 @@
   <!-- Note: SCurcuru 28-Feb-00 added ExpectedException; seems like good error text to me. -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) Could not find href attribute for xsl:include -->
   <!-- ExpectedException: (StylesheetHandler) Could not find href attribute for xsl:include -->
+  <!-- ExpectedException: xsl:include requires attribute: href -->
 
 <xsl:include/>
 

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test placement of xsl:import inside a template, which is illegal. -->
   <!-- ExpectedException: XSLT: (StylesheetHandler) xsl:import is not allowed inside a template! -->
+  <!-- ExpectedException: xsl:import is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

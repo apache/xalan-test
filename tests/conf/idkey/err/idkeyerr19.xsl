@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test for id() with too many arguments. -->
   <!-- ExpectedException: id() should have one argument -->
+  <!-- ExpectedException: FuncId only allows 1 argument -->
 
 <xsl:template match="t04">
   <out>

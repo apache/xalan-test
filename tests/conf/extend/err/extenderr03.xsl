@@ -7,6 +7,7 @@
   <!-- Section: 14 Extensions -->
   <!-- Purpose: Test function-available with too many arguments. -->
   <!-- ExpectedException: function-available requires one argument -->
+  <!-- ExpectedException: FuncExtFunctionAvailable only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

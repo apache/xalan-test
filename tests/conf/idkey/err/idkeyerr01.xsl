@@ -9,7 +9,7 @@
   <!-- Creator: David Marston -->
   <!-- ExpectedException: xsl:key requires a name attribute! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: xsl:key requires a name attribute! -->
-
+  <!-- ExpectedException: xsl:key requires attribute: name -->
 <xsl:output indent="yes"/>
 
 <xsl:key match="div" use="title" />

@@ -8,6 +8,7 @@
   <!-- Purpose: Invoke unparsed-entity-uri function with zero arguments -->
   <!-- Creator: David Marston -->
   <!-- ExpectedException: The unparsed-entity-uri function should take one argument -->
+  <!-- ExpectedException: FuncUnparsedEntityURI only allows 1 arguments -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test placement of xsl:key inside atemplate, which is illegal. -->
   <!-- ExpectedException: XSLT: (StylesheetHandler) xsl:key is not allowed inside a template! -->
+  <!-- ExpectedException: xsl:key is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

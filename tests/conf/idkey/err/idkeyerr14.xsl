@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Call key() with too few arguments. -->
   <!-- ExpectedException: key() requires two arguments -->
+  <!-- ExpectedException: FuncKey only allows 2 arguments -->
 
 <xsl:output indent="yes"/>
 

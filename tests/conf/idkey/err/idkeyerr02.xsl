@@ -9,7 +9,8 @@
   <!-- Creator: David Marston -->
   <!-- ExpectedException: xsl:key requires a match attribute! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: xsl:key requires a match attribute! -->
-  
+  <!-- ExpectedException: xsl:key requires attribute: match -->
+
 <xsl:output indent="yes"/>
 
 <xsl:key name="mykey" use="title"/>

@@ -9,6 +9,7 @@
   <!-- Creator: David Marston -->
   <!-- ExpectedException: xsl:key requires a use attribute! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: xsl:key requires a use attribute! -->
+  <!-- ExpectedException: xsl:key requires attribute: use -->
   
 <xsl:output indent="yes"/>
 

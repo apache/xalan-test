@@ -8,6 +8,7 @@
   <!-- Purpose: Test element-available with too many arguments. -->
   <!-- Creator: David Marston -->
   <!-- ExpectedException: element-available requires one argument -->
+  <!-- ExpectedException: FuncExtElementAvailable only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -9,6 +9,7 @@
   <!-- Purpose: Test of 'generate-id()' with multiple arguments. Should generate
        an error. Should test for zero, or one argument.  -->
   <!-- ExpectedException: generate-id only allows 1 argument -->
+  <!-- ExpectedException: FuncGenerateId only allows 1 arguments -->
 
 <xsl:template match="doc">
   <out>

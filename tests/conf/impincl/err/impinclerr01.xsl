@@ -9,7 +9,8 @@
   <!-- Purpose: It is an error for a stylesheet to import itself. -->
   <!-- ExpectedException: (StylesheetHandler) file:/E:\builds\testsuite\.\conf\impincl\err\impinclerr01.xsl is directly or indirectly importing itself! -->
   <!-- ExpectedException: (StylesheetHandler) file:E:/builds/testsuite/conf/impincl/err/impinclerr01.xsl is directly or indirectly importing itself! -->  
-  <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) file:E:/builds/testsuite/conf/impincl/err/impinclerr01.xsl is directly or indirectly importing itself! -->
+  <!-- ExpectedException: impinclerr01.xsl is directly or indirectly importing itself! -->
+
 <xsl:import href="impinclerr01.xsl"/>
 
 <xsl:template match="doc">
