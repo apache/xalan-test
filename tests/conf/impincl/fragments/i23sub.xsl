@@ -1,10 +1,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<!-- FileName: g -->
-<!-- Purpose: Used indirectly by impincl02, etc. -->
+<!-- FileName: i23sub -->
+<!-- Purpose: Used by impincl23 -->
 
 <xsl:template match="foo">
-  <bad-match sheet="g"/>
+  <good-match/>
 </xsl:template>
 
 </xsl:stylesheet>

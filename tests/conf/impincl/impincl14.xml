@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <doc>
-  <title>Testing-xsl:include</title>
+  <title>Testing:apply-imports</title>
   <author>Joe Jones</author>
-  <overview>testing-include</overview>
+  <overview>No templates for this part.</overview>
   <chapters>
     <chapter num="1">know xsl</chapter>
     <chapter num="2">love xsl</chapter>
