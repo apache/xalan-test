@@ -1,12 +1,14 @@
 <?xml version="1.0"?> 
-<doc att="top">
-  <?a-pi some data?>
-  <!-- This is the 1st comment -->
-  text-in-doc
+<doc>
+  <side att="view"><!-- This is the side comment -->text-in-side<?s-pi side ?></side>
+  <begin bat="top"><?a-pi some data?>
+  <!-- This is the 2nd comment -->
+  text-in-begin
   <inner blat="blob">
     inner-text
-    <!-- This is the 2nd comment -->
-    <sub>subtext</sub>
+    <!-- This is the 3rd comment -->
+    <sub latte="glub">subtext</sub>
   </inner>
-  text-in-doc2
+  text-in-begin2
+  </begin>
 </doc>
