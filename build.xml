@@ -439,6 +439,82 @@
     </target>
 
     <!-- ================================================================== -->
+    <!-- Run tests: A whole bunch of tests - used before posting builds, etc-->
+    <!-- ================================================================== -->
+    <target name="alltest" 
+            description="Run nearly all available Xalan-J 2.x tests - lots of tests!"
+            depends="all,alltest-execute">
+        <!-- Currently don't bother checking results, -pass, -notpass -->
+    </target>
+
+
+    <!-- Subject to change.  Currently a placeholder to simply 
+         execute a list of the different flavors/types of conf 
+         and other tests all in one target.
+     -->
+    <target name="alltest-execute">
+        <property name="alltest.outputDir" value="results-alltest/" />
+        <echo message="About to execute LOTS of tests, results into ${alltest.outputDir}..." />
+        <!-- Run all individual API tests through the harness -->
+        <antcall target="harness">
+            <param name="api.outputDir" value="${alltest.outputDir}harness"/>
+            <param name="api.logFile" value="${alltest.outputDir}harness/results.xml"/>
+        </antcall>
+        <!-- Run full conf test with each major available flavor into 
+             specific output directories; note any user options will 
+             override for all test calls.
+        -->
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.systemId"/>
+            <param name="conf.outputDir" value="${alltest.outputDir}systemId"/>
+            <param name="conf.logFile" value="${alltest.outputDir}systemId/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.file"/>
+            <param name="conf.outputDir" value="${alltest.outputDir}file"/>
+            <param name="conf.logFile" value="${alltest.outputDir}file/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.dom"/>
+            <param name="conf.outputDir" value="${alltest.outputDir}dom"/>
+            <param name="conf.logFile" value="${alltest.outputDir}dom/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.sax"/>
+            <param name="conf.outputDir" value="${alltest.outputDir}sax"/>
+            <param name="conf.logFile" value="${alltest.outputDir}sax/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.localPath"/>
+            <param name="conf.outputDir" value="${alltest.outputDir}localPath"/>
+            <param name="conf.logFile" value="${alltest.outputDir}localPath/results.xml"/>
+        </antcall>
+        <antcall target="conf">
+            <param name="conf.flavor" value="trax.stream"/>
+            <param name="conf.outputDir" value="${alltest.outputDir}stream"/>
+            <param name="conf.logFile" value="${alltest.outputDir}stream/results.xml"/>
+        </antcall>
+        <!-- Run various other sets of conf-like tests -->
+        <antcall target="perf">
+            <param name="perf.outputDir" value="${alltest.outputDir}perf"/>
+            <param name="perf.logFile" value="${alltest.outputDir}perf/results.xml"/>
+        </antcall>
+        <antcall target="contrib">
+            <param name="contrib.outputDir" value="${alltest.outputDir}contrib"/>
+            <param name="contrib.logFile" value="${alltest.outputDir}contrib/results.xml"/>
+        </antcall>
+        <!-- Run other misc tests -->
+        <antcall target="extensions">
+            <param name="extensions.outputDir" value="${alltest.outputDir}extensions"/>
+            <param name="extensions.logFile" value="${alltest.outputDir}extensions/results.xml"/>
+        </antcall>
+        <antcall target="bugzilla">
+            <param name="bugzilla.outputDir" value="${alltest.outputDir}bugzilla"/>
+            <param name="bugzilla.logFile" value="${alltest.outputDir}bugzilla/results.xml"/>
+        </antcall>
+    </target>
+
+    <!-- ================================================================== -->
     <!-- Build Tests: Compile/jar targets for each 'layer' of testing code  -->
     <!-- ================================================================== -->
     <target name="compile.qetest" depends="init.build"
@@ -602,10 +678,10 @@
                <doclet name="xalanjdoc.Standard" path="${doclet.jar}">
                   <param name="-d" value="${test.build.apidocs}"/>
                </doclet>
-               <group title="QETEST Independent Framework" packages="org.apache.qetest*"/>
+               <group title="QETEST Independent Framework" packages="org.apache.qetest"/>
                <group title="Xalan Framework and Base tests" packages="org.apache.qetest.xsl:org.apache.qetest.xslwrapper"/>
-               <group title="JAXP/TrAX Specific Tests" packages="org.apache.trax*"/>
-               <group title="Xalan-J 2.x Specific Tests" packages="org.apache.xalanj2*"/>
+               <group title="JAXP/TrAX Generic Tests" packages="org.apache.qetest.trax:org.apache.qetest.trax.dom:org.apache.qetest.trax.sax:org.apache.qetest.trax.stream:"/>
+               <group title="Xalan-J 2.x Specific Tests" packages="org.apache.qetest.xalanj2"/>
         </javadoc>
     </target>
 
