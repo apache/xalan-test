@@ -291,7 +291,8 @@ public class LoggingTraceListener extends LoggingHandler
         if (selectionEvent.m_selection.getType() == selectionEvent.m_selection.CLASS_NODESET)
         {
             // Must create as DTMNodeIterator for DTM_EXP merge 13-Jun-01
-            NodeIterator nl = new DTMNodeIterator(selectionEvent.m_selection.nodeset());
+            NodeIterator nl = selectionEvent.m_selection.nodeset();
+
             if (nl instanceof ContextNodeList)
             {
                 try
