@@ -137,6 +137,11 @@ public class StylesheetDatalet implements Datalet
     public StylesheetDatalet(String args)
     {
         load(args);
+        setDescription("inputName=" + inputName 
+                       + " xmlName=" + xmlName 
+                       + " outputName=" + outputName 
+                       + " goldName=" + goldName 
+                       + " flavor=" + flavor);
     }
 
 
@@ -237,6 +242,8 @@ public class StylesheetDatalet implements Datalet
      * Load fields of this Datalet from a whitespace-delimited String.  
      * Order: inputName, xmlName, outputName, goldName, flavor
      * If too few args, then fields at end of list are left at default value.
+     * EXPERIMENTAL: takes any extra args as name value pairs and 
+     * attempts to add them to our options
      * @param args array of Strings
      */
     public void load(String str)
@@ -269,6 +276,21 @@ public class StylesheetDatalet implements Datalet
                 }
             }
         }
+        // EXPERIMENTAL add extra name value pairs to our options
+        while (st.hasMoreTokens())
+        {
+            String name = st.nextToken();
+            if (st.hasMoreTokens())
+            {
+                options.put(name, st.nextToken());
+            }
+            else
+            {
+                // Just put it as 'true' for boolean options
+                options.put(name, "true");
+            }
+        }
+
     }
 }  // end of class StylesheetDatalet
 
