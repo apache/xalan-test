@@ -73,14 +73,15 @@ import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 
 // Needed SAX, DOM, JAXP classes
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
 import org.w3c.dom.Node;
 
 // java classes
@@ -542,7 +543,11 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
 
             // Verify basic transforms with with various systemId
             //  and a SAXSource(XMLReader, InputSource(various))
-    	    XMLReader reader = XMLReaderFactory.createXMLReader();
+            // Be sure to use the JAXP methods only!
+            SAXParserFactory spfactory = SAXParserFactory.newInstance();
+            spfactory.setNamespaceAware(true);
+            SAXParser saxParser = spfactory.newSAXParser();
+    	    XMLReader reader = saxParser.getXMLReader();
             // level0: one level up, with a character stream
             xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
             xslSource = new SAXSource(reader, xslInpSrc);
@@ -555,7 +560,8 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
                                     "SAXSource(reader, inpSrc(charS)).systemId(level0: one up)");
 
             // level1: same systemId as actual file, with a systemId
-    	    reader = XMLReaderFactory.createXMLReader();
+            saxParser = spfactory.newSAXParser();
+    	    reader = saxParser.getXMLReader();
             xslInpSrc = new InputSource(testFileInfo.inputName);
             xslSource = new SAXSource(reader, xslInpSrc);
 
@@ -567,7 +573,8 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
                                     "SAXSource(reader, inpSrc(str)).systemId(level1: same level)");
 
             // level2: one level down, with a byte stream
-    	    reader = XMLReaderFactory.createXMLReader();
+            saxParser = spfactory.newSAXParser();
+    	    reader = saxParser.getXMLReader();
             xslInpSrc = new InputSource(new FileInputStream(testFileInfo.inputName));
             xslSource = new SAXSource(reader, xslInpSrc);
 

@@ -67,6 +67,7 @@ import org.apache.qetest.*;
 import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
@@ -78,8 +79,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
 import org.w3c.dom.Node;
 
 // java classes
@@ -229,8 +228,12 @@ public class SAXSourceAPITest extends XSLProcessorTestBase
             reporter.check(saxSrcReaderID2.getSystemId(), NONSENSE_SYSTEMID, "SAXSource(reader, new InputSource(sysId)) has SystemId: " + saxSrcReaderID2.getSystemId());
 
             // ctor(XMLReader, InputSource) 
-            reporter.logTraceMsg("SAX way:reader = XMLReaderFactory.createXMLReader()");
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            reporter.logTraceMsg("SAX way:reader = SAXParser.getXMLReader()");
+            // Be sure to use the JAXP methods only!
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            SAXParser saxParser = factory.newSAXParser();
+            XMLReader reader = saxParser.getXMLReader();
             SAXSource saxSrcReaderID = new SAXSource(reader, srcWithID);
             reporter.checkObject(saxSrcReaderID.getInputSource(), srcWithID, "SAXSource(reader, new InputSource(sysId)) has InputSource: " + saxSrcReaderID.getInputSource());
             reporter.checkObject(saxSrcReaderID.getXMLReader(), reader, "SAXSource(reader, new InputSource(sysId)) has XMLReader: " + saxSrcReaderID.getXMLReader());
@@ -279,7 +282,9 @@ public class SAXSourceAPITest extends XSLProcessorTestBase
 
             // API Coverage set/getXMLReader
             reporter.checkObject(wackySAX.getXMLReader(), null, "wackySAX still does not have an XMLReader");
-            XMLReader wackyReader = XMLReaderFactory.createXMLReader();
+            // Be sure to use the JAXP methods only!
+            saxParser = factory.newSAXParser();
+            XMLReader wackyReader = saxParser.getXMLReader();
             wackySAX.setXMLReader(wackyReader);
             reporter.checkObject(wackySAX.getXMLReader(), wackyReader, "set/getXMLReader API coverage");
             wackySAX.setXMLReader(null);

@@ -68,6 +68,7 @@ import org.apache.qetest.trax.*;
 import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
+import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
@@ -78,14 +79,11 @@ import org.apache.xalan.serialize.SerializerFactory;
 import org.apache.xalan.serialize.Serializer;
 import org.apache.xalan.templates.OutputProperties;
 
-// Needed SAX, DOM, JAXP classes
-import javax.xml.parsers.*;
 // Needed SAX classes
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.Parser;
 import org.xml.sax.helpers.ParserAdapter;
-import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.XMLReader;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.ContentHandler;
@@ -237,7 +235,7 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
               throw new org.xml.sax.SAXException( ex1.toString() );
           } catch( NoSuchMethodError ex2 ) {
           }
-          if( reader==null ) reader = XMLReaderFactory.createXMLReader();
+          if( reader==null ) reader = getJAXPXMLReader();
           reader.setContentHandler(handler);
           
           // It's a good idea for the parser to send lexical events.
@@ -344,7 +342,7 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
                   throw new org.xml.sax.SAXException( ex1.toString() );
               } catch( NoSuchMethodError ex2 ) {
               }
-              if( reader==null ) reader= XMLReaderFactory.createXMLReader();
+              if( reader==null ) reader= getJAXPXMLReader();
               reader.setContentHandler(handler);
               reader.setProperty("http://xml.org/sax/properties/lexical-handler",
                                  handler);
@@ -606,6 +604,24 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
 
         reporter.testCaseClose();
         return true;
+    }
+
+
+    /**
+     * Worker method to get an XMLReader.
+     *
+     * Not the most efficient of methods, but makes the code simpler.
+     *
+     * @return a new XMLReader for use, with setNamespaceAware(true)
+     */
+    protected XMLReader getJAXPXMLReader()
+            throws Exception
+    {
+        // Be sure to use the JAXP methods only!
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        SAXParser saxParser = factory.newSAXParser();
+        return saxParser.getXMLReader();
     }
 
 

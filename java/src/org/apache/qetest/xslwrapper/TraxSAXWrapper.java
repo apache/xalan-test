@@ -57,6 +57,7 @@
 package org.apache.qetest.xslwrapper;
 import org.apache.qetest.QetestUtils;
 
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
@@ -75,7 +76,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -239,7 +239,8 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         TemplatesHandler templatesHandler = saxFactory.newTemplatesHandler();
 
         // Create an XMLReader and set its ContentHandler.
-        XMLReader xslReader = XMLReaderFactory.createXMLReader();
+        // Be sure to use the JAXP methods only!
+        XMLReader xslReader = getJAXPXMLReader();
         xslReader.setContentHandler(templatesHandler);
 
         // Timed: read/build Templates from StreamSource
@@ -262,7 +263,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         applyParameters(stylesheetHandler.getTransformer());
 
         // Use a new XMLReader to parse the XML document
-        XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+        XMLReader xmlReader = getJAXPXMLReader();
         xmlReader.setContentHandler(stylesheetHandler); 
 
         // Set the ContentHandler to also function as LexicalHandler,
@@ -370,7 +371,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         TemplatesHandler templatesHandler = saxFactory.newTemplatesHandler();
 
         // Create an XMLReader and set its ContentHandler.
-        XMLReader xslReader = XMLReaderFactory.createXMLReader();
+        XMLReader xslReader = getJAXPXMLReader();
         xslReader.setContentHandler(templatesHandler);
 
         // Timed: read/build Templates from StreamSource
@@ -441,7 +442,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         applyParameters(stylesheetHandler.getTransformer());
 
         // Use a new XMLReader to parse the XML document
-        XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+        XMLReader xmlReader = getJAXPXMLReader();
         xmlReader.setContentHandler(stylesheetHandler); 
 
         // Set the ContentHandler to also function as LexicalHandler,
@@ -622,5 +623,23 @@ public class TraxSAXWrapper extends TransformWrapperHelper
     {
         if (null == factory)
             newProcessor(newProcessorOpts);
+    }
+
+
+    /**
+     * Worker method to get an XMLReader.
+     *
+     * Not the most efficient of methods, but makes the code simpler.
+     *
+     * @return a new XMLReader for use, with setNamespaceAware(true)
+     */
+    protected XMLReader getJAXPXMLReader()
+            throws Exception
+    {
+        // Be sure to use the JAXP methods only!
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        SAXParser saxParser = factory.newSAXParser();
+        return saxParser.getXMLReader();
     }
 }

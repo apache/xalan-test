@@ -67,6 +67,8 @@ import org.apache.qetest.*;
 import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
@@ -83,7 +85,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.Parser;
 import org.xml.sax.helpers.ParserAdapter;
-import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.XMLReader;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.ContentHandler;
@@ -573,7 +574,7 @@ public class ExamplesTest extends XSLProcessorTestBase
               throw new org.xml.sax.SAXException( ex1.toString() );
           } catch( NoSuchMethodError ex2 ) {
           }
-          if( reader==null ) reader = XMLReaderFactory.createXMLReader();
+          if( reader==null ) reader = getJAXPXMLReader();
           reader.setContentHandler(handler);
           
           // It's a good idea for the parser to send lexical events.
@@ -671,7 +672,7 @@ public class ExamplesTest extends XSLProcessorTestBase
             throw new org.xml.sax.SAXException( ex1.toString() );
         } catch( NoSuchMethodError ex2 ) {
         }
-        if( reader==null ) reader = XMLReaderFactory.createXMLReader();
+        if( reader==null ) reader = getJAXPXMLReader();
 
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
@@ -759,7 +760,7 @@ public class ExamplesTest extends XSLProcessorTestBase
               throw new org.xml.sax.SAXException( ex1.toString() );
           } catch( NoSuchMethodError ex2 ) {
           }
-          if( reader==null ) reader = XMLReaderFactory.createXMLReader();
+          if( reader==null ) reader = getJAXPXMLReader();
 
           reporter.logTraceMsg("newXMLFilter(new StreamSource(" + QetestUtils.filenameToURL(xslID_1));
           XMLFilter filter1 = stf.newXMLFilter(new StreamSource(QetestUtils.filenameToURL(xslID_1)));
@@ -1095,7 +1096,7 @@ public class ExamplesTest extends XSLProcessorTestBase
               throw new org.xml.sax.SAXException( ex1.toString() );
           } catch( NoSuchMethodError ex2 ) {
           }
-          if( reader==null ) reader= XMLReaderFactory.createXMLReader();
+          if( reader==null ) reader= getJAXPXMLReader();
           reader.setContentHandler(handler);
           reader.setProperty("http://xml.org/sax/properties/lexical-handler",
                              handler);
@@ -1178,6 +1179,24 @@ public class ExamplesTest extends XSLProcessorTestBase
         reporter.logThrowable(reporter.ERRORMSG, t, "exampleAsSerializer threw");
     }
   }
+
+
+    /**
+     * Worker method to get an XMLReader.
+     *
+     * Not the most efficient of methods, but makes the code simpler.
+     *
+     * @return a new XMLReader for use, with setNamespaceAware(true)
+     */
+    protected XMLReader getJAXPXMLReader()
+            throws Exception
+    {
+        // Be sure to use the JAXP methods only!
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        SAXParser saxParser = factory.newSAXParser();
+        return saxParser.getXMLReader();
+    }
 
 
     /**

@@ -75,6 +75,8 @@ import javax.xml.transform.stream.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 // Needed SAX, DOM, JAXP classes
 import org.w3c.dom.Document;
@@ -83,7 +85,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 // java classes
 import java.io.File;
@@ -243,7 +244,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
         {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
 
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory)tfactory;
             TransformerHandler handler = saxTFactory.newTransformerHandler(
@@ -288,7 +289,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
         {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
 
             InputSource is = new InputSource(new FileInputStream(xslName));
@@ -353,7 +354,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             Result result = new StreamResult(fos);
             handler.setResult(result);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
@@ -409,7 +410,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             Result result = new StreamResult(fos);
             handler.setResult(result);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
@@ -460,7 +461,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             Result result = new StreamResult(fos);
             handler.setResult(result);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
@@ -513,7 +514,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             Result result = new StreamResult(fos);
             handler.setResult(result);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
@@ -558,7 +559,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             Node node = (Node) document;
             DOMSource domSource = new DOMSource(node);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
 
             //For xml file.
@@ -611,7 +612,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
             TemplatesHandler thandler = saxTFactory.newTemplatesHandler();
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(thandler);
             reporter.logTraceMsg("reader.parse(" + QetestUtils.filenameToURL(xslName) + ")");
             reader.parse(QetestUtils.filenameToURL(xslName));
@@ -656,7 +657,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
         {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
             TemplatesHandler thandler = saxTFactory.newTemplatesHandler();
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo update systemId
@@ -710,7 +711,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         {
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
             // The transformer will use a SAX parser as it's reader.
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             // Set the result handling to be a serialization to the file output stream.
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
             Result realResult = new StreamResult(fos);
@@ -771,7 +772,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             SAXTransformerFactory saxTFactory =  (SAXTransformerFactory) tfactory;
             XMLFilter filter = saxTFactory.newXMLFilter(domSource);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             // Set the result handling to be a serialization to the file output stream.
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
             Result realResult = new StreamResult(fos);
@@ -828,7 +829,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logTraceMsg("newXMLFilter(..." + xslName + ")");
             XMLFilter filter = saxTFactory.newXMLFilter(saxSource);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             // Set the result handling to be a serialization to the file output stream.
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
             Result realResult = new StreamResult(fos);
@@ -874,7 +875,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         try 
         {
             // The transformer will use a SAX parser as it's reader.
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
             TemplatesHandler thandler = saxTFactory.newTemplatesHandler();
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo update systemId
@@ -916,6 +917,25 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logThrowable(reporter.ERRORMSG, t, "SAXTFactoryTest013 threw");
         }
     }// end of SAXTFactoryTest013()
+
+
+    /**
+     * Worker method to get an XMLReader.
+     *
+     * Not the most efficient of methods, but makes the code simpler.
+     *
+     * @return a new XMLReader for use, with setNamespaceAware(true)
+     */
+    protected XMLReader getJAXPXMLReader()
+            throws Exception
+    {
+        // Be sure to use the JAXP methods only!
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        SAXParser saxParser = factory.newSAXParser();
+        return saxParser.getXMLReader();
+    }
+
 
     /**
      * Convenience method to print out usage information - update if needed.  

@@ -95,13 +95,14 @@ import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;    // We assume Features.STREAM for some tests
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 // HACK: Use Xalan's Serializers - should be changed
 import org.xml.sax.XMLReader;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 //-------------------------------------------------------------------------
 
@@ -980,16 +981,11 @@ class TMTThreadsRunner implements Runnable
     
         // Create a reader and set it's ContentHandler to be the 
         // transformer.
-        XMLReader reader = null;
+        SAXParserFactory spfactory = SAXParserFactory.newInstance();
+        spfactory.setNamespaceAware(true);
+        SAXParser jaxpParser = spfactory.newSAXParser();
+        XMLReader reader = jaxpParser.getXMLReader();
 
-        // Use JAXP1.1 ( if possible )
-            javax.xml.parsers.SAXParserFactory spfactory = javax.xml.parsers.SAXParserFactory.newInstance();
-            spfactory.setNamespaceAware(true);
-            javax.xml.parsers.SAXParser jaxpParser = spfactory.newSAXParser();
-            reader = jaxpParser.getXMLReader();
-
-        if (reader == null) 
-            reader = XMLReaderFactory.createXMLReader();
         reader.setContentHandler(handler);
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
     

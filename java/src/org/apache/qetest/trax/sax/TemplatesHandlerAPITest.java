@@ -67,6 +67,8 @@ import org.apache.qetest.*;
 import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
@@ -80,8 +82,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
 import org.w3c.dom.Node;
 
 // java classes
@@ -259,7 +259,7 @@ public class TemplatesHandlerAPITest extends XSLProcessorTestBase
             // Validate a templatesHandler can create a valid stylesheet
             templatesHandler = saxFactory.newTemplatesHandler();
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(templatesHandler);
 
             // Parse the stylesheet, which means we should be able to getTemplates()
@@ -302,7 +302,7 @@ public class TemplatesHandlerAPITest extends XSLProcessorTestBase
             //  with imports/includes, with the default systemId
             templatesHandler = saxFactory.newTemplatesHandler();
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(templatesHandler);
 
             // Parse the stylesheet, which means we should be able to getTemplates()
@@ -348,7 +348,7 @@ public class TemplatesHandlerAPITest extends XSLProcessorTestBase
             // Set the base systemId for the handler to a bogus one
             templatesHandler.setSystemId(NONSENSE_SYSTEMID);
 
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = getJAXPXMLReader();
             reader.setContentHandler(templatesHandler);
 
             // Parse the stylesheet, which should throw some 
@@ -385,6 +385,24 @@ public class TemplatesHandlerAPITest extends XSLProcessorTestBase
 
         reporter.testCaseClose();
         return true;
+    }
+
+
+    /**
+     * Worker method to get an XMLReader.
+     *
+     * Not the most efficient of methods, but makes the code simpler.
+     *
+     * @return a new XMLReader for use, with setNamespaceAware(true)
+     */
+    protected XMLReader getJAXPXMLReader()
+            throws Exception
+    {
+        // Be sure to use the JAXP methods only!
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        SAXParser saxParser = factory.newSAXParser();
+        return saxParser.getXMLReader();
     }
 
 
