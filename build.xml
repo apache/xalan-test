@@ -36,6 +36,8 @@ dependencies - users must manually 'build jar' first.
     <!-- Then, read in the default checked-in properties -->
     <property file="test.properties" />
 
+    <property name="smoketest.conf.excludes" value="${smoketest.conf.normal.excludes};${smoketest.conf.supplemental.excludes}"/>
+    <property name="smoketest.xsltc.conf.excludes" value="${smoketest.xsltc.conf.normal.excludes};${smoketest.xsltc.conf.supplemental.excludes}"/>
     <!-- Also provide environment properties with a special prefix which 
          allows us to detect if JARDIR is set.
    -->
@@ -260,21 +262,23 @@ dependencies - users must manually 'build jar' first.
             bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
-        <antcall target="scan">
-            <param name="scan.outputDir" value="${conf.outputDir}"/>
-        </antcall>
+        <property name="scan.outputDir" value="${conf.outputDir}"/>
+        <antcall target="scan"/>
     </target>
+
     <target name="conf.dom" description="Run TestletDriver over conf with DOM excludes">
         <antcall target="conf">
             <param name="conf.excludes" value="${trax.dom.excludes}"/>
             <param name="conf.flavor" value="trax.dom"/>
         </antcall>
     </target>
+
     <target name="conf.one" description="Run a single conf test">
         <antcall target="conf">
             <param name="testClass" value="org.apache.qetest.xsl.StylesheetDriver" />
         </antcall>
     </target>
+
     <target name="conf.xsltc.dom" description="Run TestletDriver over conf with DOM excludes">
         <antcall target="conf.xsltc">
             <param name="conf.xsltc.excludes" value="${trax.dom.excludes}"/>
@@ -282,6 +286,24 @@ dependencies - users must manually 'build jar' first.
         </antcall>
     </target>
 
+    <!-- ================================================================== -->
+    <!-- Run tests: the normal StylesheetTestletDriver on the accept suite  -->
+    <!-- ================================================================== -->
+    <target name="accept" description="Run TestletDriver over the accept tree">
+        <echo message="Executing Xalan accept test." />
+        <property name="qetest.summaryFile" value="Accept.xml" />
+        <property name="testType" value="accept." />
+        <property name="scan.outputDir" value="${accept.outputDir}"/>
+        <antcall target="conf"/>
+    </target>
+
+    <target name="accept.xsltc" description="Run TestletDriver over the accept tree">
+        <property name="testType" value="accept.xsltc." />
+        <property name="qetest.summaryFile" value="Accept.xml" />
+        <property name="scan.outputDir" value="${accept.xsltc.outputDir}"/>
+	<property name="use-processor" value="${accept.xsltc.processor}"/>
+        <antcall target="conf.xsltc" />
+    </target>
 
     <!-- ================================================================== -->
     <!-- Run tests: the StylesheetErrorTestlet on the conferr suite         -->
@@ -474,6 +496,10 @@ dependencies - users must manually 'build jar' first.
             description="Run the Xalan-J 2.x Smoketest"
             depends="minitest-execute,extensions.classes,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
     </target>
+    <target name="smoketest.xsltc" 
+            description="Run the Xalan-J 2.x XSLTC Smoketest"
+            depends="smoketest.xsltc-execute,smoketest.xsltc-notpass,smoketest.xsltc-pass">
+    </target>
     <target name="smoketest.dev" 
             description="Run the Xalan-J 2.x Smoketest with dependencies"
             depends="jar,minitest-execute,extensions.classes,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
@@ -499,6 +525,11 @@ dependencies - users must manually 'build jar' first.
             <param name="testType" value="smoketest.conf."/>
         </antcall>
 
+        <echo message="About to execute Accept tests..." />
+        <antcall target="accept">
+            <param name="testType" value="smoketest.accept."/>
+        </antcall>
+
         <echo message="About to execute other API tests..." />
         <antcall target="api">
             <param name="testClass" value="org.apache.qetest.xsl.XSLTestHarness"/>
@@ -513,12 +544,35 @@ dependencies - users must manually 'build jar' first.
         <condition property="smoketest-passed">
             <and>
                 <available file="${smoketest.conf.passFile}" />
+                <available file="${smoketest.accept.passFile}" />
                 <available file="${smoketest.api.passFile}" />
                 <available file="${smoketest.extensions.passFile}" />
             </and>
         </condition>
         <antcall target="scan">
             <param name="scan.outputDir" value="smoketest"/>
+        </antcall>
+    </target>
+
+    <target name="smoketest.xsltc-execute">
+        <echo message="About to execute Conformance tests..." />
+        <antcall target="conf.xsltc">
+            <param name="testType" value="smoketest.xsltc.conf."/>
+        </antcall>
+
+        <echo message="About to execute Accept tests..." />
+        <antcall target="accept.xsltc">
+            <param name="testType" value="smoketest.xsltc.accept."/>
+        </antcall>
+
+        <condition property="smoketest.xsltc-passed">
+            <and>
+                <available file="${smoketest.xsltc.conf.passFile}" />
+                <available file="${smoketest.xsltc.accept.passFile}" />
+            </and>
+        </condition>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="smoketest.xsltc"/>
         </antcall>
     </target>
 
@@ -533,6 +587,18 @@ dependencies - users must manually 'build jar' first.
     <target name="smoketest-pass" if="smoketest-passed">
         <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />
         <echo message=" [minitest] Details are in ${smoketest.conf.logFile}, ${smoketest.api.logFile}, ${smoketest.extensions.logFile}" />
+    </target>
+
+    <target name="smoketest.xsltc-notpass" unless="smoketest.xsltc-passed">
+        <echo message=" [minitest] ERROR! The Smoketest failed!" />
+        <echo message=" [minitest] See details in ${smoketest.xsltc.conf.logFile}, output is in ${smoketest.xsltc.conf.outputDir}" />
+        <echo message=" [minitest] See details in ${smoketest.xsltc.accept.logFile}, output is in ${smoketest.xsltc.accept.outputDir}" />
+        <echo message=" [minitest] Please fix any smoketest problems before checking in!" />
+        <fail message="Please fix any smoketest problems before checking in!" />
+    </target>
+    <target name="smoketest.xsltc-pass" if="smoketest.xsltc-passed">
+        <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />
+        <echo message=" [minitest] Details are in ${smoketest.conf.logFile}, ${smoketest.accept.logFile}" />
     </target>
 
     <target name="smoketest-results-dist" depends="init.test">
@@ -561,7 +627,7 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="alltest" 
             description="Run nearly *all* available Xalan-J 2.x tests with defaults"
-            depends="all,alltest.other,alltest.conf,alltest.contrib">
+            depends="all,alltest.other,alltest.conf,alltest.accept,alltest.contrib">
         <!-- Ensure that one last scan gets run of the whole output set
              (Note that when we call sub-targets, some of our subdirs 
              may have had sub-scans done as well) -->
@@ -736,6 +802,59 @@ dependencies - users must manually 'build jar' first.
         </antcall>
     </target>
 
+    <target name="alltest.accept">
+        <property name="alltest.resultDir" value="results-alltest" />
+        <property name="alltest.accept.resultDir" value="${alltest.resultDir}/accept" />
+        <echo message="About to execute accept tests with all flavors, results into ${alltest.accept.resultDir}/..." />
+        <!-- Run full accept test with each major available flavor into 
+             specific output directories; note any user options will 
+             override for all test calls.
+             Also exclude the currently failing tests in the 
+             smoketest if use.excludes is set.
+        -->
+        <condition property="accept.excludes" value="${smoketest.accept.excludes}">
+            <equals arg1="${use.excludes}" arg2="true" />
+        </condition>
+        <antcall target="accept">
+            <param name="accept.flavor" value="trax.systemId"/>
+            <param name="accept.excludes" value="${accept.excludes}"/>
+            <param name="accept.outputDir" value="${alltest.accept.resultDir}/systemId"/>
+            <param name="accept.logFile" value="${alltest.accept.resultDir}/systemId/results.xml"/>
+        </antcall>
+        <antcall target="accept">
+            <param name="accept.flavor" value="trax.file"/>
+            <param name="accept.excludes" value="${accept.excludes}"/>
+            <param name="accept.outputDir" value="${alltest.accept.resultDir}/file"/>
+            <param name="accept.logFile" value="${alltest.accept.resultDir}/file/results.xml"/>
+        </antcall>
+        <antcall target="accept">
+            <param name="accept.flavor" value="trax.dom"/>
+            <!-- Note DOM always has additional exclusions in accept tests-->
+            <param name="accept.excludes" value="${trax.dom.excludes};${accept.excludes}"/>
+            <param name="accept.outputDir" value="${alltest.accept.resultDir}/dom"/>
+            <param name="accept.logFile" value="${alltest.accept.resultDir}/dom/results.xml"/>
+        </antcall>
+        <antcall target="accept">
+            <param name="accept.flavor" value="trax.sax"/>
+            <param name="accept.excludes" value="${accept.excludes}"/>
+            <param name="accept.outputDir" value="${alltest.accept.resultDir}/sax"/>
+            <param name="accept.logFile" value="${alltest.accept.resultDir}/sax/results.xml"/>
+        </antcall>
+        <antcall target="accept">
+            <param name="accept.flavor" value="trax.localPath"/>
+            <param name="accept.excludes" value="${accept.excludes}"/>
+            <param name="accept.outputDir" value="${alltest.accept.resultDir}/localPath"/>
+            <param name="accept.logFile" value="${alltest.accept.resultDir}/localPath/results.xml"/>
+        </antcall>
+        <antcall target="accept">
+            <param name="accept.flavor" value="trax.stream"/>
+            <param name="accept.excludes" value="${accept.excludes}"/>
+            <param name="accept.outputDir" value="${alltest.accept.resultDir}/stream"/>
+            <param name="accept.logFile" value="${alltest.accept.resultDir}/stream/results.xml"/>
+        </antcall>
+        <!-- we should really run accept with each flavor -->
+    </target>
+
     <target name="alltest.conf.xsltc">
         <property name="alltest.xsltc.resultDir" value="results-alltest.xsltc" />
         <property name="alltest.conf.xsltc.resultDir" value="${alltest.xsltc.resultDir}/conf" />
@@ -787,6 +906,60 @@ dependencies - users must manually 'build jar' first.
             <param name="conf.xsltc.logFile" value="${alltest.conf.xsltc.resultDir}/stream/results.xml"/>
         </antcall>
     </target>
+
+    <target name="alltest.accept.xsltc">
+        <property name="alltest.xsltc.resultDir" value="results-alltest.xsltc" />
+        <property name="alltest.accept.xsltc.resultDir" value="${alltest.xsltc.resultDir}/accept" />
+        <echo message="About to execute xsltc.accept tests with all flavors, results into ${alltest.accept.xsltc.resultDir}/..." />
+        <!-- Run full accept test with each major available flavor into 
+             specific output directories; note any user options will 
+             override for all test calls.
+             Also exclude the currently failing tests in the 
+             smoketest if use.excludes is set.
+        -->
+        <condition property="accept.xsltc.excludes" value="${smoketest.accept.xsltc.excludes}">
+            <equals arg1="${use.excludes}" arg2="true" />
+        </condition>
+        <antcall target="accept.xsltc">
+            <param name="accept.xsltc.flavor" value="trax.systemId"/>
+            <param name="accept.xsltc.excludes" value="${accept.xsltc.excludes}"/>
+            <param name="accept.xsltc.outputDir" value="${alltest.accept.xsltc.resultDir}/systemId"/>
+            <param name="accept.xsltc.logFile" value="${alltest.accept.xsltc.resultDir}/systemId/results.xml"/>
+        </antcall>
+        <antcall target="accept.xsltc">
+            <param name="accept.xsltc.flavor" value="trax.file"/>
+            <param name="accept.xsltc.excludes" value="${accept.xsltc.excludes}"/>
+            <param name="accept.xsltc.outputDir" value="${alltest.accept.xsltc.resultDir}/file"/>
+            <param name="accept.xsltc.logFile" value="${alltest.accept.xsltc.resultDir}/file/results.xml"/>
+        </antcall>
+        <antcall target="accept.xsltc">
+            <param name="accept.xsltc.flavor" value="trax.dom"/>
+            <!-- Note DOM always has additional exclusions in accept tests-->
+            <param name="accept.xsltc.excludes" value="${trax.dom.excludes};${accept.xsltc.excludes}"/>
+            <param name="accept.xsltc.outputDir" value="${alltest.accept.xsltc.resultDir}/dom"/>
+            <param name="accept.xsltc.logFile" value="${alltest.accept.xsltc.resultDir}/dom/results.xml"/>
+        </antcall>
+        <antcall target="accept.xsltc">
+            <param name="accept.xsltc.flavor" value="trax.sax"/>
+            <param name="accept.xsltc.excludes" value="${accept.xsltc.excludes}"/>
+            <param name="accept.xsltc.outputDir" value="${alltest.accept.xsltc.resultDir}/sax"/>
+            <param name="accept.xsltc.logFile" value="${alltest.accept.xsltc.resultDir}/sax/results.xml"/>
+        </antcall>
+        <antcall target="accept.xsltc">
+            <param name="accept.xsltc.flavor" value="trax.localPath"/>
+            <param name="accept.xsltc.excludes" value="${accept.xsltc.excludes}"/>
+            <param name="accept.xsltc.outputDir" value="${alltest.accept.xsltc.resultDir}/localPath"/>
+            <param name="accept.xsltc.logFile" value="${alltest.accept.xsltc.resultDir}/localPath/results.xml"/>
+        </antcall>
+        <antcall target="accept.xsltc">
+            <param name="accept.xsltc.flavor" value="trax.stream"/>
+            <param name="accept.xsltc.excludes" value="${accept.xsltc.excludes}"/>
+            <param name="accept.xsltc.outputDir" value="${alltest.accept.xsltc.resultDir}/stream"/>
+            <param name="accept.xsltc.logFile" value="${alltest.accept.xsltc.resultDir}/stream/results.xml"/>
+        </antcall>
+    </target>
+
+
 
 
     <target name="test"
@@ -1176,8 +1349,7 @@ dependencies - users must manually 'build jar' first.
         <!-- Special: allow explicit test.properties overrides for inputDir, etc for xsltc -->
         <property name="testType" value="conf.xsltc." />
 	<!-- Set indent-number to 0 to match Xalan's default indentation -->
-	<property name="conf.xsltc.Processor.setAttribute.indent-number" value="0"/>
-
+	<property name="${testType}Processor.setAttribute.indent-number" value="0"/>
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="xsltc.runtime.class.path"
@@ -1187,9 +1359,8 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use xsltc -->
             <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
         </xalantest>
-        <antcall target="scan">
-            <param name="scan.outputDir" value="${conf.xsltc.outputDir}"/>
-        </antcall>
+        <property name="scan.outputDir" value="${conf.xsltc.outputDir}"/>
+        <antcall target="scan" />
     </target>
 
     <target name="perf.xsltc" description="Run TestletDriver over the perf tree using xsltc">
