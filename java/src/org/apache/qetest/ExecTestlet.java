@@ -190,6 +190,15 @@ public abstract class ExecTestlet extends FileTestlet
             final long startTime = System.currentTimeMillis();
             main.invoke(null, mainArgs);
             timeExec = System.currentTimeMillis() - startTime;
+
+            // Also log out a perf element by default
+            Hashtable attrs = new Hashtable();
+            attrs.put("idref", datalet.getInput());
+            attrs.put("program", getProgram());
+            attrs.put("isExternal", "false");
+            attrs.put("timeExec", new Long(timeExec));
+            logger.logElement(Logger.STATUSMSG, "perf", attrs, "Performance/timing info");
+            attrs = null;
         }
         catch (Throwable t)
         {
