@@ -3,7 +3,7 @@
 
   <!-- FileName: AXES47 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 2.2 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test for '..//name' and an attribute. -->

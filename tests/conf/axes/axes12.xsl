@@ -3,7 +3,7 @@
 
   <!-- FileName: AXES12 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 2.2 -->
   <!-- Purpose: Test for 'self::*' Axis Identifier. -->
 

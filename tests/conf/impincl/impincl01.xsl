@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: IMPINCL01 -->
+  <!-- FileName: impincl01 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 2.6.1 Stylesheet Inclusion -->
   <!-- Purpose: Test of basic Import & Include functionality. -->
 

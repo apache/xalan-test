@@ -3,7 +3,7 @@
 
   <!-- FileName: expression03 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 4.3 -->
   <!-- Purpose: Test of lang() function, matching "en-us" to partial qualifier -->
 

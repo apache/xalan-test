@@ -3,7 +3,7 @@
 
   <!-- FileName: AXES56 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991008 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 2.5 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test that combination of // and descendant specifies node can be anywhere in ancestry. -->
