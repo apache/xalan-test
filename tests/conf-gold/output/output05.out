@@ -6,5 +6,11 @@
 <tr>
 <td><img src="image2.gif"></td>
 </tr>
+<tr>
+<td><applet code="clock.class"></applet></td>
+</tr>
+<tr>
+<td><object></object></td>
+</tr>
 </TABLE>
 </HTML>
