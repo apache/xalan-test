@@ -19,6 +19,10 @@
   
   <separator/>
  
+  <document id="faq"
+            label="FAQ"
+            source="tests/faq.xml"/>
+
   <document id="run"
             label="Running Tests"
             source="tests/run.xml"/>  
