@@ -189,32 +189,34 @@ public class StreamResultAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Basic API coverage, constructor and set/get methods");
 
+        reporter.logWarningMsg("public StreamResult(File f) not yet tested");
+
         // Default no-arg ctor sets nothing
         StreamResult defaultStream = new StreamResult();
-        reporter.checkObject(defaultStream.getByteStream(), null, "Default StreamResult should have null ByteStream");
-        reporter.checkObject(defaultStream.getCharacterStream(), null, "Default StreamResult should have null CharacterStream");
+        reporter.checkObject(defaultStream.getOutputStream(), null, "Default StreamResult should have null ByteStream");
+        reporter.checkObject(defaultStream.getWriter(), null, "Default StreamResult should have null CharacterStream");
         reporter.check(defaultStream.getSystemId(), null, "Default StreamResult should have null SystemId");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StreamResult byteResult1 = new StreamResult(baos);
-        reporter.checkObject(byteResult1.getByteStream(), baos, "StreamResult(os) has ByteStream " + byteResult1.getByteStream());
-        reporter.checkObject(byteResult1.getCharacterStream(), null, "StreamResult(os) should have null CharacterStream");
+        reporter.checkObject(byteResult1.getOutputStream(), baos, "StreamResult(os) has ByteStream " + byteResult1.getOutputStream());
+        reporter.checkObject(byteResult1.getWriter(), null, "StreamResult(os) should have null CharacterStream");
         reporter.check(byteResult1.getSystemId(), null, "StreamResult(os) should have null SystemId");
 
         StringWriter strWriter = new StringWriter();
         StreamResult readerResult1 = new StreamResult(strWriter);
-        reporter.checkObject(readerResult1.getByteStream(), null, "StreamResult(writer) should have null ByteStream");
-        reporter.checkObject(readerResult1.getCharacterStream(), strWriter, "StreamResult(writer) has CharacterStream " + readerResult1.getCharacterStream());
+        reporter.checkObject(readerResult1.getOutputStream(), null, "StreamResult(writer) should have null ByteStream");
+        reporter.checkObject(readerResult1.getWriter(), strWriter, "StreamResult(writer) has CharacterStream " + readerResult1.getWriter());
         reporter.check(readerResult1.getSystemId(), null, "StreamResult(writer) should have null SystemId");
 
         StreamResult wackyStream = new StreamResult();
-        wackyStream.setByteStream(baos);
-        OutputStream gotStream = wackyStream.getByteStream();
-        reporter.checkObject(gotStream, baos, "set/getByteStream API coverage");
+        wackyStream.setOutputStream(baos);
+        OutputStream gotStream = wackyStream.getOutputStream();
+        reporter.checkObject(gotStream, baos, "set/getOutputStream API coverage");
 
-        wackyStream.setCharacterStream(strWriter);
-        Writer gotWriter = wackyStream.getCharacterStream();
-        reporter.checkObject(gotWriter, strWriter, "set/getCharacterStream API coverage");
+        wackyStream.setWriter(strWriter);
+        Writer gotWriter = wackyStream.getWriter();
+        reporter.checkObject(gotWriter, strWriter, "set/getWriter API coverage");
 
         wackyStream.setSystemId("new-system-id");
         String gotSystemId = wackyStream.getSystemId();

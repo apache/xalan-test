@@ -182,54 +182,57 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Basic API coverage, constructor and set/get methods");
 
+        reporter.logWarningMsg("public StreamSource(File f) not yet tested");
+        reporter.logWarningMsg("public void setSystemId(File f) not yet tested");
+
         // Default no-arg ctor sets nothing
         StreamSource defaultStream = new StreamSource();
-        reporter.checkObject(defaultStream.getByteStream(), null, "Default StreamSource should have null ByteStream");
-        reporter.checkObject(defaultStream.getCharacterStream(), null, "Default StreamSource should have null CharacterStream");
+        reporter.checkObject(defaultStream.getInputStream(), null, "Default StreamSource should have null ByteStream");
+        reporter.checkObject(defaultStream.getReader(), null, "Default StreamSource should have null CharacterStream");
         reporter.check(defaultStream.getPublicId(), null, "Default StreamSource should have null PublicId");
         reporter.check(defaultStream.getSystemId(), null, "Default StreamSource should have null SystemId");
 
         byte[] bytes = { 0, 0, 0, 0 };  // just a few zeroes, not really needed
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         StreamSource byteSource1 = new StreamSource(bais);
-        reporter.checkObject(byteSource1.getByteStream(), bais, "StreamSource(is) has ByteStream " + byteSource1.getByteStream());
-        reporter.checkObject(byteSource1.getCharacterStream(), null, "StreamSource(is) should have null CharacterStream");
+        reporter.checkObject(byteSource1.getInputStream(), bais, "StreamSource(is) has ByteStream " + byteSource1.getInputStream());
+        reporter.checkObject(byteSource1.getReader(), null, "StreamSource(is) should have null CharacterStream");
         reporter.check(byteSource1.getPublicId(), null, "StreamSource(is) should have null PublicId");
         reporter.check(byteSource1.getSystemId(), null, "StreamSource(is) should have null SystemId");
 
         StreamSource byteSource2 = new StreamSource(bais, "some-system-id");
-        reporter.checkObject(byteSource2.getByteStream(), bais, "StreamSource(is, sysID) has ByteStream " + byteSource2.getByteStream());
-        reporter.checkObject(byteSource2.getCharacterStream(), null, "StreamSource(is, sysID) should have null CharacterStream");
+        reporter.checkObject(byteSource2.getInputStream(), bais, "StreamSource(is, sysID) has ByteStream " + byteSource2.getInputStream());
+        reporter.checkObject(byteSource2.getReader(), null, "StreamSource(is, sysID) should have null CharacterStream");
         reporter.check(byteSource2.getPublicId(), null, "StreamSource(is, sysID) should have null PublicId");
         reporter.check(byteSource2.getSystemId(), "some-system-id", "StreamSource(is, sysID) has SystemId " + byteSource2.getSystemId());
 
         StringReader strReader = new StringReader("this is not your parent's XML data");
         StreamSource readerSource1 = new StreamSource(strReader);
-        reporter.checkObject(readerSource1.getByteStream(), null, "StreamSource(reader) should have null ByteStream");
-        reporter.checkObject(readerSource1.getCharacterStream(), strReader, "StreamSource(reader) has CharacterStream " + readerSource1.getCharacterStream());
+        reporter.checkObject(readerSource1.getInputStream(), null, "StreamSource(reader) should have null ByteStream");
+        reporter.checkObject(readerSource1.getReader(), strReader, "StreamSource(reader) has CharacterStream " + readerSource1.getReader());
         reporter.check(readerSource1.getPublicId(), null, "StreamSource(reader) should have null PublicId");
         reporter.check(readerSource1.getSystemId(), null, "StreamSource(reader) should have null SystemId");
 
         StreamSource readerSource2 = new StreamSource(strReader, "some-system-id");
-        reporter.checkObject(readerSource2.getByteStream(), null, "StreamSource(reader, sysID) should have null ByteStream");
-        reporter.checkObject(readerSource2.getCharacterStream(), strReader, "StreamSource(reader, sysID) has CharacterStream " + readerSource2.getCharacterStream());
+        reporter.checkObject(readerSource2.getInputStream(), null, "StreamSource(reader, sysID) should have null ByteStream");
+        reporter.checkObject(readerSource2.getReader(), strReader, "StreamSource(reader, sysID) has CharacterStream " + readerSource2.getReader());
         reporter.check(readerSource2.getPublicId(), null, "StreamSource(reader, sysID) should have null PublicId");
         reporter.check(readerSource2.getSystemId(), "some-system-id", "StreamSource(reader, sysID) has SystemId " + readerSource2.getSystemId());
 
         StreamSource sysIDStream = new StreamSource("real-system-id");
-        reporter.checkObject(sysIDStream.getByteStream(), null, "StreamSource(sysID) should have null ByteStream");
-        reporter.checkObject(sysIDStream.getCharacterStream(), null, "StreamSource(sysID) should have null CharacterStream");
+        reporter.checkObject(sysIDStream.getInputStream(), null, "StreamSource(sysID) should have null ByteStream");
+        reporter.checkObject(sysIDStream.getReader(), null, "StreamSource(sysID) should have null CharacterStream");
         reporter.check(sysIDStream.getPublicId(), null, "StreamSource(sysID) should have null PublicId");
         reporter.check(sysIDStream.getSystemId(), "real-system-id", "StreamSource(sysID) has SystemId " + sysIDStream.getSystemId());
 
         StreamSource wackyStream = new StreamSource();
-        wackyStream.setByteStream(bais);
-        InputStream gotStream = wackyStream.getByteStream();
-        reporter.checkObject(gotStream, bais, "set/getByteStream API coverage");
+        wackyStream.setInputStream(bais);
+        InputStream gotStream = wackyStream.getInputStream();
+        reporter.checkObject(gotStream, bais, "set/getInputStream API coverage");
 
-        wackyStream.setCharacterStream(strReader);
-        Reader gotReader = wackyStream.getCharacterStream();
-        reporter.checkObject(gotReader, strReader, "set/getCharacterStream API coverage");
+        wackyStream.setReader(strReader);
+        Reader gotReader = wackyStream.getReader();
+        reporter.checkObject(gotReader, strReader, "set/getReader API coverage");
 
         wackyStream.setSystemId("new-system-id");
         String gotSystemId = wackyStream.getSystemId();
