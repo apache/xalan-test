@@ -726,6 +726,39 @@ public class XSLProcessorTestBase extends FileBasedTest
                                  + diagnostics);
         }
     }
+    
+    /**
+     * Write a "{TestName}.Pass" or "{TestName}.Not.Pass" file 
+     * according to whether or not the overall test passed.
+     */
+    protected void createStatusFile()
+    {
+      System.out.println("reporter: "+reporter);
+      if(null != reporter)
+      {
+        String testName = this.getTestName();
+        File resultsFile = new File(testProps.getProperty("logFile"));
+        File passfile = new File(resultsFile.getParent(), testName+".Pass");
+        File failfile = new File(resultsFile.getParent(), testName+".Not.Pass");
+        if(passfile.exists())
+          passfile.delete();
+        if(failfile.exists())
+          failfile.delete();
+        
+        File statusfile = reporter.didPass() ? passfile : failfile;                 
+        try
+        {
+          java.io.FileOutputStream fio = new java.io.FileOutputStream(statusfile);
+          fio.write(0);
+          fio.close();
+        }
+        catch(Exception e)
+        {
+          System.out.println("Can't write: "+statusfile.toString());
+        }
+      }
+
+    }
 
     /**
      * Main worker method to run test from the command line.
@@ -764,6 +797,8 @@ public class XSLProcessorTestBase extends FileBasedTest
         //  specific code that's counting on this
         testProps.put(MAIN_CMDLINE, args);
         runTest(testProps);
+        
+        createStatusFile();
     }
 
     /**
