@@ -165,6 +165,9 @@ public class ExamplesTest extends XSLProcessorTestBase
     /** Sample gold files used for specific transforms - with output format.  */
     protected String outputGoldName;
 
+    /** Sample gold files used for specific transforms - ContentHandler.  */
+    protected String sax2GoldName;
+
     /** Sample gold files used for specific transforms - XMLFilter/Reader.  */
     protected String saxGoldName;
 
@@ -229,6 +232,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         param2GoldName = goldBasePath + "param2.out";
         outputGoldName = goldBasePath + "output.out";
         saxGoldName = goldBasePath + "fooSAX.out";
+        sax2GoldName = goldBasePath + "fooSAX2.out";
         NOT_DEFINED = goldBasePath + "need-validated-output-file-here.out";
         return true;
     }
@@ -549,9 +553,9 @@ public class ExamplesTest extends XSLProcessorTestBase
           reporter.logTraceMsg("reader.parse " + sourceID);
           reader.parse(sourceID);
 
-          reporter.logTraceMsg("Note: I have not double-checked that we're comparing against the correct gold file! 14-Dec-00");
+          reporter.logTraceMsg("Note: See SPR SCUU4RZT78 for discussion as to why this output is different than XMLReader/XMLFilter");
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(saxGoldName),
+                          new File(sax2GoldName),
                           "exampleContentHandlerToContentHandler fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
