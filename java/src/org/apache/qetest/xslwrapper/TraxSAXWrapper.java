@@ -274,9 +274,18 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         xmlReader.setProperty(
                 "http://xml.org/sax/properties/lexical-handler", 
                 stylesheetHandler);
-        xmlReader.setProperty(
-                "http://xml.org/sax/properties/declaration-handler",
-                stylesheetHandler);
+
+        // Also attempt to set as a DeclHandler, which Xalan-J 
+        //  supports even though it is not required by JAXP
+        // Ignore exceptions for other processors since this 
+        //  is not a required setting
+        try
+        {
+            xmlReader.setProperty(
+                    "http://xml.org/sax/properties/declaration-handler",
+                    stylesheetHandler);
+        } 
+        catch (SAXException se) { /* no-op - ignore */ }
         
         // added by sb. Tie together DTD and other handling
         xmlReader.setDTDHandler(stylesheetHandler);
