@@ -64,6 +64,7 @@ package org.apache.qetest;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -1585,8 +1586,18 @@ public class Reporter implements Logger
         //  harnesses and build environments
 
         // Calculate the name relative to any logfile we have
-        String logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, "ResultsSummary.xml"))).getParent();
-        File summaryFile = new File("ResultsSummary.xml");    //@todo have better default
+        String logFileBase = null;
+        try
+        {
+            // CanonicalPath gives a better path, especially if 
+            //  you mix your path separators up
+            logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, "ResultsSummary.xml"))).getCanonicalPath();
+        } 
+        catch (IOException ioe)
+        {
+            logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, "ResultsSummary.xml"))).getAbsolutePath();
+        }
+        logFileBase = (new File(logFileBase)).getParent();
         File[] summaryFiles = 
         {
             // Note array is ordered; should be re-designed so this doesn't matter
@@ -1609,6 +1620,7 @@ public class Reporter implements Logger
                 summaryFiles[i].delete();
         }
 
+        File summaryFile = null;
         switch (getCurrentFileResult())
         {
             case INCP_RESULT:
