@@ -454,10 +454,10 @@ public class ConsoleLogger implements Logger
         outStream.println(sIndent + element);
         indent();
 
-        for (Enumeration enum = attrs.keys();
-                enum.hasMoreElements(); /* no increment portion */ )
+        for (Enumeration keys = attrs.keys();
+                keys.hasMoreElements(); /* no increment portion */ )
         {
-            Object key = enum.nextElement();
+            Object key = keys.nextElement();
 
             outStream.println(sIndent + key.toString() + "="
                               + attrs.get(key).toString());
@@ -496,10 +496,10 @@ public class ConsoleLogger implements Logger
             {
 
                 // Fake the Properties-like output
-                for (Enumeration enum = hash.keys();
-                        enum.hasMoreElements(); /* no increment portion */ )
+                for (Enumeration keys = hash.keys();
+                        keys.hasMoreElements(); /* no increment portion */ )
                 {
-                    Object key = enum.nextElement();
+                    Object key = keys.nextElement();
 
                     outStream.println(sIndent + key.toString() + "="
                                       + hash.get(key).toString());

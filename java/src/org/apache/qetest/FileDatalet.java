@@ -393,11 +393,11 @@ public class FileDatalet implements Datalet
 
         // Also copy over all items in hash to options
         options = new Properties();
-        for (Enumeration enum = h.keys(); 
-             enum.hasMoreElements(); 
+        for (Enumeration keys = h.keys(); 
+             keys.hasMoreElements(); 
              /* no increment portion */)
         {
-            String key = (String)enum.nextElement();
+            String key = (String)keys.nextElement();
             options.put(key, h.get(key));
         }
     }

@@ -294,13 +294,13 @@ public abstract class TransformWrapperHelper implements TransformWrapper
         if (null == m_params)
             return;
 
-        for (Enumeration enum = m_params.keys();
-             enum.hasMoreElements(); 
+        for (Enumeration keys = m_params.keys();
+             keys.hasMoreElements(); 
              /* no increment portion */ )
         {
             String namespace = null;
             String name = null;
-            String key = enum.nextElement().toString();
+            String key = keys.nextElement().toString();
             //@todo compare with TransformerImpl.setParameter's use of a StringTokenizer(..., "{}"...
             // Decode the namespace, if present
             if (key.startsWith("{"))

@@ -348,11 +348,11 @@ public class XSLTestAntTask extends Task
 
         Properties passThru = new Properties();
         // Passthru any of the default prefixed properties..
-        for (Enumeration enum = antProps.keys();
-                enum.hasMoreElements(); 
+        for (Enumeration keys = antProps.keys();
+                keys.hasMoreElements(); 
                 /* no increment portion */ )
         {
-            String key = enum.nextElement().toString();
+            String key = keys.nextElement().toString();
             if (key.startsWith(ANT_PASSTHRU_PREFIX))
             {
                 // Move any of these properties into the test; 
@@ -362,11 +362,11 @@ public class XSLTestAntTask extends Task
         }
         //.. Then also passthru any alternate prefix properties
         //  this ensures alternate prefixes will overwrite default ones
-        for (Enumeration enum = antProps.keys();
-                enum.hasMoreElements(); 
+        for (Enumeration keys = antProps.keys();
+                keys.hasMoreElements(); 
                 /* no increment portion */ )
         {
-            String key = enum.nextElement().toString();
+            String key = keys.nextElement().toString();
             if (key.startsWith(altPrefix))
             {
                 // Also move alternate prefixed properties too

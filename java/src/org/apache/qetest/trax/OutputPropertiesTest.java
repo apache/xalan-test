@@ -294,10 +294,10 @@ public class OutputPropertiesTest extends FileBasedTest
 
             // Second, set the properties individually and transform
             Transformer transformer2 = templates.newTransformer();
-            for (Enumeration enum = setProps.propertyNames();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            for (Enumeration names = setProps.propertyNames();
+                    names.hasMoreElements(); /* no increment portion */ )
             {
-                String key = (String)enum.nextElement();
+                String key = (String)names.nextElement();
                 String value = setProps.getProperty(key);
                 transformer2.setOutputProperty(key, value);
             }

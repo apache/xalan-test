@@ -167,12 +167,12 @@ public class StylesheetErrorTestlet extends StylesheetTestlet
         {
             // Attempt to see if our throwable matches any gold data
             boolean foundExpected = false;
-            for (Enumeration enum = expectedExceptions.elements();
-                 enum.hasMoreElements(); 
+            for (Enumeration elements = expectedExceptions.elements();
+                 elements.hasMoreElements(); 
                  /* no increment portion */)
             {
                 // Maintenance Note: Ensure this will always be String data
-                String expExc = (String)enum.nextElement();
+                String expExc = (String)elements.nextElement();
                 if (t.toString().indexOf(expExc) > -1)
                 {
                     foundExpected = true;

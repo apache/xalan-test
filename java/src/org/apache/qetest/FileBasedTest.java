@@ -441,10 +441,10 @@ public class FileBasedTest extends TestImpl
         //  have to get updated when we have new properties
         // Note that this may result in duplicates since we
         //  re-set many of the things from bleow
-        for (Enumeration enum = props.propertyNames();
-                enum.hasMoreElements(); /* no increment portion */ )
+        for (Enumeration names = props.propertyNames();
+                names.hasMoreElements(); /* no increment portion */ )
         {
-            Object key = enum.nextElement();
+            Object key = names.nextElement();
 
             testProps.put(key, props.get(key));
         }

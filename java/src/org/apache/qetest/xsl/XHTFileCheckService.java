@@ -420,10 +420,10 @@ public class XHTFileCheckService implements CheckService
     public void applyAttributes(Properties attrs)
     {
         attributes = null;
-        for (Enumeration enum = attrs.propertyNames();
-                enum.hasMoreElements(); /* no increment portion */ )
+        for (Enumeration names = attrs.propertyNames();
+                names.hasMoreElements(); /* no increment portion */ )
         {
-            String key = (String)enum.nextElement();
+            String key = (String)names.nextElement();
             if (key.startsWith(URN_XHTFILECHECKSERVICE))
             {
                 setAttribute(key, attrs.getProperty(key));

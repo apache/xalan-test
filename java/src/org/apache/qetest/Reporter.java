@@ -1670,10 +1670,10 @@ public class Reporter implements Logger
             //  we add an XML header so this is a legal XML doc
             printWriter.println("<?xml version=\"1.0\"?>"); 
             printWriter.println("<" + elementName); 
-            for (Enumeration enum = resultsHash.keys();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            for (Enumeration keys = resultsHash.keys();
+                    keys.hasMoreElements(); /* no increment portion */ )
             {
-                Object key = enum.nextElement();
+                Object key = keys.nextElement();
                 printWriter.println(key + "=\"" + resultsHash.get(key) + "\"");
             }
             printWriter.println(">"); 
