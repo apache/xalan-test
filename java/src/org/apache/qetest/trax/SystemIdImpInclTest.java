@@ -149,7 +149,7 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public SystemIdImpInclTest()
     {
-        numTestCases = 4;  // REPLACE_num
+        numTestCases = 3; // Set numTestCases to 3 to skip the 4th one that does http:
         testName = "SystemIdImpInclTest";
         testComment = "Test behavior of imports/includes with various setSystemId sources";
     }
@@ -690,6 +690,9 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
 
     /**
      * Verify various simple Sources with http: systemIds.
+     * Test may be commented out until we have a better way to 
+     * maintain and check for existence and correct content of 
+     * stylesheets on the http server.
      *
      * @return false if we should abort the test; true otherwise
      */
