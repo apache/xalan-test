@@ -18,7 +18,8 @@ outputDir=.\\results-s2s
 logFile=.\\results-s2s\\ConfTest.xml
 
 #---- Choose processor: flavors supported: xalan|trax|other...
-flavor=trax.s2s
+# Update for StylesheetTestletDriver/trax.sax 25-Jun-01 -sc 
+flavor=trax.sax
 
 #---- Choose tests: Filter to only run specific sets of tests
 # Set category to run only the single named directory

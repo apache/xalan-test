@@ -19,7 +19,8 @@ outputDir=.\\results-d2d
 logFile=.\\results-d2d\\ConfTest.xml
 
 #---- Choose processor: flavors supported: xalan|trax|other...
-flavor=trax.d2d
+# Update for StylesheetTestletDriver/trax.dom 25-Jun-01 -sc 
+flavor=trax.dom
 
 #---- Choose tests: Filter to only run specific sets of tests
 # Set category to run only the single named directory
