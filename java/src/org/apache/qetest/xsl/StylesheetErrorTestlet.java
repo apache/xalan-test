@@ -55,11 +55,6 @@
  * <http://www.apache.org/>.
  */
 
-/*
- *
- * StylesheetErrorTestlet.java
- *
- */
 package org.apache.qetest.xsl;
 
 import org.apache.qetest.CheckService;
@@ -104,169 +99,89 @@ import java.util.Vector;
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
  */
-public class StylesheetErrorTestlet extends TestletImpl
+public class StylesheetErrorTestlet extends StylesheetTestlet
 {
     // Initialize our classname for TestletImpl's main() method
     static { thisClassName = "org.apache.qetest.xsl.StylesheetErrorTestlet"; }
-
 
     // Initialize our defaultDatalet
     { defaultDatalet = (Datalet)new StylesheetDatalet(); }
 
 
-    /** Token in xsl file denoting the text of an expected exception.  */
-    public static final String EXPECTED_EXCEPTION = "ExpectedException:";
-    public static final String EXPECTED_EXCEPTION_END = "-->";
-
     /**
      * Accesor method for a brief description of this test.  
-     *
      * @return String describing what this StylesheetErrorTestlet does.
      */
     public String getDescription()
     {
-        return "StylesheetErrorTestlet - use stylesheet w/error and verify exception thrown";
+        return "StylesheetErrorTestlet";
     }
 
 
-    /**
-     * Run this StylesheetErrorTestlet: execute it's test and return.
+    /** 
+     * Worker method to validate output file with gold; overridden
+     * to call checkFail, since our definition of error tests 
+     * is that they should have thrown an exception!  
      *
-     * @param Datalet to use as data point for the test.
+     * Logs out applicable info while validating output file.
+     *
+     * @param datalet to test with
+     * @throws allows any underlying exception to be thrown
      */
-    public void execute(Datalet d)
+    protected void checkDatalet(StylesheetDatalet datalet)
+            throws Exception
     {
-        StylesheetDatalet datalet = null;
+        // Just log a fail; error tests must throw exceptions
+        logger.checkFail(datalet.getDescription() + " did not throw any exception");
+        // Log a custom element with all the file refs
+        // Closely related to viewResults.xsl select='fileref"
+        //@todo check that these links are valid when base 
+        //  paths are either relative or absolute!
+        Hashtable attrs = new Hashtable();
+        attrs.put("idref", (new File(datalet.inputName)).getName());
         try
         {
-            datalet = (StylesheetDatalet)d;
-        }
-        catch (ClassCastException e)
+            attrs.put("baseref", System.getProperty("user.dir"));
+        } 
+        catch (Exception e) { /* no-op, ignore */ }
+        
+        attrs.put("inputName", datalet.inputName);
+        attrs.put("xmlName", datalet.xmlName);
+        attrs.put("outputName", datalet.outputName);
+        attrs.put("goldName", datalet.goldName);
+        logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance test file references");
+    }
+
+
+    /** 
+     * Worker method to validate exceptions thrown by testDatalet.  
+     *
+     * Our implementation compares t.toString() with 
+     * expectedException data from the stylesheet test.
+     *
+     * @param datalet to test with
+     * @param e Throwable that was thrown
+     */
+    protected void handleException(StylesheetDatalet datalet, Throwable t)
+    {
+        // Get gold or reference info from the datalet
+        Vector expectedExceptions = StylesheetDataletManager.getInfoItem(logger, datalet, StylesheetDataletManager.INFOITEM_EXPECTED_EXCEPTION);
+        if ((null == expectedExceptions) || (0 == expectedExceptions.size()))
         {
-            logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue with " + d);
-            return;
+            logger.logThrowable(Logger.INFOMSG, t, getDescription() + " " + datalet.getDescription());
+            // No gold info available; report ambiguous and return
+            logger.checkAmbiguous(getDescription() + " " + datalet.getDescription() 
+                            + " no " + StylesheetDataletManager.INFOITEM_EXPECTED_EXCEPTION + " available!");
         }
-
-        logger.logMsg(Logger.STATUSMSG, "about to test: " 
-                      + (null == datalet.inputName
-                         ? datalet.xmlName
-                         : datalet.inputName));
-        //@todo validate our Datalet - ensure it has valid 
-        //  and/or existing files available.
-
-        // Cleanup outName only if asked to - delete the file on disk
-        // Optimization: this takes extra time and often is not 
-        //  needed, so only do this if the option is set
-        if ("true".equalsIgnoreCase(datalet.options.getProperty("deleteOutFile")))
+        else
         {
-            try
-            {
-                boolean btmp = (new File(datalet.outputName)).delete();
-                logger.logMsg(Logger.TRACEMSG, "Deleting OutFile of::" + datalet.outputName
-                                     + " status: " + btmp);
-            }
-            catch (SecurityException se)
-            {
-                logger.logMsg(Logger.WARNINGMSG, "Deleting OutFile of::" + datalet.outputName
-                                       + " threw: " + se.toString());
-                // But continue anyways...
-            }
-        }
-
-        // Create a new TransformWrapper of appropriate flavor
-        //  null arg is unused liaison for TransformWrapper
-        //@todo allow user to pass in pre-created 
-        //  TransformWrapper so we don't have lots of objects 
-        //  created and destroyed for every file
-        TransformWrapper transformWrapper = null;
-        try
-        {
-            transformWrapper = TransformWrapperFactory.newWrapper(datalet.flavor);
-            transformWrapper.newProcessor(null);
-        }
-        catch (Throwable t)
-        {
-            logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " newWrapper/newProcessor threw");
-            logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
-            return;
-        }
-
-        // Read in expectedExecption from datalet or stylesheet file
-        Vector expectedException = getExpectedException(datalet);
-
-        // Store local copies of XSL, XML references to avoid 
-        //  potential for changing datalet            
-        String inputName = datalet.inputName;
-        String xmlName = datalet.xmlName;
-
-        //@todo Should we log a custom logElement here instead?
-        // Be sure to log everything before we start the test!
-        logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + inputName
-                      + " xmlName=" + xmlName + " flavor="  + datalet.flavor
-                      + " num" + EXPECTED_EXCEPTION + "=" 
-                      + (null != expectedException
-                        ? expectedException.size()
-                        : 0));
-
-        // Test our supplied input file, and validate exceptions
-        try
-        {
-            // Simply have the wrapper do all the transforming
-            //  or processing for us - we handle either normal .xsl 
-            //  stylesheet tests or just .xml embedded tests
-            if (null == datalet.inputName)
-            {
-                // Note: we expect an exception to be thrown!
-                // presume it's an embedded test
-                transformWrapper.transformEmbedded(xmlName, datalet.outputName); // throwaway returned value
-            }
-            else
-            {
-                // Note: we expect an exception to be thrown!
-                // presume it's a normal stylesheet test
-                transformWrapper.transform(xmlName, inputName, datalet.outputName);  // throwaway returned value
-            }
-
-            // Note: Error tests, by our definitions, are expected 
-            //  to throw an exception: so if we get here, we should 
-            //  actually report a fail!
-
-            // Log a custom element with all the file refs first
-            //  Closely related to viewResults.xsl select='fileref"
-            Hashtable attrs = new Hashtable();
-            attrs.put("idref", (new File(datalet.inputName)).getName());
-            attrs.put("inputName", datalet.inputName);
-            attrs.put("xmlName", datalet.xmlName);
-            attrs.put("outputName", datalet.outputName);
-            attrs.put("goldName", datalet.goldName);
-            logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance error test file references");
-            // Then log the failure reason
-            logger.checkFail(datalet.getDescription() + " did not throw any exception");
-        }
-        catch (Throwable t)
-        {
-            // Validate against some expected exception(s) 
-            if (null == expectedException)
-            {
-                logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " " + datalet.getDescription());
-                logger.checkAmbiguous(datalet.getDescription() 
-                                      + " no expected exception available to validate against!");
-                return;
-                
-            }
-            //@todo improve how we take in data about what's expected
-            //  -- an actual Throwable subclass to .equals
-            //  -- some part of Throwable.toString()
-            //  -- -- compared to string in datalet
-            //  -- -- compared to string in xsl file
-            //  -- some part of the stack traceback?
+            // Attempt to see if our throwable matches any gold data
             boolean foundExpected = false;
-            for (Enumeration enum = expectedException.elements();
+            for (Enumeration enum = expectedExceptions.elements();
                  enum.hasMoreElements(); 
                  /* no increment portion */)
             {
-                // Note cast is safe since we only put Strings in 
-                //  there in our own worker method
+                // Maintenance Note: Ensure this will always be String data
                 String expExc = (String)enum.nextElement();
                 if (t.toString().indexOf(expExc) > -1)
                 {
@@ -276,7 +191,7 @@ public class StylesheetErrorTestlet extends TestletImpl
             }
             if (foundExpected)
             {
-                logger.checkPass(datalet.getDescription() 
+                logger.checkPass(getDescription() + " " + datalet.getDescription() 
                                  + " expectedly threw: " + t.toString());
             }
             else
@@ -284,75 +199,10 @@ public class StylesheetErrorTestlet extends TestletImpl
                 // Put the logThrowable first, so it appears before 
                 //  the Fail record, and gets color-coded
                 logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " " + datalet.getDescription());
-                logger.checkFail(datalet.getDescription() 
-                                + " unexpectedly threw: " + t.toString());
+                logger.checkFail(getDescription() + " " + datalet.getDescription() 
+                                 + " unexpectedly threw: " + t.toString());
             }
         }
-    }
-
-    /**
-     * Worker method to get expected exception text about a stylesheet.
-     * 
-     * Currently parses the inputDir stylesheet for a line that contains 
-     * EXPECTED_EXCEPTION inside an xsl comment, on a single line, and 
-     * trims off the closing comment -->.
-     * Future work: allow options on datalet to specify some other 
-     * expected data in another format - a whole Throwable object to 
-     * compare to, or a stacktrace, etc.
-     * 
-     * @author Shane Curcuru
-     * @param d Datalet that contains info about the exception
-     * @return Vector of Strings denoting toString of exception(s)
-     * we might expect - any one of them will pass; null if error
-     */
-    protected Vector getExpectedException(StylesheetDatalet d)
-    {
-        Vector v = null;
-        // Read in the testName file to see if it's expecting something        
-        try
-        {
-            FileReader fr = new FileReader(d.inputName);
-            BufferedReader br = new BufferedReader(fr);
-            for (;;)
-            {
-                String inbuf = br.readLine();
-
-                if (inbuf == null)
-                    break;  // end of file, break out and return default (false)
-
-                int idx = inbuf.indexOf(EXPECTED_EXCEPTION);
-
-                if (idx < 0)
-                    continue;  // not on this line, keep going
-
-                // The expected exception.getMessage is the rest of the line...
-                String expExc = inbuf.substring(idx + EXPECTED_EXCEPTION.length(),
-                                         inbuf.length());
-
-                // ... less the trailing " -->" comment end; trimmed
-                int endComment = expExc.indexOf(EXPECTED_EXCEPTION_END);
-                if (endComment > -1)
-                    expExc = expExc.substring(0, endComment).trim();
-                else
-                    expExc = expExc.trim();
-
-                if (null == v)
-                    v = new Vector(); // only create if needed
-                v.addElement(expExc);
-
-                // Continue reading the file for more potential
-                //  expected exception strings - read them all
-                //@todo optimization: stop parsing after xx lines?
-
-            }  // end for (;;)
-        }
-        catch (java.io.IOException ioe)
-        {
-            logger.logMsg(Logger.ERRORMSG, "getExpectedException() threw: "
-                                   + ioe.toString());
-            return null;
-        }
-        return v;
     }
 
 }  // end of class StylesheetErrorTestlet
