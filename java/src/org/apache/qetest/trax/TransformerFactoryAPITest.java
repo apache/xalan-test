@@ -148,11 +148,11 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
                               + TRAX_SUBDIR
                               + File.separator;
 
-        testFileInfo.inputName = testBasePath + "identity.xsl";
-        testFileInfo.xmlName = testBasePath + "identity.xml";
+        testFileInfo.inputName = filenameToURL(testBasePath + "identity.xsl");
+        testFileInfo.xmlName = filenameToURL(testBasePath + "identity.xml");
         testFileInfo.goldName = goldBasePath + "identity.out";
 
-        embeddedFileInfo.xmlName = testBasePath + "embeddedIdentity.xml";
+        embeddedFileInfo.xmlName = filenameToURL(testBasePath + "embeddedIdentity.xml");
         embeddedFileInfo.goldName = goldBasePath + "embeddedIdentity.out";
 
         // Cache the system property

@@ -177,10 +177,10 @@ public class TemplatesAPITest extends XSLProcessorTestBase
         String goldBasePath = goldDir + File.separator + TRAX_SUBDIR
                               + File.separator;
 
-        simpleTest.xmlName = testBasePath + "TransformerAPIParam.xml";
-        simpleTest.inputName = testBasePath + "TransformerAPIParam.xsl";
+        simpleTest.xmlName = filenameToURL(testBasePath + "TransformerAPIParam.xml");
+        simpleTest.inputName = filenameToURL(testBasePath + "TransformerAPIParam.xsl");
         simpleTest.goldName = goldBasePath + "TransformerAPIParam.out";
-        outputFormatXSL = testBasePath + "TransformerAPIOutputFormat.xsl";
+        outputFormatXSL = filenameToURL(testBasePath + "TransformerAPIOutputFormat.xsl");
 
         // Cache trax system property
         saveXSLTProp = System.getProperty(TRAX_PROCESSOR_XSLT);

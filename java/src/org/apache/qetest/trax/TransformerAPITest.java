@@ -199,16 +199,16 @@ public class TransformerAPITest extends XSLProcessorTestBase
         String goldBasePath = goldDir + File.separator + TRAX_SUBDIR
                               + File.separator;
 
-        simpleTest.xmlName = testBasePath + "identity.xml";
-        simpleTest.inputName = testBasePath + "identity.xsl";
+        simpleTest.xmlName = filenameToURL(testBasePath + "identity.xml");
+        simpleTest.inputName = filenameToURL(testBasePath + "identity.xsl");
         simpleTest.goldName = goldBasePath + "identity.out";
 
-        paramTest.xmlName = testBasePath + "TransformerAPIParam.xml";
-        paramTest.inputName = testBasePath + "TransformerAPIParam.xsl";
+        paramTest.xmlName = filenameToURL(testBasePath + "TransformerAPIParam.xml");
+        paramTest.inputName = filenameToURL(testBasePath + "TransformerAPIParam.xsl");
         paramTest.goldName = goldBasePath + "TransformerAPIParam.out";
         
-        outputFormatTest.xmlName = testBasePath + "TransformerAPIOutputFormat.xml";
-        outputFormatTest.inputName = testBasePath + "TransformerAPIOutputFormat.xsl";
+        outputFormatTest.xmlName = filenameToURL(testBasePath + "TransformerAPIOutputFormat.xml");
+        outputFormatTest.inputName = filenameToURL(testBasePath + "TransformerAPIOutputFormat.xsl");
         outputFormatTest.goldName = goldBasePath + "TransformerAPIOutputFormatUTF16.out";
         outputFormatTestUTF8 = goldBasePath + "TransformerAPIOutputFormatUTF8.out";
 

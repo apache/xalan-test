@@ -148,12 +148,12 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
                               + TRAX_DOM_SUBDIR
                               + File.separator;
 
-        testFileInfo.inputName = testBasePath + "DOMTest.xsl";
-        testFileInfo.xmlName = testBasePath + "DOMTest.xml";
+        testFileInfo.inputName = filenameToURL(testBasePath + "DOMTest.xsl");
+        testFileInfo.xmlName = filenameToURL(testBasePath + "DOMTest.xml");
         testFileInfo.goldName = goldBasePath + "DOMTest.out";
 
-        impInclFileInfo.inputName = testBasePath + "DOMImpIncl.xsl";
-        impInclFileInfo.xmlName = testBasePath + "DOMImpIncl.xml";
+        impInclFileInfo.inputName = filenameToURL(testBasePath + "DOMImpIncl.xsl");
+        impInclFileInfo.xmlName = filenameToURL(testBasePath + "DOMImpIncl.xml");
         impInclFileInfo.goldName = goldBasePath + "DOMImpIncl.out";
 
         try
@@ -350,11 +350,12 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
         {
             // Setting SystemId with imports/inclues
             DOMSource xslDOM = new DOMSource(xslImpInclNode);
-            xslDOM.setSystemId(filenameToURI(impInclFileInfo.inputName));
+            // Note that inputName, xmlName are already URL'd
+            xslDOM.setSystemId(impInclFileInfo.inputName);
             transformerXSL = factory.newTransformer(xslDOM);
             DOMSource xmlDOM = new DOMSource(xmlImpInclNode);
             // Do we really need to set SystemId on both XML and XSL?
-            xmlDOM.setSystemId(filenameToURI(impInclFileInfo.xmlName));
+            xmlDOM.setSystemId(impInclFileInfo.xmlName);
             DOMResult emptyResult = new DOMResult();
             reporter.logTraceMsg("About to transformXSLImpIncl(xmlDOM, emptyResult)");
             transformerXSL.transform(xmlDOM, emptyResult);
@@ -479,9 +480,9 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
 
             // Use same Sources, but change Nodes for xml,xsl
             xmlSource.setNode(xmlImpInclNode);
-            xmlSource.setSystemId(filenameToURI(impInclFileInfo.xmlName));
+            xmlSource.setSystemId(impInclFileInfo.xmlName);
             xslSource.setNode(xslImpInclNode);
-            xslSource.setSystemId(filenameToURI(impInclFileInfo.inputName));
+            xslSource.setSystemId(impInclFileInfo.inputName);
             Transformer transformer2 = factory.newTransformer(xslSource);
             DOMResult result2 = new DOMResult(docBuilder.newDocument());
             transformer2.transform(xmlSource, result2);
@@ -555,26 +556,6 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
         DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
         dfactory.setNamespaceAware(true);
         d = dfactory.newDocumentBuilder();
-    }
-
-
-    /**
-     * Worker method to translate String to URI.  
-     * Note: Xerces and Crimson appear to handle some URI references 
-     * differently - this method needs further work once we figure out 
-     * exactly what kind of format each parser wants (esp. considering 
-     * relative vs. absolute references).
-     * @param String path\filename of test file
-     * @return URL to pass to SystemId
-     */
-    public String filenameToURI(String filename)
-    {
-        File f = new File(filename);
-        String tmp = f.getAbsolutePath();
-	    if (File.separatorChar == '\\') {
-	        tmp = tmp.replace('\\', '/');
-	    }
-        return "file:///" + tmp;
     }
 
 
