@@ -82,11 +82,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import org.w3c.dom.Node;
 
-// Xalan-J 2.x serializers (sould be changed to use just 
-//  identity transformer for this functionality)
-import org.apache.xalan.serialize.SerializerFactory;
-import org.apache.xalan.serialize.Serializer;
-
 // java classes
 import java.io.File;
 import java.io.FileOutputStream;
@@ -326,11 +321,18 @@ public class SAXResultAPITest extends XSLProcessorTestBase
             // Use simple Xalan serializer for disk output, setting 
             //  the stylesheet's output properties into it
             Properties outProps = streamTemplates.getOutputProperties();
-            Serializer serializer = SerializerFactory.getSerializer(outProps);
+            // Use a TransformerHandler for serialization: this 
+            //  supports ContentHandler and can replace the 
+            //  Xalan/Xerces specific Serializers we used to use
+            TransformerHandler tHandler = saxFactory.newTransformerHandler();
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
-            reporter.logTraceMsg("serializer.setOutputStream(new FileOutputStream(" + outNames.currentName() + ")");
-            serializer.setOutputStream(fos);
-            SAXResult saxResult = new SAXResult(serializer.asContentHandler());
+            //Serializer serializer = SerializerFactory.getSerializer(outProps);
+            //reporter.logTraceMsg("serializer.setOutputStream(new FileOutputStream(" + outNames.currentName() + ")");
+            //serializer.setOutputStream(fos);
+            //SAXResult saxResult = new SAXResult(serializer.asContentHandler()); // use other ContentHandler 
+            Result realResult = new StreamResult(fos);
+            tHandler.setResult(realResult);
+            SAXResult saxResult = new SAXResult(tHandler);
             
             // Just do a normal transform to this result
             Transformer transformer = streamTemplates.newTransformer();

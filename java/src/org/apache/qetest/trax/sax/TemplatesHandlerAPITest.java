@@ -84,11 +84,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import org.w3c.dom.Node;
 
-// Xalan-J 2.x serializers (sould be changed to use just 
-//  identity transformer for this functionality)
-import org.apache.xalan.serialize.SerializerFactory;
-import org.apache.xalan.serialize.Serializer;
-
 // java classes
 import java.io.File;
 import java.io.FileOutputStream;

@@ -93,11 +93,6 @@ import javax.xml.transform.stream.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-// Xalan-specific serializers for sax-to-sax flavor
-import org.apache.xalan.serialize.SerializerFactory;
-import org.apache.xalan.serialize.Serializer;
-import org.apache.xalan.templates.OutputProperties;
-
 
 /**
  * Implementation of a ProcessorWrapper for a TrAX-compilant XSLT processor.

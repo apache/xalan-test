@@ -76,11 +76,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-// Use Xalan's own serializers for SAX ContentHandler output
-import org.apache.xalan.serialize.SerializerFactory;
-import org.apache.xalan.serialize.Serializer;
-import org.apache.xalan.templates.OutputProperties;
-
 // Needed SAX, DOM, JAXP classes
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -713,17 +708,16 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
         {
+            SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
             // The transformer will use a SAX parser as it's reader.
             XMLReader reader = XMLReaderFactory.createXMLReader();
             // Set the result handling to be a serialization to the file output stream.
-            Serializer serializer = SerializerFactory.getSerializer
-                                    (OutputProperties.getDefaultMethodProperties("xml"));
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
-            serializer.setOutputStream(fos);
-//            reader.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
-            reader.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
+            Result realResult = new StreamResult(fos);
+            TransformerHandler tHandler = saxTFactory.newTransformerHandler();
+            tHandler.setResult(realResult);
+            reader.setContentHandler(tHandler);
 
-            SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
             reporter.logTraceMsg("saxTFactory.newXMLFilter(new StreamSource(" + filenameToURL(xslName) + "))");
             XMLFilter filter = saxTFactory.newXMLFilter(new StreamSource(filenameToURL(xslName)));
 
@@ -779,12 +773,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
             // Set the result handling to be a serialization to the file output stream.
-            Serializer serializer = SerializerFactory.getSerializer
-                                    (OutputProperties.getDefaultMethodProperties("xml"));
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
-            serializer.setOutputStream(fos);
-//            reader.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
-            reader.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
+            Result realResult = new StreamResult(fos);
+            TransformerHandler tHandler = saxTFactory.newTransformerHandler();
+            tHandler.setResult(realResult);
+            reader.setContentHandler(tHandler);
 
             filter.setParent(reader);
 
@@ -837,12 +830,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
             // Set the result handling to be a serialization to the file output stream.
-            Serializer serializer = SerializerFactory.getSerializer
-                                    (OutputProperties.getDefaultMethodProperties("xml"));
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
-            serializer.setOutputStream(fos);
-//            reader.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
-            reader.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
+            Result realResult = new StreamResult(fos);
+            TransformerHandler tHandler = saxTFactory.newTransformerHandler();
+            tHandler.setResult(realResult);
+            reader.setContentHandler(tHandler);
             filter.setParent(reader);
 
             // Now, when you call transformer.parse, it will set itself as
@@ -899,12 +891,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             filter.setParent(reader);
             // Set the result handling to be a serialization to the file output stream.
-            Serializer serializer = SerializerFactory.getSerializer
-                                    (OutputProperties.getDefaultMethodProperties("xml"));
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
-            serializer.setOutputStream(fos);
-//            filter.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
-            filter.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
+            Result realResult = new StreamResult(fos);
+            TransformerHandler tHandler = saxTFactory.newTransformerHandler();
+            tHandler.setResult(realResult);
+            filter.setContentHandler(tHandler);
 
             // Log what output is about to be created
             reporter.logTraceMsg("filter.parse(" + xmlName + ") into: " + outNames.currentName());
