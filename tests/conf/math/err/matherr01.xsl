@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test reaction to obsolete 'quo' operator. -->
   <!-- ExpectedException: Old syntax: quo(...) is no longer defined in XPath -->
+  <!-- ExpectedException: ERROR! Unknown op code: quo --><!-- Could be improved for usability -sc -->
 
 <xsl:template match="doc">
   <out>
