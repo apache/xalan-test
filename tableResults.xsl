@@ -12,8 +12,11 @@
 <!-- Date:     10/10/2002 -->
 <!-- Purpose:  Format org.apache.qetest.XMLFileLogger logFile results 
                into a table-based HTML page -->
-<!-- Modified: 10/17/2002 removed 'trax', is 'systemId'
-               10/22/2002 takes directory as argument -->
+<!-- Modified: 10/17/2002 - removed 'trax', is 'systemId'
+               10/22/2002 - takes directory as argument
+               12/10/2002 - some bug fixes for regression checker
+                          - bug fix for 0-failure or 0-error reports
+                          - added capability to tabulate other testTypes -->
 
 <!-- Quick how to use:
 
@@ -22,7 +25,7 @@
      In Windows or UNIX, set the RESULTSCANNER environment 
      variable to tableResults.xsl
      Execute viewResults.bat results-alltest\conf\sax\results.xml.
-		 (the stylesheet will find the other xml files).
+     (the stylesheet will find the other xml files).
      In UNIX, execute viewResults.sh as above.
   2. To compare a current run against a previous run:
      Run the stylesheet with the parameter 'compareAgainst' which
@@ -31,15 +34,55 @@
      stylesheet with the parameter 'resultDir' which points to the
      results-alltest.xsltc/conf directory of the xsltc test run.
 
+  Alternate (newer) way to run based on results of a specific test:
+
+  1. build smoketest, build alltest, or build conf
+  2. Run stylesheet with the parameter 'testType' set to either smoketest,
+     alltest, or conf. tableResults will automatically choose the correct
+     output directory and names. See below.
+
 -->
+
+	
+	<!-- 4 possible modes of operation:
+	  1. Analyzing the results of an alltest.conf or alltest.accept;
+	     must specify resultDir as pointing to results-alltest/conf
+	     or results-alltest/accept. Default operation, testType="default"
+	  2. Analyzing the results of an alltest; must specify
+	     resultDir as pointing to results-alltest, testType="alltest"
+	  3. Analyzing the results of an smoketest; must specify
+	     resultDir as pointing to smoketest, testType="smoketest"
+	  4. Analyzing the results of a conf or accept; must specify resultDir
+	     as pointing to results-conf or results-accept, testType="conf"
+        -->
+	<xsl:param name="testType" select="default"/>
+	<xsl:variable name="defaultPath">
+		<xsl:choose>
+			<xsl:when test="$testType = 'alltest'">
+				<xsl:text>results-alltest</xsl:text>
+			</xsl:when>
+			<xsl:when test="$testType = 'smoketest'">
+				<xsl:text>smoketest</xsl:text>
+			</xsl:when>
+			<xsl:when test="$testType = 'conf'">
+				<xsl:text>results-conf</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>results-alltest/conf</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- Directory of results to analyze
+	     the 'default' setting should be ok if testType is used -->
+	<xsl:param name="resultDir" select="$defaultPath"/>
 
 	<!-- Directory of results to compare against
 	     Specify a directory of old results to get cross comparison. -->
-	<xsl:param name="resultDir" select="string('results-alltest/conf')"/>
 	<xsl:param name="compareAgainst" select="$resultDir"/>
 
 	<!-- Basic Structure of output document -->
-	<xsl:template match="resultsfile">
+	<xsl:template match="/">
 		<HTML>
 			<HEAD>
 				<STYLE TYPE="text/css">
@@ -49,7 +92,22 @@
 				</STYLE>
 			</HEAD>
 			<BODY>
-				<xsl:apply-templates select="testfile[last()]"/>
+				<TABLE BORDER="1" CELLPADDING="5" CELLSPACING="0">
+					<xsl:choose>
+						<xsl:when test="$testType = 'smoketest' or $testType = 'alltest'">
+							<xsl:call-template name="execute">
+								<xsl:with-param name="bucket" select="'conf'"/>
+								<xsl:with-param name="nolegend" select="1"/>
+							</xsl:call-template>
+							<xsl:call-template name="execute">
+								<xsl:with-param name="bucket" select="'accept'"/>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="execute"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</TABLE>
 			</BODY>
 		</HTML>
 	</xsl:template>
@@ -63,76 +121,119 @@
 		Test run by: <xsl:value-of select="hashtable/hashitem[@key='user.name']"/>
 		on a <xsl:value-of select="hashtable/hashitem[@key='os.arch']"/>
 		running <xsl:value-of select="hashtable/hashitem[@key='os.name']"/>
+		<xsl:if test="hashtable/hashitem[@key='processor']">
+		  <BR/>
+		  <xsl:text>Processor: </xsl:text>
+			<xsl:value-of select="hashtable/hashitem[@key='processor']"/>
+		</xsl:if>
 	</xsl:template>
   
 	<!-- Output the summary and category summaries for test sets. -->
-	<xsl:template match="testfile">
+	<xsl:template name="execute">
+		<xsl:param name="bucket" select="'conf'"/>
+		<xsl:param name="nolegend" select="0"/>
 		<!-- Set up two variables for test results, and old test results. -->
 		<xsl:variable name="resultsfile">
-			<xsl:copy-of select="document(concat($resultDir,'/dom/results.xml'))/resultsfile/testfile 
-			  | document(concat($resultDir,'/sax/results.xml'))/resultsfile/testfile 
-			  | document(concat($resultDir,'/stream/results.xml'))/resultsfile/testfile 
-			  | document(concat($resultDir,'/file/results.xml'))/resultsfile/testfile 
-			  | document(concat($resultDir,'/systemId/results.xml'))/resultsfile/testfile 
-			  | document(concat($resultDir,'/localPath/results.xml'))/resultsfile/testfile"/>
+			<xsl:choose>
+				<xsl:when test="$testType = 'alltest'">
+					<xsl:copy-of select="document(concat($resultDir,'/',$bucket,'/dom/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/',$bucket,'/sax/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/',$bucket,'/stream/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/',$bucket,'/file/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/',$bucket,'/systemId/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/',$bucket,'/localPath/results.xml'))/resultsfile/testfile"/>
+				</xsl:when>
+				<xsl:when test="$testType = 'smoketest'">
+					<xsl:copy-of select="document(concat($resultDir,'/results-',$bucket,'.xml'))/resultsfile/testfile"/>
+				</xsl:when>
+				<xsl:when test="$testType = 'conf'">
+					<xsl:copy-of select="document(concat($resultDir,'/results.xml'))/resultsfile/testfile"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="document(concat($resultDir,'/dom/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/sax/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/stream/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/file/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/systemId/results.xml'))/resultsfile/testfile 
+						| document(concat($resultDir,'/localPath/results.xml'))/resultsfile/testfile"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="oldfile">
-			<xsl:copy-of select="document(concat($compareAgainst,'/dom/results.xml'))/resultsfile/testfile 
-					| document(concat($compareAgainst,'/sax/results.xml'))/resultsfile/testfile 
-					| document(concat($compareAgainst,'/stream/results.xml'))/resultsfile/testfile 
-					| document(concat($compareAgainst,'/file/results.xml'))/resultsfile/testfile 
-					| document(concat($compareAgainst,'/systemId/results.xml'))/resultsfile/testfile 
-					| document(concat($compareAgainst,'/localPath/results.xml'))/resultsfile/testfile"/>
+			<xsl:choose>
+				<xsl:when test="$testType = 'alltest'">
+					<xsl:copy-of select="document(concat($compareAgainst,'/',$bucket,'/dom/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/',$bucket,'/sax/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/',$bucket,'/stream/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/',$bucket,'/file/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/',$bucket,'/systemId/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/',$bucket,'/localPath/results.xml'))/resultsfile/testfile"/>
+				</xsl:when>
+				<xsl:when test="$testType = 'smoketest'">
+					<xsl:copy-of select="document(concat($compareAgainst,'/results-',$bucket,'.xml'))/resultsfile/testfile"/>
+				</xsl:when>
+				<xsl:when test="$testType = 'conf'">
+					<xsl:copy-of select="document(concat($compareAgainst,'/results.xml'))/resultsfile/testfile"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="document(concat($compareAgainst,'/dom/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/sax/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/stream/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/file/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/systemId/results.xml'))/resultsfile/testfile 
+							| document(concat($compareAgainst,'/localPath/results.xml'))/resultsfile/testfile"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:variable>
 		<!-- Number of flavours; used for column widths -->
 		<xsl:variable name="flavs" select="count(xalan:nodeset($resultsfile)/testfile)"/>
-		<TABLE BORDER="1" CELLPADDING="5" CELLSPACING="0">
-			<TR>
-				<xsl:element name="TD">
-					<xsl:attribute name="COLSPAN">
-						<xsl:value-of select="$flavs + 2"/>
-					</xsl:attribute>
-					<B>Conformance Test Results on <xsl:value-of select="@time"/></B>
-				</xsl:element>
-			</TR>
-			<TR>
-				<TD COLSPAN="1"><B>Environment</B></TD>
-				<xsl:element name="TD">
-					<xsl:attribute name="COLSPAN">
-						<xsl:value-of select="$flavs + 1"/>
-					</xsl:attribute>
-					<xsl:variable name="flavor">
-						<xsl:value-of select="hashtable/hashitem[@key='flavor']"/>
-					</xsl:variable>
-					<b>Currently Tested:</b><br/>
-					<xsl:apply-templates select="." mode="hashElements"/><br/>
-					<b>Compared Against:</b><br/>
-					<xsl:apply-templates select="xalan:nodeset($oldfile)/testfile[hashtable/hashitem[@key='flavor'] = $flavor]" mode="hashElements"/>
-				</xsl:element>
-			</TR>
-			<xsl:call-template name="teststatus">
+		<TR>
+			<xsl:element name="TD">
+				<xsl:attribute name="COLSPAN">
+					<xsl:value-of select="$flavs + 2"/>
+				</xsl:attribute>
+				<B>Conformance Test Results: <xsl:value-of select="$bucket"/></B>
+			</xsl:element>
+		</TR>
+		<TR>
+			<TD COLSPAN="1"><B>Environment</B></TD>
+			<xsl:element name="TD">
+				<xsl:attribute name="COLSPAN">
+					<xsl:value-of select="$flavs + 1"/>
+				</xsl:attribute>
+				<xsl:variable name="flavor">
+					<xsl:value-of select="xalan:nodeset($resultsfile)/testfile[last()]/hashtable/hashitem[@key='flavor']"/>
+				</xsl:variable>
+				<b>Currently Tested:</b><br/>
+				<xsl:apply-templates select="xalan:nodeset($resultsfile)/testfile[last()]" mode="hashElements"/><br/>
+				<b>Compared Against:</b><br/>
+				<xsl:apply-templates select="xalan:nodeset($oldfile)/testfile[hashtable/hashitem[@key='flavor'] = $flavor]" mode="hashElements"/>
+			</xsl:element>
+		</TR>
+		<xsl:call-template name="teststatus">
+			<xsl:with-param name="resultsfile" select="$resultsfile"/>
+			<xsl:with-param name="flavs" select="$flavs"/>
+		</xsl:call-template>
+		<TR>
+			<xsl:element name="TD">
+				<xsl:attribute name="COLSPAN">
+					<xsl:value-of select="$flavs + 2"/>
+				</xsl:attribute><B>Category Summaries</B>
+			</xsl:element>
+		</TR>
+		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile[last()]/testcase">
+			<xsl:call-template name="testcase">
 				<xsl:with-param name="resultsfile" select="$resultsfile"/>
-				<xsl:with-param name="flavs" select="$flavs"/>
+				<xsl:with-param name="oldfile" select="$oldfile"/>
+				<xsl:with-param name="bg">
+					<xsl:choose>
+						<xsl:when test="position() mod 2 = 1">#F0F0F0</xsl:when>
+						<xsl:otherwise>#FFFFFF</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
 			</xsl:call-template>
-			<TR>
-				<xsl:element name="TD">
-					<xsl:attribute name="COLSPAN">
-						<xsl:value-of select="$flavs + 2"/>
-					</xsl:attribute><B>Category Summaries</B>
-				</xsl:element>
-			</TR>
-			<xsl:for-each select="testcase">
-				<xsl:call-template name="testcase">
-					<xsl:with-param name="resultsfile" select="$resultsfile"/>
-					<xsl:with-param name="oldfile" select="$oldfile"/>
-					<xsl:with-param name="bg">
-						<xsl:choose>
-							<xsl:when test="position() mod 2 = 1">#F0F0F0</xsl:when>
-							<xsl:otherwise>#FFFFFF</xsl:otherwise>
-						</xsl:choose>
-					</xsl:with-param>
-				</xsl:call-template>
-			</xsl:for-each>
+		</xsl:for-each>
+		<xsl:if test="not($nolegend)">
 			<TR>
 				<xsl:element name="TD">
 					<xsl:attribute name="COLSPAN">
@@ -155,7 +256,7 @@
 					</UL>
 				</xsl:element>
 			</TR>
-		</TABLE>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="testcase">
@@ -355,7 +456,7 @@
 					</FONT>
 					<xsl:call-template name="diff">
 						<xsl:with-param name="newlist" select="substring-after($newlist,' ')"/>
-						<xsl:with-param name="oldlist" select="substring-after($oldlist,' ')"/>
+						<xsl:with-param name="oldlist" select="$oldlist"/>
 					</xsl:call-template>
 				</xsl:when>
 			</xsl:choose>
@@ -411,56 +512,56 @@
 	<xsl:template name="totalCases">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Pass-cases + @Fail-cases + @Errr-cases"/></TD>
+			<TD><xsl:value-of select="sum(@Pass-cases) + sum(@Fail-cases) + sum(@Errr-cases)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="passCases">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Pass-cases"/></TD>
+			<TD><xsl:value-of select="sum(@Pass-cases)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="failCases">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Fail-cases"/></TD>
+			<TD><xsl:value-of select="sum(@Fail-cases)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="errrCases">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Errr-cases"/></TD>
+			<TD><xsl:value-of select="sum(@Errr-cases)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="totalChecks">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Pass-checks + @Fail-checks + @Errr-checks"/></TD>
+			<TD><xsl:value-of select="sum(@Pass-checks) + sum(@Fail-checks) + sum(@Errr-checks)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="passChecks">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Pass-checks"/></TD>
+			<TD><xsl:value-of select="sum(@Pass-checks)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="failChecks">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Fail-checks"/></TD>
+			<TD><xsl:value-of select="sum(@Fail-checks)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="errrChecks">
 		<xsl:param name="resultsfile"/>
 		<xsl:for-each select="xalan:nodeset($resultsfile)/testfile/teststatus">
-			<TD><xsl:value-of select="@Errr-checks"/></TD>
+			<TD><xsl:value-of select="sum(@Errr-checks)"/></TD>
 		</xsl:for-each>
 	</xsl:template>
 
