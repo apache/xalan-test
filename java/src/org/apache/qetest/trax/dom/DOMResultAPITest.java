@@ -80,6 +80,7 @@ import org.w3c.dom.Node;
 
 // java classes
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Properties;
 
 //-------------------------------------------------------------------------
@@ -103,6 +104,11 @@ public class DOMResultAPITest extends XSLProcessorTestBase
      * Public members include inputName (for xsl); xmlName; goldName; etc.
      */
     protected XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+
+    /** 
+     * Information about an xsl/xml file pair for transforming with import/include.  
+     */
+    protected XSLTestfileInfo impInclFileInfo = new XSLTestfileInfo();
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_DOM_SUBDIR = "trax" + File.separator + "dom";
@@ -145,6 +151,10 @@ public class DOMResultAPITest extends XSLProcessorTestBase
         testFileInfo.inputName = testBasePath + "DOMTest.xsl";
         testFileInfo.xmlName = testBasePath + "DOMTest.xml";
         testFileInfo.goldName = goldBasePath + "DOMTest.out";
+
+        impInclFileInfo.inputName = testBasePath + "DOMImpIncl.xsl";
+        impInclFileInfo.xmlName = testBasePath + "DOMImpIncl.xml";
+        impInclFileInfo.goldName = testBasePath + "DOMImpIncl.out";
         try
         {
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -216,6 +226,7 @@ public class DOMResultAPITest extends XSLProcessorTestBase
 
     /**
      * Basic functionality of DOMResults.
+     * Test 'blank' Result; reuse Results; swap Nodes; etc.
      *
      * @return false if we should abort the test; true otherwise
      */
@@ -223,43 +234,195 @@ public class DOMResultAPITest extends XSLProcessorTestBase
     {
         reporter.testCaseInit("Basic functionality of DOMResults");
 
+        DocumentBuilder docBuilder = null;
         TransformerFactory factory = null;
         Templates templates = null;
         Transformer transformer = null;
         Node xmlNode = null;
         Node xslNode = null;
+        Node xslImpInclNode = null;
+        Node xmlImpInclNode = null;
         try
         {
             factory = TransformerFactory.newInstance();
             DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
             dfactory.setNamespaceAware(true);
-            DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+            docBuilder = dfactory.newDocumentBuilder();
             reporter.logTraceMsg("parsing xml, xsl files");
             xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
             xmlNode = docBuilder.parse(new InputSource(testFileInfo.xmlName));
-            
-            // Try to get templates, transformer from node
-            DOMSource xslDOM = new DOMSource(xslNode);
-            templates = factory.newTemplates(xslDOM);
-            DOMSource xmlDOM = new DOMSource(xmlNode);
-            
-            DOMResult blankDOM = new DOMResult();
-            transformer = templates.newTransformer();
-            transformer.transform(xmlDOM, blankDOM);
-            reporter.logTraceMsg("blankDOM is now: " + blankDOM);
-            reporter.checkAmbiguous("More tests to be added!");            
-            
+            xslImpInclNode = docBuilder.parse(new InputSource(impInclFileInfo.inputName));
+            xmlImpInclNode = docBuilder.parse(new InputSource(impInclFileInfo.xmlName));
         }
         catch (Throwable t)
         {
             reporter.checkFail("Problem creating factory; can't continue testcase");
             reporter.logThrowable(reporter.ERRORMSG, t,
                                   "Problem creating factory; can't continue testcase");
+            reporter.testCaseClose();
             return true;
+        }
+        try
+        {
+            // Try to get templates, transformer from node
+            DOMSource xslSource = new DOMSource(xslNode);
+            templates = factory.newTemplates(xslSource);
+            DOMSource xmlSource = new DOMSource(xmlNode);
+            
+            // Transforming into a DOMResult with a node is already 
+            //  well covered in DOMSourceAPITest and elsewhere
+            // Verify a 'blank' Result object gets filled up properly
+            DOMResult blankResult = new DOMResult();
+            transformer = templates.newTransformer();
+            transformer.transform(xmlSource, blankResult);
+            reporter.logTraceMsg("blankResult is now: " + blankResult);
+            Node blankNode = blankResult.getNode();
+            if (blankNode != null)
+            {
+                serializeDOMAndCheck(blankNode, testFileInfo.goldName, "transform into blank DOMResult");
+            }
+            else
+            {
+                reporter.checkFail("transform into 'blank' DOMResult");
+            }
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with blank results");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem with blank results");
+        }
+        try
+        {
+            DOMSource xmlSource = new DOMSource(xmlNode);
+            DOMSource xslSource = new DOMSource(xslNode);
+            templates = factory.newTemplates(xslSource);
+            
+            // Reuse the same result for multiple transforms
+            DOMResult reuseResult = new DOMResult(docBuilder.newDocument());
+            transformer = templates.newTransformer();
+            transformer.transform(xmlSource, reuseResult);
+            Node reuseNode = reuseResult.getNode();
+            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reuseable1 DOMResult");
+            
+            // Get a new transformer just to avoid extra complexity
+            reporter.logTraceMsg("About to re-use DOMResult from previous transform as-is");
+            transformer = templates.newTransformer();
+            transformer.transform(xmlSource, reuseResult); // SPR SCUU4RJKG4 throws DOM006
+            reuseNode = reuseResult.getNode();
+            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reused1 DOMResult");
+
+            // Reuse again, with the same transformer
+            transformer.transform(xmlSource, reuseResult);
+            reuseNode = reuseResult.getNode();
+            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reused1 DOMResult again");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with re-using results(1)");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem with re-using results(1)");
+        }
+        try
+        {
+            DOMSource xmlSource = new DOMSource(xmlNode);
+            DOMSource xslSource = new DOMSource(xslNode);
+            templates = factory.newTemplates(xslSource);
+            
+            // Reuse the same result for multiple transforms, after resetting node
+            DOMResult reuseResult = new DOMResult(docBuilder.newDocument());
+            transformer = templates.newTransformer();
+            transformer.transform(xmlSource, reuseResult);
+            Node reuseNode = reuseResult.getNode();
+            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reuseable2 DOMResult");
+            
+            // Get a new transformer just to avoid extra complexity
+            reporter.logTraceMsg("About to re-use DOMResult from previous transform after setNode()");
+            transformer = templates.newTransformer();
+            reuseResult.setNode(docBuilder.newDocument());
+            transformer.transform(xmlSource, reuseResult);
+            reuseNode = reuseResult.getNode();
+            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reused2 DOMResult");
+
+            // Reuse again, with the same transformer
+            reuseResult.setNode(docBuilder.newDocument());
+            transformer.transform(xmlSource, reuseResult);
+            reuseNode = reuseResult.getNode();
+            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reused2 DOMResult again");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with re-using results(2)");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem with re-using results(2)");
         }
 
         reporter.testCaseClose();
         return true;
+    }
+
+
+    /**
+     * Worker method to serialize DOM and fileChecker.check().  
+     * @return true if pass, false otherwise
+     */
+    public boolean serializeDOMAndCheck(Node dom, String goldFileName, String comment)
+    {
+        if ((dom == null) || (goldFileName == null))
+        {
+            reporter.logWarningMsg("serializeDOMAndCheck of null dom or goldFileName!");
+            return false;
+        }
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            if (factory.getFeature(StreamResult.FEATURE))
+            {
+                // Use identity transformer to serialize
+                Transformer identityTransformer = factory.newTransformer();
+                StreamResult streamResult = new StreamResult(new FileOutputStream(outNames.nextName()));
+                DOMSource nodeSource = new DOMSource(dom);
+                reporter.logTraceMsg("serializeDOMAndCheck() into " + outNames.currentName());
+                identityTransformer.transform(nodeSource, streamResult);
+                fileChecker.check(reporter, 
+                                  new File(outNames.currentName()), 
+                                  new File(goldFileName), 
+                                  comment + " into " + outNames.currentName());
+                return true;    // Note: should check return from fileChecker.check!
+            }
+            else
+            {   // We should try another method to serialize the data
+                reporter.logWarningMsg("getFeature(StreamResult.FEATURE), can't validate serialized data");
+                return false;
+            }
+            
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("serializeDOMAndCheckFile threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "serializeDOMAndCheckFile threw:");
+            return false;
+        }
+    }
+
+
+    /**
+     * Worker method to translate String to URI.  
+     * Note: Xerces and Crimson appear to handle some URI references 
+     * differently - this method needs further work once we figure out 
+     * exactly what kind of format each parser wants (esp. considering 
+     * relative vs. absolute references).
+     * @param String path\filename of test file
+     * @return URL to pass to SystemId
+     */
+    public String filenameToURI(String filename)
+    {
+        File f = new File(filename);
+        String tmp = f.getAbsolutePath();
+	    if (File.separatorChar == '\\') {
+	        tmp = tmp.replace('\\', '/');
+	    }
+        return "file:///" + tmp;
     }
 
 
