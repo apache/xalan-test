@@ -11,6 +11,9 @@ if [ "$1" = "-h" ] ; then
     echo   Example: build api -DtestClass=TransformerAPITest -Dqetest.loggingLevel=30
     exit 1
 fi
+CLS_PATH_SEP=:
+# if we're on windows, override that:
+uname | grep WIN && CLS_PATH_SEP=\;
 
 # If PARSER_JAR is not set, default to xercesImpl.jar
 if [ "$PARSER_JAR" = "" ] ; then
@@ -51,32 +54,32 @@ do
     # if the directory is empty, then it will return the input string
     # this is stupid, so check for it
     if [ "$i" != "${DIRLIBS}" ] ; then
-        _ANT_CP=$_ANT_CP:"$i"
+        _ANT_CP=$_ANT_CP${CLS_PATH_SEP}"$i"
     fi
 done
 
 # If JARDIR is set, prepend all .jars there to our classpath
 if [ "$JARDIR" != "" ] ; then
-    CLASSPATH=${_ANT_CP}:${CLASSPATH}
+    CLASSPATH=${_ANT_CP}${CLS_PATH_SEP}${CLASSPATH}
 
     DIRLIBS=${JARDIR}/*.jar
     for i in ${DIRLIBS}
     do
         if [ "$i" != "${DIRLIBS}" ] ; then
-            CLASSPATH="$i":${CLASSPATH}
+            CLASSPATH="$i"${CLS_PATH_SEP}${CLASSPATH}
         fi
     done
 else
-    CLASSPATH=${CLASSPATH}:${_ANT_CP}:${PARSER_JAR}:${XML_APIS_JAR}
+    CLASSPATH=${CLASSPATH}${CLS_PATH_SEP}${_ANT_CP}${CLS_PATH_SEP}${PARSER_JAR}${CLS_PATH_SEP}${XML_APIS_JAR}
 fi
 
 if [ "$JAVA_HOME" != "" ] ; then
   if test -f $JAVA_HOME/lib/tools.jar ; then
-    CLASSPATH=${CLASSPATH}:${JAVA_HOME}/lib/tools.jar
+    CLASSPATH=${CLASSPATH}${CLS_PATH_SEP}${JAVA_HOME}/lib/tools.jar
   fi
 
   if test -f $JAVA_HOME/lib/classes.zip ; then
-    CLASSPATH=${CLASSPATH}:${JAVA_HOME}/lib/classes.zip
+    CLASSPATH="${CLASSPATH}${CLS_PATH_SEP}${JAVA_HOME}/lib/classes.zip"
   fi
 else
   echo "Warning: JAVA_HOME environment variable is not set."
@@ -97,7 +100,7 @@ fi
 # also pass along the selected parser to Ant
 ANT_OPTS="${ANT_OPTS} -Dparserjar=${PARSER_JAR}"
 
-echo Running: $JAVACMD ${JAVA_OPTS} -classpath "${CLASSPATH}" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
+echo Running:  $JAVACMD ${JAVA_OPTS} -classpath "${CLASSPATH}" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
 $JAVACMD ${JAVA_OPTS} -classpath "${CLASSPATH}" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
 
 echo "build.sh complete!"
