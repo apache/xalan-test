@@ -671,7 +671,10 @@ public class XMLFileLogger implements Logger
                            Object msg)
     {
 
-        if (isReady())
+        if (isReady()
+            && (element != null)
+            && (attrs != null)
+           )
         {
             reportPrinter.println("<" + element + " " + ATTR_LEVEL + "=\""
                                   + level + "\"");
@@ -685,9 +688,10 @@ public class XMLFileLogger implements Logger
                                       + attrs.get(key).toString() + "\"");
             }
 
-            reportPrinter.print(">");
-            reportPrinter.println(msg.toString());
-            reportPrinter.print("></" + element + ">");
+            reportPrinter.println(">");
+            if (msg != null)
+                reportPrinter.println(msg.toString());
+            reportPrinter.println("</" + element + ">");
         }
     }
 
