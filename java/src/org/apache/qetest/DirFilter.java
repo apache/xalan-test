@@ -73,7 +73,8 @@ public class DirFilter extends IncludeExcludeFilter
     /** Initialize for defaults (not using inclusion list).  */
     public DirFilter()
     {
-        setUseIncludesOnly(true);
+        // Default is to not use includes; just get all dirs
+        setUseIncludesOnly(false);
     }
 
     /**
@@ -86,7 +87,12 @@ public class DirFilter extends IncludeExcludeFilter
     {
         setIncludes(inc);
         setExcludes(exc);
-        setUseIncludesOnly(true);
+        // Only use includes only if they're set
+        //refactor: logic might better be put in IncludeExcludeFilter
+        if ((null != inc) && (inc.length() > 0))
+            setUseIncludesOnly(true);
+        else
+            setUseIncludesOnly(false);
     }
 
     /**
