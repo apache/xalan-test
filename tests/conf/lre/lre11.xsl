@@ -14,8 +14,11 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.2 Stylesheet Element -->
   <!-- Creator: Paul Dick -->
+  <!-- AdditionalSpec: 2.1 of XSLT for namespaces on attributes -->
   <!-- Purpose: Testing the xsl:transform element and its attributes. english
-       attribute and ped,bdd namespace nodes are all that should be output. -->
+       attribute and #default,ped,bdd namespace nodes are all that should be output.
+       (#default is used.) xsl:if must be assumed to be a directive to the processor,
+       so it could raise an error. -->
 
 <xsl:template match="doc">
   <out xsl:if= "my if" english="to leave"/>
