@@ -100,7 +100,7 @@
         <pathelement path="${java.class.path}" />
     </path>
 
-    <path id="runexamplestest.class.path">
+    <path id="runapitests.class.path">
         <pathelement path="${build.dir}/${testxsl.jar.name}" />
         <pathelement path="${prepend.class.path}" />
         <pathelement path="${java.class.path}" />
@@ -241,19 +241,23 @@
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
                includes="${test.root}trax/*.java"
-               debug="${debug}" />
+               debug="${debug}"
+               classpathref="compiletest.class.path" />
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
                includes="${test.root}trax/stream/*.java"
-               debug="${debug}" />
+               debug="${debug}"
+               classpathref="compiletest.class.path" />
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
                includes="${test.root}trax/dom/*.java"
-               debug="${debug}" />
+               debug="${debug}"
+               classpathref="compiletest.class.path" />
         <javac srcdir="${src.dir}" 
                destdir="${build.dir}" 
                includes="${test.root}trax/sax/*.java"
-               debug="${debug}" />
+               debug="${debug}"
+               classpathref="compiletest.class.path" />
     </target>
     <target name="package.trax" depends="compile.trax"
             description="Build testxsl.jar for testing Xalan-J 2.x" >
@@ -316,7 +320,8 @@
         <property name="results.dir" value="../results-minitest" />
         <property name="results.xml" value="${results.dir}/Minitest.xml" />
         <property name="results.html" value="${results.dir}/Minitest.html" />
-        <property name="results.marker" value="${results.dir}/Minitest.Pass" />
+        <!-- Coordinate results.marker with Reporter.writeResultsStatus(true) -->
+        <property name="results.marker" value="${results.dir}/Pass-Minitest.xml" />
         <echo message=" [minitest] Compile the Minitest." />
         <javac srcdir="${test.dir}trax" 
                destdir="${build.dir}" 
@@ -416,9 +421,9 @@
     -->
     <target name="conftest-xalan2" depends="compile.xsl,compile.trax.xslwrappers" >
         <property name="conftest-results.dir" value="../results-conftest" />
-        <property name="conftest-results.xml" value="${conftest-results.dir}/ConformanceTest.xml" />
-        <property name="conftest-results.html" value="${conftest-results.dir}/ConformanceTest.html" />
-        <property name="conftest-results.marker" value="${conftest-results.dir}/ConformanceTest.Pass" />
+        <property name="conftest-results.xml" value="${conftest-results.dir}/conf.xml" />
+        <property name="conftest-results.html" value="${conftest-results.dir}/conf.html" />
+        <property name="conftest-results.marker" value="${conftest-results.dir}/Pass-StylesheetTestletDriver.xml" />
 
         <!--  [conftest] Compile the ConformanceTest - already done by depends="compile.xsl" -->
 
@@ -428,7 +433,7 @@
              includes="**/*.class,**/*.properties" />
 
         <echo message=" [conftest] Run the ConformanceTest." />
-        <java classname="org.apache.qetest.xsl.ConformanceTest"
+        <java classname="org.apache.qetest.xsl.StylesheetTestletDriver"
               classpathref="runconftest.class.path"
               fork="${fork-tests}"
               failonerror="yes">
@@ -441,15 +446,15 @@
             <arg value="-logFile" />
             <arg path="${conftest-results.xml}" />
             <arg value="-loggingLevel" />
-            <arg value="${test.loggingLevel}" />
+            <arg value="99" />
+            <arg value="-ConsoleLogger.loggingLevel" />
+            <arg value="20" />
             <arg value="-flavor" />
             <arg value="${test.flavor}" />
 			<arg value="-excludes"/>
             <arg value="${test.excludes}" />
 			<arg value="-embedded"/>
             <arg value="${test.embedded}" />
-            <arg value="-noErrTest" />
-            <arg value="true" />
             <!-- Nice-to-have: simple way to specify -category foo 
                  here, so users could just run one directory of 
                  files. For now, you have to do that from the 
@@ -468,7 +473,7 @@
                style="../viewResults.xsl"
                basedir="${conftest-results.dir}"
                destdir="${conftest-results.dir}"
-               includes="ConformanceTest.xml" />
+               includes="conf.xml" />
     </target>
     <target name="conftest-pass" if="conftest-passed">
         <echo message=" [conftest] CONGRATULATIONS! The ConformanceTest passed!" />
@@ -486,76 +491,65 @@
     <!-- =================================================================== -->
     <!-- Worker targets to compile and run the examples test              -->
     <!-- =================================================================== -->
-    <target name="examplestest-xalan1" depends="compile.xsl"> 
-        <echo message=" [examplestest] SORRY! examplestest.xalan1 is not implemented yet!" />
+    <target name="apitests-xalan1" depends="compile.xsl"> 
+        <echo message=" [apitests] SORRY! apitests.xalan1 is not implemented yet!" />
     </target>
-    <target name="examplestest-xalan2" depends="compile.xsl" >
-        <property name="examplestest-results.dir" value="../results-examplestest" />
-        <property name="examplestest-results.xml" value="${examplestest-results.dir}/ExamplesTest.xml" />
-        <property name="examplestest-results.html" value="${examplestest-results.dir}/ExamplesTest.html" />
-        <property name="examplestest-results.marker" value="${examplestest-results.dir}/ExamplesTest.Pass" />
-        <echo message=" [examplestest] Compile the ExamplesTest." />
-        <javac srcdir="${test.dir}trax" 
-               destdir="${build.dir}" 
-               includes="ExamplesTest.java"
-               debug="${debug}" 
-               classpathref="compiletest.class.path" />
+    <target name="apitests-xalan2" depends="compile.trax" >
+        <property name="known-good-apitests" 
+                  value="trax.TemplatesAPITest;trax.TransformerAPITest;trax.TransformerFactoryAPITest;trax.stream.StreamResultAPITest;trax.stream.StreamSourceAPITest;trax.dom.DOMResultAPITest;trax.dom.DOMSourceAPITest;trax.sax.SAXResultAPITest;trax.sax.SAXSourceAPITest;trax.sax.SAXTransformerFactoryAPITest;trax.sax.TemplatesHandlerAPITest;trax.sax.TransformerHandlerAPITest;trax.SystemIdTest;trax.SystemIdImpInclTest;trax.EmbeddedStylesheetTest;trax.OutputPropertiesTest;trax.URIResolverTest;trax.ErrorListenerAPITest;trax.ErrorListenerTest;trax.ExamplesTest" />
+        <property name="apitests-results.dir" value="../results-apitests" />
+        <property name="apitests-results.xml" value="${apitests-results.dir}/Harness.xml" />
+        <property name="apitests-results.html" value="${apitests-results.dir}/Harness.html" />
+        <property name="apitests-results.marker" value="${apitests-results.dir}/Pass-Harness.xml" />
 
-        <echo message=" [examplestest] Jar the ExamplesTest" />
+        <echo message=" [apitests] Jar the API Tests" />
         <jar jarfile="${build.dir}/${testxsl.jar.name}" 
              basedir="${build.dir}" 
              includes="**/*.class,**/*.properties" />
 
-        <echo message=" [examplestest] Run the ExamplesTest." />
-        <java classname="org.apache.qetest.trax.ExamplesTest"
-              classpathref="runexamplestest.class.path"
+        <echo message=" [apitests] Run various API tests." />
+        <java classname="org.apache.qetest.xsl.XSLTestHarness"
+              classpathref="runapitests.class.path"
               fork="${fork-tests}"
               failonerror="no">
-            <arg value="-inputDir" />
-            <arg path="${tests.root}/api" />
-            <arg value="-goldDir" />
-            <arg path="${tests.root}/examples-gold" />
-            <arg value="-outputDir" />
-            <arg path="${examplestest-results.dir}" />
-            <arg value="-logFile" />
-            <arg path="${examplestest-results.xml}" />
-            <arg value="-loggingLevel" />
-            <arg value="${test.loggingLevel}" />
-            <arg value="-flavor" />
-            <arg value="${test.flavor}" />
+            <!-- Note that the harness simply takes a properties 
+                 file to load options from, it does not parse 
+                 command line args like other tests do. 
+            -->
+            <arg path="../apitests-xalan2.prop" />
         </java>
         <!-- Set properties for running other targets -->
-        <available file="${examplestest-results.marker}" property="examplestest-passed" />
+        <available file="${apitests-results.marker}" property="apitests-passed" />
     </target>
 
-    <!-- Common worker targets for other examplestest targets to call -->
-    <target name="examplestest-report" if="xalan-liaison">
-        <echo message=" [examplestest] Create ExamplesTest report" />
+    <!-- Common worker targets for other apitests targets to call -->
+    <target name="apitests-report" if="xalan-liaison">
+        <echo message=" [apitests] Create API tests report" />
         <style processor="xalan"
-               style="../viewResults.xsl"
+               style="../viewHarnessResults.xsl"
                basedir="${results.dir}"
                destdir="${results.dir}"
-               includes="ExamplesTest.xml" />
+               includes="Harness.xml" />
     </target>
-    <target name="examplestest-pass" if="examplestest-passed">
-        <echo message=" [examplestest] CONGRATULATIONS! The ExamplesTest passed!" />
-        <echo message=" [examplestest] See details in ${examplestest-results.html}" />
+    <target name="apitests-pass" if="apitests-passed">
+        <echo message=" [apitests] CONGRATULATIONS! The API tests passed!" />
+        <echo message=" [apitests] See details in ${apitests-results.html}" />
     </target>
-    <target name="examplestest-not-pass" unless="examplestest-passed">
-        <echo message=" [examplestest] ERROR! The ExamplesTest failed!" />
-        <echo message=" [examplestest] See details in ${examplestest-results.xml} or ${examplestest-results.html}" />
-        <echo message=" [examplestest] Please fix any ExamplesTest problems before checking in!" />
-        <fail message="Please fix any ExamplesTest problems before checking in!" />
+    <target name="apitests-not-pass" unless="apitests-passed">
+        <echo message=" [apitests] ERROR! The API tests failed!" />
+        <echo message=" [apitests] See details in ${apitests-results.xml} or ${apitests-results.html}" />
+        <echo message=" [apitests] Please fix any API tests problems before checking in!" />
+        <fail message="Please fix any API tests problems before checking in!" />
     </target>
 
     <!-- =================================================================== -->
     <!-- Run a general smoke test composed of other tests                    -->
     <!-- =================================================================== -->
 	<target name="smoketest-xalan2" 
-	        depends="conftest-xalan2, minitest-xalan2, examplestest-xalan2, 
+	        depends="conftest-xalan2, minitest-xalan2, apitests-xalan2, 
 	        conftest-report,conftest-not-pass,conftest-pass,
 	        minitest-report,minitest-not-pass,minitest-pass,
-	        examplestest-report,examplestest-not-pass,examplestest-pass"/>
+	        apitests-report,apitests-not-pass,apitests-pass"/>
 
 
     <!-- =================================================================== -->
