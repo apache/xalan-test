@@ -6,7 +6,7 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 12.3 -->
   <!-- Creator: David Marston -->
-  <!-- Purpose: Test repeat declaration of decimal-format, named the same. -->
+  <!-- Purpose: Test repeat declaration of decimal-format, named the same, but different settings. -->
   <!-- ExpectedException: xsl:decimal-format names must be unique. -->
 
 <xsl:decimal-format name="myminus" minus-sign='_' />
