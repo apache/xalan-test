@@ -56,6 +56,7 @@
  */
 package org.apache.qetest.xslwrapper;
 
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.ErrorListener;
@@ -122,23 +123,27 @@ public abstract class TraxWrapperUtils
 
 
     /**
-     * Apply specific Attributes to a TransformerFactory OR call 
-     * specific setFoo() API's on a TransformerFactory.  
+     * Apply specific Attributes to a TransformerFactory OR 
+     * Transformer, OR call specific setFoo() API's on a 
+     * TransformerFactory OR Transformer.  
      *
      * Filters on hashkeys.startsWith("Processor.setAttribute.")
      * Most Attributes are simply passed to factory.setAttribute(), 
      * however certain special cases are handled:
      * setURIResolver, setErrorListener.
-     * Exceptions thrown by underlying factory are ignored.
+     * Exceptions thrown by underlying transformer are propagated.
+     * 
+     * This takes an Object so that an underlying worker method can 
+     * process either a TransformerFactory or a Transformer.
      *
      * @param factory TransformerFactory to call setAttributes on.
      * @param attrs Hashtable of potential attributes to set.
      */
-    public static void setAttributes(TransformerFactory factory, 
+    public static void setAttributes(Object setPropsOn, 
                                      Hashtable attrs)
                                      throws IllegalArgumentException
     {
-        if ((null == factory) || (null == attrs))
+        if ((null == setPropsOn) || (null == attrs))
             return;
 
         Enumeration attrKeys = null;
@@ -162,7 +167,12 @@ public abstract class TraxWrapperUtils
                 // Strip off our marker for the property name
                 String processorKey = key.substring(TransformWrapper.SET_PROCESSOR_ATTRIBUTES.length());
                 Object value = attrs.get(key);
-                setAttribute(factory, processorKey, value);
+                // Ugly, but it works -sc
+                if (setPropsOn instanceof TransformerFactory)
+                    setAttribute((TransformerFactory)setPropsOn, processorKey, value);
+                else if (setPropsOn instanceof Transformer)
+                    setAttribute((Transformer)setPropsOn, processorKey, value);
+                // else - ignore it, no-op    
             }
         }
 
@@ -183,8 +193,9 @@ public abstract class TraxWrapperUtils
      * Most Attributes are simply passed to factory.setAttribute(), 
      * however certain special cases are handled:
      * setURIResolver, setErrorListener.
-     * Exceptions thrown by underlying factory are ignored.
+     * Exceptions thrown by underlying transformer are propagated.
      *
+     * @see setAttribute(Transformer, String, Object)
      * @param factory TransformerFactory to call setAttributes on.
      * @param key specific attribute or special case attr.
      * @param value to set for key.
@@ -213,6 +224,47 @@ public abstract class TraxWrapperUtils
         {
             // General case; just call setAttribute
             factory.setAttribute(key, value);
+        }
+    }
+
+
+    /**
+     * Apply specific Attributes to a Transformer OR call 
+     * specific setFoo() API's on a Transformer.  
+     *
+     * Filters on hashkeys.startsWith("Processor.setAttribute.")
+     * Only certain special cases are handled:
+     * setURIResolver, setErrorListener.
+     * Exceptions thrown by underlying transformer are propagated.
+     *
+     * @see setAttribute(TransformerFactory, String, Object)
+     * @param factory TransformerFactory to call setAttributes on.
+     * @param key specific attribute or special case attr.
+     * @param value to set for key.
+     */
+    private static void setAttribute(Transformer transformer, 
+                                     String key, 
+                                     Object value)
+                                     throws IllegalArgumentException
+    {
+        if ((null == transformer) || (null == key))
+            return;
+
+        // Note: allow exceptions to propagate here
+
+        // Check if this is a special case to call a specific 
+        //  API, or the general case to call setAttribute(key...)
+        if (SET_URI_RESOLVER.equals(key))
+        {
+            transformer.setURIResolver((URIResolver)value);
+        }
+        else if (SET_ERROR_LISTENER.equals(key))
+        {
+            transformer.setErrorListener((ErrorListener)value);
+        }
+        else
+        {
+            // General case; no-op; no equivalent
         }
     }
 }
