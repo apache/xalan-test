@@ -77,7 +77,7 @@
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
     <property name="xml-apis.jar" value="${xalan.bin.dir}/xml-apis.jar"/>
-    <property name="parserjar" value="${xalan.bin.dir}/xerces.jar"/>
+    <property name="parserjar" value="${xalan.bin.dir}/xercesImpl.jar"/>
     <property name="bsf.jar" value="${xalan.bin.dir}/bsf.jar"/>
     <!-- The js.jar is for Javascript extensions tests; you must 
          get this .jar yourself.  Feel free to reset the location.
@@ -942,7 +942,7 @@
     <!-- Actually, I'd like to figure out some sneaky Ant trick to 
          allow swapping of parts of classpaths (i.e. swap in xsltc.jar 
          and related files instead of xalan.jar; likewise replace 
-         xerces.jar with the PARSER_JAR defined outside) to clean 
+         xercesImpl.jar with the PARSER_JAR defined outside) to clean 
          this section up.  But for the time being I'm planning on 
          simply maintaining separate-but-equal targets.xsltc
     -->

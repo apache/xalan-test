@@ -12,9 +12,9 @@ if [ "$1" = "-h" ] ; then
     exit 1
 fi
 
-# If PARSER_JAR is not set, default to xerces.jar
+# If PARSER_JAR is not set, default to xercesImpl.jar
 if [ "$PARSER_JAR" = "" ] ; then
-    PARSER_JAR=xerces.jar
+    PARSER_JAR=xercesImpl.jar
 fi
 
 if [ "$ANT_HOME" = "" ] ; then
