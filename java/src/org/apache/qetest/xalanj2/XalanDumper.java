@@ -58,6 +58,8 @@
 package org.apache.qetest.xalanj2;
 import org.apache.qetest.*;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -109,8 +111,10 @@ public abstract class XalanDumper
     /** Simple output formats: a contained object.  */
     public static final int DUMP_CONTAINED = 2;
     /** Simple output formats: don't close block.  */
-    public static final int DUMP_NOCLOSE = 3;
+    public static final int DUMP_NOCLOSE = 4;
 
+    /** Cheap-o recursion marker: already recursing in Nodes/NodeLists.  */
+    public static final int DUMP_NODE_RECURSION = 16;
 
     /**
      * Return String describing an ElemTemplateElement.
@@ -252,8 +256,43 @@ public abstract class XalanDumper
     {
         if (null == n)
             return "Node" + LBRACKET + NULL + RBRACKET;
-        return "Node" + LBRACKET 
-            + org.apache.xalan.trace.TracerEvent.printNode(n) + RBRACKET;
+
+        // Copied but modified from TracerEvent; ditch hashCode
+        StringBuffer buf = new StringBuffer();
+
+        if (n instanceof Element)
+        {
+            buf.append(n.getNodeName());
+
+            Node c = n.getFirstChild();
+
+            while (null != c)
+            {
+                if (c instanceof Attr)
+                {
+                    buf.append(dump(c, dumpLevel | DUMP_NODE_RECURSION) + " ");
+                }
+                c = c.getNextSibling();
+            }
+        }
+        else
+        {
+            if (n instanceof Attr)
+            {
+                buf.append(n.getNodeName() + "=" + n.getNodeValue());
+            }
+            else
+            {
+                buf.append(n.getNodeName());
+            }
+        }
+
+            
+        // If we're already recursing, don't bother printing out 'Node' again
+        if (DUMP_NODE_RECURSION == (dumpLevel & DUMP_NODE_RECURSION))
+            return LBRACKET + buf.toString() + RBRACKET;
+        else
+            return "Node" + LBRACKET + buf.toString() + RBRACKET;
     }
 
     /**
@@ -266,10 +305,34 @@ public abstract class XalanDumper
     public static String dump(NodeList nl, int dumpLevel)
     {
         if (null == nl)
-            return NULL + SEP + "NodeList";
+            return "NodeList" + LBRACKET + NULL + RBRACKET;
+
+        StringBuffer buf = new StringBuffer();
+
+        int len = nl.getLength() - 1;
+        int i = 0;
+        while (i < len)
+        {
+            Node n = nl.item(i);
+            if (null != n)
+            {
+                buf.append(dump(n, dumpLevel) + ", ");
+            }
+            ++i;
+        }
+
+        if (i == len)
+        {
+            Node n = nl.item(len);
+            if (null != n)
+            {
+                buf.append(dump(n, dumpLevel));
+            }
+        }
         return "NodeList" + LBRACKET 
-            + org.apache.xalan.trace.TracerEvent.printNodeList(nl) + RBRACKET;
+            + buf.toString() + RBRACKET;
     }
+
 
     /**
      * Print String type of node.  
