@@ -166,7 +166,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
         embeddedCSSFileInfo.xmlName = testBasePath + "TransformerFactoryAPIModern.xml"; // just the local path\filename
         // embeddedCSSFileInfo.optionalName = testBasePath + "TransformerFactoryAPIModern.css"; // other file required by XML file
 
-        // Cache the system property
+        // Cache the system property; is reset in testFileClose
         cachedSysProp = System.getProperty(defaultPropName);
         return true;
     }
@@ -184,7 +184,6 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             System.getProperties().remove(defaultPropName);
         else
             System.getProperties().put(defaultPropName, cachedSysProp);
-        
         return true;
     }
 
@@ -259,20 +258,26 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             // Could also verify specific type of exception
         }
 
-        // test when system property is Xalan-J 2.x's implementation
+        // Reset the system property to what was cached previously
         try
         {
             // This should come last so it will stay set for the rest of the test
-            System.getProperties().put(defaultPropName, XALAN_CLASSNAME);
-            reporter.logStatusMsg("System property " + defaultPropName 
+            // Note: this needs review, since in the future we may 
+            //  not guaruntee order of testCase execution!
+            if (cachedSysProp == null)
+                System.getProperties().remove(defaultPropName);
+            else
+                System.getProperties().put(defaultPropName, cachedSysProp);
+
+            reporter.logStatusMsg("System property (default) " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
-            reporter.checkPass("factory.newInstance() of Xalan impl is: " + factory.toString());
+            reporter.checkPass("factory.newInstance() of default impl is: " + factory.toString());
         }
         catch (Throwable t)
         {
-            reporter.checkFail("factory.newInstance() of Xalan impl threw: " + t.toString());
-            reporter.logThrowable(reporter.ERRORMSG, t, "factory.newInstance() of Xalan impl threw:");
+            reporter.checkFail("factory.newInstance() of default impl threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "factory.newInstance() of default impl threw:");
         }
 
         reporter.logStatusMsg("@todo code coverage for findFactory() method");
@@ -658,6 +663,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
     public String usage()
     {
         return ("Common [optional] options supported by TransformerFactoryAPITest:\n"
+                + "-transformerFactory <FQCN of TransformerFactoryImpl; default Xalan 2.x>\n"
                 + "(Note: assumes inputDir=.\\tests\\api)\n"
                 + super.usage());   // Grab our parent classes usage as well
     }
@@ -669,9 +675,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
      */
     public static void main(String[] args)
     {
-
         TransformerFactoryAPITest app = new TransformerFactoryAPITest();
-
         app.doMain(args);
     }
 }

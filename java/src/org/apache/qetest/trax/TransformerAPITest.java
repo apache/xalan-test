@@ -145,24 +145,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
     public static final String MEDIA_TYPE_VALUE = "text/test/xml";
     public static final String OMIT_XML_DECLARATION_VALUE = "yes";
 
-    /** Cache the relevant system property. */
-    protected String saveXSLTProp = null;
-
-    /** Allow user to override our default of Xalan 2.x processor classname. */
-    public static final String XALAN_CLASSNAME =
-        "org.apache.xalan.processor.TransformerFactoryImpl";
-
-    /** 
-     * Commandline/properties string to initialize a different 
-     * TransformerFactory implementation - otherwise we default to 
-     * Xalan 2.x org.apache.xalan.processor.TransformerFactoryImpl
-     */
-    protected String PROCESSOR_CLASSNAME = "processorClassname";
-
-    /** NEEDSDOC Field processorClassname          */
-    protected String processorClassname = XALAN_CLASSNAME;
-
-    /** NEEDSDOC Field TRAX_PROCESSOR_XSLT          */
+    /** System property name javax.xml.transform.TransformerFactory.  */
     public static final String TRAX_PROCESSOR_XSLT = "javax.xml.transform.TransformerFactory";
 
     /** Subdir name under test\tests\api for files.  */
@@ -220,20 +203,6 @@ public class TransformerAPITest extends XSLProcessorTestBase
         htmlFormatTest.inputName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xsl");
         htmlFormatTest.goldName = goldBasePath + "TransformerAPIHTMLFormat.out";
 
-        // Cache trax system property
-        saveXSLTProp = System.getProperty(TRAX_PROCESSOR_XSLT);
-
-        reporter.logInfoMsg(TRAX_PROCESSOR_XSLT + " property is: "
-                            + saveXSLTProp);
-
-        // Check if user wants to use a processor other than Xalan 2.x
-        processorClassname = testProps.getProperty(PROCESSOR_CLASSNAME,
-                                                   XALAN_CLASSNAME);
-        // @todo fix: user should be able to specify -processorClassname 
-        //  on the command line to override the system properties
-
-        reporter.logInfoMsg(PROCESSOR_CLASSNAME + " property is: "
-                            + processorClassname);
         reporter.logInfoMsg(TRAX_PROCESSOR_XSLT + " property is: "
                             + System.getProperty(TRAX_PROCESSOR_XSLT));
 
@@ -257,26 +226,6 @@ public class TransformerAPITest extends XSLProcessorTestBase
         return true;
     }
 
-    /**
-     * Cleanup this test - reset the cached system property trax.processor.xslt.  
-     *
-     * @param p Properties to initialize with (may be unused)
-     * @return false if test should be aborted, true otherwise
-     */
-    public boolean doTestFileClose(Properties p)
-    {
-
-        if (saveXSLTProp == null)
-        {
-            System.getProperties().remove(TRAX_PROCESSOR_XSLT);
-        }
-        else
-        {
-            System.getProperties().put(TRAX_PROCESSOR_XSLT, saveXSLTProp);
-        }
-
-        return true;
-    }
 
     /**
      * TRAX Transformer: cover basic get/setParameter(s) APIs.

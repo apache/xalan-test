@@ -117,20 +117,7 @@ public class TemplatesAPITest extends XSLProcessorTestBase
     /** Name of a stylesheet with xsl:output HTML. */
     protected String outputFormatXSL = null;
 
-    /** Cache the relevant system property. */
-    protected String saveXSLTProp = null;
-
-    /** Allow user to override our default of Xalan 2.x processor classname. */
-    public static final String XALAN_CLASSNAME =
-        "org.apache.xalan.processor.TransformerFactoryImpl";
-
-    /** NEEDSDOC Field PROCESSOR_CLASSNAME          */
-    protected String PROCESSOR_CLASSNAME = "processorClassname";
-
-    /** NEEDSDOC Field processorClassname          */
-    protected String processorClassname = XALAN_CLASSNAME;
-
-    /** NEEDSDOC Field TRAX_PROCESSOR_XSLT          */
+    /** System property name javax.xml.transform.TransformerFactory.  */
     public static final String TRAX_PROCESSOR_XSLT = "javax.xml.transform.TransformerFactory";
 
     /** Known outputFormat property name from outputFormatTest  */
@@ -182,21 +169,6 @@ public class TemplatesAPITest extends XSLProcessorTestBase
         simpleTest.goldName = goldBasePath + "TransformerAPIParam.out";
         outputFormatXSL = QetestUtils.filenameToURL(testBasePath + "TransformerAPIOutputFormat.xsl");
 
-        // Cache trax system property
-        saveXSLTProp = System.getProperty(TRAX_PROCESSOR_XSLT);
-
-        reporter.logInfoMsg(TRAX_PROCESSOR_XSLT + " property is: "
-                            + saveXSLTProp);
-
-        // Check if user wants to use a processor other than Xalan 2.x
-        processorClassname = testProps.getProperty(PROCESSOR_CLASSNAME,
-                                                   XALAN_CLASSNAME);
-
-        // @todo fix: user should be able to specify -processorClassname 
-        //  on the command line to override the system properties
-
-        reporter.logInfoMsg(PROCESSOR_CLASSNAME + " property is: "
-                            + processorClassname);
         reporter.logInfoMsg(TRAX_PROCESSOR_XSLT + " property is: "
                             + System.getProperty(TRAX_PROCESSOR_XSLT));
         try
@@ -219,27 +191,6 @@ public class TemplatesAPITest extends XSLProcessorTestBase
         return true;
     }
 
-    /**
-     * Cleanup this test - reset the cached system property trax.processor.xslt.  
-     *
-     * NEEDSDOC @param p
-     *
-     * NEEDSDOC ($objectName$) @return
-     */
-    public boolean doTestFileClose(Properties p)
-    {
-
-        if (saveXSLTProp == null)
-        {
-            System.getProperties().remove(TRAX_PROCESSOR_XSLT);
-        }
-        else
-        {
-            System.getProperties().put(TRAX_PROCESSOR_XSLT, saveXSLTProp);
-        }
-
-        return true;
-    }
 
     /**
      * TRAX Templates: cover newTransformer(), 
