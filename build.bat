@@ -42,6 +42,9 @@ if not "%OS%"=="Windows_NT" goto win9xStart
 :winNTStart
 @setlocal
 
+set classpath=..\java\bin\ant.jar;..\java\bin\xercesImpl.jar;..\java\bin\xalan.jar;..\java\bin\xml-apis.jar;%CLASSPATH%
+
+
 rem On NT/2K grab all arguments at once
 set ANT_CMD_LINE_ARGS=%*
 goto doneStart
