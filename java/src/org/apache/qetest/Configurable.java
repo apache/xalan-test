@@ -56,6 +56,7 @@
  */
 
 package org.apache.qetest;
+import java.util.Properties;
 
 /**
  * Interface with basic configuration API's.  
@@ -91,6 +92,24 @@ public interface Configurable
      */
     public void setAttribute(String name, Object value)
         throws IllegalArgumentException;
+
+
+    /**
+     * Allows the user to set specific attributes on the testing 
+     * utility or it's underlying product object under test.
+     * 
+     * This method should attempt to set any applicable attributes 
+     * found in the given attrs onto itself, and will ignore any and 
+     * all attributes it does not recognize.  It should never 
+     * throw exceptions.  This method may overwrite any previous 
+     * attributes that were set.  Currently since this takes a 
+     * Properties block you may only be able to set objects that 
+     * are Strings, although individual implementations may 
+     * attempt to use Hashtable.get() on only the local part.
+     * 
+     * @param attrs Props of various name, value attrs.
+     */
+    public void applyAttributes(Properties attrs);
 
 
     /**

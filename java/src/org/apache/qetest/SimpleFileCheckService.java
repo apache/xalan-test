@@ -60,6 +60,7 @@ package org.apache.qetest;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;
+import java.util.Properties;
 
 /**
  * Simply does .readLine of each file into string buffers and then String.equals().
@@ -212,6 +213,19 @@ public class SimpleFileCheckService implements CheckService
      */
     public void setAttribute(String name, Object value)
         throws IllegalArgumentException
+    {
+        /* no-op */        
+    }
+
+    /**
+     * Allows the user to set specific attributes on the testing 
+     * utility or it's underlying product object under test.
+     * 
+     * No-op; this class does not have any supported attributes.
+     * 
+     * @param attrs Props of various name, value attrs.
+     */
+    public void applyAttributes(Properties attrs)
     {
         /* no-op */        
     }

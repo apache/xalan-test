@@ -69,7 +69,9 @@ import java.io.FileReader;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 
 /**
  * Uses an XML/HTML/Text diff comparator to check or diff two files.
@@ -288,10 +290,33 @@ public class XHTFileCheckService implements CheckService
         return check(logger, actual, reference, msg, null);
     }
 
-    /**
-     * Whether whitespace differences will cause a fail or not.  
+    /** 
+     * Prefix to all attrs we understand.  
+     * Note: design-wise, it would be better to have these constants 
+     * in the XHTComparator class, since we know we're tightly bound 
+     * to them anyways, and they shouldn't really be bound to us.
+     * But for my current purposes, it's simpler to put them here 
+     * for documentation purposes.
      */
-    public static final String ALLOW_WHITESPACE_DIFF = "urn:XHTFileCheckService:allowWhitespaceDiff";
+    public static final String URN_XHTFILECHECKSERVICE = "urn:XHTFileCheckService:";
+
+    /** Whether whitespace differences will cause a fail or not.  */
+    public static final String ALLOW_WHITESPACE_DIFF = URN_XHTFILECHECKSERVICE + "allowWhitespaceDiff";
+
+    /** If we should call parser.setValidating().  */
+    public static final String SETVALIDATING = URN_XHTFILECHECKSERVICE + "setValidating";
+
+    /** If we should call parser.setIgnoringElementContentWhitespace().  */
+    public static final String SETIGNORINGELEMENTCONTENTWHITESPACE = URN_XHTFILECHECKSERVICE + "setIgnoringElementContentWhitespace";
+
+    /** If we should call parser.setExpandEntityReferences().  */
+    public static final String SETEXPANDENTITYREFERENCES = URN_XHTFILECHECKSERVICE + "setExpandEntityReferences";
+
+    /** If we should call parser.setIgnoringComments().  */
+    public static final String SETIGNORINGCOMMENTS = URN_XHTFILECHECKSERVICE + "setIgnoringComments";
+
+    /** If we should call parser.setCoalescing().  */
+    public static final String SETCOALESCING = URN_XHTFILECHECKSERVICE + "setCoalescing";
 
     /**
      * Whether whitespace differences will cause a fail or not.  
@@ -302,16 +327,16 @@ public class XHTFileCheckService implements CheckService
     protected boolean allowWhitespaceDiff = false;  // default; backwards compatible
 
     /**
-     * Hash of parser-like attributes that have been set.  
+     * Properties/Hash of parser-like attributes that have been set.  
      */
-    protected Hashtable attributes = null;
+    protected Properties attributes = null;
 
     /**
      * Allows the user to set specific attributes on the testing 
      * utility or it's underlying product object under test.
      * 
      * Supports basic JAXP DocumentBuilder attributes, plus our own 
-     * "allow-whitespace-diff" attribute.
+     * ALLOW_WHITESPACE_DIFF attribute.
      * 
      * @param name The name of the attribute.
      * @param value The value of the attribute.
@@ -325,21 +350,63 @@ public class XHTFileCheckService implements CheckService
         // Check for our own attributes first
         if (ALLOW_WHITESPACE_DIFF.equals(name))
         {
-            //@todo set allowWhitespaceDiff based on value here
+            try
+            {
+                allowWhitespaceDiff = (new Boolean((String)value)).booleanValue();
+            } 
+            catch (Throwable t)
+            {
+                // If it's an illegal value or type, ignore it
+            }
         }
         else
         {
             if (null == attributes)
             {
-                attributes = new Hashtable();
+                attributes = new Properties();
             }
             attributes.put(name, value);
         }
     }
 
     /**
+     * Allows the user to set specific attributes on the testing 
+     * utility or it's underlying product object under test.
+     * 
+     * This method should attempt to set any applicable attributes 
+     * found in the given attrs onto itself, and will ignore any and 
+     * all attributes it does not recognize.  It should never 
+     * throw exceptions.  This method will overwrite any previous 
+     * attributes that were set.
+     * This method will only set values that are Strings findable 
+     * by the Properties.getProperty() method.
+     * 
+     * Future Work: this could be optimized by simply setting our 
+     * Properties block to default from the passed-in one, but for 
+     * now instead it only copies over the explicit values that 
+     * we think are applicable.
+     * 
+     * @param attrs Props of various name, value attrs.
+     */
+    public void applyAttributes(Properties attrs)
+    {
+        attributes = null;
+        for (Enumeration enum = attrs.propertyNames();
+                enum.hasMoreElements(); /* no increment portion */ )
+        {
+            String key = (String)enum.nextElement();
+            if (key.startsWith(URN_XHTFILECHECKSERVICE))
+            {
+                setAttribute(key, attrs.getProperty(key));
+            }
+        }
+    }
+
+    /**
      * Allows the user to retrieve specific attributes on the testing 
      * utility or it's underlying product object under test.
+     *
+     * See applyAttributes for some limitations.
      *
      * @param name The name of the attribute.
      * @return value of supported attributes or null if not recognized.
@@ -354,7 +421,6 @@ public class XHTFileCheckService implements CheckService
         if (ALLOW_WHITESPACE_DIFF.equals(name))
         {
             return new Boolean(allowWhitespaceDiff);
-            
         }
         else if (null != attributes)
         {

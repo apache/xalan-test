@@ -127,11 +127,6 @@ public class StylesheetTestlet extends TestletImpl
             logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue with " + d);
             return;
         }
-
-        logger.logMsg(Logger.STATUSMSG, "About to test: " 
-                      + (null == datalet.inputName
-                         ? datalet.xmlName
-                         : datalet.inputName));
         //@todo validate our Datalet - ensure it has valid 
         //  and/or existing files available.
 
@@ -172,98 +167,111 @@ public class StylesheetTestlet extends TestletImpl
         }
         catch (Throwable t)
         {
-            logThrowable(t, getDescription() + " newWrapper/newProcessor threw");
+            logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " newWrapper/newProcessor threw");
             logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
             return;
         }
 
-        // Test our supplied input file, and compare with gold
+        // Transform our supplied input file, and compare with gold
         try
         {
-            // Store local copies of XSL, XML references to avoid 
-            //  potential for changing datalet            
-            String inputName = datalet.inputName;
-            String xmlName = datalet.xmlName;
-
-            //@todo Should we log a custom logElement here instead?
-            logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + inputName
-                          + " xmlName=" + xmlName + " outputName=" + datalet.outputName
-                          + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor);
-
-            // Simply have the wrapper do all the transforming
-            //  or processing for us - we handle either normal .xsl 
-            //  stylesheet tests or just .xml embedded tests
-            long retVal = 0L;
-            if (null == datalet.inputName)
-            {
-                // presume it's an embedded test
-                long [] times = transformWrapper.transformEmbedded(xmlName, datalet.outputName);
-                retVal = times[TransformWrapper.IDX_OVERALL];
-            }
-            else
-            {
-                // presume it's a normal stylesheet test
-                long[] times = transformWrapper.transform(xmlName, inputName, datalet.outputName);
-                retVal = times[TransformWrapper.IDX_OVERALL];
-            }
-
-            // If we get here, attempt to validate the contents of 
-            //  the last outputFile created
-            CheckService fileChecker = (CheckService)datalet.options.get("fileCheckerImpl");
-            // Supply default value
-            if (null == fileChecker)
-                fileChecker = new XHTFileCheckService();
-            if (Logger.PASS_RESULT
-                != fileChecker.check(logger,
-                                     new File(datalet.outputName), 
-                                     new File(datalet.goldName), 
-                                     getDescription() + " " + datalet.getDescription())
-               )
-            {
-                // Log a custom element with all the file refs first
-                // Closely related to viewResults.xsl select='fileref"
-                //@todo check that these links are valid when base 
-                //  paths are either relative or absolute!
-                Hashtable attrs = new Hashtable();
-                attrs.put("idref", (new File(datalet.inputName)).getName());
-                attrs.put("inputName", datalet.inputName);
-                attrs.put("xmlName", datalet.xmlName);
-                attrs.put("outputName", datalet.outputName);
-                attrs.put("goldName", datalet.goldName);
-                logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance test file references");
-                // No longer need to log failure reason, this kind 
-                //  of functionality should be kept in checkServices
-            }
+            testDatalet(datalet, transformWrapper);
         }
-        // Note that this class can only validate positive test 
-        //  cases - we don't handle ExpectedExceptions
+        // Handle any exceptions from the testing
         catch (Throwable t)
         {
-            // Put the logThrowable first, so it appears before 
-            //  the Fail record, and gets color-coded
-            logThrowable(t, getDescription() + " " + datalet.getDescription());
-            logger.checkFail(getDescription() + " " + datalet.getDescription() 
-                             + " threw: " + t.toString());
+            handleException(datalet, t);
             return;
         }
 	}
 
 
-    /**
-     * Logs out throwable.toString() and stack trace to our Logger.
-     * //@todo Copied from Reporter; should probably be moved into Logger.
-     * @param throwable thrown throwable/exception to log out.
-     * @param msg description of the throwable.
+    /** 
+     * Worker method to actually perform the transform.  
+     *
+     * Logs out applicable info; attempts to perform transformation; 
+     * and if sucessful, validates output file.
+     *
+     * @param datalet to test with
+     * @param transformWrapper to have perform the transform
+     * @throws allows any underlying exception to be thrown
      */
-    protected void logThrowable(Throwable throwable, String msg)
+    protected void testDatalet(StylesheetDatalet datalet, TransformWrapper transformWrapper)
+            throws Exception
     {
-        StringWriter sWriter = new StringWriter();
-        sWriter.write(msg + "\n");
+        //@todo Should we log a custom logElement here instead?
+        logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
+                      + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
+                      + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor);
 
-        PrintWriter pWriter = new PrintWriter(sWriter);
-        throwable.printStackTrace(pWriter);
+        // Simply have the wrapper do all the transforming
+        //  or processing for us - we handle either normal .xsl 
+        //  stylesheet tests or just .xml embedded tests
+        long retVal = 0L;
+        if (null == datalet.inputName)
+        {
+            // presume it's an embedded test
+            long [] times = transformWrapper.transformEmbedded(datalet.xmlName, datalet.outputName);
+            retVal = times[TransformWrapper.IDX_OVERALL];
+        }
+        else
+        {
+            // presume it's a normal stylesheet test
+            long[] times = transformWrapper.transform(datalet.xmlName, datalet.inputName, datalet.outputName);
+            retVal = times[TransformWrapper.IDX_OVERALL];
+        }
 
-        logger.logArbitrary(Logger.STATUSMSG, sWriter.toString());
+        // If we get here, attempt to validate the contents of 
+        //  the last outputFile created
+        CheckService fileChecker = (CheckService)datalet.options.get("fileCheckerImpl");
+        // Supply default value
+        if (null == fileChecker)
+            fileChecker = new XHTFileCheckService();
+        // Apply any testing options to the fileChecker
+        // Note: for the overall conformance test case, this is 
+        //  a bit inefficient, but we don't necessarily know if 
+        //  the checkService has already been setup or not    
+        fileChecker.applyAttributes(datalet.options);    
+        if (Logger.PASS_RESULT
+            != fileChecker.check(logger,
+                                 new File(datalet.outputName), 
+                                 new File(datalet.goldName), 
+                                 getDescription() + " " + datalet.getDescription())
+           )
+        {
+            // Log a custom element with all the file refs first
+            // Closely related to viewResults.xsl select='fileref"
+            //@todo check that these links are valid when base 
+            //  paths are either relative or absolute!
+            Hashtable attrs = new Hashtable();
+            attrs.put("idref", (new File(datalet.inputName)).getName());
+            attrs.put("inputName", datalet.inputName);
+            attrs.put("xmlName", datalet.xmlName);
+            attrs.put("outputName", datalet.outputName);
+            attrs.put("goldName", datalet.goldName);
+            logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance test file references");
+            // No longer need to log failure reason, this kind 
+            //  of functionality should be kept in checkServices
+        }
+    }
+
+
+    /** 
+     * Worker method to validate or log exceptions thrown by testDatalet.  
+     *
+     * Provided so subclassing is simpler; our implementation merely 
+     * calls checkErr and logs the exception.
+     *
+     * @param datalet to test with
+     * @param e Throwable that was thrown
+     */
+    protected void handleException(StylesheetDatalet datalet, Throwable t)
+    {
+        // Put the logThrowable first, so it appears before 
+        //  the Fail record, and gets color-coded
+        logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " " + datalet.getDescription());
+        logger.checkFail(getDescription() + " " + datalet.getDescription() 
+                         + " threw: " + t.toString());
     }
 }  // end of class StylesheetTestlet
 

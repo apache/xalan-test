@@ -73,7 +73,7 @@ import java.io.BufferedReader;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import java.util.Hashtable;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 // DOM imports
@@ -208,7 +208,7 @@ public class XHTComparator
      */
     public boolean compare(String goldFileName, String testFileName,
                            PrintWriter reporter, boolean[] warning,
-                           Hashtable attributes)
+                           Properties attributes)
     {
 
         // parse the gold doc
@@ -652,7 +652,7 @@ public class XHTComparator
      *
      * NEEDSDOC (parse) @return
      */
-    Document parse(String filename, PrintWriter reporter, String which, Hashtable attributes)
+    Document parse(String filename, PrintWriter reporter, String which, Properties attributes)
     {
         // Force filerefs to be URI's if needed: note this is independent of any other files
         String docURI = filename;
@@ -667,18 +667,8 @@ public class XHTComparator
         // Always set namespaces on
         dfactory.setNamespaceAware(true);
         // Set other attributes here as needed
-        if (null != attributes)
-        {
-            Object tmp = attributes.get("setValidating");
-            if (null != tmp)
-            {
-                if (tmp instanceof Boolean)
-                    dfactory.setValidating(((Boolean)tmp).booleanValue());
-                else if (tmp instanceof String)
-                    dfactory.setValidating(new Boolean((String)tmp).booleanValue());
-            }
-        }
-
+        applyAttributes(dfactory, attributes);
+        
         String parseType = which + PARSE_TYPE + "[xml];";
         Document doc = null;
         try
@@ -751,5 +741,47 @@ public class XHTComparator
 
         return doc;
     }  // end of parse()
+    
+    /**
+     * Pass applicable attributes onto our DocumentBuilderFactory.  
+     *
+     * Only passes thru attributes we explicitly know about and 
+     * are constants from XHTFileCheckService.
+     * 
+     * @param dbf factory to attempt to set* onto
+     * @param attrs various attributes we should try to set
+     */
+    protected void applyAttributes(DocumentBuilderFactory dfactory, Properties attributes)
+    {
+        if ((null == attributes) || (null == dfactory))
+            return;
+
+        String tmp = attributes.getProperty(XHTFileCheckService.SETVALIDATING);
+        if (null != tmp)
+        {
+            dfactory.setValidating(new Boolean(tmp).booleanValue());
+        }
+        tmp = attributes.getProperty(XHTFileCheckService.SETIGNORINGELEMENTCONTENTWHITESPACE);
+        if (null != tmp)
+        {
+            dfactory.setIgnoringElementContentWhitespace(new Boolean(tmp).booleanValue());
+        }
+        tmp = attributes.getProperty(XHTFileCheckService.SETEXPANDENTITYREFERENCES);
+        if (null != tmp)
+        {
+            dfactory.setExpandEntityReferences(new Boolean(tmp).booleanValue());
+        }
+        tmp = attributes.getProperty(XHTFileCheckService.SETIGNORINGCOMMENTS);
+        if (null != tmp)
+        {
+            dfactory.setIgnoringComments(new Boolean(tmp).booleanValue());
+        }
+        tmp = attributes.getProperty(XHTFileCheckService.SETCOALESCING);
+        if (null != tmp)
+        {
+            dfactory.setCoalescing(new Boolean(tmp).booleanValue());
+        }
+        /* Unknown attributes are ignored! */
+    }
 
 }
