@@ -11,7 +11,7 @@
   <!-- Scenario: operation="standard-HTML" -->
   <!-- Discretionary: number-greek-alpha="true" -->
 
-<xsl:output method="html" encoding="ISO-8859-7"/>
+<xsl:output method="html" encoding="ISO-8859-1"/>
 
 <xsl:template match="doc">
   <out>
