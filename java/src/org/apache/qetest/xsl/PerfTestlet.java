@@ -114,6 +114,8 @@ public class PerfTestlet extends StylesheetTestlet
         // Setup: Save options from the datalet in convenience variables
         int iterations = 10;
         boolean runtimeGC = false;
+        long[] times = null;
+
         try
         {
             iterations = Integer.parseInt(datalet.options.getProperty("iterations"));
@@ -126,6 +128,7 @@ public class PerfTestlet extends StylesheetTestlet
         catch (Exception e) { /* no-op, leave as default */ }
 
         // Setup: store various XalanC-like timing data in convenience variables
+		long warmup = 0L;			// First transform. Used to load classes.
         long singletransform = 0L;  // Very first Preload end-to-end transform
         long etoe = 0L;     // First end-to-end transform during iterations
         long avgetoe = 0L;  // Average of end-to-end transforms during iterations
@@ -134,17 +137,22 @@ public class PerfTestlet extends StylesheetTestlet
         long unparsedxml = 0L;   // First stylesheet process during iterations
         long avgunparsedxml = 0L;// Average of stylesheet process during iterations
 
-        logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
-                      + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
-                      + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor
-                      + " iterations=" + iterations 
-                      + " algorithim=" + getDescription());
+        //logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
+        //              + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
+        //              + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor
+        //              + " iterations=" + iterations 
+        //              + " algorithim=" + getDescription());
 
         //@todo make various logMemory calls optional
-        logMemory(runtimeGC, true);
+        logMemory(runtimeGC, false);
+
+        // Measure(warmup): JVM warm up
+        times = transformWrapper.transform(datalet.xmlName, datalet.inputName,
+                                            datalet.outputName);
+        warmup = times[TransformWrapper.IDX_OVERALL];
+        logMemory(runtimeGC, false);
 
         // Measure(singletransform): Very first Preload end-to-end transform
-        long[] times = null;
         times = transformWrapper.transform(datalet.xmlName, datalet.inputName,
                                             datalet.outputName);
         singletransform = times[TransformWrapper.IDX_OVERALL];
@@ -176,7 +184,7 @@ public class PerfTestlet extends StylesheetTestlet
         // Measure(etoe): once: first full process
         times = transformWrapper.transform(datalet.xmlName, datalet.inputName, datalet.outputName);
         etoe = times[TransformWrapper.IDX_OVERALL];
-        logMemory(runtimeGC, true);
+        logMemory(runtimeGC, false);
 
         // Aggregate all specific timing data returned by TransformWrappers
         //  note that different flavors of wrappers will be able 
@@ -210,6 +218,7 @@ public class PerfTestlet extends StylesheetTestlet
         // inputName is the actual name we gave to the processor
         attrs.put("inputName", datalet.inputName);
         attrs.put("iterations", new Integer(iterations));
+		attrs.put("warmup", new Long(warmup)); 
         attrs.put("singletransform", new Long(singletransform)); // Very first Preload end-to-end transform
         attrs.put("etoe", new Long(etoe)); // First end-to-end transform during iterations
         // Note that avgetoe should match logTimes()'s OVERALL value
@@ -234,14 +243,14 @@ public class PerfTestlet extends StylesheetTestlet
 		fOutStrm.close();
 
 		// Calculate thruput as Kb/sec. This is based on DataPower code.
-		double thruPut = (double)(1000 * (btIn + btOut)) / (double)(1024 * 2 * avgparsexsl);
+		double thruPut = (double)(1000 * (btIn + btOut)) / (double)(1024 * 2 * avgunparsedxml);
 
 		DecimalFormat fmt = new DecimalFormat("####.##");
 		StringBuffer x = new StringBuffer( fmt.format(thruPut));
 		attrs.put("KBs", x); 
 
-        logger.logElement(Logger.STATUSMSG, "perf", attrs, "PItr;");
-
+        //logger.logElement(Logger.STATUSMSG, "perf", attrs, "PItr;");
+		logger.logElement(Logger.STATUSMSG, "perf", attrs, fIn.getName());
     }
 
     /**

@@ -105,7 +105,7 @@ public abstract class QetestFactory
             try
             {
                 service = (CheckService)fClazz.newInstance();
-                logger.logMsg(Logger.TRACEMSG, TYPE_FILES + " is " + service);
+                //logger.logMsg(Logger.TRACEMSG, TYPE_FILES + " is " + service);
             } 
             catch (Exception e)
             {

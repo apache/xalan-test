@@ -269,7 +269,8 @@ public abstract class QetestUtils
     {
         java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat ("MMddHHmm");
         if (null != baseId)
-            return formatter.format(new java.util.Date())+ ";" + baseId;
+            //return formatter.format(new java.util.Date())+ ";" + baseId;
+            return baseId + ":" + formatter.format(new java.util.Date());
         else
             return formatter.format(new java.util.Date());
     }
