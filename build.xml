@@ -76,7 +76,7 @@
 
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
-    <property name="xerces.jar" value="${xalan.bin.dir}/xerces.jar"/>
+    <property name="parserjar" value="${xalan.bin.dir}/xerces.jar"/>
     <property name="bsf.jar" value="${xalan.bin.dir}/bsf.jar"/>
     <!-- The js.jar is for Javascript extensions tests; you must 
          get this .jar yourself.  Feel free to reset the location.
@@ -120,14 +120,14 @@
     <path id="compiletest.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
-        <pathelement location="${xerces.jar}" />
+        <pathelement location="${parserjar}" />
     </path>
 
     <!-- Classpath used when running API tests -->
     <path id="api.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
-        <pathelement location="${xerces.jar}" />
+        <pathelement location="${parserjar}" />
         <pathelement location="${testxsl.jar}" />
     </path>
 
@@ -135,7 +135,7 @@
     <path id="conf.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
-        <pathelement location="${xerces.jar}" />
+        <pathelement location="${parserjar}" />
         <pathelement location="${testxsl.jar}" />
     </path>
 
@@ -188,6 +188,7 @@
         description="Prepare timestamp, echo JARDIR for debugging">
         <!-- Note this is case-sensitive, even on Windows! -->
         <echo message="Your ==JARDIR== is set to ==${ENV.JARDIR}==" />
+        <echo message="Using parserjar ${parserjar}" />
         <tstamp />
         <!-- Note this is used when styling results files from tests to html. -->
         <available classname="org.apache.tools.ant.taskdefs.optional.XalanLiaison" property="xalan-liaison" />
@@ -818,7 +819,7 @@
         <pathelement location="${xalan.bin.dir}/java_cup.jar" />
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
         <pathelement location="${testxsl.jar}" />
-        <pathelement location="${xerces.jar}" />
+        <pathelement location="${parserjar}" />
         <pathelement location="${xalan.jar}" />
     </path>
     <!-- xsltc-folk: are these the correct classpaths needed? -->
@@ -830,7 +831,7 @@
         <pathelement location="${xalan.bin.dir}/java_cup.jar" />
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
         <pathelement location="${testxsl.jar}" />
-        <pathelement location="${xerces.jar}" />
+        <pathelement location="${parserjar}" />
         <pathelement location="${xalan.jar}" />
         <!-- Note addition of . to the classpath to enable loading 
              of translets; this needs more work and coordination 

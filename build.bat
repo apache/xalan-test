@@ -87,7 +87,7 @@ if not "%JARDIR%" == "" set _ANT_CP=%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARD
 
 if "%JAVA_HOME%" == "" goto noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=%JAVA_HOME%\bin\java
-goto runAnt
+goto checkJikes
 
 :noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=java
@@ -96,18 +96,21 @@ echo Warning: you should set JAVA_HOME and add tools.jar/classes.zip to your CLA
 echo.
 
 :checkJikes
+rem also pass along the selected parser to Ant
+set _ANT_OPTS=%ANT_OPTS% -Dparserjar=%_PARSER_JAR%
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 
 :runAnt
-"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" %_ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 goto end
 
 :runAntWithJikes
-"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" %JAVA_OPTS% -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %_ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 
 :end
 set _ANT_CP=
 set _ANT_HOME=
+set _ANT_OPTS=
 set _JAVACMD=
 set _PARSER_JAR=
 set ANT_CMD_LINE_ARGS=
