@@ -66,6 +66,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import java.util.Date;
 import java.util.Enumeration;
@@ -373,25 +374,6 @@ public class XMLFileLogger implements Logger
         return ready;
     }
 
-    /**
-     * Is this Logger still running OK?
-     * @return status - true if an error has occoured, false if it's still working fine
-     */
-    public boolean checkError()
-    {
-
-        // Ensure our underlying logger, if one, is still OK
-        if ((reportPrinter != null) && reportPrinter.checkError())
-        {
-
-            // NEEDSWORK: should we set ready = false in this case?
-            //            errors in the PrintStream are not necessarily fatal
-            error = true;
-        }
-
-        return error;
-    }
-
     /** Flush this logger - ensure our File is flushed. */
     public void flush()
     {
@@ -644,6 +626,35 @@ public class XMLFileLogger implements Logger
             reportPrinter.print("<" + ELEM_DOUBLEVAL + ">" + dVal + "</"
                                 + ELEM_DOUBLEVAL + ">");
             reportPrinter.println("</" + ELEM_STATISTIC + ">");
+        }
+    }
+
+    /**
+     * Logs out Throwable.toString() and a stack trace of the 
+     * Throwable with the specified severity.
+     * <p>This uses logArbitrary to log out your msg - message, 
+     * a newline, throwable.toString(), a newline,
+     * and then throwable.printStackTrace().</p>
+     * //@todo future work to use logElement() to output 
+     * a specific &lt;throwable&gt; element instead.
+     * @author Shane_Curcuru@lotus.com
+     * @param level severity of message.
+     * @param throwable throwable/exception to log out.
+     * @param msg description of the throwable.
+     */
+    public void logThrowable(int level, Throwable throwable, String msg)
+    {
+        if (isReady())
+        {
+            StringWriter sWriter = new StringWriter();
+
+            sWriter.write(msg + "\n");
+            sWriter.write(throwable.toString() + "\n");
+
+            PrintWriter pWriter = new PrintWriter(sWriter);
+
+            throwable.printStackTrace(pWriter);
+            logArbitrary(level, sWriter.toString());
         }
     }
 

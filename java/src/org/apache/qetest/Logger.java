@@ -86,10 +86,18 @@ import java.util.Properties;
  * <li>To make it easier to generate 'reports' based on test output
  * (i.e. number of tests passed/failed, graphs of results, etc.)</li>
  * </ul>
+ * <p>While there are a number of very good general purpose logging 
+ * utilities out there, I prefer to use this Logger or a similar 
+ * class to report the results of tests because this class 
+ * specifically constrains the format and manner that a test reports 
+ * results.  This should help to keep tests more structured and 
+ * easier for other users to understand.  Specific Logger 
+ * implementations may of course choose to store or log out their 
+ * results in any manner they like; in fact I plan on implementing 
+ * a <a href="http://jakarta.apache.org/log4j/docs/index.html">
+ * Log4JLogger</a> class in the future.</p>
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
- * @todo maybe add set/getOutput methods? Would allow most
- * types of loggers to get output streams, etc. externally
  */
 public interface Logger
 {
@@ -107,17 +115,25 @@ public interface Logger
      */
     public static final String OPT_LOGGERS = "loggers";
 
-    /** NEEDSDOC Field LOGGER_SEPARATOR          */
+    /** Constant ';' semicolon for delimiter in OPT_LOGGERS field.   */
     public static final String LOGGER_SEPARATOR = ";";
 
     /**
      * A default Logger classname - ConsoleLogger.
+     * //@todo have a factory creation service for this so that any 
+     * test or testlet that wishes a default logger at startup 
+     * can simply ask a common place for one.
      */
     public static final String DEFAULT_LOGGER =
         "org.apache.qetest.ConsoleLogger";
 
     /**
      * Parameter: level of output to log, int 0-99.
+     * {@link #CRITICALMSG CRITICALMSG = 0}, only very important 
+     * messages are output from the test or shown in a report, to
+     * {@link #TRACEMSG TRACEMSG}, where all messages are output
+     * or shown in the result.  
+     * {@link #CRITICALMSG See CRITICALMSG for a chart of levels.}
      */
     public static final String OPT_LOGGINGLEVEL = "loggingLevel";
 
@@ -128,24 +144,27 @@ public interface Logger
 
     /**
      * Parameter: if we should dump debugging info to System.err.
+     * <p>This is primarily for debugging the test framework itself, 
+     * not necessarily for debugging the application under test.</p>
      */
     public static final String OPT_DEBUG = "debug";
 
     /**
      * Parameter: Name of test results file for file-based Loggers.
      * <p>File-based loggers should use this key as an initializer
-     * for the name of their output file
-     * Commandline Format: <code>-logFile path\to\ResultsFileName.ext</code>
-     * Properties file Format: <code>logFile=path\\to\\ResultsFileName.ext</code></p>
+     * for the name of their output file.</p>
+     * <p>Commandline Format: <code>-logFile path\to\ResultsFileName.ext</code></p>
+     * <p>Properties file Format: <code>logFile=path\\to\\ResultsFileName.ext</code></p>
+     * //@todo Need more doc about platform separator differences
      */
     public static final String OPT_LOGFILE = "logFile";
 
     /**
      * Parameter: Indent depth for console or HTML/XML loggers.
      * <p>Loggers may use this as an integer number of spaces to
-     * indent, as applicable to their situation.
-     * Commandline Format: <code>-indent <i>nn</i></code>
-     * Properties file Format: <code>indent=<i>nn</i></code></p>
+     * indent, as applicable to their situation.</p>
+     * <p>Commandline Format: <code>-indent <i>nn</i></code></p>
+     * <p>Properties file Format: <code>indent=<i>nn</i></code></p>
      */
     public static final String OPT_INDENT = "indent";
 
@@ -172,33 +191,62 @@ public interface Logger
      * continue, hopefully sucessfully.</li>
      * <li>STATUSMSG - Reports on basic status of the test, when you
      * want to include more detail than in a check() call</li>
-     * <li>INFOMSG - For more basic script debugging messages.</li>
+     * <li>INFOMSG - For more basic test debugging messages.</li>
      * <li>TRACEMSG - Tracing all operations, detailed debugging information.</li>
      * </ul>
+     * <p>Note that Logger implementations should also generally 
+     * put the actual level that each call is logged at into any  
+     * persistent outputs.  This will enable you to use results \
+     * analysis tools later on against the results and screen 
+     * against loggingLevel then as well.</p>
+     * <p>A common technique is to run a set of tests with a very 
+     * high loggingLevel, so most or all output is stored by Loggers, 
+     * and then analyze the results with a low logging level.  If 
+     * those results show some problems, you can always re-analyze 
+     * the results with a higher logging level without having to 
+     * re-run the test.</p>
      * @see #logMsg(int, java.lang.String)
      */
     // Levels are separated in actual values in case you wish to add your own levels in between
     public static final int CRITICALMSG = 0;  // Lowest possible loggingLevel
 
-    /** NEEDSDOC Field ERRORMSG          */
+    /** 
+     * ERRORMSG - Logs an error and (optionally) a fail.  
+     * {@link #CRITICALMSG See CRITICALMSG for a chart.}
+     */
     public static final int ERRORMSG = 10;
 
-    /** NEEDSDOC Field FAILSONLY          */
+    /** 
+     * FAILSONLY - Skips logging out most pass messages.  
+     * {@link #CRITICALMSG See CRITICALMSG for a chart.}
+     */
     public static final int FAILSONLY = 20;
 
-    /** NEEDSDOC Field WARNINGMSG          */
+    /** 
+     * WARNINGMSG - Used for non-fail warnings.  
+     * {@link #CRITICALMSG See CRITICALMSG for a chart.}
+     */
     public static final int WARNINGMSG = 30;
 
-    /** NEEDSDOC Field STATUSMSG          */
+    /** 
+     * STATUSMSG - Reports on basic status of the test.  
+     * {@link #CRITICALMSG See CRITICALMSG for a chart.}
+     */
     public static final int STATUSMSG = 40;
 
-    /** NEEDSDOC Field INFOMSG          */
+    /** 
+     * INFOMSG - For more basic test debugging messages.  
+     * {@link #CRITICALMSG See CRITICALMSG for a chart.}
+     */
     public static final int INFOMSG = 50;
 
-    /** NEEDSDOC Field TRACEMSG          */
+    /** 
+     * TRACEMSG - Tracing all operations.  
+     * {@link #CRITICALMSG See CRITICALMSG for a chart.}
+     */
     public static final int TRACEMSG = 60;  // Highest possible loggingLevel
 
-    /** NEEDSDOC Field DEFAULT_LOGGINGLEVEL          */
+    /** Default level is {@link #STATUSMSG STATUSMSG}.   */
     public static final int DEFAULT_LOGGINGLEVEL = STATUSMSG;
 
     /**
@@ -217,7 +265,10 @@ public interface Logger
     // Note: string representations are explicitly set to all be 
     //       4 characters long to make it simpler to parse results
 
-    /** NEEDSDOC Field INCP          */
+    /** 
+     * Constant "Incp" for result files.   
+     * @see #INCP_RESULT
+     */
     public static final String INCP = "Incp";
 
     /**
@@ -229,7 +280,10 @@ public interface Logger
      */
     public static final int PASS_RESULT = 2;
 
-    /** NEEDSDOC Field PASS          */
+    /** 
+     * Constant "Pass" for result files.   
+     * @see #PASS_RESULT
+     */
     public static final String PASS = "Pass";
 
     /**
@@ -246,7 +300,10 @@ public interface Logger
      */
     public static final int AMBG_RESULT = 5;
 
-    /** NEEDSDOC Field AMBG          */
+    /** 
+     * Constant "Ambg" for result files.   
+     * @see #AMBG_RESULT
+     */
     public static final String AMBG = "Ambg";
 
     /**
@@ -261,7 +318,10 @@ public interface Logger
      */
     public static final int FAIL_RESULT = 8;
 
-    /** NEEDSDOC Field FAIL          */
+    /** 
+     * Constant "Fail" for result files.   
+     * @see #FAIL_RESULT
+     */
     public static final String FAIL = "Fail";
 
     /**
@@ -278,7 +338,12 @@ public interface Logger
      */
     public static final int ERRR_RESULT = 9;
 
-    /** NEEDSDOC Field ERRR          */
+    /** 
+     * Constant "Errr" for result files.   
+     * Note all constant strings for results are 4 chars long
+     * to make fixed-length record file-based results simpler.
+     * @see #ERRR_RESULT
+     */
     public static final String ERRR = "Errr";
 
     /**
@@ -302,7 +367,7 @@ public interface Logger
      * Returns information about the Property name=value pairs that
      * are understood by this Logger/Reporter.
      * @author Shane_Curcuru@lotus.com
-     * @return same as {@link java.applet.Applet.getParameterInfo}.
+     * @return same as {@link java.applet.Applet#getParameterInfo()}.
      */
     public abstract String[][] getParameterInfo();
 
@@ -329,38 +394,25 @@ public interface Logger
      * Call once to initialize this Logger/Reporter from Properties.
      * <p>Simple hook to allow Logger/Reporters with special output
      * items to initialize themselves.</p>
+     *
      * @author Shane_Curcuru@lotus.com
-     * @param Properties block to initialize from.
-     * @param status, true if OK, false if an error occoured.
-     *
-     * NEEDSDOC @param p
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param p Properties block to initialize from.
+     * @return status, true if OK, false if an error occoured.
      */
     public abstract boolean initialize(Properties p);
 
     /**
      * Is this Logger/Reporter ready to log results?
+     * Obviously the meaning of 'ready' may be slightly different 
+     * between different kinds of Loggers.  A ConsoleLogger may 
+     * simply always be ready, since it probably just sends it's 
+     * output to System.out.  File-based Loggers may not be ready 
+     * until they've opened their file, and if IO errors happen, 
+     * may have to report not ready later on as well.
      * @author Shane_Curcuru@lotus.com
      * @return status - true if it's ready to report, false otherwise
      */
     public abstract boolean isReady();
-
-    /**
-     * Is this Logger/Reporter still running OK?
-     * Note that a'la java.io.PrintWriter, this class should never
-     * throw exceptions.  It will merely quietly fail and set this
-     * error flag when something bad happens.
-     * <p>Note this may have slightly different meanings for various
-     * types of Loggers (file-based, network-based, etc.) or for
-     * Reporters (which may still be able to function if only one
-     * of their Loggers has an error)</p>
-     * <p>Note: we should consider renaming this to avoid possible 
-     * confusion with the checkErr(String) method.</p>
-     * @author Shane_Curcuru@lotus.com
-     * @return status - true if an error has occoured, false if it's OK
-     */
-    public abstract boolean checkError();
 
     /**
      * Flush this Logger/Reporter - should ensure all output is flushed.
@@ -372,7 +424,9 @@ public interface Logger
 
     /**
      * Close this Logger/Reporter - should include closing any OutputStreams, etc.
-     * Logger/Reporters should return isReady() = false after closing.
+     * Logger/Reporters should return {@link #isReady()} = false 
+     * after being closed; presumably they will not actually log 
+     * out any further data.
      * @author Shane_Curcuru@lotus.com
      */
     public abstract void close();
@@ -436,7 +490,8 @@ public interface Logger
      * {@link #checkFail(String)}, etc. to report the actual
      * results of your tests.</p>
      * @author Shane_Curcuru@lotus.com
-     * @param level severity of message.
+     * @param level severity of message; from {@link #CRITICALMSG} 
+     * to {@link #TRACEMSG}
      * @param msg comment to log out.
      */
     public abstract void logMsg(int level, String msg);
@@ -445,7 +500,8 @@ public interface Logger
      * Report an arbitrary String to result file with specified severity.
      * Log out the String provided exactly as-is.
      * @author Shane_Curcuru@lotus.com
-     * @param level severity or class of message.
+     * @param level severity of message; from {@link #CRITICALMSG} 
+     * to {@link #TRACEMSG}
      * @param msg arbitrary String to log out.
      */
     public abstract void logArbitrary(int level, String msg);
@@ -457,20 +513,41 @@ public interface Logger
      * they need to, with the simplest API.  The actual meanings of the numbers
      * are dependent on the implementer.
      * @author Shane_Curcuru@lotus.com
-     * @param level severity of message.
-     * @param lVal statistic in long format.
-     * @param dVal statistic in double format.
+     * @param level severity of message; from {@link #CRITICALMSG} 
+     * to {@link #TRACEMSG}
+     * @param lVal statistic in long format, if available.
+     * @param dVal statistic in double format, if available.
      * @param msg comment to log out.
      */
     public abstract void logStatistic(int level, long lVal, double dVal,
                                       String msg);
 
     /**
+     * Logs out Throwable.toString() and a stack trace of the 
+     * Throwable with the specified severity.
+     * <p>Works in conjuntion with {@link #setLoggingLevel(int)}; 
+     * only outputs messages that are more severe than the current 
+     * logging level.</p>
+     * <p>This uses logArbitrary to log out your msg - message, 
+     * a newline, throwable.toString(), a newline,
+     * and then throwable.printStackTrace().</p>
+     * <p>Note that this does not imply a failure or problem in 
+     * a test in any way: many tests may want to verify that 
+     * certain exceptions are thrown, etc.</p>
+     * @author Shane_Curcuru@lotus.com
+     * @param level severity of message.
+     * @param throwable throwable/exception to log out.
+     * @param msg description of the throwable.
+     */
+    public abstract void logThrowable(int level, Throwable throwable, String msg);
+
+    /**
      * Logs out a element to results with specified severity.
      * This method is primarily for Loggers that output to fixed
      * structures, like files, XML data, or databases.
      * @author Shane_Curcuru@lotus.com
-     * @param level severity of message.
+     * @param level severity of message; from {@link #CRITICALMSG} 
+     * to {@link #TRACEMSG}
      * @param element name of enclosing element
      * @param attrs hash of name=value attributes
      * @param msg Object to log out; up to Loggers to handle
@@ -482,7 +559,8 @@ public interface Logger
     /**
      * Logs out contents of a Hashtable with specified severity.
      * <p>Loggers should store or log the full contents of the hashtable.</p>
-     * @param level severity or class of message.
+     * @param level severity of message; from {@link #CRITICALMSG} 
+     * to {@link #TRACEMSG}
      * @param hash Hashtable to log the contents of.
      * @param msg decription of the Hashtable.
      */
@@ -494,9 +572,10 @@ public interface Logger
     // There is no public void checkIncp(String comment) method
 
     /**
-     * Writes out a Pass record with comment.
+     * Writes out a Pass record with comment.  
      * @author Shane_Curcuru@lotus.com
      * @param comment comment to log with the pass record.
+     * @see #PASS_RESULT
      */
     public abstract void checkPass(String comment);
 
@@ -504,6 +583,7 @@ public interface Logger
      * Writes out an ambiguous record with comment.
      * @author Shane_Curcuru@lotus.com
      * @param comment to log with the ambg record.
+     * @see #AMBG_RESULT
      */
     public abstract void checkAmbiguous(String comment);
 
@@ -511,6 +591,7 @@ public interface Logger
      * Writes out a Fail record with comment.
      * @author Shane_Curcuru@lotus.com
      * @param comment comment to log with the fail record.
+     * @see #FAIL_RESULT
      */
     public abstract void checkFail(String comment);
 
@@ -518,6 +599,7 @@ public interface Logger
      * Writes out an Error record with comment.
      * @author Shane_Curcuru@lotus.com
      * @param comment comment to log with the error record.
+     * @see #ERRR_RESULT
      */
     public abstract void checkErr(String comment);
 
@@ -534,6 +616,7 @@ public interface Logger
      * @author Shane_Curcuru@lotus.com
      * @param comment comment to log with the pass record.
      * @param ID token to log with the pass record.
+     * @see #PASS_RESULT
      */
     public abstract void checkPass(String comment, String id);
 
@@ -542,6 +625,7 @@ public interface Logger
      * @author Shane_Curcuru@lotus.com
      * @param comment to log with the ambg record.
      * @param ID token to log with the pass record.
+     * @see #AMBG_RESULT
      */
     public abstract void checkAmbiguous(String comment, String id);
 
@@ -550,6 +634,7 @@ public interface Logger
      * @author Shane_Curcuru@lotus.com
      * @param comment comment to log with the fail record.
      * @param ID token to log with the pass record.
+     * @see #FAIL_RESULT
      */
     public abstract void checkFail(String comment, String id);
 
@@ -558,6 +643,7 @@ public interface Logger
      * @author Shane_Curcuru@lotus.com
      * @param comment comment to log with the error record.
      * @param ID token to log with the pass record.
+     * @see #ERRR_RESULT
      */
     public abstract void checkErr(String comment, String id);
 }  // end of class Logger

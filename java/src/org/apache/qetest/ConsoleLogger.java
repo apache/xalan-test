@@ -63,6 +63,8 @@
 package org.apache.qetest;
 
 import java.io.PrintStream;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -244,16 +246,6 @@ public class ConsoleLogger implements Logger
     }
 
     /**
-     * Is this Logger/Reporter still running OK?
-     * //@todo rename method; too confusing with boolean checkErr(String)
-     * @return false - ConsoleLoggers never have errors
-     */
-    public boolean checkError()
-    {
-        return false;
-    }
-
-    /**
      * Flush this Logger/Reporter - no-op for ConsoleLogger.
      */
     public void flush()
@@ -402,6 +394,30 @@ public class ConsoleLogger implements Logger
             return;
             
         outStream.println(sIndent + msg + " l: " + lVal + " d: " + dVal);
+    }
+
+    /**
+     * Logs out Throwable.toString() and a stack trace of the 
+     * Throwable with the specified severity.
+     * @author Shane_Curcuru@lotus.com
+     * @param level severity of message.
+     * @param throwable throwable/exception to log out.
+     * @param msg description of the throwable.
+     */
+    public void logThrowable(int level, Throwable throwable, String msg)
+    {
+        if (consoleLoggingLevel < level)
+            return;
+
+        StringWriter sWriter = new StringWriter();
+
+        sWriter.write(msg + "\n");
+        sWriter.write(throwable.toString() + "\n");
+
+        PrintWriter pWriter = new PrintWriter(sWriter);
+        throwable.printStackTrace(pWriter);
+
+        outStream.println(sWriter.toString());
     }
 
     /**

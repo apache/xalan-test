@@ -251,17 +251,6 @@ public class Reporter implements Logger
     }
 
     /**
-     * Is this Logger/Reporter still running OK?
-     * Should be deprecated and removed: not used. -sc 21-Mar-01
-     * @author Shane_Curcuru@lotus.com
-     * @return status - true if an error has occoured, false if it's OK
-     */
-    public boolean checkError()
-    {
-        return false;
-    }
-
-    /**
      * Flush this Logger/Reporter - should ensure all output is flushed.
      * Note that the flush operation is not necessarily pertinent to
      * all types of Logger/Reporter - console-type Loggers no-op this.
@@ -1013,14 +1002,20 @@ public class Reporter implements Logger
     }
 
     /**
-     * Logs out throwable.toString() and stack trace to result file with specified severity.
-     * <p>Works in conjuntion with setLoggingLevel(int); only outputs messages that
-     * are more severe than the current logging level.</p>
-     * <p>This uses logArbitrary to log out your message, newline, throwable.toString(), newline,
-     * and then throwable.printStackTrace(). No corresponding Logger call exists.</p>
+     * Logs out Throwable.toString() and a stack trace of the 
+     * Throwable with the specified severity.
+     * <p>Works in conjuntion with {@link #setLoggingLevel(int)}; 
+     * only outputs messages that are more severe than the current 
+     * logging level.</p>
+     * <p>This uses logArbitrary to log out your msg - message, 
+     * a newline, throwable.toString(), a newline,
+     * and then throwable.printStackTrace().</p>
+     * <p>Note that this does not imply a failure or problem in 
+     * a test in any way: many tests may want to verify that 
+     * certain exceptions are thrown, etc.</p>
      * @author Shane_Curcuru@lotus.com
      * @param level severity of message.
-     * @param throwable thrown throwable/exception to log out.
+     * @param throwable throwable/exception to log out.
      * @param msg description of the throwable.
      */
     public void logThrowable(int level, Throwable throwable, String msg)
@@ -1029,18 +1024,9 @@ public class Reporter implements Logger
         if (level > loggingLevel)
             return;
 
-        StringWriter sWriter = new StringWriter();
-
-        sWriter.write(msg + "\n");
-        sWriter.write(throwable.toString() + "\n");
-
-        PrintWriter pWriter = new PrintWriter(sWriter);
-
-        throwable.printStackTrace(pWriter);
-
         for (int i = 0; i < numLoggers; i++)
         {
-            loggers[i].logArbitrary(level, sWriter.toString());
+            loggers[i].logThrowable(level, throwable, msg);
         }
     }
 
