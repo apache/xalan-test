@@ -850,6 +850,7 @@ public class ExamplesTest extends XSLProcessorTestBase
 
           Transformer transformer = templates.newTransformer();
           DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+          dfactory.setNamespaceAware(true); // must have namespaces for xsl files!
           DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
           org.w3c.dom.Document outNode = docBuilder.newDocument();
           reporter.logTraceMsg("docBuilder.parse(new InputSource(" + QetestUtils.filenameToURL(sourceID));
