@@ -135,7 +135,7 @@ public class SerializedStylesheetTest extends XSLProcessorTestBase
                               + File.separator + "Minitest.xsl");
         minitestFileInfo.xmlName = QetestUtils.filenameToURL(inputDir
                               + File.separator + "Minitest.xml");
-        minitestFileInfo.goldName = goldDir + File.separator + "Minitest.out";
+        minitestFileInfo.goldName = goldDir + File.separator + "Minitest-xalanj2.out";
 
         return true;
     }
@@ -216,10 +216,13 @@ public class SerializedStylesheetTest extends XSLProcessorTestBase
             Transformer transformer = templates.newTransformer();
             reporter.logInfoMsg("About to transform(xmlDoc, StreamResult(" + outNames.nextName() + "))");
             transformer.transform(new StreamSource(minitestFileInfo.xmlName), new StreamResult(outNames.currentName()));
-            fileChecker.check(reporter, 
-                              new File(outNames.currentName()), 
-                              new File(minitestFileInfo.goldName), 
-                              "Using serialized Templates, transform into " + outNames.currentName());
+            if (Logger.PASS_RESULT != 
+                fileChecker.check(reporter, 
+                        new File(outNames.currentName()), 
+                        new File(minitestFileInfo.goldName), 
+                        "Using serialized Templates, transform into " + outNames.currentName())
+               )
+                reporter.logStatusMsg("Using serialized Templates: failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
         {
