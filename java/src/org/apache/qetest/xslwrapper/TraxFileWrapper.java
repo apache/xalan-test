@@ -164,6 +164,8 @@ public class TraxFileWrapper extends TransformWrapperHelper
         {   
             throw new TransformerConfigurationException("TraxFileWrapper.newProcessor: factory does not support Streams!");
         }
+        // Set any of our options as Attributes on the factory
+        TraxWrapperUtils.setAttributes(factory, options);
         return (Object)factory;
     }
 

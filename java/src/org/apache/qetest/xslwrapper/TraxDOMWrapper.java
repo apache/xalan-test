@@ -178,6 +178,8 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         {   
             throw new TransformerConfigurationException("TraxDOMWrapper.newProcessor: factory does not support DOM!");
         }
+        // Set any of our options as Attributes on the factory
+        TraxWrapperUtils.setAttributes(factory, options);
         return (Object)factory;
     }
 

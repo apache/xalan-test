@@ -184,6 +184,8 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         {   
             throw new TransformerConfigurationException("TraxSAXWrapper.newProcessor: factory does not support SAX!");
         }
+        // Set any of our options as Attributes on the factory
+        TraxWrapperUtils.setAttributes(factory, options);
         saxFactory = (SAXTransformerFactory)factory;
         return (Object)saxFactory;
     }

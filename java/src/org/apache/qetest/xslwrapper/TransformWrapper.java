@@ -253,6 +253,16 @@ public interface TransformWrapper
 
 
     /**
+     * Marker for Attributes to set on Processors.  
+     * 
+     * Options that startWith() this constant will actually be 
+     * attempted to be set onto our underlying processor/transformer.
+     */
+    public static final String SET_PROCESSOR_ATTRIBUTES = 
+        "Processor.setAttribute.";
+
+
+    /**
      * Get a general description of this wrapper itself.
      *
      * @return a general description of this wrapper: roughly how 

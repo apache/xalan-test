@@ -56,7 +56,11 @@
  */
 package org.apache.qetest.xslwrapper;
 
+import javax.xml.transform.TransformerFactory;
+
 import java.lang.reflect.Field;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Properties;
 
 /**
@@ -112,5 +116,59 @@ public abstract class TraxWrapperUtils
         catch (Exception e2) { /* no-op, ignore */ }
 
         return p;
+    }
+
+
+    /**
+     * Apply specific Attributes to a TransformerFactory.  
+     *
+     * Filters on hashkeys.startsWith("Processor.setAttribute.")
+     * Exceptions thrown by underlying factory are ignored.
+     *
+     * @param factory TransformerFactory to call setAttributes on.
+     * @param attrs Hashtable of potential attributes to set.
+     */
+    public static void setAttributes(TransformerFactory factory, 
+                                     Hashtable attrs)
+                                     throws IllegalArgumentException
+    {
+        if ((null == factory) || (null == attrs))
+            return;
+
+        Enumeration attrKeys = null;
+        try
+        {
+            attrKeys = ((Properties)attrs).propertyNames();
+        }
+        catch (ClassCastException cce)
+        {
+            // Simply get as Hashtable instead
+            attrKeys = attrs.keys();
+        }
+
+        while (attrKeys.hasMoreElements())
+        {
+            String key = (String) attrKeys.nextElement();
+            // Only attempt to set the attr if it matches our marker
+            if ((null != key)
+                && (key.startsWith(TransformWrapper.SET_PROCESSOR_ATTRIBUTES)))
+            {
+                // Strip off our marker for the property name
+                String processorKey = key.substring(TransformWrapper.SET_PROCESSOR_ATTRIBUTES.length());
+                Object value = null;
+                try
+                {
+                    value = ((Properties)attrs).getProperty(key);
+                }
+                catch (ClassCastException cce)
+                {
+                    // Simply get as Hashtable instead
+                    value = attrs.get(key);
+                }
+                // Note: allow exceptions to propagate here
+                factory.setAttribute(processorKey, value);
+            }
+        }
+
     }
 }

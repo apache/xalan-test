@@ -60,6 +60,7 @@ import org.apache.qetest.QetestUtils;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -167,6 +168,14 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         //@todo do we need to do any other cleanup?
         reset(false);
         factory = TransformerFactory.newInstance();
+        // Verify the factory supports Streams!
+        if (!(factory.getFeature(StreamSource.FEATURE)
+              && factory.getFeature(StreamResult.FEATURE)))
+        {   
+            throw new TransformerConfigurationException("TraxStreamWrapper.newProcessor: factory does not support Streams!");
+        }
+        // Set any of our options as Attributes on the factory
+        TraxWrapperUtils.setAttributes(factory, options);
         return (Object)factory;
     }
 
