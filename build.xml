@@ -331,6 +331,29 @@ dependencies - users must manually 'build jar' first.
         </antcall>
     </target>
 
+
+    <target name="conferr.xsltc" description="Run TestletDriver over the conferr negative test tree" depends="init.test">
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <echo message="Executing Xalan conferr test-xsltc: ${testClass}" />
+        <property name="testType" value="conferr.xsltc." />
+
+        <!-- Set indent-number to 0 to match Xalan's default indentation -->
+        <property name="${testType}Processor.setAttribute.indent-number" value="0" />
+
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="conf.class.path"
+            bootclasspathref="boot.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" >
+            <!-- Explicitly set TransformerFactory property to use xsltc -->
+            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
+        </xalantest>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${conferr.xsltc.outputDir}" />
+        </antcall>
+    </target>
+
     <!-- ================================================================== -->
     <!-- Run tests: the normal StylesheetTestletDriver on the perf suite    -->
     <!-- ================================================================== -->
