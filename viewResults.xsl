@@ -26,6 +26,9 @@
 <!-- When set to true, skips (does not) output any checkresult[@result='PASS'] -->
 <xsl:param name="failsonly">false</xsl:param>
 
+<!-- When set to true, also outputs perf-related stuff -->
+<xsl:param name="perfLogging">false</xsl:param>
+
 <!-- File listing known bugs, so that when we get a result
      checkresult[@result='$FAIL'] who has an @id that also 
      matches a known bug, we can print 'SPR' instead of 'Fail' -->
@@ -125,7 +128,7 @@
     <!-- It is illegal for a testcase to contain another testcase, so don't bother 
          selecting them: however you must check for every other kind of item -->
     <!-- fileref comes from XSLDirectoryIterator when a test has a non-pass checkresult -->
-    <xsl:apply-templates select="message | arbitrary | checkresult | hashtable | fileref"/>
+    <xsl:apply-templates select="message | arbitrary | checkresult | hashtable | fileref | statistic | perf"/>
     <TR><TD></TD><TD><xsl:text>Case time (milliseconds): </xsl:text>
     <xsl:value-of select="(statistic[starts-with(@desc,$CASE_STOP)]/longval) - (statistic[starts-with(@desc,$CASE_START)]/longval)"/></TD></TR>
     <!-- Print out the overall caseresult at the end -->
@@ -178,10 +181,40 @@
 </xsl:template>
 
 <!-- If users want a 'condensed' report, set failsonly=true, and then we skip all pass records -->
-<xsl:template match="checkresult[@result=$PASS]">
-  <xsl:if test="$failsonly='false'">
-    <TR><TD><xsl:value-of select="@result"/></TD><TD><xsl:value-of select="@desc"/></TD></TR>
+<xsl:template match="statistic">
+  <xsl:if test="$perfLogging='true'">
+    <xsl:call-template name="log-statistic"/>
   </xsl:if>
+</xsl:template>
+<xsl:template name="log-statistic">
+  <!-- //@todo Note assumption we're in a table -->
+  <TR>
+    <TD><xsl:value-of select="@level"/></TD>
+    <TD><xsl:value-of select="@desc"/><xsl:text> </xsl:text><xsl:value-of select="longval"/></TD>
+  </TR>
+</xsl:template>
+
+<xsl:template match="perf">
+  <xsl:if test="$perfLogging='true'">
+    <xsl:call-template name="log-perf"/>
+  </xsl:if>
+</xsl:template>
+<xsl:template name="log-perf">
+  <!-- //@todo Note assumption we're in a table -->
+  <TR>
+    <TD><xsl:value-of select="@idref"/></TD>
+    <TD>
+      <xsl:value-of select="@desc"/>
+      <xsl:text> avgparsexsl: </xsl:text><xsl:value-of select="@avgparsexsl"/>
+      <xsl:text> singletransform: </xsl:text><xsl:value-of select="@singletransform"/>
+      <xsl:text> unparsedxml: </xsl:text><xsl:value-of select="@unparsedxml"/>
+      <xsl:text> parsexsl: </xsl:text><xsl:value-of select="@parsexsl"/>
+      <xsl:text> avgetoe: </xsl:text><xsl:value-of select="@avgetoe"/>
+      <xsl:text> avgunparsedxml: </xsl:text><xsl:value-of select="@avgunparsedxml"/>
+      <xsl:text> etoe: </xsl:text><xsl:value-of select="@etoe"/>
+      <xsl:text> iterations: </xsl:text><xsl:value-of select="@iterations"/>
+    </TD>
+  </TR>
 </xsl:template>
 
 <!-- 
@@ -213,6 +246,14 @@
     </TD>
   </TR>
 </xsl:template>
+
+<!-- Output simplistic performance data if asked -->
+<xsl:template match="checkresult[@result=$PASS]">
+  <xsl:if test="$failsonly='false'">
+    <TR><TD><xsl:value-of select="@result"/></TD><TD><xsl:value-of select="@desc"/></TD></TR>
+  </xsl:if>
+</xsl:template>
+
 
 <!-- Differentiate results that are not within a testcase! 
      These get their own table element so they stand out.  Also, 
@@ -315,7 +356,7 @@
 <!-- Special processing for java.class.path! This, more specific template must be after the generic one -->
 <xsl:template match="hashitem[@key='java.class.path']">
   <TR><TD bgcolor="yellow"><xsl:value-of select="@key"/></TD><TD><xsl:value-of select="."/></TD></TR>
-  <TR><TD bgcolor="yellow"></TD><TD><xsl:call-template name="ClasspathItems"></xsl:call-template></TD></TR>
+  <TR><TD bgcolor="yellow"></TD><TD><xsl:call-template name="ClasspathItems"/></TD></TR>
 </xsl:template>
 
 <!-- Output the special messages that the Harness outputs showing which exact
@@ -417,6 +458,6 @@
 </xsl:template>
 
 <!-- Override default text node processing, so statistics, arbitrary messages, and other stuff is skipped -->
-<xsl:template match="text()"></xsl:template>
+<xsl:template match="text()"/>
 
 </xsl:stylesheet>
