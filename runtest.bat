@@ -27,8 +27,8 @@ if '%1' == '-jview' goto setjv
 if '%1' == '-JVIEW' goto setjv
 
 @REM Non-jview: Trickery to guess appropriate location of java.exe program
-if '%JAVA_HOME%' == '' set JAVA_EXE=java
-if not '%JAVA_HOME%' == '' set JAVA_EXE=%JAVA_HOME%\bin\java
+if "%JAVA_HOME%" == "" set JAVA_EXE=java
+if not "%JAVA_HOME%" == "" set JAVA_EXE=%JAVA_HOME%\bin\java
 set CMDCP=-classpath
 goto dojardir
 
@@ -47,27 +47,27 @@ goto dojardir
 @REM Note that this could cause conflicts if the user only specified 
 @REM    some of the needed jars in the classpath, and then we add separate
 @REM    copies of them later on.
-if '%JARDIR%' == '' echo runtest.bat must have JARDIR set!
-if '%JARDIR%' == '' goto done
+if "%JARDIR%" == "" echo runtest.bat must have JARDIR set!
+if "%JARDIR%" == "" goto done
 
 @REM If JARDIR set, put those references first then default classpath
-if not '%JARDIR%' == '' set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
 
 @REM Wrappers use EXTRA_CP to add items to our classpath; if set, append
-if not '%EXTRA_CP%' == '' set TEST_CP=%TEST_CP%;%EXTRA_CP%
+if not "%EXTRA_CP%" == "" set TEST_CP=%TEST_CP%;%EXTRA_CP%
 
 @REM Wrappers use END_PKG to switch around the end of the packagename; if not set, default it
 if '%END_PKG%' == '' set END_PKG=xsl
 
 @REM If exactly one option passed, assume we run: %JAVA_EXE% TestName -load TestName.prop
 @REM this is a convenience for most tests, if they have a same-named prop file with them
-if '%2' == '' echo %JAVA_EXE% %JAVA_OPTS% %CMDCP% %TEST_CP% org.apache.qetest.%END_PKG%.%1 -load %1.prop
-if '%2' == '' %JAVA_EXE% %JAVA_OPTS% %CMDCP% %TEST_CP% org.apache.qetest.%END_PKG%.%1 -load %1.prop
-if '%2' == '' goto done
+if "%2" == "" echo "%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1 -load %1.prop
+if "%2" == "" "%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1 -load %1.prop
+if "%2" == "" goto done
 
 @REM Otherwise, assume it's a bare classname to run with extra args
-echo %JAVA_EXE% %JAVA_OPTS% %CMDCP% %TEST_CP% org.apache.qetest.%END_PKG%.%1  %2 %3 %4 %5 %6 %7 %8 %9
-%JAVA_EXE% %JAVA_OPTS% %CMDCP% %TEST_CP% org.apache.qetest.%END_PKG%.%1  %2 %3 %4 %5 %6 %7 %8 %9
+echo "%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1  %2 %3 %4 %5 %6 %7 %8 %9
+"%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1  %2 %3 %4 %5 %6 %7 %8 %9
 
 :done
 @echo %0 complete!
