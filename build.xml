@@ -446,6 +446,7 @@
 
     <target name="smoketest-results-dist" depends="init.test">
         <!-- tar.gz the automation and batch files, etc. -->
+        <!-- Note the includes location is tied to test.properties smoketest.*.outputDir, etc. -->
         <tar tarfile="../xalan-smoketest-${DSTAMP}.tar" 
              includes="xml-xalan/test/smoketest/"
              basedir="../.." 
@@ -464,8 +465,9 @@
     <!-- ================================================================== -->
     <!-- Run tests: A whole bunch of tests - used before posting builds, etc-->
     <!-- ================================================================== -->
+    <property name="alltest.resultDir" value="results-alltest" />
     <target name="alltest" 
-            description="Run nearly all available Xalan-J 2.x tests - lots of tests!"
+            description="Run nearly *all* available Xalan-J 2.x tests"
             depends="all,alltest-execute">
         <!-- Currently don't bother checking results, -pass, -notpass -->
     </target>
@@ -476,12 +478,11 @@
          and other tests all in one target.
      -->
     <target name="alltest-execute">
-        <property name="alltest.outputDir" value="results-alltest/" />
-        <echo message="About to execute LOTS of tests, results into ${alltest.outputDir}..." />
+        <echo message="About to execute LOTS of tests, results into ${alltest.resultDir}/..." />
         <!-- Run all individual API tests through the harness -->
         <antcall target="harness">
-            <param name="api.outputDir" value="${alltest.outputDir}harness"/>
-            <param name="api.logFile" value="${alltest.outputDir}harness/results.xml"/>
+            <param name="api.outputDir" value="${alltest.resultDir}/harness"/>
+            <param name="api.logFile" value="${alltest.resultDir}/harness/results.xml"/>
         </antcall>
         <!-- Run full conf test with each major available flavor into 
              specific output directories; note any user options will 
@@ -489,52 +490,62 @@
         -->
         <antcall target="conf">
             <param name="conf.flavor" value="trax.systemId"/>
-            <param name="conf.outputDir" value="${alltest.outputDir}systemId"/>
-            <param name="conf.logFile" value="${alltest.outputDir}systemId/results.xml"/>
+            <param name="conf.outputDir" value="${alltest.resultDir}/systemId"/>
+            <param name="conf.logFile" value="${alltest.resultDir}/systemId/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.file"/>
-            <param name="conf.outputDir" value="${alltest.outputDir}file"/>
-            <param name="conf.logFile" value="${alltest.outputDir}file/results.xml"/>
+            <param name="conf.outputDir" value="${alltest.resultDir}/file"/>
+            <param name="conf.logFile" value="${alltest.resultDir}/file/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.dom"/>
-            <param name="conf.outputDir" value="${alltest.outputDir}dom"/>
-            <param name="conf.logFile" value="${alltest.outputDir}dom/results.xml"/>
+            <param name="conf.outputDir" value="${alltest.resultDir}/dom"/>
+            <param name="conf.logFile" value="${alltest.resultDir}/dom/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.sax"/>
-            <param name="conf.outputDir" value="${alltest.outputDir}sax"/>
-            <param name="conf.logFile" value="${alltest.outputDir}sax/results.xml"/>
+            <param name="conf.outputDir" value="${alltest.resultDir}/sax"/>
+            <param name="conf.logFile" value="${alltest.resultDir}/sax/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.localPath"/>
-            <param name="conf.outputDir" value="${alltest.outputDir}localPath"/>
-            <param name="conf.logFile" value="${alltest.outputDir}localPath/results.xml"/>
+            <param name="conf.outputDir" value="${alltest.resultDir}/localPath"/>
+            <param name="conf.logFile" value="${alltest.resultDir}/localPath/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.stream"/>
-            <param name="conf.outputDir" value="${alltest.outputDir}stream"/>
-            <param name="conf.logFile" value="${alltest.outputDir}stream/results.xml"/>
+            <param name="conf.outputDir" value="${alltest.resultDir}/stream"/>
+            <param name="conf.logFile" value="${alltest.resultDir}/stream/results.xml"/>
         </antcall>
         <!-- Run various other sets of conf-like tests -->
         <antcall target="perf">
-            <param name="perf.outputDir" value="${alltest.outputDir}perf"/>
-            <param name="perf.logFile" value="${alltest.outputDir}perf/results.xml"/>
+            <param name="perf.outputDir" value="${alltest.resultDir}/perf"/>
+            <param name="perf.logFile" value="${alltest.resultDir}/perf/results.xml"/>
         </antcall>
         <antcall target="contrib">
-            <param name="contrib.outputDir" value="${alltest.outputDir}contrib"/>
-            <param name="contrib.logFile" value="${alltest.outputDir}contrib/results.xml"/>
+            <param name="contrib.outputDir" value="${alltest.resultDir}/contrib"/>
+            <param name="contrib.logFile" value="${alltest.resultDir}/contrib/results.xml"/>
         </antcall>
         <!-- Run other misc tests -->
         <antcall target="extensions">
-            <param name="extensions.outputDir" value="${alltest.outputDir}extensions"/>
-            <param name="extensions.logFile" value="${alltest.outputDir}extensions/results.xml"/>
+            <param name="extensions.outputDir" value="${alltest.resultDir}/extensions"/>
+            <param name="extensions.logFile" value="${alltest.resultDir}/extensions/results.xml"/>
         </antcall>
         <antcall target="bugzilla">
-            <param name="bugzilla.outputDir" value="${alltest.outputDir}bugzilla"/>
-            <param name="bugzilla.logFile" value="${alltest.outputDir}bugzilla/results.xml"/>
+            <param name="bugzilla.outputDir" value="${alltest.resultDir}/bugzilla"/>
+            <param name="bugzilla.logFile" value="${alltest.resultDir}/bugzilla/results.xml"/>
         </antcall>
+    </target>
+
+    <target name="test"
+        depends="alltest"
+        description="Alias for alltest">
+    </target>
+
+    <target name="check"
+        depends="alltest"
+        description="Alias for alltest">
     </target>
 
     <!-- ================================================================== -->
@@ -653,8 +664,25 @@
          in testxsl.jar from the java/ directory, as well as 
          various other classes in subdirs under tests/
     -->
-    <target name="all" description="Build testxsl.jar *and* compile .java under tests/ dir"
+    <target name="all" description="Build testxsl.jar *and* compile .java under tests/"
         depends="jar,bugzilla.classes,extensions.classes">
+    </target>
+
+    <target name="main"
+        depends="all"
+        description="Alias for all">
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Various targets to clean the build tree                             -->
+    <!-- =================================================================== -->
+    <target name="distclean" depends="clean"
+        description="Clean everything, including most test results!" >
+        <delete dir="${alltest.resultDir}" />
+        <delete dir="${apitest.outputDir}" />
+        <delete dir="${conftest.outputDir}" />
+        <delete dir="${perftest.outputDir}" />
+        <delete dir="${contrib.outputDir}" />
     </target>
 
     <target name="clean"
@@ -708,12 +736,15 @@
         </javadoc>
     </target>
 
+    <target name="printerdocs" depends="init.docs">
+      <echo message="${ant.project.name} currently doesn't support printerdocs; try docs or javadocs instead."/>
+    </target>
 
     <!-- =================================================================== -->
     <!-- Build distribution - simple zip/tar.gz for sharing tests            -->
     <!-- =================================================================== -->
     <target name="dist" depends="all,docs,javadocs,dist-nodeps"
-        description="Build a simple distribution module from all plus docs">
+        description="Build a simple distribution module incl. docs">
     </target>
 
     <target name="dist-nodeps" depends="init.build"
@@ -857,5 +888,15 @@
             <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
         </xalantest>
     </target>
+
+  <!-- =================================================================== -->
+  <!-- Install/Uninstall targets - not currently applicable                -->
+  <!-- =================================================================== -->
+  <target name="install">
+    <echo message="${ant.project.name} currently doesn't support (un)installation; try jar or api instead"/>
+  </target>
+  <target name="uninstall">
+    <echo message="${ant.project.name} currently doesn't support (un)installation; try distclean instead"/>
+  </target>
 
 </project>
