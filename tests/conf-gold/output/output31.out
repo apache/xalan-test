@@ -11,7 +11,7 @@
     9. " "  <A href=" "></A><img src="Test 31 Gif.gif">
    10."%"  <A href="%"></A>	
    11."	"  <A href="%09"></A>	
-   12.""  <A href="%7F"></A>	
+   12."&#127;"  <A href="%7F"></A>	
    13."&Ntilde;"  <A href="%C3%91"></A>	
-   14."&OElig;"  <A href="%C5%92"></A><A href="phnix.html">test1</A><A href="ph%C3%85%C2%92nix.html">test2</A>
+   14."Œ"  <A href="%C5%92"></A><A href="phnix.html">test1</A><A href="ph%C3%85%C2%92nix.html">test2</A>
 </out>
