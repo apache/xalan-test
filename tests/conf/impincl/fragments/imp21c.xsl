@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <!-- FileName: imp21c -->
-<!-- Purpose: Used indirectly by impincl21 -->
+<!-- Purpose: Used indirectly by impincl21 and impincl25 -->
 
 <xsl:template match="foo">
   <C>
