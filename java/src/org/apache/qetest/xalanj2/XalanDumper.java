@@ -133,6 +133,13 @@ public abstract class XalanDumper
         buf.append(elem.getNodeName());
         buf.append(SEP + LNUM + elem.getLineNumber());
         buf.append(SEP + CNUM + elem.getColumnNumber());
+        buf.append(SEP + "getLength=" + elem.getLength());
+        if (DUMP_VERBOSE == (dumpLevel & DUMP_VERBOSE))
+        {
+            // Only include systemIds (which are long) if verbose
+            buf.append(SEP + "getSystemId=" + elem.getSystemId());
+            buf.append(SEP + "getStylesheet=" + elem.getStylesheet().getSystemId());
+        }
         try
         {
             Class cl = ((Object)elem).getClass();
@@ -195,6 +202,12 @@ public abstract class XalanDumper
         buf.append("xsl:" + elem.getNodeName());
         buf.append(SEP + LNUM + elem.getLineNumber());
         buf.append(SEP + CNUM + elem.getColumnNumber());
+        if (DUMP_VERBOSE == (dumpLevel & DUMP_VERBOSE))
+        {
+            // Only include systemIds (which are long) if verbose
+            buf.append(SEP + "getSystemId=" + elem.getSystemId());
+            buf.append(SEP + "getStylesheet=" + elem.getStylesheet().getSystemId());
+        }
         try
         {
             Class cl = ((Object)elem).getClass();
