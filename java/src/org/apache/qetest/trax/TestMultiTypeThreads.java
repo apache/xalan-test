@@ -1345,7 +1345,7 @@ class TMTThreadsRunner implements Runnable
     private void logContainedException(TransformerException parent, PrintWriter p)
     {
 
-        Exception containedException = parent.getException();
+        Throwable containedException = parent.getException();
 
         if (null != containedException)
         {
