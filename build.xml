@@ -271,38 +271,79 @@
     <!-- ================================================================== -->
     <!-- Run tests: Run the Xalan-J 2.x Minitest                            -->
     <!-- ================================================================== -->
-    <target name="minitest" description="Run the Xalan-J 2.x Minitest">
-        <antcall target="api">
-            <param name="testClass" value="org.apache.qetest.trax.Minitest"/>
-        </antcall>
+    <!-- This target doesn't actually do anything itself - it merely 
+         depends on other targets, in order, to first run the whole 
+         Minitest, then to log to Ant whether the test didn't pass 
+         (i.e. failed, incomplete, error or ambiguous) or passed.
+    -->
+    <target name="minitest" 
+            description="Run the Xalan-J 2.x Minitest"
+            depends="minitest-execute,minitest-notpass,minitest-pass">
     </target>
 
-
-    <!-- ================================================================== -->
-    <!-- Run tests: Run the Xalan-J 2.x Smoketest, including several tests  -->
-    <!-- Note: this target is frequently called from outside of this file!  -->
-    <!-- ================================================================== -->
-    <target name="smoketest" description="Run the Xalan-J 2.x Smoketest">
+    <target name="minitest-execute">
         <echo message="About to execute the Minitest..." />
         <antcall target="api">
             <param name="testClass" value="org.apache.qetest.trax.Minitest"/>
             <param name="testType" value="minitest."/>
         </antcall>
+        <available file="${minitest.passfile}" property="minitest-passed" />
+    </target>
+    <target name="minitest-notpass" unless="minitest-passed">
+        <echo message=" [minitest] ERROR! The Minitest failed!" />
+        <echo message=" [minitest] See details in ${minitest.logFile}, output is in ${minitest.outputDir}" />
+        <echo message=" [minitest] Please fix any Minitest problems before checking in!" />
+        <fail message="Please fix any Minitest problems before checking in!" />
+    </target>
+    <target name="minitest-pass" if="minitest-passed">
+        <echo message=" [minitest] CONGRATULATIONS! The Minitest passed!" />
+        <echo message=" [minitest] See details in ${minitest.logFile}" />
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- Run tests: Run the Xalan-J 2.x Smoketest, including several tests  -->
+    <!-- Note: this target is frequently called from outside of this file!  -->
+    <!-- ================================================================== -->
+    <target name="smoketest" 
+            description="Run the Xalan-J 2.x Smoketest"
+            depends="minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
+        <echo message="About to execute the Minitest..." />
+    </target>
+
+    <target name="smoketest-execute">
+        <echo message="About to execute Conformance tests..." />
+        <antcall target="conf">
+            <param name="testType" value="smoketest.conf."/>
+        </antcall>
+        <available file="${smoketest.conf.passFile}" property="smoketest-conf-passed" />
+
         <echo message="About to execute other API tests..." />
         <antcall target="api">
             <param name="testClass" value="org.apache.qetest.xsl.XSLTestHarness"/>
             <param name="testType" value="smoketest.api."/>
         </antcall>
-        <echo message="About to execute Conformance tests..." />
-        <antcall target="conf">
-            <param name="qetest.category" value="copy"/> <!-- HACK DEBUGGING -->
-            <param name="testType" value="smoketest.conf."/>
-        </antcall>
-        <!-- Now, evaluate the results to see if we should fail or not -->
-        <!-- TBD -->
+        <available file="${smoketest.conf.passFile}" property="smoketest-conf-passed" />
     </target>
-
-
+    <target name="smoketest-conf-notpass" unless="smoketest-conf-passed">
+        <echo message=" [minitest] ERROR! The Smoketest-conf failed!" />
+        <echo message=" [minitest] See details in ${smoketest.conf.logFile}, output is in ${smoketest.conf.outputDir}" />
+        <echo message=" [minitest] Please fix any conformance problems before checking in!" />
+        <fail message="Please fix any conformance problems before checking in!" />
+    </target>
+    <target name="smoketest-conf-pass" if="smoketest-conf-passed">
+        <echo message=" [minitest] CONGRATULATIONS! The Smoketest-conf passed!" />
+        <echo message=" [minitest] See details in ${smoketest.conf.logFile}" />
+    </target>
+    <target name="smoketest-api-notpass" unless="smoketest-api-passed">
+        <echo message=" [minitest] ERROR! The Smoketest-api failed!" />
+        <echo message=" [minitest] See details in ${smoketest.api.logFile}, output is in ${smoketest.api.outputDir}" />
+        <echo message=" [minitest] Please fix any API test problems before checking in!" />
+        <fail message="Please fix any API test problems before checking in!" />
+    </target>
+    <target name="smoketest-api-pass" if="smoketest-api-passed">
+        <echo message=" [minitest] CONGRATULATIONS! The Smoketest-api passed!" />
+        <echo message=" [minitest] See details in ${smoketest.api.logFile}" />
+    </target>
 
     <!-- ================================================================== -->
     <!-- Build Tests: Compile/jar targets for each 'layer' of testing code  -->
