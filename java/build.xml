@@ -42,7 +42,7 @@
     <!-- // TODO add org.apache.qetest.xalanj2, xalanc1, etc.  -->
 
     <property name="javadocs.packages" 
-              value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.xalanj1"/>
+              value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.trax.dom,org.apache.qetest.trax.stream,org.apache.qetest.xalanj1"/>
 
     <property name="xdocs.dir" value="./xdocs"/>
     <property name="xdocs.book" value="${xdocs.dir}/sources/xalantest.xml"/>
@@ -139,6 +139,12 @@
              basedir="${build.dir}" 
              includes="**/*.class,**/*.properties" />
     </target>
+    <!-- Provide alternate names for the targets: currently, we're 
+         focusing most Xalan-J 2.x testing just on the TRAX or 
+         javax.xml.transform interface.  Later on, we should also 
+         separately test the other Xalan-J 2.x API's! -->
+    <target name="compile.xalan2" depends="compile.trax"></target>
+    <target name="package.xalan2" depends="package.trax"></target>
 
 
     <!-- All wrappers; requires competitor's jars in the classpath, as appropriate
