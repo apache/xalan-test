@@ -56,6 +56,7 @@
  */
 package org.apache.qetest.xslwrapper;
 
+import org.apache.qetest.Configurable;
 import java.util.Hashtable;
 import java.util.Properties;
 
@@ -86,7 +87,7 @@ import java.util.Properties;
  * @author Shane Curcuru
  * @version $Id$
  */
-public interface TransformWrapper
+public interface TransformWrapper extends Configurable
 {
 
     /**
@@ -263,15 +264,6 @@ public interface TransformWrapper
 
 
     /**
-     * Get a general description of this wrapper itself.
-     *
-     * @return a general description of this wrapper: roughly how 
-     * it performs transforms (stream/SAX/DOM/etc) and what it times
-     */
-    public String getDescription();
-
-
-    /**
      * Get a specific description of the wrappered processor.  
      *
      * @return specific description of the underlying processor or 
@@ -302,56 +294,6 @@ public interface TransformWrapper
      * by the actual implementation
      */
     public Object newProcessor(Hashtable options) throws Exception;
-
-
-    /**
-     * Allows the user to ask the wrapper to set specific 
-     * attributes on the underlying implementation.  
-     *
-     * Attribute names that are recognized by the wrapper will 
-     * be re-mapped to the appropriate API calls to the underlying 
-     * processor.  Attribute names that are not recognized by the 
-     * wrapper will be set directly into the underlying processor 
-     * where the processor supports a similar setAttribute API.
-     *
-     * //@todo define behavior when the underlying processor throws 
-     * an exception that's not an IllegalArgumentException.
-     *
-     * @param name The name of the attribute.
-     * @param value The value of the attribute.
-     * @throws IllegalArgumentException thrown if the underlying
-     * implementation doesn't recognize the attribute.
-     * 
-     * @see #ATTRIBUTE_INDENT
-     * @see #ATTRIBUTE_DIAGNOSTICS
-     */
-    public void setAttribute(String name, Object value)
-        throws IllegalArgumentException;
-
-
-    /**
-     * Allows the user to retrieve specific attributes on the 
-     * underlying implementation.  
-     * 
-     * Attribute names that are recognized by the wrapper will 
-     * be re-mapped to the appropriate API calls to the underlying 
-     * processor, or will simply return internal state values.  
-     * Attribute names that are not recognized by the 
-     * wrapper will be set directly into the underlying processor 
-     * where the processor supports a similar getAttribute API.
-     *
-     * //@todo define behavior when the underlying processor throws 
-     * an exception that's not an IllegalArgumentException.
-     *
-     * @param name The name of the attribute.
-     * @return value The value of the attribute.
-     * @throws IllegalArgumentException thrown if the underlying
-     * implementation doesn't recognize the attribute.
-     * 
-     * @see #ATTRIBUTE_INDENT
-     * @see #ATTRIBUTE_DIAGNOSTICS
-     */
-    public Object getAttribute(String name) throws IllegalArgumentException;
 
 
     /**
