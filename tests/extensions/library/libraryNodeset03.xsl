@@ -14,7 +14,6 @@
  
 <xsl:strip-space elements="*"/>
 <xsl:output indent="yes"/>
-             
 <xsl:variable name="rtf">
 	<docelem>
 		<elem1>
@@ -168,7 +167,7 @@
 	    </xsl:element>
 
 	    <xsl:element name="Parent1">
-		  <xsl:value-of select="name(cextend:nodeset($rtf)/docelem[2]/elem1[3]/elem2/test:elem4[2]/parent::*)"/>
+		  <xsl:value-of select="name(cextend:nodeset($rtf)/docelem/elem1[3]/elem2/test:elem4[2]/parent::*)"/>
 	    </xsl:element>
 
 	    <xsl:element name="Preceding">
