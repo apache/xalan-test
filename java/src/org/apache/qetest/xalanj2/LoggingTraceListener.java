@@ -64,6 +64,7 @@ package org.apache.qetest.xalanj2;
 import org.apache.qetest.*;
 
 import java.io.IOException;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
 
@@ -75,8 +76,9 @@ import org.apache.xalan.templates.ElemTemplate;
 import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.templates.ElemTextLiteral;
 import org.apache.xalan.templates.Constants;
-import org.apache.xpath.axes.ContextNodeList;
+import org.apache.xml.dtm.ref.DTMNodeIterator;
 import org.apache.xml.utils.QName;
+import org.apache.xpath.axes.ContextNodeList;
 import org.apache.xpath.XPath;
 
 /**
@@ -288,7 +290,8 @@ public class LoggingTraceListener extends LoggingHandler
 
         if (selectionEvent.m_selection.getType() == selectionEvent.m_selection.CLASS_NODESET)
         {
-            NodeIterator nl = selectionEvent.m_selection.nodeset();
+            // Must create as DTMNodeIterator for DTM_EXP merge 13-Jun-01
+            NodeIterator nl = new DTMNodeIterator(selectionEvent.m_selection.nodeset());
             if (nl instanceof ContextNodeList)
             {
                 try
