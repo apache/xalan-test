@@ -1,4 +1,5 @@
 <html><head><title></title></head><body>
+<center><h1>SAX2DTM Design Notes</h1></center>
 <p>The current implementation is subject to change and this class
 should be accessed only through published interface methods.  However,
 the following information is provided to aid in an understanding of how this
@@ -19,6 +20,15 @@ summary="Key arrays used: the first cell contains the array name and the second 
 </tr>
 
 <tr>
+<td rowspan="1" colspan="1"><code>m_exptype</code></td>
+<td rowspan="1" colspan="1">int</td>
+<td rowspan="1" colspan="1">An integer representing a unique value for a Node.  The first 6
+bits represent the Node type, as shown below.  The next 10 bits represent an index
+into m_namespaceNames.  The remaining 16 bits represent an index into m_locNamesPool.
+<b>Start here.</b>  This Vector represents the list of Nodes.</td>
+</tr>
+
+<tr>
 <td rowspan="1" colspan="1"><code>m_locNamesPool</code></td>
 <td rowspan="1" colspan="1">String</td>
 <td rowspan="1" colspan="1">Local (prefixed) names.  Field of m_expandedNameTable.</td>
@@ -28,14 +38,6 @@ summary="Key arrays used: the first cell contains the array name and the second 
 <td rowspan="1" colspan="1"><code>m_namespaceNames</code></td>
 <td rowspan="1" colspan="1">String</td>
 <td rowspan="1" colspan="1">Namespace URIs.  Field of m_expandedNameTable.</td>
-</tr>
-
-<tr>
-<td rowspan="1" colspan="1"><code>m_exptype</code></td>
-<td rowspan="1" colspan="1">int</td>
-<td rowspan="1" colspan="1">An integer representing a unique value for a Node.  The first 6
-bits represent the Node type, as shown below.  The next 6 bits represent an index
-into m_namespaceNames.  The remaining 20 bits represent an index into m_locNamesPool.</td>
 </tr>
 
 <tr>
@@ -68,7 +70,7 @@ in the next table.</td>
 <p>This table shows how the array values are used for each type of Node supported by
 this implementation.  An <i>n</i> represents an index into <code>m_namespaceNames</code>
 for the namespace URI associated with the attribute or element.  It actually consists
-of the 6 bits, including the rightmost two bits of the leftmost byte.  The <code>eeeee</code>
+of the 10 bits, including the rightmost two bits of the leftmost byte.  The <i>eeee</i>
 represents an index into <code>m_locNamesPool</code> for the value indicated in the table.</p>
 
 <table border="1"
@@ -82,8 +84,8 @@ summary="Node table">
 
 <tr>
 <td rowspan="1" colspan="1">Attr</td>
-<td rowspan="1" colspan="1">&nbsp;08<i>neeeee</i><br>-0d<i>neeeee</i><br>
-<i>eeeee</i> is local name of attribute.</td>
+<td rowspan="1" colspan="1">&nbsp;08<i>neeee</i><br>-0b<i>neeee</i><br>
+<i>eeee</i> is local name of attribute.</td>
 <td rowspan="1" colspan="1"><b>No namespace</b>: an index into
 <code>m_valuesOrPrefixes</code> pointing to the attribute value.
 <br><b>Namespace</b>: a negative number, the absolute value of which is an index
@@ -111,8 +113,8 @@ for comment text.</td>
 
 <tr>
 <td rowspan="1" colspan="1">Element</td>
-<td rowspan="1" colspan="1">&nbsp;04<i>neeeee</i><br>-07<i>neeeee</i><br>
-<i>eeeee</i> is local name of element.</td>
+<td rowspan="1" colspan="1">&nbsp;04<i>neeee</i><br>-07<i>neeee</i><br>
+<i>eeee</i> is local name of element.</td>
 <td rowspan="1" colspan="1"><b>No namespace</b>: 0.
 <br><b>Namespace</b>: an index into
 <code>m_valuesOrPrefixes</code> pointing to the QName.</td>
@@ -120,21 +122,31 @@ for comment text.</td>
 </tr>
 
 <tr>
+<td rowspan="1" colspan="1">Text</td>
+<td rowspan="1" colspan="1">&nbsp;0C000000</td>
+<td rowspan="1" colspan="1">an index into m_data.</td>
+<td rowspan="1" colspan="1"><b>index</b>: an int containing starting subscript in
+<code>m_chars</code> for the text.
+<br><b>index+1</b>: an int
+containing the length of the text.</td>
+
+<tr>
 <td rowspan="1" colspan="1">ProcessingInstruction</td>
-<td rowspan="1" colspan="1">&nbsp;1C0<i>eeeee</i>
-<br><i>eeeee</i> is the target name.</td>
+<td rowspan="1" colspan="1">&nbsp;1C0<i>eeee</i>
+<br><i>eeee</i> is the target name.</td>
 <td rowspan="1" colspan="1">index into <code>m_valuesOrPrefixes</code>
 for PI data.</td>
 <td rowspan="1" colspan="1">unused</td>
 </tr>
 
 <tr>
-<td rowspan="1" colspan="1">Text</td>
-<td rowspan="1" colspan="1">&nbsp;14000000</td>
-<td rowspan="1" colspan="1">an index into m_data.</td>
-<td rowspan="1" colspan="1"><b>index</b>: an int containing starting subscript in
-<code>m_chars</code> for the text.
-<br><b>index+1</b>: an int
-containing the length of the text.</td>
+<td rowspan="1" colspan="1">Namespace</td>
+<td rowspan="1" colspan="1">&nbsp;34<i>neeee</i><br>
+<i>eeee</i> is namespace prefix.</td>
+<td rowspan="1" colspan="1">index into
+<code>m_valuesOrPrefixes</code> pointing to the namespace URI.</td>
+<td rowspan="1" colspan="1">unused</td>
+</tr>
+
 </table>
 </body>
