@@ -72,17 +72,19 @@ rem Note: classpath handling is special for testing Xalan
 rem If PARSER_JAR blank, default to xerces in the xalan dir
 if "%PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xerces.jar
 if not "%PARSER_JAR%" == "" set _PARSER_JAR=%PARSER_JAR%
+set _XML-APIS_JAR=%XML-APIS_JAR%
+if "%_XML-APIS_JAR%" == "" set _XML-APIS_JAR=..\java\bin\xml-apis.jar
 
-rem If JARDIR is blank, then only add Ant and a PARSER_JAR to the 
+rem If JARDIR is blank, then only add Ant, PARSER_JAR, and XML-APIS_JAR to the 
 rem    classpath before running Ant - then within the Ant file, it 
 rem    will add other .jars from default locations
-if "%JARDIR%" == "" set _CLASSPATH=%CLASSPATH%;%_ANT_HOME%\bin\ant.jar;%_PARSER_JAR%
+if "%JARDIR%" == "" set _CLASSPATH=%CLASSPATH%;%_ANT_HOME%\bin\ant.jar;%_XML-APIS_JAR%;%_PARSER_JAR%
 
 rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files 
 rem    in the classpath first from that one dir
 rem Note: Does not yet support xsltc testing! TBD -sc
 rem Note: Does not yet support using crimson from JARDIR (forces xerces.jar)! TBD -sc
-if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xml-apis.jar;%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
 
 rem Attempt to automatically add system classes to very end of _CLASSPATH
 if exist "%JAVA_HOME%\lib\tools.jar" set _CLASSPATH=%_CLASSPATH%;%JAVA_HOME%\lib\tools.jar
@@ -101,6 +103,7 @@ echo.
 
 :checkJikes
 rem also pass along the selected parser to Ant
+rem Note: we don't need to do this for xml-apis.jar
 set _ANT_OPTS=%ANT_OPTS% -Dparserjar=%_PARSER_JAR%
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 

@@ -76,7 +76,7 @@
 
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
-    <property name="xml-apis.jar" value="${xalan.build.dir}/xml-apis.jar"/>
+    <property name="xml-apis.jar" value="${xalan.bin.dir}/xml-apis.jar"/>
     <property name="parserjar" value="${xalan.bin.dir}/xerces.jar"/>
     <property name="bsf.jar" value="${xalan.bin.dir}/bsf.jar"/>
     <!-- The js.jar is for Javascript extensions tests; you must 
@@ -98,6 +98,7 @@
         <pathelement location="${doclet.jar}" />
         <pathelement location="${xalan.jar}" />
         <pathelement location="${xml-apis.jar}" />
+        <pathelement location="${parserjar}" />
         <pathelement path="${java.class.path}" />
     </path>
 
@@ -582,6 +583,10 @@
             <param name="conferr.flavor" value="trax.systemId"/>
             <param name="conferr.outputDir" value="${alltest.resultDir}/conferr"/>
             <param name="conferr.logFile" value="${alltest.resultDir}/conferr/results.xml"/>
+            <!-- Note that conferr doesn't currently use gold files, 
+                 but we need to set the goldDir anyway for convenience
+            --> 
+            <param name="conferr.goldDir" value="${alltest.resultDir}/conferr-gold"/>
         </antcall>
         <!-- Run various other sets of conf-like tests -->
         <antcall target="perf">
