@@ -18,7 +18,7 @@
 
    <xsl:template match="matcher">
       <xsl:variable name="config"><xsl:copy-of select="."/></xsl:variable>
-      <xsl:value-of select="bug3722:dumpConfig($config)"/>
+      <dumpConfig><xsl:value-of select="bug3722:dumpConfig($config)"/></dumpConfig>
    </xsl:template>
  
 </xsl:stylesheet>

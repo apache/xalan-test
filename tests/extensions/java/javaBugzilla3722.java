@@ -48,17 +48,26 @@ public class javaBugzilla3722 extends TestableExtension
                         } 
                         catch (Exception e) 
                         {
-                            extnLogger.logThrowable(Logger.ERRORMSG, e, "dumpConfig threw:");
-                            extnLogger.checkFail("dumpConfig threw unexpected exception");
+                            if (extnLogger == null) 
+                            {
+                                e.printStackTrace();
+                                throw new RuntimeException("FATAL ERROR: javaBugzilla3722 has no logger; " + e.toString());
+                            }
+                            else
+                            {
+                                extnLogger.logThrowable(Logger.ERRORMSG, e, "dumpConfig threw:");
+                                extnLogger.checkFail("dumpConfig threw unexpected exception");
+                            }
                         }
                     } else 
                     {
-                        extnLogger.logMsg(Logger.INFOMSG, "<" + node.getNodeName() + "/>");
+                        // Output info about the node for later debugging
+                        counters.put(node.getNodeName(), node.getNodeValue());
                     }
                 }
             }
         }
-        return "dumpConfig-done";
+        return "dumpConfig.count=" + counter;
     }
 
     //// Implementations of TestableExtension
@@ -105,25 +114,10 @@ public class javaBugzilla3722 extends TestableExtension
         // Supply default value
         if (null == fileChecker)
             fileChecker = new XHTFileCheckService();
-        if (Logger.PASS_RESULT
-            != fileChecker.check(logger,
-                                 new File(datalet.outputName), 
-                                 new File(datalet.goldName), 
-                                 "Extension test of " + datalet.getDescription())
-           )
-        {
-            // Log a custom element with all the file refs first
-            // Closely related to viewResults.xsl select='fileref"
-            //@todo check that these links are valid when base 
-            //  paths are either relative or absolute!
-            Hashtable attrs = new Hashtable();
-            attrs.put("idref", (new File(datalet.inputName)).getName());
-            attrs.put("inputName", datalet.inputName);
-            attrs.put("xmlName", datalet.xmlName);
-            attrs.put("outputName", datalet.outputName);
-            attrs.put("goldName", datalet.goldName);
-            logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Extension test file references");
-        }
+        fileChecker.check(logger,
+                          new File(datalet.outputName), 
+                          new File(datalet.goldName), 
+                          "Extension test of " + datalet.getDescription());
     }
 
 
