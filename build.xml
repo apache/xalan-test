@@ -151,6 +151,16 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${jtidy.jar}" />
     </path>
 
+    <!-- Boot class path for JDK 1.4. Order is important to ensure
+         GUMP builds work correctly, and people who don't use the
+         build.bat/build.sh can still build on JDK 1.4 as normal. -->
+    <path id="boot.class.path">
+        <pathelement location="${xalan.jar}" />
+        <pathelement location="${java.class.path}" />
+        <pathelement location="${xml-apis.jar}" />
+        <pathelement location="${parserjar}" />
+    </path>
+
     <!-- Classpath used when running perf or performance tests -->
     <path id="perf.class.path">
         <path refid="conf.class.path" />
@@ -247,6 +257,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="conf.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <antcall target="scan">
@@ -283,6 +294,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="conf.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <antcall target="scan">
@@ -301,6 +313,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="perf.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <antcall target="scan">
@@ -319,6 +332,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="contrib.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <antcall target="scan">
@@ -338,6 +352,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="api.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
     </target>
@@ -354,6 +369,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="api.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <antcall target="scan">
@@ -388,6 +404,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="bugzilla.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <echo message="If you got ClassNotFound, did you 'build bugzilla.classes' first?" />
@@ -407,6 +424,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="extensions.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
         <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
@@ -1163,6 +1181,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="xsltc.runtime.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}">
             <!-- Explicitly set TransformerFactory property to use xsltc -->
@@ -1182,6 +1201,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="xsltc.runtime.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}">
             <!-- Explicitly set TransformerFactory property to use xsltc -->
@@ -1224,6 +1244,7 @@ dependencies - users must manually 'build jar' first.
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="xsltc.compile.class.path"
+            bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}">
             <!-- Explicitly set TransformerFactory property to use xsltc -->
