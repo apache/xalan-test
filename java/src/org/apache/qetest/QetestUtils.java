@@ -130,10 +130,10 @@ public abstract class QetestUtils
 	        tmp = tmp.replace('\\', '/');
 	    }
         // Note the presumption that it's a file reference
-        // Attempt to not add too many extra slashes on the 
-        //  front if it already starts with a slash
-        //@todo evaluate if this is really correct!
-        if (filename.startsWith("/"))
+        // Ensure we have the correct number of slashes at the 
+        //  start: we always want 3 /// if it's absolute
+        //  (which we should have forced above)
+        if (tmp.startsWith("/"))
             return "file://" + tmp;
         else
             return "file:///" + tmp;
