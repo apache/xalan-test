@@ -397,11 +397,12 @@ public class TraxWrapper extends ProcessorWrapper
             String xmlSource, String xslStylesheet, OutputStream resultStream)
                 throws java.lang.Exception  // Cover all exception cases
     {
-        if (!processor.getFeature(Features.DOM))
+        if (!(processor.getFeature(DOMSource.FEATURE) 
+              && processor.getFeature(DOMResult.FEATURE)))
         {
-            // If DOMs are not supported, then bail
+            // If DOMs are not supported in either input (Sources)
+            //  or output (Results), then bail
             return ERROR;
-
         }
         long endTime = 0;
         long startTime = System.currentTimeMillis();

@@ -199,6 +199,22 @@ public class TemplatesAPITest extends XSLProcessorTestBase
                             + processorClassname);
         reporter.logInfoMsg(TRAX_PROCESSOR_XSLT + " property is: "
                             + System.getProperty(TRAX_PROCESSOR_XSLT));
+        try
+        {
+            TransformerFactory tf = TransformerFactory.newInstance();
+            if (!(tf.getFeature(StreamSource.FEATURE)
+                  && tf.getFeature(StreamResult.FEATURE)))
+            {   // The rest of this test relies on Streams
+                reporter.logErrorMsg("Streams not supported! Some tests may be invalid!");
+            }
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail(
+                "Problem creating factory; Some tests may be invalid!");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem creating factory; Some tests may be invalid!");
+        }
 
         return true;
     }

@@ -155,9 +155,10 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
         try
         {
             TransformerFactory tf = TransformerFactory.newInstance();
-            if (!tf.getFeature(Features.STREAM))
+            if (!(tf.getFeature(StreamSource.FEATURE)
+                  && tf.getFeature(StreamResult.FEATURE)))
             {   // The rest of this test relies on Streams
-                reporter.logErrorMsg("Features.STREAM not supported! Some tests may be invalid!");
+                reporter.logErrorMsg("Streams not supported! Some tests may be invalid!");
             }
         }
         catch (Throwable t)
