@@ -230,12 +230,11 @@ public class PerformanceTest extends XSLDirectoryIterator
                 // Use this static convenience method; returns a URL; convert to String via toExternalForm()
                 // Note: we should consider caching the original strings first, 
                 //  in case we later on have a use for them instead of the URI'd format
-                XMLName = getURLFromString(XMLName, null).toExternalForm();
-                XSLName = getURLFromString(XSLName, null).toExternalForm();
+                XMLName = filenameToURL(XMLName);
+                XSLName = filenameToURL(XSLName);
 
                 // Note: Currently 28-Jun-00, the output of files is handled differently, so 
                 //  we do NOT want to convert those.  Subject to change, however.
-                // OutName = getURLFromString(OutName, null).toExternalForm();
                 reporter.logTraceMsg("processSingleFile() useURI: "
                                      + XSLName);
             }
