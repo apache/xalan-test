@@ -992,7 +992,7 @@
         <pathelement location="${xalan.bin.dir}/JLex.jar" />
         <pathelement location="${xalan.bin.dir}/java_cup.jar" />
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
-        <pathelement location="${xalan.bin.dir}/jakarta-regexp-1.2.jar" />
+        <pathelement location="${xalan.bin.dir}/regexp.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
@@ -1005,6 +1005,7 @@
         <pathelement location="${xalan.bin.dir}/JLex.jar" />
         <pathelement location="${xalan.bin.dir}/java_cup.jar" />
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
+        <pathelement location="${xalan.bin.dir}/regexp.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
