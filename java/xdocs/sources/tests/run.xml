@@ -67,6 +67,35 @@
         more output shown in the results (higher numbers up to 99 show more details, 
         lower numbers, down to 0, show fewer details).
       </p>  
+      <p>Alternatively, the tableResults.xsl stylesheet can be used to pretty-print
+        results from the conformance test for multiple TRAX flavours:<br/><br/>
+        <code>cd \xml-xalan\test</code><br/><br/>
+        <code>build alltest.conf</code><br/><br/>
+        <code>set RESULTSCANNER=tableResults.xsl</code><br/><br/>
+        <code>viewResults.bat results-alltest/conf/sax/results.xml results.html [options]</code><br/><br/>
+        This will generate a pretty-printed HTML table in results.html, listing all
+        flavours as well as the results of individual test cases for each category.
+        The options can be passed to tableResults.xsl to generate conformance reports
+        on previously run tests, or to compare two runs of the conformance test suite.
+      </p>  
+      <p>Possible options that can be passed to tableResults.xsl:
+        <ul>
+          <li>
+            <code>-param resultsDir /path/to/result/results-alltest/conf</code><br/><br/>
+            Passing the path to the <code>results-alltest/conf</code> directory generates
+            a report based on the results in that directory. Defaults to <code>./results-alltest/conf</code><br/><br/>
+          </li>
+          <li>
+            <code>-param compareAgainst /path/to/other/results-alltest/conf</code><br/><br/>
+            Passing the path to anothe <code>results-alltest/conf</code> directory compares
+            that result against the result pointed to by resultsDir.<br/><br/>
+          </li>
+          <li>
+            <code>-param resultsDir results-alltest.xsltc/conf</code><br/><br/>
+            Generates a report on the results of an xsltc test (with the <code>alltest.conf.xsltc</code>) target.
+          </li>
+        </ul>
+      </p>      
       <p>Future work includes greatly updated results analysis stylesheets. 
       See FailScanner.xsl and PerfScanner.xsl for ideas.  An important design 
       principle in the tests is that at runtime the tests merely output 
