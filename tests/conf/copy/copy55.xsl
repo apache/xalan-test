@@ -12,7 +12,7 @@
   <!-- The data also has a namespace node that is re-declared exactly the same on the inner element.
     This redundant declaration does not have to be copied, so it isn't. -->
 
-<xsl:output method="xml" indent="yes" encoding="UTF-8"/>
+<xsl:output method="xml" indent="no" encoding="UTF-8"/>
 
 <xsl:template match="/">
     <xsl:copy-of select="."/>
