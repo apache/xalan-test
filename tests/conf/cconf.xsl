@@ -15,6 +15,7 @@
 
   <xsl:apply-templates select="$Results/resultsfile/testfile/RunResults"/>
 
+  <!-- This table displays the list of tests that failed. -->
   <TABLE frame="box" border="1" rules="groups" width="95%" cellspacing="2" cellpadding="5">
   <CAPTION align="center"><b><xsl:text>Failed Cases:</xsl:text></b></CAPTION>
     <!-- fake row to establish widths -->
@@ -22,6 +23,7 @@
     <xsl:apply-templates select="$Results/resultsfile/testfile/Test_Dir"/>
   </TABLE>
 
+  <!-- This table displays the list of tests without gold files. -->
   <TABLE frame="box" border="1" rules="groups" width="95%" cellspacing="2" cellpadding="5">
   <CAPTION align="center"><b>The following testcases were missing gold files:</b></CAPTION>
     <!-- fake row to establish widths -->
@@ -40,6 +42,7 @@
 		<th align="center">RunID</th>
 		<th align="center">Xerces</th>
 		<th align="center">TestBase</th>
+		<th align="center">Source</th>
 		<th align="center">Pass</th>
 		<th align="center">Fail</th>
 		<th align="center">Missing Gold</th>
@@ -48,6 +51,7 @@
 	<td align="center"><b><xsl:value-of select="@UniqRunid"/></b></td>
 	<td align="center"><b><xsl:value-of select="@Xerces-Version"/></b></td>
 	<td align="center"><b><xsl:value-of select="@TestBase"/></b></td>
+	<td align="center"><b><xsl:value-of select="@xmlFormat"/></b></td>
 	<td align="center"><b><xsl:value-of select="@Passed"/></b></td>
 	<td align="center" bgcolor="red"><b><xsl:value-of select="@Failed"/></b></td>
 	<td align="center"><b><xsl:value-of select="@No_Gold_Files"/></b></td>
