@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version="1.0">
+
+  <!-- FileName: position80 -->
+  <!-- Document: http://www.w3.org/TR/xpath -->
+  <!-- DocVersion: 19991116 -->
+  <!-- Section: 2.2 -->
+  <!-- Purpose: Ensure last() is working with unionpaths of ancestors. -->
+  <!-- Author: Scott Boag -->
+
+<xsl:template match="/">
+  <out>
+  	<xsl:for-each select="//section/title">
+
+	  <xsl:for-each select="(ancestor::section
+		                                        |ancestor::simplesect
+		                                        |ancestor::sect1
+		                                        |ancestor::sect2
+		                                        |ancestor::sect3
+		                                        |ancestor::sect4
+		                                        |ancestor::sect5)[last()]">
+		<name><xsl:value-of select="name(.)"/></name>
+	  </xsl:for-each>
+  	</xsl:for-each>
+  </out>
+</xsl:template>
+
+
+</xsl:stylesheet>
