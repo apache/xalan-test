@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<!DOCTYPE HTMLlat1 SYSTEM "HTMLlat1.dtd">
+<!DOCTYPE HTMLlat1 SYSTEM "htmllat1.dtd">
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <!-- FileName: copy20 -->
