@@ -256,18 +256,18 @@ public class XPathASTTestlet extends FileTestlet
         // Cheap-o validation: ensure non-null, dump contents
         if (null != matchpats)
         {
-            for (Enumeration enum = matchpats.elements();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            for (Enumeration elements = matchpats.elements();
+                    elements.hasMoreElements(); /* no increment portion */ )
             {
-                logXPath((String)enum.nextElement(), datalet.getDescription());
+                logXPath((String)elements.nextElement(), datalet.getDescription());
             }
         }
         if (null != selectpats)
         {
-            for (Enumeration enum = selectpats.elements();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            for (Enumeration elements = selectpats.elements();
+                    elements.hasMoreElements(); /* no increment portion */ )
             {
-                logXPath((String)enum.nextElement(), datalet.getDescription());
+                logXPath((String)elements.nextElement(), datalet.getDescription());
             }
         }
     }

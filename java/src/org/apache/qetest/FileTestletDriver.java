@@ -517,13 +517,13 @@ public class FileTestletDriver extends FileBasedTest /// extends XSLProcessorTes
 
         // For every file in the vector, construct the matching 
         //  out, gold, and xml/xsl files
-        for (Enumeration enum = files.elements();
-                enum.hasMoreElements(); /* no increment portion */ )
+        for (Enumeration elements = files.elements();
+                elements.hasMoreElements(); /* no increment portion */ )
         {
             String file = null;
             try
             {
-                file = (String)enum.nextElement();
+                file = (String)elements.nextElement();
             }
             catch (ClassCastException cce)
             {

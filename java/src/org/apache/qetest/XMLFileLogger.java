@@ -706,10 +706,10 @@ public class XMLFileLogger implements Logger
             reportPrinter.println("<" + element + " " + ATTR_LEVEL + "=\""
                                   + level + "\"");
 
-            for (Enumeration enum = attrs.keys();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            for (Enumeration keys = attrs.keys();
+                    keys.hasMoreElements(); /* no increment portion */ )
             {
-                Object key = enum.nextElement();
+                Object key = keys.nextElement();
 
                 reportPrinter.println(key.toString() + "=\""
                                       + escapeString(attrs.get(key).toString()) + "\"");
@@ -761,10 +761,10 @@ public class XMLFileLogger implements Logger
 
             try
             {
-                for (Enumeration enum = hash.keys();
-                        enum.hasMoreElements(); /* no increment portion */ )
+                for (Enumeration keys = hash.keys();
+                        keys.hasMoreElements(); /* no increment portion */ )
                 {
-                    Object key = enum.nextElement();
+                    Object key = keys.nextElement();
 
                     // Ensure we'll have clean output by pre-fetching value before outputting anything
                     String value = escapeString(hash.get(key).toString());

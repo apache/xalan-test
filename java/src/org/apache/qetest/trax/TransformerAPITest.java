@@ -582,10 +582,10 @@ public class TransformerAPITest extends FileBasedTest
 
                 // Validate the two have the same properties (which they 
                 //  should, since we just got the templates now)
-                for (Enumeration enum = tmpltProps.propertyNames();
-                        enum.hasMoreElements(); /* no increment portion */ )
+                for (Enumeration names = tmpltProps.propertyNames();
+                        names.hasMoreElements(); /* no increment portion */ )
                 {
-                    String key = (String)enum.nextElement();
+                    String key = (String)names.nextElement();
                     String value = tmpltProps.getProperty(key);
                     reporter.check(value, outProps.getProperty(key), 
                                    "Template, transformer identical outProp: " + key);

@@ -510,18 +510,18 @@ public class Minitest extends FileBasedTest
             // Log a big message at the very end to make it easier to see
             StringBuffer buf = new StringBuffer("Minitest.testCase5 PERFORMANCE NUMBERS\n");
             buf.append("        STREAM OVERALL TIMES: ");
-            for (Enumeration enum = streamTimes.elements();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            for (Enumeration elements = streamTimes.elements();
+                    elements.hasMoreElements(); /* no increment portion */ )
             {
-                buf.append(enum.nextElement());
+                buf.append(elements.nextElement());
                 buf.append(", ");
             }
             buf.append("\n");
             buf.append("           DOM OVERALL TIMES: ");
-            for (Enumeration enum = domTimes.elements();
-                    enum.hasMoreElements(); /* no increment portion */ )
+            for (Enumeration elements = domTimes.elements();
+                    elements.hasMoreElements(); /* no increment portion */ )
             {
-                buf.append(enum.nextElement());
+                buf.append(elements.nextElement());
                 buf.append(", ");
             }
             buf.append("\n");
