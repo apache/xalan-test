@@ -8,14 +8,14 @@
   <!-- Purpose: Test ((a or b) and (c or d)) combination of logical expressions in a predicate-->
 
 <xsl:template match="foo">
-
-  <xsl:text>Test:  ((a or b) and (c or d)):&#xa;</xsl:text>
-  <xsl:text>Match: </xsl:text>
+<out>
+  <test-info>((a or b) and (c or d))</test-info>
+  <test-output>
   <xsl:for-each select="bar[(@a='1' or @b='1') and (@c='1' or @d='1')]">
     <xsl:value-of select="@seq"/><xsl:text> </xsl:text>
   </xsl:for-each>
-  <xsl:text>&#xa;</xsl:text>
-
+  </test-output>
+</out>
 </xsl:template>
 
 </xsl:stylesheet>

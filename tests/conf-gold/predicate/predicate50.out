@@ -1,3 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-Test:  (a and (b or c) and d):
-Match: b d f 
+<out><test-info>(a and (b or c) and d)</test-info><test-output>b d f </test-output></out>

@@ -1,3 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-Test:  ((a or b) and c)
-Match: 6 7 a b e f 
+<out><test-info>((a or b) and c)</test-info><test-output>6 7 a b e f </test-output></out>

@@ -9,14 +9,14 @@
   <!-- Author: Morten Jorgensen -->
 
 <xsl:template match="foo">
-
-  <xsl:text>Test:  (a and b)&#xa;</xsl:text>
-  <xsl:text>Match: </xsl:text>
+<out>
+  <test-info>(a and b)</test-info>
+  <test-output>
   <xsl:for-each select="bar[@a='1' and @b='1']">
     <xsl:value-of select="@seq"/><xsl:text> </xsl:text>
   </xsl:for-each>
-  <xsl:text>&#xa;</xsl:text>
-
+  </test-output>
+</out>
 </xsl:template>
 
 </xsl:stylesheet>
