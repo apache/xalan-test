@@ -342,37 +342,19 @@ public class XSLProcessorTestBase extends FileBasedTest
         reporter.testFileInit(testName, testComment);
 
         // Create a file-based CheckService for later use
-        if (fileChecker == null)
+        if (null == fileChecker)
         {
-            try
+            if ((null != fileCheckerName) && (fileCheckerName.length() > 0))
             {
-                String[] testPackages = 
-                {
-                    "org.apache.qetest.xsl",
-                    "org.apache.qetest.trax",
-                    "org.apache.qetest.xalanj2",
-                    "org.apache.qetest.xalanj1",
-                    "org.apache.qetest"
-                };
-                // Use utility method to attempt to guess classnames 
-                //  that are not fully specified, if needed
-                Class fClass = QetestUtils.testClassForName(fileCheckerName, 
-                                                            testPackages, 
-                                                            fileCheckerName);
-
-                fileChecker = (CheckService) fClass.newInstance();
-
-                reporter.logTraceMsg("Using file-based CheckService: "
-                                     + fileChecker);
+                // Use the user's specified class; if not available 
+                //  will return null which gets covered below
+                fileChecker = QetestFactory.newCheckService(reporter, fileCheckerName);
             }
-            catch (Exception e)
+            
+            if (null == fileChecker)
             {
-                reporter.logErrorMsg("Failed to create an instance of "
-                                       + fileCheckerName + ": "
-                                       + e.toString());
-
-                // This could cause NullPointerExceptions for those 
-                //  tests that rely on our fileChecker...
+                // If that didn't work, then ask for default one that does files
+                fileChecker = QetestFactory.newCheckService(reporter, QetestFactory.TYPE_FILES);
             }
         }
 
