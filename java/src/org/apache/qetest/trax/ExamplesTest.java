@@ -1167,7 +1167,7 @@ public class ExamplesTest extends FileBasedTest
     
         Properties oprops = new Properties();
         oprops.put("method", "html");
-        oprops.put("indent-amount", "2");
+        oprops.put("{http://xml.apache.org/xslt}indent-amount", "2");
         serializer.setOutputProperties(oprops);
         serializer.transform(new DOMSource(doc), 
                              new StreamResult(outNames.nextName()));
