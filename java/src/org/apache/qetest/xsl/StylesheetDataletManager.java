@@ -77,6 +77,114 @@ import java.util.Vector;
  */
 public abstract class StylesheetDataletManager // provide static services only
 {
+
+    /** 
+     * Token in xsl file denoting the text of an expected exception.  
+     * Used in getInfoItem.
+     */
+    public static final String INFOITEM_EXPECTED_EXCEPTION = "ExpectedException:";
+
+    /**
+     * Get specified information about the datalet.
+     * 
+     * <p>Note that different kinds of information may be read 
+     * or discovered in different ways.</p>
+     *
+     * <p>Currently only implemented for 
+     * INFOITEM_EXPECTED_EXCEPTION.</p>
+     *
+     * @param logger to report problems to
+     * @param datalet to get information about
+     * @param infoItem to get information about
+     * @return Vector of object(s) of appropriate type; 
+     * or null if error
+     */
+    public static Vector getInfoItem(Logger logger, StylesheetDatalet datalet, String infoItem)
+    {
+        if ((null == datalet) || (null == infoItem))
+        {
+            logger.logMsg(Logger.ERRORMSG, "getTestInfo called with null datalet or infoItem!");
+            return null;
+        }
+        if (INFOITEM_EXPECTED_EXCEPTION.equals(infoItem))
+        {
+            return getExpectedException(logger, datalet);
+        }
+        else
+        {
+            logger.logMsg(Logger.WARNINGMSG, "getTestInfo unsupported infoItem: " + infoItem);
+            return null;
+        }
+    }
+
+
+    /**
+     * Worker method to get expected exception text about a stylesheet.
+     * 
+     * Currently parses the inputDir stylesheet for a line that contains 
+     * EXPECTED_EXCEPTION inside an xsl comment, on a single line, and 
+     * trims off the closing comment -->.
+     * Future work: allow options on datalet to specify some other 
+     * expected data in another format - a whole Throwable object to 
+     * compare to, or a stacktrace, etc.
+     * 
+     * @author Shane Curcuru
+     * @param d Datalet that contains info about the exception
+     * @return Vector of Strings denoting toString of exception(s)
+     * we might expect - any one of them will pass; null if error
+     */
+    protected static Vector getExpectedException(Logger logger, StylesheetDatalet d)
+    {
+        final String EXPECTED_EXCEPTION_END = "-->";
+        Vector v = null;
+        // Read in the testName file to see if it's expecting something        
+        try
+        {
+            FileReader fr = new FileReader(d.inputName);
+            BufferedReader br = new BufferedReader(fr);
+            for (;;)
+            {
+                String inbuf = br.readLine();
+
+                if (inbuf == null)
+                    break;  // end of file, break out and return
+
+                int idx = inbuf.indexOf(INFOITEM_EXPECTED_EXCEPTION);
+
+                if (idx < 0)
+                    continue;  // not on this line, keep going
+
+                // The expected exception.getMessage is the rest of the line...
+                String expExc = inbuf.substring(idx + INFOITEM_EXPECTED_EXCEPTION.length(),
+                                         inbuf.length());
+
+                // ... less the trailing " -->" comment end; trimmed
+                int endComment = expExc.indexOf(EXPECTED_EXCEPTION_END);
+                if (endComment > -1)
+                    expExc = expExc.substring(0, endComment).trim();
+                else
+                    expExc = expExc.trim();
+
+                if (null == v)
+                    v = new Vector(); // only create if needed
+                v.addElement(expExc);
+
+                // Continue reading the file for more potential
+                //  expected exception strings - read them all
+                //@todo optimization: stop parsing after xx lines?
+
+            }  // end for (;;)
+        }
+        catch (java.io.IOException ioe)
+        {
+            logger.logMsg(Logger.ERRORMSG, "getExpectedException() threw: "
+                                   + ioe.toString());
+            return null;
+        }
+        return v;
+    }
+
+
     /** '[' character, first char in first line of xsltmark fileList.  */
     public static final String XSLTMARK_CHAR = "[";
 
