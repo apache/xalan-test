@@ -754,9 +754,9 @@ public class XMLFileLogger implements Logger
                     Object key = enum.nextElement();
 
                     // Ensure we'll have clean output by pre-fetching value before outputting anything
-                    String value = hash.get(key).toString();
+                    String value = escapeString(hash.get(key).toString());
 
-                    reportPrinter.print(HASHITEM_HDR + key.toString()
+                    reportPrinter.print(HASHITEM_HDR + escapeString(key.toString())
                                         + "\">");
                     reportPrinter.print(value);
                     reportPrinter.println("</" + ELEM_HASHITEM + ">");
