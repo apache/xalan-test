@@ -350,31 +350,10 @@ public class ThreadedStylesheetTestlet
             // Supply default value
             if (null == fileChecker)
                 fileChecker = new XHTFileCheckService();
-            if (Logger.PASS_RESULT
-                != fileChecker.check(logger,
-                                     new File(datalet.outputName + "-" + threadIdentifier), 
-                                     new File(datalet.goldName), 
-                                     "Shared Templates of: " + datalet.getDescription())
-               )
-            {
-                // Log a custom element with all the file refs first
-                // Closely related to viewResults.xsl select='fileref"
-                //@todo check that these links are valid when base 
-                //  paths are either relative or absolute!
-                Hashtable attrs = new Hashtable();
-                attrs.put("inputName", "Shared Templates");
-                attrs.put("xmlName", datalet.xmlName);
-                attrs.put("outputName", datalet.outputName + "-" + threadIdentifier);
-                attrs.put("goldName", datalet.goldName);
-                logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance test file references2");
-                // Then log the failure reason
-                logger.logArbitrary(Logger.STATUSMSG, (new File(datalet.inputName)).getName() 
-                                    + " failure reason: " + fileChecker.getExtendedInfo());
-                // Also force our result to fail (Note: we should really 
-                //  use a Reporter to track our status, since this might 
-                //  just be AMBG or ERRR instead of FAIL)
-                result = Logger.FAIL_RESULT;
-            }
+            fileChecker.check(logger,
+                              new File(datalet.outputName + "-" + threadIdentifier), 
+                              new File(datalet.goldName), 
+                              "Shared Templates of: " + datalet.getDescription());
         }
         // Note that this class can only validate positive test 
         //  cases - we don't handle ExpectedExceptions
@@ -452,32 +431,10 @@ public class ThreadedStylesheetTestlet
             // Supply default value
             if (null == fileChecker)
                 fileChecker = new XHTFileCheckService();
-            if (Logger.PASS_RESULT
-                != fileChecker.check(logger,
-                                     new File(datalet.outputName + "-" + threadIdentifier), 
-                                     new File(datalet.goldName), 
-                                     getDescription() + " " + datalet.getDescription())
-               )
-            {
-                // Log a custom element with all the file refs first
-                // Closely related to viewResults.xsl select='fileref"
-                //@todo check that these links are valid when base 
-                //  paths are either relative or absolute!
-                Hashtable attrs = new Hashtable();
-                attrs.put("idref", (new File(datalet.inputName)).getName());
-                attrs.put("inputName", datalet.inputName);
-                attrs.put("xmlName", datalet.xmlName);
-                attrs.put("outputName", datalet.outputName + "-" + threadIdentifier);
-                attrs.put("goldName", datalet.goldName);
-                logger.logElement(Logger.STATUSMSG, "fileref", attrs, "Conformance test file references");
-                // Then log the failure reason
-                logger.logArbitrary(Logger.STATUSMSG, (new File(datalet.inputName)).getName() 
-                                    + " failure reason: " + fileChecker.getExtendedInfo());
-                // Also force our result to fail (Note: we should really 
-                //  use a Reporter to track our status, since this might 
-                //  just be AMBG or ERRR instead of FAIL)
-                result = Logger.FAIL_RESULT;
-            }
+            fileChecker.check(logger,
+                              new File(datalet.outputName + "-" + threadIdentifier), 
+                              new File(datalet.goldName), 
+                              getDescription() + " " + datalet.getDescription())
         }
         // Note that this class can only validate positive test 
         //  cases - we don't handle ExpectedExceptions
