@@ -1,0 +1,16 @@
+# See also test.properties, harness.perf.* or perf.* section
+# Feel free to edit to run different files; note we do *not* use inputDir, etc.
+# First file is compiled into common Templates object
+#   all remaining files are then spun off onto a thread each
+# Lines must be qualified path/filenames whitespace separated like:
+# path/inputName path/xmlName path/outputName path/goldName flavor [optional options]
+
+# This file is used as a Templates
+tests/api/trax/identity.xsl tests/api/trax/identity.xml results-perf/identity-shared.out tests/api-gold/trax/identity.out trax
+
+# These files are each processed in their own thread
+tests/perf/basic/basic-all_well.xsl  tests/perf/xtestdata/play-alls_well.xml  results-perf/basic-all_well.out  tests/perf-gold/basic/basic-all_well.out   trax
+tests/perf/basic/basic-datetranscode.xsl  tests/perf/basic/basic-datetranscode.xml  results-perf/basic-datetranscode.out  tests/perf-gold/basic/basic-datetranscode.out   trax
+tests/perf/output/outputHhref.xsl  tests/perf/output/outputHhref.xml  results-perf/outputHhref.out  tests/perf-gold/output/outputHhref.out   trax
+tests/perf/sort/sort-words1.xsl  tests/perf/xtestdata/words-repeat.xml  results-perf/sort-words1.out  tests/perf-gold/sort/sort-words1.out   trax
+tests/perf/sort/sort-numbers1.xsl  tests/perf/xtestdata/num1krandom.xml  results-perf/sort-numbers1.out  tests/perf-gold/sort/sort-numbers1.out   trax
