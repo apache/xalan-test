@@ -69,11 +69,16 @@ import org.apache.qetest.xsl.*;
 // Import all relevant TRAX packages
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 // Needed SAX, DOM, JAXP classes
+import org.w3c.dom.Document;
 
 // java classes
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
@@ -99,6 +104,9 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
     /** Embedded identity test file for getEmbedded....  */
     protected XSLTestfileInfo embeddedFileInfo = new XSLTestfileInfo();
 
+    /** Modern test for testCase6.  */
+    protected XSLTestfileInfo embeddedCSSFileInfo = new XSLTestfileInfo();
+
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_SUBDIR = "trax";
 
@@ -114,7 +122,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public TransformerFactoryAPITest()
     {
-        numTestCases = 5;  // REPLACE_num
+        numTestCases = 6;  // REPLACE_num
         testName = "TransformerFactoryAPITest";
         testComment = "API Coverage test for TransformerFactory class of TRAX";
     }
@@ -154,6 +162,9 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
 
         embeddedFileInfo.xmlName = filenameToURL(testBasePath + "embeddedIdentity.xml");
         embeddedFileInfo.goldName = goldBasePath + "embeddedIdentity.out";
+
+        embeddedCSSFileInfo.xmlName = testBasePath + "TransformerFactoryAPIModern.xml"; // just the local path\filename
+        // embeddedCSSFileInfo.optionalName = testBasePath + "TransformerFactoryAPIModern.css"; // other file required by XML file
 
         // Cache the system property
         cachedSysProp = System.getProperty(defaultPropName);
@@ -357,9 +368,9 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logStatusMsg("System property " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
-            String media= null;     // currently ignored
-            String title = null;    // currently ignored
-            String charset = null;  // currently ignored
+            String media= null;     // currently untested
+            String title = null;    // currently untested
+            String charset = null;  // currently untested
 
             // May throw IOException
             FileOutputStream resultStream = new FileOutputStream(outNames.nextName());
@@ -367,6 +378,9 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             // Get the xml-stylesheet and process it
             Source stylesheet = factory.getAssociatedStylesheet(new StreamSource(embeddedFileInfo.xmlName), 
                                                                 media, title, charset);
+            reporter.check((stylesheet instanceof Source), true, "getAssociatedStylesheet returns instanceof Source");
+            reporter.check((null != stylesheet), true, "getAssociatedStylesheet returns a non-null Source");
+
             Transformer transformer = factory.newTransformer(stylesheet);
             reporter.logCriticalMsg("SPR SCUU4RXTSQ occours in below line, even though check reports pass (missing linefeed)");
             transformer.transform(new StreamSource(embeddedFileInfo.xmlName), new StreamResult(resultStream));
@@ -459,6 +473,95 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setErrorListener threw:");
         }
         reporter.logStatusMsg("@todo feature testing for ErrorListener");
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Miscellaneous tests.
+     * Bug/tests submitted by Bhakti.Mehta@eng.sun.com
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase6()
+    {
+        reporter.testCaseInit("Miscellaneous getAssociatedStylesheets tests");
+        TransformerFactory factory = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+
+            // Note that embeddedCSSFileInfo has the following PI:
+            //  <?xml-stylesheet href="TransformerFactoryAPIModern.css" title="Modern" media="screen" type="text/css"?>
+            // Which we should return null from, since we only support 
+            //  types that are properly mapped to xslt:
+            //  text/xsl, text/xml, and application/xml+xslt
+            //  see also EmbeddedStylesheetTest
+            Document doc = db.parse(new File(embeddedCSSFileInfo.xmlName));
+            DOMSource domSource = new DOMSource(doc);
+
+            // TransformerFactory01.check01()
+            try 
+            {
+                reporter.logInfoMsg("About to getAssociatedStylesheet(domsource-w/outsystemid, screen,Modern,null)");
+                Source s = factory.getAssociatedStylesheet(domSource,"screen","Modern",null);
+                reporter.check((null == s), true, "getAssociatedStylesheet returns null Source for text/css");
+            }
+            catch (Throwable t)
+            {
+                reporter.checkFail("TransformerFactory01.check01a threw: " + t.toString());
+                reporter.logThrowable(reporter.STATUSMSG, t, "TransformerFactory01.check01a threw");
+            }
+            try 
+            {
+                domSource.setSystemId(filenameToURL(embeddedCSSFileInfo.xmlName));
+                reporter.logInfoMsg("About to getAssociatedStylesheet(domsource-w/systemid, screen,Modern,null)");
+                Source s = factory.getAssociatedStylesheet(domSource,"screen","Modern",null);
+                reporter.check((null == s), true, "getAssociatedStylesheet returns null Source for text/css");
+            }
+            catch (Throwable t)
+            {
+                reporter.checkFail("TransformerFactory01.check01b threw: " + t.toString());
+                reporter.logThrowable(reporter.STATUSMSG, t, "TransformerFactory01.check01b threw");
+            }
+
+            // public void TransformerFactory02.check01(){
+            try 
+            {
+                StreamSource ss = new StreamSource(new FileInputStream(embeddedCSSFileInfo.xmlName));
+                reporter.logInfoMsg("About to getAssociatedStylesheet(streamsource-w/outsystemid, screen,Modern,null)");
+                Source s = factory.getAssociatedStylesheet(ss,"screen","Modern",null);
+                reporter.check((null == s), true, "getAssociatedStylesheet returns null Source for text/css");
+            }
+            catch (Throwable t)
+            {
+                reporter.checkFail("TransformerFactory02.check01a threw: " + t.toString());
+                reporter.logThrowable(reporter.STATUSMSG, t, "TransformerFactory02.check01a threw");
+            }
+            try 
+            {
+                StreamSource ss = new StreamSource(new FileInputStream(embeddedCSSFileInfo.xmlName));
+                ss.setSystemId(filenameToURL(embeddedCSSFileInfo.xmlName));
+                reporter.logInfoMsg("About to getAssociatedStylesheet(streamsource-w/systemid, screen,Modern,null)");
+                Source s = factory.getAssociatedStylesheet(ss,"screen","Modern",null);
+                reporter.check((null == s), true, "getAssociatedStylesheet returns null Source for text/css");
+            }
+            catch (Throwable t)
+            {
+                reporter.checkFail("TransformerFactory02.check01b threw: " + t.toString());
+                reporter.logThrowable(reporter.STATUSMSG, t, "TransformerFactory02.check01b threw");
+            }
+        }
+        catch (Throwable t)
+        {
+            reporter.checkErr("Miscellaneous getAssociatedStylesheets tests threw: " + t.toString());
+            reporter.logThrowable(reporter.STATUSMSG, t, "Miscellaneous getAssociatedStylesheets tests threw");
+        }
 
         reporter.testCaseClose();
         return true;
