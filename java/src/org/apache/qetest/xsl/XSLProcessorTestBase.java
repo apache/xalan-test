@@ -101,7 +101,8 @@ public class XSLProcessorTestBase extends FileBasedTest
      * Convenience method to print out usage information.
      * @author Shane Curcuru
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return String describing our usage; includes most of the 
+     * flags we support and our parent class' usage
      */
     public String usage()
     {
@@ -139,18 +140,18 @@ public class XSLProcessorTestBase extends FileBasedTest
      */
     public static final String OPT_CATEGORY = "category";
 
-    /** NEEDSDOC Field category          */
+    /** Parameter: Only run a single subcategory of the tests.  */
     protected String category = null;
 
     /**
      * Parameter: Reuse/reset processor between cases or create a new one each time?
      * <p>Default: false - create one processor and call reset between tests.</p>
+     * <p>Should be deprecated, I think. -sc 21-Mar-01</p>
      */
-
     // TODO: Move to directoryiterator
     public static final String OPT_NOREUSE = "noReuse";
 
-    /** NEEDSDOC Field noReuse          */
+    /** Parameter: Reuse/reset processor between cases or create a new one each time?  */
     protected boolean noReuse = true;
 
     /**
@@ -161,7 +162,7 @@ public class XSLProcessorTestBase extends FileBasedTest
     // TODO: Move to directoryiterator
     public static final String OPT_LIAISON = "liaison";
 
-    /** NEEDSDOC Field liaison          */
+    /** Parameter: What parser liaison or option to use?.   */
     protected String liaison = null;
 
     /**
@@ -170,18 +171,19 @@ public class XSLProcessorTestBase extends FileBasedTest
      */
     public static final String OPT_FLAVOR = "flavor";
 
-    /** NEEDSDOC Field flavor          */
+    /** Parameter: What flavor of ProcessorWrapper to use: trax|xalan1|other?  */
     protected String flavor = "trax";
 
     /**
      * Parameter: Name of output file for diagnostics/error logs?
      * <p>Default: null, do not use one</p>
+     * <p>Should be deprecated, I think. -sc 21-Mar-01</p>
      */
 
     // TODO: Move to directoryiterator
     public static final String OPT_DIAGNOSTICS = "diagnostics";
 
-    /** NEEDSDOC Field diagnostics          */
+    /** Parameter: Name of output file for diagnostics/error logs?  */
     protected String diagnostics = null;
 
     /**
@@ -190,58 +192,64 @@ public class XSLProcessorTestBase extends FileBasedTest
      */
     public static final String OPT_PRECOMPILE = "precompile";
 
-    /** NEEDSDOC Field precompile          */
+    /** Parameter: Should we try to use a precompiled stylesheet?  */
     protected boolean precompile = false;
 
     /**
      * Parameter: Should we run any 'err' subdir tests or not?
      * <p>Default: false (i.e. <b>do</B> run error tests by default).</p>
-     * @todo update, this is clumsy (reverse double negative option)
+     * <p>Should be deprecated, I think: don't try to run both 
+     * positive and negative tests together, do them separately.
+     * -sc 21-Mar-01</p>
      */
     public static final String OPT_NOERRTEST = "noErrTest";
 
-    /** NEEDSDOC Field noErrTest          */
+    /** Parameter: Should we run any 'err' subdir tests or not?  */
     protected boolean noErrTest = false;
 
     /**
-     * Parameter: force use of URI's for Xerces 1.1.2 or leave filenames alone?
+     * Parameter: force use of URI's or leave filenames alone?
      * <p>Default: true, use URI's</p>
      * @todo update, this is clumsy
      */
     public static final String OPT_USEURI = "useURI";
 
-    /** NEEDSDOC Field useURI          */
+    /** Parameter: force use of URI's or leave filenames alone?  */
     protected boolean useURI = true;
 
     /**
      * Parameter: Which CheckService should we use for XML output Files?
-     * <p>Default: org.apache.qetest.SimpleFileCheckService.</p>
+     * <p>Default: org.apache.qetest.XHTFileCheckService.</p>
      */
     public static final String OPT_FILECHECKER = "fileChecker";
 
-    /** NEEDSDOC Field fileCheckerName          */
+    /** Parameter: Which CheckService should we use for XML output Files?  */
     protected String fileCheckerName =
         "org.apache.qetest.xsl.XHTFileCheckService";
 
-    /** NEEDSDOC Field fileChecker          */
+    /** FileChecker instance for use by subclasses; created in preTestFileInit()  */
     protected CheckService fileChecker = null;
 
     /**
      * Parameter: Should we exclude any specific test files?
-     * <p>Default: null (no excludes; otherwise specify semicolon delimited list like 'axes01.xsl;bool99.xsl').</p>
+     * <p>Default: null (no excludes; otherwise specify 
+     * semicolon delimited list of bare filenames something like 
+     * 'axes01.xsl;bool99.xsl').</p>
      */
     public static final String OPT_EXCLUDES = "excludes";
 
-    /** NEEDSDOC Field excludes          */
+    /** Parameter: Should we exclude any specific test files?  */
     protected String excludes = null;
 
     /**
      * Parameter: Are there any embedded stylesheets in XML files?
-     * <p>Default: null (no special tests; otherwise specify semicolon delimited list like 'axes01.xml;bool99.xml').</p>
+     * <p>Default: null (no embedded tests; otherwise specify 
+     * semicolon delimited list of bare filenames something like 
+     * 'axes02.xml;bool98.xml').</p>
      */
     public static final String OPT_EMBEDDED = "embedded";
 
-    /** NEEDSDOC Field embedded          */
+    /** Parameter: Are there any embedded stylesheets in XML files?  */
     protected String embedded = null;
 
     /**
@@ -264,12 +272,14 @@ public class XSLProcessorTestBase extends FileBasedTest
 
     /**
      * Initialize this test - called once before running testcases.
-     * <p>Use the loggers field to create some loggers in a Reporter.</p>
+     * <p>We auto-create a reporter and some loggers: if logFile is 
+     * set, we add an XMLFileLogger, and we usually add a 
+     * ConsoleLogger.  We also create a fileChecker for later use.</p>
      * @author Shane_Curcuru@lotus.com
      *
-     * NEEDSDOC @param p
+     * @param p unused
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return true always
      */
     public boolean preTestFileInit(Properties p)
     {
@@ -332,7 +342,19 @@ public class XSLProcessorTestBase extends FileBasedTest
         {
             try
             {
-                Class fClass = Class.forName(fileCheckerName);
+                String[] testPackages = 
+                {
+                    "org.apache.qetest.xsl",
+                    "org.apache.qetest.trax",
+                    "org.apache.qetest.xalanj2",
+                    "org.apache.qetest.xalanj1",
+                    "org.apache.qetest"
+                };
+                // Use utility method to attempt to guess classnames 
+                //  that are not fully specified, if needed
+                Class fClass = QetestUtils.testClassForName(fileCheckerName, 
+                                                            testPackages, 
+                                                            fileCheckerName);
 
                 fileChecker = (CheckService) fClass.newInstance();
 
@@ -341,7 +363,7 @@ public class XSLProcessorTestBase extends FileBasedTest
             }
             catch (Exception e)
             {
-                reporter.logWarningMsg("Failed to create an instance of "
+                reporter.logErrorMsg("Failed to create an instance of "
                                        + fileCheckerName + ": "
                                        + e.toString());
 
@@ -355,8 +377,9 @@ public class XSLProcessorTestBase extends FileBasedTest
 
     /**
      * Override mostly blank routine to dump environment info.
-     * <p>Log out information about our environment in a structured way.</p>
-     * @author Shane_Curcuru@lotus.com
+     * <p>Log out information about our environment in a structured 
+     * way: mainly by calling logTestProps() here.</p>
+     * 
      * @param p unused
      *
      * @return true always
@@ -378,6 +401,26 @@ public class XSLProcessorTestBase extends FileBasedTest
         reporter.logHashtable(reporter.CRITICALMSG, testProps, "testProps");
     }
 
+    /**
+     * Mark the test complete - called once after running testcases.
+     * <p>Currently logs a summary of our test status and then tells 
+     * our reporter to log the testFileClose. This will calculate 
+     * final results, and complete logging for any structured 
+     * output logs (like XML files).</p>
+     *
+     * @param p Unused; passed through to super
+     *
+     * @return true if OK, false otherwise
+     */
+    protected boolean postTestFileClose(Properties p)
+    {
+        // Log out a special summary status, with marker file
+        reporter.writeResultsStatus(true);
+
+        // Ask our superclass to handle this as well
+        return super.postTestFileClose(p);
+    }
+
     // use other implementations from FileBasedTest
     //-----------------------------------------------------
     //-------- Initialize our common input params --------
@@ -395,10 +438,6 @@ public class XSLProcessorTestBase extends FileBasedTest
      */
     public boolean initializeFromProperties(Properties props)
     {
-
-        debugPrintln("XSLProcessorTestBase.initializeFromProperties(" + props
-                     + ")");
-
         // Get any superclass' default processing
         boolean b = super.initializeFromProperties(props);
 
@@ -466,10 +505,6 @@ public class XSLProcessorTestBase extends FileBasedTest
      */
     public boolean initializeFromArray(String[] args)
     {
-
-        debugPrintln("XSLProcessorTestBase.initializeFromArray(" + args
-                     + ")");
-
         // Read in command line args and setup internal variables
         String optPrefix = "-";
         int nArgs = args.length;
@@ -688,90 +723,6 @@ public class XSLProcessorTestBase extends FileBasedTest
     //-----------------------------------------------------
     //-------- Other useful and utility methods --------
     //-----------------------------------------------------
-
-    /**
-     * Worker method to translate a String filename to URL.  
-     * Note: This method is not necessarily proven to get the 
-     * correct URL for every possible kind of filename.
-     * @param String path\filename of test file
-     * @return URL to pass to SystemId
-     */
-    public static String filenameToURL(String filename)
-    {
-        File f = new File(filename);
-        String tmp = f.getAbsolutePath();
-	    if (File.separatorChar == '\\') {
-	        tmp = tmp.replace('\\', '/');
-	    }
-        return "file:///" + tmp;
-    }
-
-    
-    /**
-     * Write a "{TestName}.Pass" or "{TestName}.Not.Pass" file 
-     * according to whether or not the overall test passed.
-     * But: Don't write this file if we're a Minitest, since 
-     * Minitests already output a better format of a status 
-     * file already in doTestFileClose (which is where this 
-     * kind of functionality probably belongs anyway).
-     * -- Subject to change! --
-     * @author scott_boag@lotus.com
-     */
-    protected void createStatusFile()
-    {
-        if(null != reporter)
-        {
-            String testName = this.getTestName();
-            if ("Minitest".equalsIgnoreCase(testName))
-            {
-                reporter.logWarningMsg("Note! Minitests write their own status files!");
-                return;                
-            }
-            File resultsFile = new File(testProps.getProperty("logFile"));
-            // Note we can either have pass/notpass, or we can 
-            //  use the full set of test status values from 
-            //  Logger.java: pass/fail/errr/incp/ambg
-            File passfile = new File(resultsFile.getParent(), testName + "." + Logger.PASS);
-            File failfile = new File(resultsFile.getParent(), testName + ".Not." + Logger.PASS);
-            if(passfile.exists())
-                passfile.delete();
-            if(failfile.exists())
-                failfile.delete();
-
-            // didPass returns pass/fail in a different manner 
-            //  than is used elsewhere in the tests.  We need to 
-            //  decide on a common way to do this everywhere.
-            //  See Logger's javadoc for PASS_RESULT, INCP_RESULT, etc.
-            // the only potential difficulty (for minitest, etc. use)
-            //  is ambiguous results, which are neither passes 
-            //  nor fails
-            // File statusfile = reporter.didPass() ? passfile : failfile;                 
-            File statusfile = null;
-            if (reporter.getCurrentFileResult() == Logger.PASS_RESULT)
-                statusfile = passfile;
-            else
-                statusfile = failfile;
-
-            try
-            {
-                java.io.FileOutputStream fio = new java.io.FileOutputStream(statusfile);
-                fio.write(0);   // We should really write something more meaningful here
-                fio.close();
-            }
-            catch(Exception e)
-            {
-                // Note: System.out/.err should *only* *ever* be 
-                //  used in places where a reporter is not available
-                // System.out.println("Can't write: "+statusfile.toString());
-                reporter.logCriticalMsg("Can't write: " + statusfile.toString());
-            }
-        }
-        else
-        {
-            System.err.println("ERROR! createStatusFile has no reporter, can't work!");
-        }
-    }
-
     /**
      * Main worker method to run test from the command line.
      * Test subclasses generally need not override.
@@ -791,9 +742,6 @@ public class XSLProcessorTestBase extends FileBasedTest
      */
     public void doMain(String[] args)
     {
-
-        debugPrintln("XSLProcessorTestBase.doMain(" + args + ")");
-
         // Initialize any instance variables from the command line 
         //  OR specified properties block
         if (!initializeFromArray(args))
@@ -817,11 +765,6 @@ public class XSLProcessorTestBase extends FileBasedTest
 
         // Actually go and execute the test
         runTest(testProps);
-        
-        // Note that this is only called if run from the command
-        //  line directly, and is not called when executed from 
-        //  XSLTestHarness (which calls runTest directly)
-        createStatusFile();
     }
 
     /**
@@ -830,15 +773,11 @@ public class XSLProcessorTestBase extends FileBasedTest
      * <p>Test subclasses <b>must</b> override, obviously.
      * Only provided here for debugging.</p>
      *
-     * NEEDSDOC @param args
+     * @param args command line arguments
      */
     public static void main(String[] args)
     {
-
         XSLProcessorTestBase app = new XSLProcessorTestBase();
-
-        app.debug = true;  // HACK
-
         app.doMain(args);
     }
 }  // end of class XSLProcessorTestBase
