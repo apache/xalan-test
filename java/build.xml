@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+/**
+ * build.xml
+ * Ant 1.2x build script for Xalan-J tests.  
+ * @author shane_curcuru@lotus.com
+ *
+ */
+-->
+
+<project name="xslqetest" default="package.trax" basedir=".">
+
+<!-- @see build.bat,build.sh for how to use this -->
+<!-- The user should first setup system stuff in the CLASSPATH,
+     like classes.zip, servlet.jar, and the JAVA_HOME env. var.
+     build.bat/build.sh should then setup our other basic CLASSPATH
+     dependencies: either from defaults of ../../java/bin, etc., 
+     or from some user-specified JARDIR.
+
+     For wrapper targets, the user must include any other JARS needed
+     for the various wrappers, like xt.jar, xp.jar, ezx.jar, etc.
+     Note, however, that pre-compiled .class files are already checked in 
+     for some other wrappers. -->
+
+    <property name="name" value="testxsl"/>
+    <property name="Name" value="Testxsl"/>
+    <property name="version" value="3.0"/>
+    <property name="year" value="2000"/>
+    <property name="copyright" value="Copyright &#169; ${year} The Apache Software Foundation.  All rights reserved."/>
+    <property name="testxsl.jar" value="${name}.jar"/>
+
+    <property name="build.compiler" value="classic"/>
+    <property name="compiler" value="${build.compiler}"/>
+    <property name="debug" value="on"/>
+
+    <property name="src.dir" value="./src"/>
+    <property name="test.root" value="/org/apache/qetest"/>
+    <property name="test.dir" value="${src.dir}${test.root}"/>
+    <property name="build.dir" value="./build"/>
+    <property name="build.docs" value="${build.dir}/apidocs"/>
+    <!-- // TODO add org.apache.qetest.xalanj2, xalanc1, etc.  -->
+
+    <property name="javadocs.packages" 
+              value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.xalanj1"/>
+
+    <!-- Prepare output tree; copy over prebuilt classes -->
+    <target name="prepare">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${build.docs}" />
+        <mkdir dir="${build.dir}${test.root}" />
+        <!-- Also copy over precompiled external processor wrapper classes -->
+        <copy todir="${build.dir}${test.root}/xslwrapper" >
+            <fileset dir="${test.dir}/xslwrapper">
+                <include name="**/*.class" />
+                <include name="**/*.properties" />
+            </fileset>
+        </copy>
+        
+        <tstamp />
+    </target>
+
+    <!-- Compile generic qetest reporter; used by all tests; no code dependencies -->
+    <target name="compile.reporter" depends="prepare">
+        <javac srcdir="${test.dir}" 
+               destdir="${build.dir}" 
+               includes="*.java" 
+               debug="${debug}" />
+    </target>
+
+    <!-- Compile Processor-wrapper based tests; must also compile ProcessorWrapper itself -->
+    <target name="compile.xsl" depends="compile.reporter">
+        <javac srcdir="${test.dir}/xslwrapper" 
+               destdir="${build.dir}" 
+               includes="ProcessorWrapper.java"
+               debug="${debug}" />
+        <javac srcdir="${test.dir}/xsl" 
+               destdir="${build.dir}" 
+               debug="${debug}" />
+    </target>
+    <target name="package.xsl" depends="compile.xsl">
+        <jar jarfile="${build.dir}/${testxsl.jar}" 
+             basedir="${build.dir}" 
+             includes="**/*.class,**/*.properties" />
+    </target>
+
+    <!-- For Xalan-J 1.x testing, use these targets -->
+    <target name="compile.xalan1" depends="compile.xsl">
+        <javac srcdir="${test.dir}/xslwrapper" 
+               destdir="${build.dir}" 
+               includes="XalanWrapper.java"
+               debug="${debug}" />
+        <javac srcdir="${test.dir}/xalanj1" 
+               destdir="${build.dir}" 
+               debug="${debug}" />
+    </target>
+    <target name="package.xalan1" depends="compile.xalan1">
+        <jar jarfile="${build.dir}/${testxsl.jar}" 
+             basedir="${build.dir}" 
+             includes="**/*.class,**/*.properties" />
+    </target>
+
+    <!-- For TRAX interface-only testing, use these targets -->
+    <target name="compile.trax" depends="compile.xsl">
+        <javac srcdir="${test.dir}/xslwrapper" 
+               destdir="${build.dir}" 
+               includes="TraxWrapper.java"
+               debug="${debug}" />
+        <javac srcdir="${test.dir}/trax" 
+               destdir="${build.dir}" 
+               debug="${debug}" />
+    </target>
+    <target name="package.trax" depends="compile.trax">
+        <jar jarfile="${build.dir}/${testxsl.jar}" 
+             basedir="${build.dir}" 
+             includes="**/*.class,**/*.properties" />
+    </target>
+
+
+    <!-- All wrappers; requires competitor's jars in the classpath, as appropriate
+         (You may be better off compiling other wrappers by hand, and then simply 
+         checking in their .class files instead) -->
+    <target name="compile.xslwrapper.wrappers" depends="prepare">
+        <javac srcdir="${test.dir}/xslwrapper" 
+                destdir="${build.dir}" 
+                debug="${debug}" />
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Creates the API documentation                                       -->
+    <!-- =================================================================== -->
+    <target name="javadocs" depends="prepare">
+        <javadoc
+             sourcepath="${src.dir}"
+             destdir="${build.docs}"
+             packagenames="${javadocs.packages}"
+             public="true"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="${Name}" 
+             doctitle="${Name}"
+             bottom="${copyright}"
+        />
+    </target>
+
+</project>
