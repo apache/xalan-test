@@ -972,6 +972,18 @@
           
     </target>
 
+    <target name="export" depends="jar"
+        description="Build a very simple export of just the important sources">
+        <!-- Zip only the sources used in the plain 'jar' target -->
+        <zip zipfile="${test.build.dir}/testxsl-src-${DSTAMP}.zip" >
+          <zipfileset dir="java">
+            <include name="src/"/>
+            <!-- Don't copy qetesttest due to JUnit dependency -->
+            <exclude name="src/${test.root}qetesttest/"/>
+          </zipfileset>
+        </zip>
+          
+    </target>
 
     <!-- ================================================================== -->
     <!-- Special: Targets specific to XSLTC which requires extra .jars      -->
