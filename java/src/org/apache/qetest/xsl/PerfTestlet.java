@@ -113,17 +113,20 @@ public class PerfTestlet extends StylesheetTestlet
     {
         // Setup: Save options from the datalet in convenience variables
         int iterations = 10;
-        boolean runtimeGC = false;
+        boolean runtimeGC = true;
         long[] times = null;
 
+		// Read in necessary options from test.properties file.
         try
         {
             iterations = Integer.parseInt(datalet.options.getProperty("iterations"));
         }
         catch (Exception e) { /* no-op, leave as default */ }
         try
-        {
-            runtimeGC = (new Boolean(datalet.options.getProperty("runtimeGC"))).booleanValue();
+        {	
+        	String gc = datalet.options.getProperty("runtimeGC");
+			if (gc != null)
+				runtimeGC = (Boolean.valueOf(gc)).booleanValue(); 
         }
         catch (Exception e) { /* no-op, leave as default */ }
 
@@ -290,6 +293,7 @@ public class PerfTestlet extends StylesheetTestlet
         if (doGC)
         {
             Runtime.getRuntime().gc();
+			//System.out.print(".");
         }
         if (doLog)
         {
