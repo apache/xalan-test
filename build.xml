@@ -805,21 +805,17 @@
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xalanj2/*.java,${test.root}dtm/*.java"
+               excludes="${test.root}dtm/xsltcDocCode.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
     </target>
 
-	<!-- Target for XSLTC-specific API tests.  -->
-    <target name="xsltc.tests" depends="compile">
-        <echo message="Compile XSLTC specific tests" />
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
-               includes="${test.root}xsltc/*.java"
-               debug="${debug}"
-               classpathref="compiletest.class.path" />
-    </target>
-
-    <target name="jar" depends="compile,xsltc.tests"
+    <!-- Note that this target must *not* depend on any XSLTC tests, 
+         which have to be compiled separately; otherwise the 
+         smoketest will fail.  Please see compile.xsltc and 
+         jar.xsltc targets instead.
+    -->
+    <target name="jar" depends="compile"
         description="Build testxsl.jar with all available tests">
         <jar jarfile="${testxsl.jar}" 
              basedir="${test.build.dir}" 
@@ -1065,7 +1061,7 @@
         description="Compile xsltc native API tests only">
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}xsltc/*.java"
+               includes="${test.root}xsltc/*.java,${test.root}dtm/*.java"
                debug="${debug}">
             <classpath refid="xsltc.compile.class.path" />
         </javac>               
