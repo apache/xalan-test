@@ -67,6 +67,8 @@ import org.apache.xpath.objects.XMLStringFactoryImpl;
 import org.apache.xml.dtm.*;
 import org.apache.xml.dtm.ref.*;
 
+import org.apache.qetest.dtm.dtmWSStripper;
+
 
 /**
  * Unit test for DTMManager/DTM
@@ -82,6 +84,18 @@ import org.apache.xml.dtm.ref.*;
  * */
 public class TestDTMTraverser {
 
+/*class myWSStripper implements DTMWSFilter {
+
+void myWWStripper()
+  { }
+
+public short getShouldStripSpace(int elementHandle, DTM dtm)
+  {
+ 	return DTMWSFilter.STRIP;
+  }
+
+}
+*/
 static final String[] TYPENAME=
   { "NULL",
     "ELEMENT",
@@ -110,8 +124,13 @@ static final String[] TYPENAME=
 		{
 			String defaultSource=
 				"<?xml version=\"1.0\"?>\n"+
-				"<Document>"+
-				"<A><B><C><D><E><F/></E></D></C></B></A><Aa/>"+
+				"<Document xmlns:x=\"www.x.com\" a1=\"hello\" a2=\"goodbye\">"+
+				"<!-- Default test document -->"+
+				"<?api a1=\"yes\" a2=\"no\"?>"+
+				"<A><B><C><D><E><F/></E></D></C></B></A>"+
+				"<Aa/><Ab/><Ac><Ac1/></Ac>"+
+				"<Ad xmlns:xx=\"www.xx.com\" xmlns:y=\"www.y.com\" xmlns:z=\"www.z.com\">"+
+				"<Ad1/></Ad>"+
 				"</Document>";
 
 			source=new StreamSource(new StringReader(defaultSource));
@@ -131,44 +150,171 @@ static final String[] TYPENAME=
       // with no whitespace filtering, nonincremental, but _with_
       // indexing (a fairly common case, and avoids the special
       // mode used for RTF DTMs).
-      DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-      DTM dtm=manager.getDTM(source, true, null, false, true);
 
-	  // Get the Document node and then the first child.
+	  // For testing with some of David Marston's files I do want to strip whitespace.
+	  dtmWSStripper stripper = new dtmWSStripper();
+
+      DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
+      DTM dtm=manager.getDTM(source, true, stripper, false, true);
+
+	  // Get various nodes to use as context nodes.
 	  int dtmRoot = dtm.getDocument();			// #document
-	  int child = dtm.getFirstChild(dtmRoot);	// <Document>
-	  int sndChild = dtm.getFirstChild(child);	// <A>
+	  String dtmRootName = dtm.getNodeName(dtmRoot);
+	  int DNode = dtm.getFirstChild(dtmRoot);	// <Document>
+	  String DNodeName = dtm.getNodeName(DNode);
+	  int CNode = dtm.getFirstChild(DNode);		// <Comment>
+	  int PINode = dtm.getNextSibling(CNode);	// <PI>
+	  int ANode = dtm.getNextSibling(PINode);	// <A>
+	  String ANodeName = dtm.getNodeName(ANode);
+	  int lastNode = 0;
+
       
-	  // Get a traverser for CHILD:: axis.
-	  System.out.println("#### First Traverser for <Document>\n");			   
+	  // Get a traverser for Child:: axis.
+	  System.out.println("\n#### CHILD from "+"<"+DNodeName+">");			   
       DTMAxisTraverser at = dtm.getAxisTraverser(Axis.CHILD);
 
 	  // Traverse the axis and print out node info.
-      for (int atNode = at.first(child); DTM.NULL != atNode;
-              atNode = at.next(child, atNode))
+      for (int atNode = at.first(DNode); DTM.NULL != atNode;
+              atNode = at.next(DNode, atNode))
+		{  printNode(dtm, atNode, " ");
+		   lastNode = atNode;
+		}
+      
+	  // Get a traverser for Parent:: axis.
+	  String lastNodeName = dtm.getNodeName(lastNode);
+	  System.out.println("\n#### PARENT from "+"<"+lastNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.PARENT);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		  printNode(dtm, atNode, " ");
+		
+	  // Get a from Self:: axis.
+	  System.out.println("\n#### SELF from "+"<"+lastNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.SELF);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		  printNode(dtm, atNode, " ");
+		
+	  // Get a traverser for NameSpaceDecls:: axis.
+	  System.out.println("\n#### NAMESPACEDECLS from "+"<"+lastNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.NAMESPACEDECLS);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		  printNode(dtm, atNode, " ");
+		
+	  // Get a traverser for Namespace:: axis.
+	  System.out.println("\n#### NAMESPACE from "+"<"+lastNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.NAMESPACE);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		  printNode(dtm, atNode, " ");
+      
+	  // Get a traverser for Preceding:: axis.
+	  System.out.println("\n#### PRECEDING from "+"<"+lastNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.PRECEDING);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
 
-	  // Get a traverser for DESCENDANT:: axis.
-	  System.out.println("#### Second Traverser for <A>\n");
+	  // Get a traverser for Preceding:: axis.
+	  System.out.println("\n#### PRECEDINGSIBLING from "+"<"+lastNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.PRECEDINGSIBLING);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
+
+      
+	  // Get a traverser for Attribute:: axis.
+	  System.out.println("\n#### ATTRIBUTE from "+"<"+DNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.ATTRIBUTE);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(DNode); DTM.NULL != atNode;
+              atNode = at.next(DNode, atNode))
+		printNode(dtm, atNode, " ");
+
+	  // Get a traverser for Following:: axis.
+	  System.out.println("\n#### FOLLOWING from "+"<"+ANodeName+">");
+      at = dtm.getAxisTraverser(Axis.FOLLOWING);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(ANode); DTM.NULL != atNode;
+              atNode = at.next(ANode, atNode))
+		printNode(dtm, atNode, " ");
+
+	  // Get a traverser for FollowingSibling:: axis.
+	  System.out.println("\n#### FOLLOWINGSIBLING from "+"<"+ANodeName+">");
+      at = dtm.getAxisTraverser(Axis.FOLLOWINGSIBLING);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(ANode); DTM.NULL != atNode;
+              atNode = at.next(ANode, atNode))
+		printNode(dtm, atNode, " ");
+
+	  // Get a traverser for  DESCENDANT:: axis.
+	  System.out.println("\n#### DESCENDANT from "+"<"+ANodeName+">");
       DTMAxisTraverser at2 = dtm.getAxisTraverser(Axis.DESCENDANT);
 
 	  // Traverse the axis and print out node info.
-	  int lastNode = 0;
-      for (int atNode = at2.first(sndChild); DTM.NULL != atNode;
-              atNode = at2.next(sndChild, atNode))
+	  for (int atNode = at2.first(ANode); DTM.NULL != atNode;
+              atNode = at2.next(ANode, atNode))
+		{
+			printNode(dtm, atNode, " ");
+			lastNode = atNode;
+		}
+
+	  // Get a traverser for  DESCENDANTORSELF:: axis.
+	  System.out.println("\n#### DESCENDANT-OR-SELF from "+"<"+ANodeName+">");
+      at2 = dtm.getAxisTraverser(Axis.DESCENDANTORSELF);
+
+	  // Traverse the axis and print out node info.
+	  for (int atNode = at2.first(ANode); DTM.NULL != atNode;
+              atNode = at2.next(ANode, atNode))
 		{
 			printNode(dtm, atNode, " ");
 			lastNode = atNode;
 		}
 
 	  // Get a traverser for ANCESTOR:: axis.
-	  System.out.println("#### Third Traverser for <F>\n");
+	  lastNodeName = dtm.getNodeName(lastNode);
+	  System.out.println("\n#### ANCESTOR from "+"<"+lastNodeName+">");
       DTMAxisTraverser at3 = dtm.getAxisTraverser(Axis.ANCESTOR);
 
 	  // Traverse the axis and print out node info.
       for (int atNode = at3.first(lastNode); DTM.NULL != atNode;
               atNode = at3.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
+
+	  // Get a traverser for AncestororSelf:: axis.
+	  System.out.println("\n#### ANCESTOR-OR-SELF from "+"<"+lastNodeName+">");
+      at3 = dtm.getAxisTraverser(Axis.ANCESTORORSELF);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at3.first(lastNode); DTM.NULL != atNode;
+              atNode = at3.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
+
+	  // Get a traverser for ALL:: axis.
+	  System.out.println("\n#### ALL(absolute axis) from "+"<"+dtmRootName+">");
+      at3 = dtm.getAxisTraverser(Axis.ALL);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at3.first(lastNode); DTM.NULL != atNode;
+              atNode = at3.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
+
 
     }
     catch(Exception e)
@@ -189,30 +335,18 @@ static final String[] TYPENAME=
     String value=dtm.getNodeValue(nodeHandle);
     String vq=(value==null) ? "" : "\"";
 
-    System.out.println(indent+
-		       "Node "+nodeHandle+": "+
-		       TYPENAME[dtm.getNodeType(nodeHandle)]+" \""+
-		       dtm.getNodeNameX(nodeHandle)+ " : " +
-			   dtm.getNodeName(nodeHandle)+
-		       "\" expandedType="+dtm.getExpandedTypeID(nodeHandle)+
-
-		       "\n"+
-		       indent+
-			   "\tQName Info: "+
-			   //"Prefix= " +dtm.getPrefix(kid)+
-			   " LocalName= "+"\""+dtm.getLocalName(nodeHandle)+"\""+
-			   " URI= "+"\""+dtm.getNamespaceURI(nodeHandle)+"\""+
-
-		       "\n"+
-		       indent+
-		       "\tParent=" + dtm.getParent(nodeHandle) +
-		       " FirstChild=" + dtm.getFirstChild(nodeHandle) +
-		       " NextSib=" + dtm.getNextSibling(nodeHandle)+
-			   " Level=" + dtm.getLevel(nodeHandle)+"\n"+
-		       
-		       indent+
+    // Skip outputing of text nodes. In most cases they clutter the output, 
+	// besides I'm only interested in the elemental structure of the dtm. 
+    if( TYPENAME[dtm.getNodeType(nodeHandle)] != "TEXT" )
+	{
+    	System.out.println(indent+
+		       +nodeHandle+": "+
+		       TYPENAME[dtm.getNodeType(nodeHandle)]+" "+
+			   dtm.getNodeName(nodeHandle)+" "+
+			   " Level=" + dtm.getLevel(nodeHandle)+" "+
 		       "\tValue=" + vq + value + vq
 		       ); 
+	}
   }
   
 }
