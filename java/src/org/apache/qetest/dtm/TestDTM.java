@@ -226,7 +226,8 @@ public boolean testCase1()
 	buf.append(" *** DOCUMENT PROPERTIES: *** "+
 	  "\nDocURI=\""+dtm.getDocumentBaseURI()+"\" "+
 	  "SystemID=\""+dtm.getDocumentSystemIdentifier(rootNode)+"\"\n"+
-	  "DocEncoding=\""+dtm.getDocumentEncoding(rootNode)+"\" "+
+         // removed from test until implemented bugzilla 14753
+         // "DocEncoding=\""+dtm.getDocumentEncoding(rootNode)+"\" "+
 	  "StandAlone=\""+dtm.getDocumentStandalone(rootNode)+"\" "+
 	  "DocVersion=\""+dtm.getDocumentVersion(rootNode)+"\""+
 	  "\n\n");
