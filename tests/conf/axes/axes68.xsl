@@ -15,11 +15,11 @@
 </xsl:template>
 
 <xsl:template match="*">
-  <xsl:text>Namespaces for </xsl:text><xsl:value-of select="name(.)"/><xsl:text>:
-</xsl:text>
-  <xsl:for-each select="namespace::*">
-    <xsl:value-of select="name(.)"/><xsl:text>=</xsl:text><xsl:value-of select="."/><xsl:text>,&#010;</xsl:text>
-  </xsl:for-each>
+  <xsl:element name="{name(.)}">
+     <xsl:for-each select="namespace::*">
+        <xsl:element name="{name(.)}"><xsl:value-of select="."/></xsl:element>
+     </xsl:for-each>
+  </xsl:element>
   <xsl:apply-templates/>
 </xsl:template>
 

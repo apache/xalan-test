@@ -7,16 +7,22 @@
   <!-- Section: 3.4 -->
   <!-- Purpose: Show that we can limit match to non-empty elements. -->
 
-<xsl:template match="/a" > 
-  <!-- If the node 'a' has a child 'b' that has a value in it, 
-  then show it. Otherwise don't show it. --> 
+<xsl:template match="/" >
+  <out>
+    <xsl:apply-templates/>
+  </out>
+</xsl:template>
 
-  <xsl:if test='b[not(.="")]' >( <xsl:value-of select="b" /> )</xsl:if> 
+<xsl:template match="a" >
+  <!-- If the node 'a' has a child 'b' that has a value in it,
+  then show it. Otherwise don't show it. -->
 
-  <!-- If the node 'a' has a child 'c' that has a value in it, 
-  then show it. Otherwise don't show it. --> 
+  <xsl:if test='b[not(.="")]' >( <xsl:value-of select="b" /> )</xsl:if>
 
-  <xsl:if test='c[not(.="")]' >( <xsl:value-of select="c" /> )</xsl:if> 
+  <!-- If the node 'a' has a child 'c' that has a value in it,
+  then show it. Otherwise don't show it. -->
+
+  <xsl:if test='c[not(.="")]' >( <xsl:value-of select="c" /> )</xsl:if>
 </xsl:template>
 
 </xsl:stylesheet> 

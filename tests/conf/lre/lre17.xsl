@@ -6,7 +6,7 @@
 
 <xsl:output method="xml" indent="yes"/>
 
-  <!-- FileName: lre15 -->
+  <!-- FileName: lre17 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.1 Literal Result Elements-->
@@ -15,16 +15,7 @@
        only work to omit namespace declarations that are not actually used. -->
 
 <xsl:template match="doc">
-  <out x="by the corner"  xsl:exclude-result-prefixes="ped">
-    <jad:output1/>
-	<jad:output2>
-		<jad:output2a/>
-	</jad:output2>
-	<ljh:output1/>
-	<ljh:output2>
-		<ljh:output2a/>
-	</ljh:output2>
-  </out>
+  <sits x="little jack horner" xsl:exclude-result-prefixes="ped jad"/>
 </xsl:template>
 
 </xsl:stylesheet>

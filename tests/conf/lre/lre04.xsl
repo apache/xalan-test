@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-				xmlns:ped="http://tester.com"
-				xmlns:bdd="http://buster.com"
-				xmlns:jad="http://administrator.com">
+    xmlns:bdd="http://buster.com"
+    xmlns:jad="http://administrator.com">
 
   <!-- FileName: lre04 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
@@ -14,9 +13,9 @@
        bearing the exclude-result-prefixes or xsl:exclude-result-prefixes attribute. -->
 
 <xsl:template match="doc">
-  <out x="by the corner" xsl:if= "my if" /><xsl:text>&#010;</xsl:text>
+  <out x="by the corner"><xsl:text>&#010;</xsl:text>
   <sits x="little jack horner" xsl:exclude-result-prefixes="jad"/><xsl:text>&#010;</xsl:text> 
-  <minding x="his peas and queues" xsl:exclude-result-prefixes="jad bdd"/>
+  <minding x="his peas and queues" xsl:exclude-result-prefixes="jad bdd"/></out>
 </xsl:template>
 
 </xsl:stylesheet>

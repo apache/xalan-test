@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <out>
-A...1. adresse1 2. AFTER
-A...1. adéresse2 2. after
-A...1. adresse3 
-A...1. BEFORE 2. adresse4
-A...1. before 2. adéresse5</out>
+<e>1. adresse1 </e><e>2. AFTER</e>
+<e>1. adéresse2 </e><e>2. after</e>
+<e>1. adresse3 </e>
+<e>1. BEFORE </e><e>2. adresse4</e>
+<e>1. before </e><e>2. adéresse5</e></out>

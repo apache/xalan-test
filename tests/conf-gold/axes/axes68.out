@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<out>Namespaces for docs:
-
-  Namespaces for doc:
-ext=http://somebody.elses.extension,
-
-    Namespaces for section:
-ext=http://somebody.elses.extension,
-foo=http://foo.com,
-
-      Namespaces for inner:
-ext=http://somebody.elses.extension,
-foo=http://foo.com,
-whiz=http://whiz.com/special/page,
-
+<out><docs/>
+  <doc><ext>http://somebody.elses.extension</ext></doc>
+    <section><foo>http://foo.com</foo><ext>http://somebody.elses.extension</ext></section>
+      <inner><whiz>http://whiz.com/special/page</whiz><foo>http://foo.com</foo><ext>http://somebody.elses.extension</ext></inner>
     
   
 </out>

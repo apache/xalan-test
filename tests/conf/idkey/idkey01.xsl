@@ -7,20 +7,21 @@
   <!-- Section: 12.2 -->
   <!-- Purpose: Build links using keys and generate-id(). -->
 
-<xsl:output indent="yes"/>
+<xsl:output method="html" indent="yes"/>
 
 <xsl:key name="titles" match="div" use="title"/>
 <xsl:key name="id" match="@id" use="@id"/>
 
 <xsl:template match="doc">
-  <P>Reference numbers should match the titles, links should work.</P>
-  <xsl:for-each select="div">
-    <HR/>
-    <H1 id="{generate-id(.)}">
-      <xsl:number level="multiple" count="div" format="1.1. "/>
-      <xsl:value-of select="title"/></H1>
-    <xsl:apply-templates/>
-  </xsl:for-each>
+  <HTML><P>Reference numbers should match the titles, links should work.</P>
+    <xsl:for-each select="div">
+      <HR/>
+      <H1 id="{generate-id(.)}">
+        <xsl:number level="multiple" count="div" format="1.1. "/>
+        <xsl:value-of select="title"/></H1>
+      <xsl:apply-templates/>
+    </xsl:for-each>
+  </HTML>
 </xsl:template>
 
 <xsl:template match="p">

@@ -13,7 +13,7 @@
 <xsl:template match="/">
   <html><body>
     <a href="#">
-      <img border="0" src="image.jpg"/>
+      <img src="image.jpg"/>
     </a>
   </body></html>
 </xsl:template>

@@ -8,8 +8,8 @@
   <!-- Creator: Paul Dick -->
   <!-- Purpose: Test whitespace in template matched on root. -->
 
-<xsl:template match="/">
+<xsl:template match="/"><out>
       x
-      </xsl:template>
+      </out></xsl:template>
 
 </xsl:stylesheet>

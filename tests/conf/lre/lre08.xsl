@@ -10,8 +10,10 @@
        attribute value template. -->
 
 <xsl:template match="/">
-  <xsl:element name="{.//doc2/doc3/a/@level}"/>
-  <xsl:element name="{.//*[starts-with(name(.),'ba')]}"/>
+  <out>
+    <xsl:element name="{.//doc2/doc3/a/@level}"/>
+    <xsl:element name="{.//*[starts-with(name(.),'ba')]}"/>
+  </out>
 </xsl:template>
 
 </xsl:stylesheet>

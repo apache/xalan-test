@@ -17,7 +17,7 @@
 <xsl:template match="doc">
   <xsl:for-each select="namespace::node()">
     <xsl:text>&#010;</xsl:text>
-    <xsl:value-of select="name(.)"/>=<xsl:value-of select="."/><xsl:text>,</xsl:text>
+    <xsl:element name="{name(.)}"><xsl:value-of select="."/></xsl:element>
   </xsl:for-each>
 </xsl:template>
 

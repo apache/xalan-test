@@ -13,7 +13,7 @@
 <HTML>
   <Form>
 	<xsl:value-of select="zoneone"/> 
-	<Input Type="checkbox" Name="zoneone">
+	<Input Type="checkbox">
 	  <xsl:if test="zoneone/@checked='1'">
 	    <xsl:attribute name="CHECKED">1</xsl:attribute>
       </xsl:if>

@@ -16,14 +16,12 @@
 </xsl:template>
 
 <xsl:template match="*">
-  <xsl:text>Namespaces for </xsl:text><xsl:value-of select="name(.)"/><xsl:text>:
-</xsl:text>
-  <xsl:for-each select="namespace::*">
-    <xsl:value-of select="name(.)"/>
-    <xsl:text>=</xsl:text>
-    <xsl:value-of select="generate-id()"/>
-    <xsl:text>,&#010;</xsl:text>
+  <xsl:element name="{name(.)}">
+    <xsl:for-each select="namespace::*">
+	<xsl:sort/>
+    <xsl:element name="{name(.)}"><xsl:value-of select="generate-id()"/></xsl:element>
   </xsl:for-each>
+  </xsl:element>
   <xsl:apply-templates/>
 </xsl:template>
 

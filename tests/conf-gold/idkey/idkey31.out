@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<out>Namespaces for docs:
-
-  Namespaces for doc:
-ext=N5,
-
-    Namespaces for section:
-ext=N5,
-foo=N8,
-
-      Namespaces for inner:
-ext=N5,
-foo=N8,
-whiz=NB,
-
+<out><docs/>
+  <doc><ext>N5</ext></doc>
+    <section><foo>N8</foo><ext>N5</ext></section>
+      <inner><foo>N8</foo><ext>N5</ext><whiz>NB</whiz></inner>
     
   
 </out>

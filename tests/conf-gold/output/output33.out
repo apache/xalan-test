@@ -1,6 +1,6 @@
 <HTML>
-<area>
-<area test="&amp;" shape="rect" coords="0,0,115,115" href="cgiprogram?param1=1&amp;Param2=2">
+<area test="&amp;">
+<area href="cgiprogram?param1=1&amp;Param2=2">
 <base>
 <basefont>
 <br>

@@ -15,14 +15,20 @@
   <!-- Elaboration: Numbering inside different template is still based on position
      of each node in the source tree, if there is no value attribute in xsl:number. -->
 
-<xsl:template match="doc/chapter">
+<xsl:template match="/">
   <out>
+    <xsl:apply-templates/>
+  </out>
+</xsl:template>
+
+<xsl:template match="doc/chapter">
+  <list>
     <xsl:text>&#10;</xsl:text>
     <xsl:for-each select="note">
       <xsl:sort data-type="text" order="descending"/>
       <xsl:apply-templates select="." mode="numbering"/>
     </xsl:for-each>
-  </out>
+  </list>
 </xsl:template>
 
 <xsl:template match="note" mode="numbering">

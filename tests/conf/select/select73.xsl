@@ -19,9 +19,11 @@
 
 <xsl:template match="A">
   <xsl:text>
-A...</xsl:text>
+</xsl:text>
   <xsl:for-each select="child::node()">
-    <xsl:value-of select="position()"/><xsl:text>. </xsl:text><xsl:value-of select="."/>
+    <e>
+      <xsl:value-of select="position()"/><xsl:text>. </xsl:text><xsl:value-of select="."/>
+    </e>
   </xsl:for-each>
 </xsl:template>
 

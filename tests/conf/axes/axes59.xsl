@@ -10,15 +10,18 @@
 
 <xsl:template match="/">
   <out>
+    <xsl:text>&#010;</xsl:text>
     <xsl:apply-templates/>
   </out>
 </xsl:template>
 
 <xsl:template match="doc">
   <xsl:for-each select="namespace::*">
-    <xsl:text>&#010;</xsl:text>
-    <xsl:value-of select="name(.)"/>=<xsl:value-of select="."/><xsl:text>,</xsl:text>
+    <xsl:sort select="name(.)"/>
+    <xsl:element name="{name(.)}"><xsl:value-of select="."/></xsl:element><xsl:text>,&#010;</xsl:text>
   </xsl:for-each>
 </xsl:template>
+
+<xsl:template match="text()"/><!-- To suppress empty lines -->
 
 </xsl:stylesheet>

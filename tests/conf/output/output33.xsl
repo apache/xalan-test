@@ -11,8 +11,8 @@
 
 <xsl:template match="/">
   <HTML>
-	<area/>
-     <area coords="0,0,115,115" shape="rect" test="&amp;">
+	<area test="&amp;"/>
+    <area>
         <xsl:attribute name="href">cgiprogram?param1=1&amp;Param2=2</xsl:attribute>
     </area>	
     <base/>

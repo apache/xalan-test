@@ -12,7 +12,7 @@
   <HTML>
     <foo name="&lt;abcd>"/>
 	<h1 title="&lt;contacts>">People</h1>
-	<frame scrolling="yes" name="z&lt;this>z"/>    
+	<frame name="z&lt;this>z"/>    
   </HTML>
 </xsl:template>
 
