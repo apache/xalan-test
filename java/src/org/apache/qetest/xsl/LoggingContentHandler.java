@@ -75,99 +75,101 @@ import org.xml.sax.SAXException;
 /**
  * Cheap-o ContentHandler for use by API tests.
  * <p>Implements ContentHandler and dumps simplistic info 
- * everything to a Reporter; a way to debug SAX stuff.</p>
+ * everything to a Logger; a way to debug SAX stuff.</p>
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class LoggingContentHandler implements ContentHandler
+public class LoggingContentHandler extends LoggingHandler implements ContentHandler
 {
 
-    /** No-op ctor seems useful. */
-    public LoggingContentHandler(){}
+    /** No-op sets logger to default.  */
+    public LoggingContentHandler()
+    {
+        setLogger(getDefaultLogger());
+    }
 
     /**
-     * Ctor that calls setReporter automatically.  
+     * Ctor that calls setLogger automatically.  
      *
-     * @param r Reporter we should log to
-     * @todo this should really be a Logger, not Reporter
+     * @param r Logger we should log to
      */
-    public LoggingContentHandler(Reporter r)
+    public LoggingContentHandler(Logger l)
     {
-        setReporter(r);
+        setLogger(l);
     }
 
-    /** 
-     * Our Reporter, who we tell all our secrets to.  
-     * Could/Should be switched to be a Logger.  
-     */
-    private Reporter reporter;
 
     /**
-     * Accesor methods for our Reporter.  
-     * @param r Reporter to set
+     * Our default handler that we pass all events through to.
      */
-    public void setReporter(Reporter r)
-    {
-        if (r != null)
-            reporter = r;
-    }
+    protected ContentHandler defaultHandler = null;
+
 
     /**
-     * Accesor methods for our Reporter.  
-     * @return Reporter we use
+     * Set a default handler for us to wrapper.
+     * Set a ContentHandler for us to use.
+     *
+     * @param default Object of the correct type to pass-through to;
+     * throws IllegalArgumentException if null or incorrect type
      */
-    public Reporter getReporter()
+    public void setDefaultHandler(Object defaultC)
     {
-        return (reporter);
+        try
+        {
+            defaultHandler = (ContentHandler)defaultC;
+        }
+        catch (Throwable t)
+        {
+            throw new java.lang.IllegalArgumentException("setDefaultHandler illegal type: " + t.toString());
+        }
     }
 
-    /** Prefixed to all reporter msg output.  */
-    private final String prefix = "LCH:";
+
+    /**
+     * Accessor method for our default handler.
+     *
+     * @return default (Object) our default handler; null if unset
+     */
+    public Object getDefaultHandler()
+    {
+        return (Object)defaultHandler;
+    }
+
+
+    /** Prefixed to all logger msg output.  */
+    public final String prefix = "LCH:";
+
 
     /** Cheap-o string representation of last event we got.  */
-    private String lastEvent = null;
+    protected String lastItem = NOTHING_HANDLED;
+
 
     /**
-     * Method setLastEvent set our lastEvent field.
+     * Accessor for string representation of last event we got.  
      * @param s string to set
      */
-    protected void setLastEvent(String s)
+    protected void setLastItem(String s)
     {
-        lastEvent = s;
+        lastItem = s;
     }
+
 
     /**
      * Accessor for string representation of last event we got.  
      * @return last event string we had
      */
-    public String getLastEvent()
+    public String getLast()
     {
-        return lastEvent;
+        return lastItem;
     }
 
-    /** What loggingLevel to use for reporter.logMsg(). */
-    private int level = Reporter.DEFAULT_LOGGINGLEVEL;
 
-    /**
-     * Accesor methods; don't think it needs to be synchronized.  
-     * @param l loggingLevel for us to use
-     */
-    public void setLoggingLevel(int l)
-    {
-        level = l;
-    }
+    /** setExpected, etc. not yet implemented.  */
 
-    /**
-     * Accesor methods; don't think it needs to be synchronized.  
-     * @return loggingLevel we use
-     */
-    public int getLoggingLevel()
-    {
-        return level;
-    }
 
     /** How many characters to report from characters event.  */
     private int charLimit = 30;
+
 
     /**
      * How many characters to report from characters event.  
@@ -177,6 +179,7 @@ public class LoggingContentHandler implements ContentHandler
     {
         charLimit = l;
     }
+
 
     /**
      * How many characters to report from characters event.  
@@ -189,43 +192,56 @@ public class LoggingContentHandler implements ContentHandler
 
 
     ////////////////// Implement ContentHandler ////////////////// 
+    protected Locator ourLocator = null;
+    
     public void setDocumentLocator (Locator locator)
     {
         // Note: this implies this class is !not! threadsafe
-        setLastEvent("setDocumentLocator");
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("setDocumentLocator");
+        ourLocator = locator; // future use
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.setDocumentLocator(locator);
     }
 
 
     public void startDocument ()
         throws SAXException
     {
-        setLastEvent("startDocument");
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("startDocument");
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.startDocument();
     }
 
 
     public void endDocument()
         throws SAXException
     {
-        setLastEvent("endDocument");
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("endDocument");
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.endDocument();
     }
 
 
     public void startPrefixMapping (String prefix, String uri)
         throws SAXException
     {
-        setLastEvent("startPrefixMapping: " + prefix + ", " + uri);
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("startPrefixMapping: " + prefix + ", " + uri);
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.startPrefixMapping(prefix, uri);
     }
 
 
     public void endPrefixMapping (String prefix)
         throws SAXException
     {
-        setLastEvent("endPrefixMapping: " + prefix);
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("endPrefixMapping: " + prefix);
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.endPrefixMapping(prefix);
     }
 
 
@@ -242,16 +258,20 @@ public class LoggingContentHandler implements ContentHandler
         {
             buf.append(", " + atts.getQName(i));
         }
-        setLastEvent(buf.toString());
-        reporter.logMsg(level, getLastEvent());
+        setLastItem(buf.toString());
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.startElement(namespaceURI, localName, qName, atts);
     }
 
 
     public void endElement (String namespaceURI, String localName, String qName)
         throws SAXException
     {
-        setLastEvent("endElement: " + namespaceURI + ", " + namespaceURI + ", " + qName);
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("endElement: " + namespaceURI + ", " + namespaceURI + ", " + qName);
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.endElement(namespaceURI, localName, qName);
     }
 
 
@@ -260,34 +280,42 @@ public class LoggingContentHandler implements ContentHandler
     {
         String s = new String(ch, start, (length > charLimit) ? charLimit : length);
         if(length > charLimit)
-            setLastEvent("characters: \"" + s + "\"...");
+            setLastItem("characters: \"" + s + "\"...");
         else
-            setLastEvent("characters: \"" + s + "\"");
-        reporter.logMsg(level, getLastEvent());
+            setLastItem("characters: \"" + s + "\"");
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.characters(ch, start, length);
     }
 
 
     public void ignorableWhitespace (char ch[], int start, int length)
         throws SAXException
     {
-        setLastEvent("ignorableWhitespace: len " + length);
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("ignorableWhitespace: len " + length);
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.ignorableWhitespace(ch, start, length);
     }
 
 
     public void processingInstruction (String target, String data)
         throws SAXException
     {
-        setLastEvent("processingInstruction: " + target + ", " + data);
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("processingInstruction: " + target + ", " + data);
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.processingInstruction(target, data);
     }
 
 
     public void skippedEntity (String name)
         throws SAXException
     {
-        setLastEvent("skippedEntity: " + name);
-        reporter.logMsg(level, getLastEvent());
+        setLastItem("skippedEntity: " + name);
+        logger.logMsg(level, prefix + getLast());
+        if (null != defaultHandler)
+            defaultHandler.skippedEntity(name);
     }
 
 }
