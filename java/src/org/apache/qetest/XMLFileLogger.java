@@ -699,7 +699,7 @@ public class XMLFileLogger implements Logger
                 Object key = enum.nextElement();
 
                 reportPrinter.println(key.toString() + "=\""
-                                      + attrs.get(key).toString() + "\"");
+                                      + escapeString(attrs.get(key).toString()) + "\"");
             }
 
             reportPrinter.println(">");
@@ -737,7 +737,7 @@ public class XMLFileLogger implements Logger
         if (isReady())
         {
             reportPrinter.println(HASHTABLE_HDR + level + "\" " + ATTR_DESC
-                                  + "=\"" + msg + "\">");
+                                  + "=\"" + escapeString(msg) + "\">");
 
             if (hash == null)
             {
