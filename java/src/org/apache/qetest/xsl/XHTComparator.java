@@ -114,17 +114,20 @@ import org.xml.sax.InputSource;
 public class XHTComparator
 {
 
-    /** NEEDSDOC Field MAX_VALUE_DISPLAY_LEN          */
+    /** Default value for maximum output length of diff'd values.  */
     static final int MAX_VALUE_DISPLAY_LEN = 511;  // arbitrary length, for convenience
 
-    /** NEEDSDOC Field maxDisplayLen          */
+    /** 
+     * Maximum output length we may log for differing values.  
+     * When two nodes have mismatched values, we output the first 
+     * two values that were mismatched.  In some cases, this may be 
+     * extremely long, so limit how much we output for convenience.
+     */
     private int maxDisplayLen = MAX_VALUE_DISPLAY_LEN;
 
     /**
-     * NEEDSDOC Method setMaxDisplayLen 
-     *
-     *
-     * NEEDSDOC @param i
+     * Accessor method for maxDisplayLen.
+     * @param i maximum length we log out
      */
     public void setMaxDisplayLen(int i)
     {
@@ -282,50 +285,20 @@ public class XHTComparator
 
         if ((null != value1) && (null != value2) &&!value1.equals(value2))
         {
-            // System.err.println("value1:");
-            // System.err.println(value1);
-            // System.err.println("value2:");
-            // System.err.println(value2);
             reporter.println(MISMATCH_VALUE + nodeTypeString(gold) + "len="
                            + value1.length() + SEPARATOR
                            + nodeTypeString(test) + "len=" + value2.length()
                            + SEPARATOR + "lengths do not match");
 
-            // Ignore old conditional printing; always print out values, even with newlines -sc
-
-            /**
-             *     // semi-HACK: only report out stuff that's short enough
-             *     // TODO This should be a settable property for the test harness! -sc
-             *     if((value1.length() < maxDisplayLen)
-             *        && (value2.length() < maxDisplayLen))
-             *     {
-             *       boolean doPrintValue = true;
-             *       // TODO wouldn't it be more efficient to do indexOf's? -sc
-             *       for(int i = 0; i < value1.length(); i++)
-             *       {
-             *         char c = value1.charAt(i);
-             *         if((c == 0x0A) || (c == 0x0D) || (c == '\n'))
-             *         {
-             *           doPrintValue = false;
-             *           break;
-             *         }
-             *       }
-             *       if(doPrintValue)
-             *       {
-             *         for(int i = 0; i < value2.length(); i++)
-             *         {
-             *           char c = value2.charAt(i);
-             *           if((c == 0x0A) || (c == 0x0D) || (c == '\n'))
-             *           {
-             *             doPrintValue = false;
-             *             break;
-             *           }
-             *         }
-             *       }
-             *       if(doPrintValue)
-             *       {
-             * / Ignore old conditional printing; always print out values, even with newlines -sc
-             */
+            // Limit length we output to logs; extremely long values 
+            //  are more hassle than they're worth (at that point, 
+            //  it's either obvious what the problem is, or it's 
+            //  such a small problem that you'll need to manually
+            //  compare the files separately
+            if (value1.length() > maxDisplayLen)
+                value1 = value1.substring(0, maxDisplayLen);
+            if (value2.length() > maxDisplayLen)
+                value2 = value2.substring(0, maxDisplayLen);
             reporter.println(MISMATCH_VALUE_GOLD + nodeTypeString(gold) + SEPARATOR + "\n" + value1);
             reporter.println(MISMATCH_VALUE_TEXT + nodeTypeString(test) + SEPARATOR + "\n" + value2);
 
