@@ -11,8 +11,10 @@
   <!-- No exception expected, but output is just some blank lines. -->
 
 <xsl:template match="/">
+<out>
   <xsl:value-of select="id('c')/@id"/>
   <xsl:apply-templates/>
+</out>
 </xsl:template>
 
 </xsl:stylesheet>
