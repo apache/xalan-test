@@ -97,13 +97,12 @@ public abstract class ProcessorWrapper
      * <p>May throw exceptions related to the creating of a new processor.
      * Subclasses must set the value of (Object)p in this method and return it.</p>
      * <p>Note that not all processors may use liaisons in the same manner.</p>
+     * //@todo revisit: see if liaisonClassName should be genericized
+     *
      * @param liaisonClassName [optional] if non-null & non-blank,
      * classname of an XML liaison
      * @return (Object)processor as a side effect; null if error
-     * @exception Exception may be thrown by underlying operation
-     * @todo revisit: see if liaisonClassName should be genericized
-     *
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public abstract Object createNewProcessor(String liaisonClassName)
         throws java.lang.Exception;  // Cover all exception cases
@@ -119,8 +118,7 @@ public abstract class ProcessorWrapper
 
     /**
      * Reference to actual current processor object.  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @return underlying (Object)processor object
      */
     public Object getProcessor()
     {
@@ -132,15 +130,20 @@ public abstract class ProcessorWrapper
 
     /**
      * If we think the current processor has a preprocessed stylesheet ready.  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @return true if ready to call processToFile(String xmlSource, 
+     * String resultFile)
      */
     public boolean getStylesheetReady()
     {
         return stylesheetReady;
     }
 
-    /** Return value when an error occours from process* methods. */
+    /** 
+     * Return value when an error occours from process* methods. 
+     * Most methods return either a long representing the milliseconds 
+     * the 'interesting' portions of the operation took, or this 
+     * ERROR constant if something went wrong.
+     */
     public static final long ERROR = -1L;
 
     //-----------------------------------------------------
@@ -148,17 +151,23 @@ public abstract class ProcessorWrapper
     //-----------------------------------------------------
 
     /**
-     * Process the xmlSource using the xslStylesheet to produce the resultFile.
-     * <p>May throw exceptions related to asking the processor to perform the process.</p>
-     * <p>Attempts to ask each processor to accomplish the task in the simplest
-     * and most obvious manner.  Often copied from various processor's samples.</p>
-     * @param xmlSource name of source XML file
-     * @param xslStylesheet name of stylesheet XSL file
-     * @param resultFile name of output file
-     * @return milliseconds process time took or ProcessorWrapper.ERROR
-     * @exception Exception may be thrown by underlying operation
+     * Process xmlSource using xslStylesheet to produce resultFile.
+     * <p>Will throw any exceptions from the underlying processor 
+     * as-is, so callers probably need to catch Exception, and then 
+     * check whichever specific types of Exception they expect.</p>
+     * <p>Attempts to ask each processor to accomplish the task 
+     * in the simplest and most obvious manner.  Often copied from 
+     * various processor's samples. Should only time data related 
+     * to the basic act of processing the file, not time setting up 
+     * local variables or processing the filenames. <b>Note:</b> 
+     * the format of the filenames (absolute, relative, local, URI)
+     * is not necessarily defined.</p>
      *
-     * @throws java.lang.Exception
+     * @param xmlSource file name of source XML file
+     * @param xslStylesheet file name of stylesheet XSL file
+     * @param resultFile file name of output file
+     * @return milliseconds process time took or ProcessorWrapper.ERROR
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public abstract long processToFile(
         String xmlSource, String xslStylesheet, String resultFile)
@@ -166,36 +175,66 @@ public abstract class ProcessorWrapper
 
     /**
      * Preprocess a stylesheet and set it into the processor.
-     * @param xslStylesheet name of stylesheet XSL file
-     * @return milliseconds process time took or ProcessorWrapper.ERROR
-     * @exception Exception may be thrown by underlying operation
+     * <p>Most XSLT processors offer some feature allowing you to 
+     * parse and pre-process a stylesheet into a compact memory 
+     * representation, which may then be used later to perform a 
+     * process or transformation. Normal usage would be to call this 
+     * method, then call processToFile(String xmlSource, 
+     * String resultFile), and then validate the resultFile.</p>
      *
-     * @throws java.lang.Exception
+     * @param xslStylesheet file name of stylesheet XSL file
+     * @return milliseconds process time took or ProcessorWrapper.ERROR
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public abstract long preProcessStylesheet(String xslStylesheet)
         throws java.lang.Exception;  // should cover all exception cases
 
     /**
-     * Process the xmlSource using a preProcessStylesheet to produce the resultFile.
-     * @param xmlSource name of source XML file
-     * @param resultFile name of output file
-     * @return milliseconds process time took or ProcessorWrapper.ERROR
-     * @exception Exception may be thrown by underlying operation
+     * Process xmlSource using a preProcessStylesheet to produce resultFile.
+     * <p>Must call preProcessStylesheet(String xslStylesheet) 
+     * before calling this method.</p>
      *
-     * @throws java.lang.Exception
+     * @param xmlSource file name of source XML file
+     * @param resultFile file name of output file
+     * @return milliseconds process time took or ProcessorWrapper.ERROR
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public abstract long processToFile(String xmlSource, String resultFile)
         throws java.lang.Exception;  // should cover all exception cases
 
     /**
+     * Process xmlSource with embedded stylesheet to produce resultFile.
+     * <p>Wrappers will ask their processor to parse an XML file 
+     * that presumably has an &lt;?xml-stylesheet element in it.</p>
+     *
+     * @param xmlSource file name of source XML file
+     * @param resultFile file name of output file
+     * @return milliseconds process time took or ProcessorWrapper.ERROR
+     * @throws java.lang.Exception covers any underlying exceptions
+     */
+    public abstract long processEmbeddedToFile(String xmlSource, String resultFile)
+        throws java.lang.Exception;  // should cover all exception cases
+
+    /**
      * Set a String name=value param in the processor, if applicable.
+     * <p>The implementation is wrapper dependent, but generally 
+     * wrappers should set any Params given immediately before 
+     * performing any processing operations. Does not necessarily 
+     * handle namespaces, nor non-String valued values.</p>
+     *
      * @param key name of the param
-     * @param expression value of the param
+     * @param expression value of the param, as a String
      */
     public abstract void setStylesheetParam(String key, String expression);
 
     /**
      * Set a String namespace:name=value param in the processor, if applicable.
+     * <p>The implementation is wrapper dependent, but generally 
+     * wrappers should set any Params given immediately before 
+     * performing any processing operations. Does not handle 
+     * non-String valued values; if the processor does not obviously 
+     * support namespaces, the namespace is ignored.</p>
+     *
      * @param namespace of the param
      * @param key name of the param
      * @param expression value of the param
@@ -203,11 +242,19 @@ public abstract class ProcessorWrapper
     public abstract void setStylesheetParam(String namespace, String key,
                                             String expression);
 
-    /** Reset the state of the processor, if applicable. */
+    /** 
+     * Reset the state of the processor, if applicable. 
+     * <p>This implementation is wrapper dependent, but generally 
+     * should be called before re-using the same wrapper to 
+     * process additional files.</p>
+     */
     public abstract void reset();
 
     /**
      * Set a diagnostics output PrintWriter, if applicable.
+     * <p>For processors that offer a simple diagnostics stream, 
+     * this is passed in.  Not (currently) used for tracing or 
+     * advanced diagnostics features in some processors.</p>
      * @param pw PrintWriter to dump diagnostic or error output
      */
     public abstract void setDiagnosticsOutput(java.io.PrintWriter pw);
@@ -231,7 +278,9 @@ public abstract class ProcessorWrapper
      * so clients don't necessarily have to know the full classname.</p>
      * <ul>Where:
      * <li>key = String simple name = xalan|trax|etc...</li>
-     * <li>value = String full classname</li>
+     * <li>Supports: See ProcessorWrapper.properties</li>
+     * <li>Or:</li>
+     * <li>value = String FQCN of wrapper implementation</li>
      * <li>Or, optionally:</li>
      * <li>value = String full classname;property=value</li>
      * <li>Supports: See ProcessorWrapper.properties</li>
@@ -268,7 +317,8 @@ public abstract class ProcessorWrapper
     /**
      *  Accessor for our wrapperMapper.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return Properties block of wrapper implementations 
+     * that we implicitly know about
      */
     public static final Properties getDescriptions()
     {

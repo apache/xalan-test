@@ -283,6 +283,24 @@ public class XalanWrapper extends ProcessorWrapper
         return (endTime - startTime);
     }
 
+
+    /**
+     * Process xmlSource with embedded stylesheet to produce resultFile.
+     * <p>Wrappers will ask their processor to parse an XML file 
+     * that presumably has an &lt;?xml-stylesheet element in it.</p>
+     *
+     * @param xmlSource file name of source XML file
+     * @param resultFile file name of output file
+     * @return milliseconds process time took or ProcessorWrapper.ERROR
+     * @throws java.lang.Exception covers any underlying exceptions
+     */
+    public long processEmbeddedToFile(String xmlSource, String resultFile)
+        throws java.lang.Exception  // should cover all exception cases
+    {
+        throw new RuntimeException("processEmbeddedToFile() not yet implemented!");
+    }
+
+
     /**
      * Reset the state.
      * <p>This needs to be called after a process() call is invoked,

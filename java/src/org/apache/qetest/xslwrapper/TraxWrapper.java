@@ -218,12 +218,11 @@ public class TraxWrapper extends ProcessorWrapper
      * property to the Xalan 2.x implementation.  It also reads
      * the "trax.wrapper.type" property to determine how we should
      * perform transformations: eg, SAX2SAX, DOM2DOM, FILE2FILE, etc..</p>
+     *
      * @param liaisonClassName [optional] if non-null & non-blank,
      * classname of an XML liaison
      * @return (Object)processor as a side effect; null if error
-     * @exception Exception may be thrown by underlying operation
-     *
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public Object createNewProcessor(String liaisonClassName)
             throws java.lang.Exception  // Cover all exception cases
@@ -312,13 +311,12 @@ public class TraxWrapper extends ProcessorWrapper
      * and most obvious manner.  Often copied from various processor's samples.</p>
      * <p>This also respects the "trax.wrapper.type" System property to
      * support different types of transforms.</p>
+     *
      * @param xmlSource name of source XML file
      * @param xslStylesheet name of stylesheet XSL file
      * @param resultFile name of output file, presumably XML
      * @return milliseconds process time took
-     * @exception Exception may be thrown by underlying operation
-     *
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public long processToFile(
             String xmlSource, String xslStylesheet, String resultFile)
@@ -383,15 +381,14 @@ public class TraxWrapper extends ProcessorWrapper
 
     /**
      * Perform the transform from a DOM to a DOM (then serialize).
-     * @todo EVALUATE TIMING: right now, we time everything, 
+     *
+     * //@todo EVALUATE TIMING: right now, we time everything, 
      * all DOM building and transforms (but not serialization)
      * @param xmlSource name of source XML file
      * @param xslStylesheet name of stylesheet XSL file
      * @param resultFile name of output file, presumably XML
      * @return milliseconds process time took
-     * @exception Exception may be thrown by underlying operation
-     *
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     protected long processDOMToDOM(
             String xmlSource, String xslStylesheet, OutputStream resultStream)
@@ -447,12 +444,11 @@ public class TraxWrapper extends ProcessorWrapper
 
     /**
      * Preprocess a stylesheet and set it into the processor, based on string inputs.
-     * @todo Does NOT respect the "trax.wrapper.type" System property yet.
+     *
+     * //@todo Does NOT respect the "trax.wrapper.type" System property yet.
      * @param xslStylesheet name of stylesheet XSL file
      * @return milliseconds process time took or ProcessorWrapper.ERROR
-     * @exception Exception may be thrown by underlying operation
-     *
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public long preProcessStylesheet(String xslStylesheet)
             throws java.lang.Exception  // should cover all exception cases
@@ -483,13 +479,12 @@ public class TraxWrapper extends ProcessorWrapper
 
     /**
      * Process the xmlSource using the xslStylesheet to produce the resultFile.
-     * @todo Does NOT respect the "trax.wrapper.type" System property yet.
+     *
+     * //@todo Does NOT respect the "trax.wrapper.type" System property yet.
      * @param xmlSource name of source XML file
      * @param resultFile name of output file, presumably XML
      * @return milliseconds process time took or ProcessorWrapper.ERROR
-     * @exception Exception may be thrown by underlying operation
-     *
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception covers any underlying exceptions
      */
     public long processToFile(String xmlSource, String resultFile)
             throws java.lang.Exception  // should cover all exception cases
@@ -526,6 +521,57 @@ public class TraxWrapper extends ProcessorWrapper
         return (endTime - startTime);
     }
 
+
+    /**
+     * Process xmlSource with embedded stylesheet to produce resultFile.
+     * <p>Wrappers will ask their processor to parse an XML file 
+     * that presumably has an &lt;?xml-stylesheet element in it.</p>
+     *
+     * @param xmlSource file name of source XML file
+     * @param resultFile file name of output file
+     * @return milliseconds process time took or ProcessorWrapper.ERROR
+     * @throws java.lang.Exception covers any underlying exceptions
+     */
+    public long processEmbeddedToFile(String xmlSource, String resultFile)
+        throws java.lang.Exception  // should cover all exception cases
+    {
+        // Ensure we (apparently) have some processor
+        if (processor == null)
+            throw new java.lang.IllegalStateException(
+                "You must call createNewProcessor first!");
+
+        // Declare variables ahead of time to minimize latency
+        long startTime = 0;
+        long endTime = 0;
+        String media= null;     // currently ignored
+        String title = null;    // currently ignored
+        String charset = null;  // currently ignored
+
+        // May throw IOException
+        FileOutputStream resultStream = new FileOutputStream(resultFile);
+
+        // Begin timing the whole process
+        startTime = System.currentTimeMillis();
+
+        // Get the xml-stylesheet and process it
+        Source stylesheetSource = processor.getAssociatedStylesheet(new StreamSource(xmlSource), 
+                                                              media, title, charset);
+
+        Transformer transformer = processor.newTransformer(stylesheetSource);
+          
+        applyParams(transformer, params);
+
+        transformer.transform(new StreamSource(xmlSource), new StreamResult(resultStream));
+
+        endTime = System.currentTimeMillis();
+
+        // Force output stream closed, just in case
+        resultStream.close();
+
+        return (endTime - startTime);
+    }
+
+
     /**
      * Reset the state.
      */
@@ -544,9 +590,9 @@ public class TraxWrapper extends ProcessorWrapper
     }
 
     /**
-     * Set diagnostics output PrintWriter.  
+     * Set diagnostics output PrintWriter - not implemented.  
      *
-     * NEEDSDOC @param pw
+     * @param pw ignored
      */
     public void setDiagnosticsOutput(java.io.PrintWriter pw)
     {
@@ -561,9 +607,9 @@ public class TraxWrapper extends ProcessorWrapper
     }
 
     /**
-     * Set the indent level of the processor.  
+     * Set the indent level of the processor - not implemented.  
      *
-     * NEEDSDOC @param i
+     * @param i ignored
      */
     public void setIndent(int i)
     {
