@@ -193,11 +193,21 @@ public class FileDatalet implements Datalet
 
     /** 
      * Accessor method for optional properties; settable.  
-     * <p>Note this method simply points our options at the 
-     * caller's Properties; it does not do a clone since that 
-     * would be quite costly.</p>
+     * <p>Note this method creates a new Properties that simply 
+     * defaults to the passed in properties instead of cloning it.</p>
+     * <p>This used to simply assign this variable to the passed 
+     * in variable, but that leads to problems when errant 
+     * Testlets mutate their Datalet's Options, which can result 
+     * in the master test's testProps getting changed.</p>
+     *
+     * @param p Properties to set as our defaults; if null, we 
+     * do not change anything
      */
-    public void setOptions(Properties p) { options = p; }
+    public void setOptions(Properties p) 
+    { 
+        if (null != p)
+            options = new Properties(p);
+    }
 
 
     /** 
