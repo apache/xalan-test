@@ -723,11 +723,33 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             //  IOException if anything goes wrong
             urlConnection.connect();
             // Convenience: log out when the doc was last modified
-            reporter.logStatusMsg(testURL.toString() + " last modified: " 
+            reporter.logInfoMsg(testURL.toString() + " last modified: " 
                                   + urlConnection.getLastModified());
+            int contentLen = urlConnection.getContentLength();
+            reporter.logStatusMsg("URL.getContentLength() was: " + contentLen);
+            if (contentLen < 1)
+            {
+                // if no content, throw 'fake' exception to 
+                //  short-circut test case
+                throw new IOException("URL.getContentLength() was: " + contentLen);
+            }
+            // Also verify that the file there contains (some of) the data we expect!
+            reporter.logTraceMsg("calling urlConnection.getContent()...");
+            Object content = urlConnection.getContent();
+            if (null == content)
+            {
+                // if no content, throw 'fake' exception to 
+                //  short-circut test case
+                throw new IOException("URL.getContent() was null!");
+            }
+            reporter.logTraceMsg("getContent().toString() is now: " + content.toString());
+
+            //@todo we should also verify some key strings in the 
+            //  expected .xsl file here, if possible
         }
         catch (IOException ioe)
         {
+            reporter.logThrowable(Logger.ERRORMSG, ioe, "Can't connect threw");
             reporter.logErrorMsg("Can't connect to: " + httpSystemIdBase 
                                  + "/impincl/SystemIdInclude.xsl, skipping testcase");
             reporter.checkPass("FAKE PASS RECORD; testCase was skipped");
