@@ -8,6 +8,7 @@
   <!-- Purpose: Processing instruction content can't create nodes other then 
        text nodes. -->
   <!-- ExpectedException: Can not add xsl:element to xsl:processing-instruction -->
+  <!-- ExpectedException: xsl:element is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc/tag">
  <out>

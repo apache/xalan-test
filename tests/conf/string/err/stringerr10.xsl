@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'substring-after()' with one argument -->
   <!-- ExpectedException: substring-after() requires two arguments -->
+  <!-- ExpectedException: FuncSubstringAfter only allows 2 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to use a boolean where a node-set is needed in apply-templates.-->
   <!-- ExpectedException: XPATH: Can not convert #UNKNOWN to a NodeList -->
+  <!-- ExpectedException: Can not convert #BOOLEAN to a NodeList! -->
 
 <xsl:template match="/">
   <out>

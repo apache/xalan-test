@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Incorrect value for order attribute on sort. -->
   <!-- ExpectedException: Sorting order must be "ascending" or "descending" -->
+  <!-- ExpectedException: Attribute: order has an illegal value: sideways -->
 
 <xsl:template match="doc">
   <out>

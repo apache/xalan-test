@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: last() should not have any arguments. -->
   <!-- ExpectedException: zero arguments expected  -->
+  <!-- ExpectedException: FuncLast only allows 0 arguments -->
 
 <xsl:template match="doc">
   <out>

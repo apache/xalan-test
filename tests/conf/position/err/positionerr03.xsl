@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test too few arguments to count(). -->
   <!-- ExpectedException: The count function should take one argument -->
+  <!-- ExpectedException: FuncCount only allows 1 arguments -->
 
 <xsl:template match="doc">
   <out>

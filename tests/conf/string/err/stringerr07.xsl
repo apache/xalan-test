@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'starts-with()' with too many arguments -->
   <!-- ExpectedException: starts-with() has too many arguments -->
+  <!-- ExpectedException: FuncStartsWith only allows 2 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -10,6 +10,7 @@
   <!-- Purpose: Don't allow transform to be matched with stylesheet. -->
   <!-- ExpectedException: The element type "xsl:transform" must be terminated by the matching end-tag "&lt;/xsl:transform&gt;". -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: The element type "xsl:transform" must be terminated by the matching end-tag "&lt;/xsl:transform&gt;". -->
+  <!-- ExpectedException: The element type "xsl:transform" must be terminated by the matching end-tag "</xsl:transform>". -->
 
 <!-- Explicitly match text nodes so the output is just 39 -->
 <xsl:template match="text()">

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'string()' with too many arguments -->
   <!-- ExpectedException: string() has too many arguments. -->
+  <!-- ExpectedException: FuncString only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'substring-before()' with one argument -->
   <!-- ExpectedException: substring-before() requires two arguments -->
+  <!-- ExpectedException: FuncSubstringBefore only allows 2 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -7,6 +7,7 @@
   <!-- Section: 11.2 Values of Variables and Parameters  -->
   <!-- Purpose: Test for missing name attribute in xsl:variable -->
   <!-- ExpectedException: xsl:variable must have a name attribute. -->
+  <!-- ExpectedException: xsl:variable requires attribute: name -->
 
 <xsl:variable select="'ABC'"/>
 

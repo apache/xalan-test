@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Incorrect value for case-order attribute on sort. -->
   <!-- ExpectedException: Sorting case-order must be "upper-first" or "lower-first" -->
+  <!-- ExpectedException: Attribute: case-order has an illegal value: bad-order -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Section: 7.6.1 Generating Text with xsl:value -->
   <!-- Purpose: Test error reporting for missing required select attribute. -->
   <!-- ExpectedException: xsl:value-of requires a select attribute. -->
+  <!-- ExpectedException: xsl:value-of requires attribute: select -->
 
 <xsl:template match="/">
 	<xsl:value-of/>

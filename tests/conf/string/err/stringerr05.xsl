@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'contains()' with too many arguments -->
   <!-- ExpectedException: contains() has too many arguments -->
+  <!-- ExpectedException: FuncContains only allows 2 arguments -->
 
 <xsl:template match="/">
   <out>

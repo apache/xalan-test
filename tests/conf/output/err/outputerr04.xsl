@@ -9,6 +9,7 @@
   <!-- Section: 7.3 Creating Processing Instructions -->
   <!-- Purpose: Try to create processing instruction with an improper name. -->
   <!-- ExpectedException: java.lang.RuntimeException: processing-instruction name must be a valid NCName -->
+  <!-- ExpectedException: processing-instruction name must be a valid NCName: + -->
 
 <xsl:template match="/">
  <HTML>

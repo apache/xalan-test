@@ -9,6 +9,7 @@
   <!-- Purpose: Test placement of preserve-space inside a template, which is illegal. -->
   <!-- ExpectedException: xsl:preserve-space is not allowed inside a template! -->
   <!-- ExpectedException: XSLT: (StylesheetHandler) xsl:preserve-space is not allowed inside a template! -->
+  <!-- ExpectedException: xsl:preserve-space is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

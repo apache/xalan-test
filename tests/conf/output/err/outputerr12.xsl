@@ -7,6 +7,7 @@
   <!-- Section: 16 -->
   <!-- Purpose: Test placement of xsl:output inside atemplate, which is illegal. -->
   <!-- ExpectedException: Must put xsl:output outside any template. -->
+  <!-- ExpectedException: xsl:output is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="/">
   <xsl:output method="html"/>

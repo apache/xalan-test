@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to use a number where a node-set is needed in for-each.-->
   <!-- ExpectedException: XPATH: Can not convert #UNKNOWN to a NodeList -->
+  <!-- ExpectedException: Can not convert #NUMBER to a NodeList! -->
 
 <xsl:template match="/">
   <out>

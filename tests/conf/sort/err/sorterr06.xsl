@@ -10,6 +10,7 @@
   <!-- ExpectedException: xsl:sort can only be used with xsl:apply-templates or xsl:for-each. -->
   <!-- ExpectedException: (StylesheetHandler) xsl:sort can only be used with xsl:apply-templates or xsl:for-each. -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:sort can only be used with xsl:apply-templates or xsl:for-each. -->
+  <!-- ExpectedException: xsl:sort is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="/">
   <Out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'contains()' with one argument -->
   <!-- ExpectedException: contains() requires two arguments -->
+  <!-- ExpectedException: FuncContains only allows 2 arguments -->
 
 <xsl:template match="/">
   <out>

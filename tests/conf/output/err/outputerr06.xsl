@@ -10,6 +10,7 @@
   <!-- ExpectedException: Can not add xsl:value-of to xsl:text -->
   <!-- ExpectedException: ElemTemplateElement error: Can not add xsl:value-of to xsl:text -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: ElemTemplateElement error: Can not add xsl:value-of to xsl:text -->
+  <!-- ExpectedException: xsl:value-of is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="/">
   <HTML>

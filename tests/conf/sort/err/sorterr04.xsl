@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Undefined attribute on sort. -->
   <!-- ExpectedException: xsl:sort has an illegal attribute: invalidattr -->
+  <!-- ExpectedException: "invalidattr" attribute is not allowed on the xsl:sort element! -->
 
 <xsl:template match="doc">
   <out>

@@ -6,7 +6,7 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 11.2 Values of Variables and Parameters  -->
   <!-- Purpose: Test for xsl:variable with more than one select. -->
-  <!-- ExpectedException: XSLT: Attribute "select" was already specified for element "xsl:variable". -->
+  <!-- ExpectedException: Attribute "select" was already specified for element "xsl:variable". -->
   <!-- Author: David Marston -->
 
 <xsl:template match="doc">

@@ -7,6 +7,7 @@
   <!-- Section: 12.4 -->
   <!-- Purpose: Test too many arguments to system-property -->
   <!-- ExpectedException: system-property requires one argument -->
+  <!-- ExpectedException: FuncSystemProperty only allows 1 arguments -->
 
 <xsl:template match="doc">
   <out>

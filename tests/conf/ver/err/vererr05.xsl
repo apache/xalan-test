@@ -9,6 +9,7 @@
   <!-- Purpose: Test use of an undefined element (garbage) as if was part of XSLT. -->
   <!-- ExpectedException: Unknown XSL element: garbage -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: Unknown XSL element: garbage -->
+  <!-- ExpectedException: xsl:garbage is not allowed in this position in the stylesheet! -->
 
   <xsl:template match="/">
     <out>

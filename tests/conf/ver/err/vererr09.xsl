@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test that version number is required. -->
   <!-- ExpectedException: stylesheet must have version attribute -->
+  <!-- ExpectedException: xsl:stylesheet requires attribute: version -->
 
 <xsl:template match="/">
   <out>

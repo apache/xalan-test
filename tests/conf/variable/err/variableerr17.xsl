@@ -8,6 +8,7 @@
   <!-- Purpose: Try to set top-level params with circular references -->
   <!-- ExpectedException: Variable defined using itself -->
   <!-- Author: David Marston -->
+  <!-- ExpectedException: Variable circle0 is directly or indirectly referencing itself! -->
 
 <xsl:variable name="circle0" select="concat('help',$circle1)"/>
 <xsl:param name="circle1" select="concat('help',$circle0)"/>

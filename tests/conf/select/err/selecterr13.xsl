@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to use an RTF where a node-set is needed in for-each.-->
   <!-- ExpectedException: XPATH: Can not convert #UNKNOWN to a NodeList -->
+  <!-- ExpectedException: Can not convert #RTREEFRAG to a NodeList! -->
 
 <xsl:variable name="ResultTreeFragTest">
   <xsl:value-of select="doc"/>

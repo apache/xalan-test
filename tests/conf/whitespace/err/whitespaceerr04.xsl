@@ -8,6 +8,7 @@
   <!-- Purpose: Test placement of strip-space inside atemplate, which is illegal. -->
   <!-- ExpectedException: xsl:strip-space is not allowed inside a template! -->
   <!-- ExpectedException: XSLT: (StylesheetHandler) xsl:strip-space is not allowed inside a template! -->
+  <!-- ExpectedException: xsl:strip-space is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test for select with empty value. -->
   <!-- ExpectedException: null expression selected -->
+  <!-- ExpectedException: Empty expression! --><!-- Not a great error, but probably close enough -sc -->
 
 <xsl:template match="/">
   <xsl:apply-templates select=""/>

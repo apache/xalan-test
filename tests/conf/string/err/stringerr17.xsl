@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'translate()' with too many arguments -->
   <!-- ExpectedException: The translate() function takes three arguments -->
+  <!-- ExpectedException: FuncTranslate only allows 3 arguments -->
 
 <xsl:template match="/">
   <out>

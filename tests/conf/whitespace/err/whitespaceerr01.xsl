@@ -10,6 +10,7 @@
        from xsl:strip-space. -->
   <!-- ExpectedException: (StylesheetHandler) xsl:strip-space requires an elements attribute! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:strip-space requires an elements attribute! -->
+  <!-- ExpectedException: xsl:strip-space requires attribute: elements -->
 
 <xsl:strip-space/>
 

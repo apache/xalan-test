@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to provide an argument to current(). -->
   <!-- ExpectedException: current() must not have any arguments -->
+  <!-- ExpectedException: FuncCurrent only allows 0 arguments -->
 
 <xsl:template match="doc">
   <out>

@@ -10,6 +10,7 @@
        from xsl:preserve-space. -->
   <!-- ExpectedException: (StylesheetHandler) xsl:preserve-space requires an elements attribute! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:preserve-space requires an elements attribute! -->
+  <!-- ExpectedException: xsl:preserve-space requires attribute: elements -->
 
 <xsl:preserve-space/>
 

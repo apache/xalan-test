@@ -9,6 +9,7 @@
   <!-- Section: 7.3 Creating Processing Instructions -->
   <!-- Purpose: Try to create processing instruction without a name. -->
   <!-- ExpectedException: xsl:processing-instruction must have a name attribute. -->
+  <!-- ExpectedException: xsl:processing-instruction requires attribute: name -->
 
 <xsl:template match="/">
  <HTML>

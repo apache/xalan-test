@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Undefined value for data-type attribute on sort. -->
   <!-- ExpectedException: Sorting data-type must be "text" or "number" -->
+  <!-- ExpectedException: Attribute: data-type has an illegal value: badtype -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: position() should not have any arguments. -->
   <!-- ExpectedException: zero arguments expected  -->
+  <!-- ExpectedException: FuncPosition only allows 0 arguments -->
 
 <xsl:template match="doc">
   <out>

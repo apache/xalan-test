@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to use an AVT for the select value. -->
   <!-- ExpectedException: select value for xsl:sort cannot contain {} -->
+  <!-- ExpectedException: Extra illegal tokens: '{.}' --><!-- Could use improvements for usability -sc -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'substring()' with one argument -->
   <!-- ExpectedException: substring() requires 2-3 arguments -->
+  <!-- ExpectedException: FuncSubstring only allows 2 or 3 arguments -->
 
 <xsl:template match="/">
   <out>

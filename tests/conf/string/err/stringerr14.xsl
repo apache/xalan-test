@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'concat()' with one argument -->
   <!-- ExpectedException: concat() requires two or more arguments -->
+  <!-- ExpectedException: FuncConcat only allows >1 arguments -->
 
 <xsl:template match="/">
   <out>

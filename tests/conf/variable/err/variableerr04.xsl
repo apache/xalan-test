@@ -6,7 +6,7 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 11.2 Values of Variables and Parameters -->
   <!-- Purpose: Negative test, attempt to use variable RTF as a nodeset. -->
-  <!-- ExpectedException: XPATH: Can not convert #RTREEFRAG to a NodeList! -->
+  <!-- ExpectedException: Can not convert #RTREEFRAG to a NodeList! -->
   <!-- Author: Paul Dick -->
 
 <xsl:template match="doc">
