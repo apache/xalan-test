@@ -101,10 +101,10 @@ public class XSLTestHarness
     {
         XSLProcessorTestBase tmp = new XSLProcessorTestBase();
         return ("XSLTestHarness - execute multiple Tests in sequence and log results:\n"
-                + "    Usage: java XSLTestHarness properties.prop\n"
-                + "    Reads in all options from a Properties file\n"
-                + "    -tests" + OPT_TESTS + "  <semicolon;delimited;list;of FQCNs tests to run>\n"
-                + "    Most other options are identical to XSLProcessorTestBase:\n"
+                + "    Usage: java XSLTestHarness [-load] properties.prop\n"
+                + "    Reads in all options from a Properties file:\n"
+                + "    " + OPT_TESTS + "=<semicolon;delimited;list;of FQCNs tests to run>\n"
+                + "    Most other options (in prop file only) are identical to XSLProcessorTestBase:\n"
                 + tmp.usage()
                 );
     }
@@ -174,12 +174,21 @@ public class XSLTestHarness
     protected String[] doTestHarnessInit(String args[])
     {
         // Harness loads all info from one properties file
-        String propFileName = args[0];
-        harnessProps = new Properties();
+        // semi-HACK: accept and ignore -load as first arg only
+        String propFileName = null;
+        if ("-load".equalsIgnoreCase(args[0]))
+        {
+            propFileName = args[1];
+        }
+        else
+        {
+            propFileName = args[0];
+        }
         try
         {
             // Load named file into our properties block
             FileInputStream fIS = new FileInputStream(propFileName);
+            harnessProps = new Properties();
             harnessProps.load(fIS);
         } 
         catch (IOException ioe)
