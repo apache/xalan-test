@@ -74,7 +74,7 @@ import java.net.MalformedURLException;
 
 import java.util.StringTokenizer;
 
-// DOM imports from Xerces
+// DOM imports
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,12 +82,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Text;
 
-// Xerces imports
-import org.apache.xerces.parsers.DOMParser;
-import org.apache.xerces.dom.DOMImplementationImpl;
-import org.apache.html.dom.HTMLBuilder;
+// Xerces imports - use JAXP interface instead
+// Needed JAXP classes
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-// SAX2 imports from Xerces
+// SAX2 imports
 import org.xml.sax.InputSource;
 
 /**
@@ -99,11 +100,11 @@ import org.xml.sax.InputSource;
  * if that fails, attempt to parse each as an HTML document using
  * <i>NEED NEW HTML PARSER</i>; if that fails, pretend to parse each
  * doc as a single text node.</p>
- * @todo document whitespace difference handling better -sc
- * @todo check how namespaces are handled and diff'd -sc
- * @todo check how XML decls are handled (or not) -sc
- * @todo check how files of different encodings are handled in each parse type -sc
- * @todo Allow param to define the type of parse we do (i.e. if a
+ * //@todo document whitespace difference handling better -sc
+ * //@todo check how namespaces are handled and diff'd -sc
+ * //@todo check how XML decls are handled (or not) -sc
+ * //@todo check how files of different encodings are handled in each parse type -sc
+ * //@todo Allow param to define the type of parse we do (i.e. if a
  * testwriter knows their output file will be XML, we should only
  * attempt to parse it as XML, not other types)
  * @author Scott_Boag@lotus.com
@@ -173,6 +174,12 @@ public class XHTComparator
     /** NEEDSDOC Field MISMATCH_VALUE          */
     public static final String MISMATCH_VALUE = "mismatch-value" + SEPARATOR;
 
+    /** NEEDSDOC Field MISMATCH_VALUE          */
+    public static final String MISMATCH_VALUE_GOLD = "mismatch-value-gold" + SEPARATOR;
+
+    /** NEEDSDOC Field MISMATCH_VALUE          */
+    public static final String MISMATCH_VALUE_TEXT = "mismatch-value-text" + SEPARATOR;
+
     /** NEEDSDOC Field MISSING_TEST_VALUE          */
     public static final String MISSING_TEST_VALUE = "missing-value-" + TEST
                                                         + SEPARATOR;
@@ -228,7 +235,7 @@ public class XHTComparator
     /**
      * The contract is: when you enter here the gold and test nodes are the same type,
      * both non-null, and both in the same basic position in the tree.
-     * @todo verify caller really performs for the contract -sc
+     * //@todo verify caller really performs for the contract -sc
      *
      * NEEDSDOC @param gold
      * NEEDSDOC @param test
@@ -247,7 +254,7 @@ public class XHTComparator
         // If both there but not equal, fail
         if ((null != name1) && (null != name2) &&!name1.equals(name2))
         {
-            reporter.print(MISMATCH_NODE + nodeTypeString(gold) + SEPARATOR
+            reporter.println(MISMATCH_NODE + nodeTypeString(gold) + SEPARATOR
                            + nodeTypeString(test) + SEPARATOR
                            + "name does not equal test node");
 
@@ -255,7 +262,7 @@ public class XHTComparator
         }
         else if ((null != name1) && (null == name2))
         {
-            reporter.print(MISSING_TEST_NODE + nodeTypeString(gold)
+            reporter.println(MISSING_TEST_NODE + nodeTypeString(gold)
                            + SEPARATOR + nodeTypeString(test) + SEPARATOR
                            + "name missing on test");
 
@@ -263,7 +270,7 @@ public class XHTComparator
         }
         else if ((null == name1) && (null != name2))
         {
-            reporter.print(MISSING_GOLD_NODE + nodeTypeString(gold)
+            reporter.println(MISSING_GOLD_NODE + nodeTypeString(gold)
                            + SEPARATOR + nodeTypeString(test) + SEPARATOR
                            + "name missing on gold");
 
@@ -275,13 +282,13 @@ public class XHTComparator
 
         if ((null != value1) && (null != value2) &&!value1.equals(value2))
         {
-            System.err.println("value1:");
-            System.err.println(value1);
-            System.err.println("value2:");
-            System.err.println(value2);
-            reporter.print(MISMATCH_VALUE + nodeTypeString(gold) + "-"
+            // System.err.println("value1:");
+            // System.err.println(value1);
+            // System.err.println("value2:");
+            // System.err.println(value2);
+            reporter.println(MISMATCH_VALUE + nodeTypeString(gold) + "len="
                            + value1.length() + SEPARATOR
-                           + nodeTypeString(test) + "-" + value2.length()
+                           + nodeTypeString(test) + "len=" + value2.length()
                            + SEPARATOR + "lengths do not match");
 
             // Ignore old conditional printing; always print out values, even with newlines -sc
@@ -319,15 +326,14 @@ public class XHTComparator
              *       {
              * / Ignore old conditional printing; always print out values, even with newlines -sc
              */
-            reporter.println();
-            reporter.print(MISMATCH_VALUE + value1 + SEPARATOR + value2
-                           + SEPARATOR + "values do not match");
+            reporter.println(MISMATCH_VALUE_GOLD + nodeTypeString(gold) + SEPARATOR + "\n" + value1);
+            reporter.println(MISMATCH_VALUE_TEXT + nodeTypeString(test) + SEPARATOR + "\n" + value2);
 
             return false;
         }
         else if ((null != value1) && (null == value2))
         {
-            reporter.print(MISSING_TEST_VALUE + nodeTypeString(gold) + "-"
+            reporter.println(MISSING_TEST_VALUE + nodeTypeString(gold) + "-"
                            + value1 + SEPARATOR + nodeTypeString(test)
                            + SEPARATOR + "test no value");
 
@@ -335,7 +341,7 @@ public class XHTComparator
         }
         else if ((null == value1) && (null != value2))
         {
-            reporter.print(MISSING_GOLD_VALUE + nodeTypeString(gold)
+            reporter.println(MISSING_GOLD_VALUE + nodeTypeString(gold)
                            + SEPARATOR + nodeTypeString(test) + "-" + value2
                            + SEPARATOR + "gold no value");
 
@@ -360,7 +366,7 @@ public class XHTComparator
 
             if ((null != goldAttrs) && (null == testAttrs))
             {
-                reporter.print(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
+                reporter.println(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
                                + SEPARATOR + nodeTypeString(test) + SEPARATOR
                                + "test no attrs");
 
@@ -368,7 +374,7 @@ public class XHTComparator
             }
             else if ((null == goldAttrs) && (null != testAttrs))
             {
-                reporter.print(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
+                reporter.println(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
                                + SEPARATOR + nodeTypeString(test) + SEPARATOR
                                + "gold no attrs");
 
@@ -380,7 +386,7 @@ public class XHTComparator
 
             if (gn != tn)
             {
-                reporter.print(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
+                reporter.println(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
                                + "-" + gn + SEPARATOR + nodeTypeString(test)
                                + "-" + tn + SEPARATOR
                                + "attribte count mismatch");
@@ -399,7 +405,7 @@ public class XHTComparator
 
                 if (null == testAttr)
                 {
-                    reporter.print(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
+                    reporter.println(MISMATCH_ATTRIBUTE + nodeTypeString(gold)
                                    + "-" + goldAttrName + SEPARATOR
                                    + nodeTypeString(test) + SEPARATOR
                                    + "missing attribute on test");
@@ -463,12 +469,9 @@ public class XHTComparator
     }  // end of diff()
 
     /**
-     * NEEDSDOC Method isWhiteSpace 
-     *
-     *
-     * NEEDSDOC @param s
-     *
-     * NEEDSDOC (isWhiteSpace) @return
+     * Returns Character.isWhitespace
+     * @param s String to check for whitespace
+     * @return true if all whitespace; false otherwise
      */
     boolean isWhiteSpace(String s)
     {
@@ -550,7 +553,7 @@ public class XHTComparator
 
             if ((null != gold) && (null == test))
             {
-                reporter.print(MISSING_TEST_NODE + nodeTypeString(gold)
+                reporter.println(MISSING_TEST_NODE + nodeTypeString(gold)
                                + SEPARATOR + SEPARATOR
                                + "missing node on test");
 
@@ -565,7 +568,7 @@ public class XHTComparator
 
             if ((null == gold) && (null != test))
             {
-                reporter.print(MISSING_GOLD_NODE + SEPARATOR
+                reporter.println(MISSING_GOLD_NODE + SEPARATOR
                                + nodeTypeString(test) + SEPARATOR
                                + "missing node on gold");
 
@@ -595,7 +598,7 @@ public class XHTComparator
                 gold = savedGold;
                 test = savedTest;
 
-                reporter.print(MISMATCH_NODE + nodeTypeString(gold)
+                reporter.println(MISMATCH_NODE + nodeTypeString(gold)
                                + SEPARATOR + nodeTypeString(test) + SEPARATOR
                                + "node type mismatch");
 
@@ -674,12 +677,10 @@ public class XHTComparator
      */
     Document parse(String filename, PrintWriter reporter, String which)
     {
-
         // Force filerefs to be URI's if needed: note this is independent of any other files
         // Remember: this only applies to the wacky Xerces parser, which we're presumably
         //  using as our default DOMParser() below
         String xercesFilename = filename;
-
         if (useURI)
         {
             try
@@ -698,20 +699,20 @@ public class XHTComparator
         }
 
         String parseType = which + PARSE_TYPE + "[xml];";
-        DOMParser parser = new DOMParser();
+        // Use JAXP instead of Xerces-specific calls
+        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+        dfactory.setNamespaceAware(true);
         Document doc = null;
 
         try
         {
-
             // Use the Xerces-munged name specifically here!
-            parser.parse(new InputSource(xercesFilename));
-
-            doc = parser.getDocument();
+            DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+            doc = docBuilder.parse(new InputSource(xercesFilename));
         }
         catch (Throwable se)
         {
-            reporter.print(WARNING + se.toString() + "\n");
+            reporter.println(WARNING + se.toString());
 
             parseType = which + PARSE_TYPE + "[html];";
 
@@ -726,21 +727,9 @@ public class XHTComparator
             {
                 try
                 {
-                    reporter.print(WARNING + e.toString() + "\n");
+                    reporter.println(WARNING + e.toString());
 
                     parseType = which + PARSE_TYPE + "[text];";
-
-                    // Safer not to rely directly upon the DocumentImpl classes.
-                    //   DocumentImpl docImpl = new DocumentImpl();
-                    //   docImpl.appendChild(docElem);
-                    //   DocumentImpl docImpl =
-                    // Instead, use the DOM Level 2 createDocument call.
-                    // Obtaining the DOMImplementation is still nonportable;
-                    // DOM Level 3 may address that.
-                    Document docImpl =
-                        DOMImplementationImpl.getDOMImplementation().createDocument(
-                            null, "out", null);
-                    Element docElem = docImpl.getDocumentElement();
 
                     // Parse as text, line by line
                     //   Since we already know it should be text, this should 
@@ -748,7 +737,6 @@ public class XHTComparator
                     FileReader fr = new FileReader(filename);
                     BufferedReader br = new BufferedReader(fr);
                     StringBuffer buffer = new StringBuffer();
-
                     for (;;)
                     {
                         String tmp = br.readLine();
@@ -762,26 +750,29 @@ public class XHTComparator
                         buffer.append("\n");  // Put in the newlines as well
                     }
 
-                    Text tx = docImpl.createTextNode(buffer.toString());
+                    DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+                    doc = docBuilder.newDocument();
+                    Element outElem = doc.createElement("out");
+                    Text textNode = doc.createTextNode(buffer.toString());
 
                     // Note: will this always be a valid node?  If we're parsing 
                     //    in as text, will there ever be cases where the diff that's 
                     //    done later on will fail becuase some really garbage-like 
                     //    text has been put into a node?
-                    docElem.appendChild(tx);
-
-                    doc = docImpl;
+                    outElem.appendChild(textNode);
+                    doc.appendChild(outElem);
                 }
                 catch (Throwable throwable)
                 {
-                    reporter.print(OTHER_ERROR + filename + SEPARATOR
-                                   + "threw:" + throwable.toString() + "\n");
+                    reporter.println(OTHER_ERROR + filename + SEPARATOR
+                                   + "threw:" + throwable.toString());
+                    // throwable.printStackTrace();
                 }
             }
         }
 
         // Output a newline here for readability
-        reporter.print(parseType + "\n");
+        reporter.println(parseType);
 
         return doc;
     }  // end of parse()
