@@ -17,6 +17,7 @@
 <xsl:template match="a">
   <xsl:value-of select="."/><xsl:text>-</xsl:text>
   <xsl:for-each select="attribute::*">
+    <xsl:sort select="name(.)"/>
     <xsl:value-of select="."/><xsl:text>|</xsl:text>
   </xsl:for-each>
 </xsl:template>
