@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<catalog>
+	<id>123</id>
+	<pointer>
+		<urlref urlstr="compu.xml"/>
+	</pointer>
+</catalog>
