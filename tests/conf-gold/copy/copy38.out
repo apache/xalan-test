@@ -2,7 +2,7 @@
 <body>
 <h1>Matches in Group A</h1>
 <h2>Brazil versus Scotland</h2>
-<table cellpadding="5" border="1" bgcolor="#cccccc">
+<table border="1">
 <tr>
 <td><b>Date</b></td><td><b>Home Team</b></td><td><b>Away Team</b></td><td><b>Result</b></td>
 </tr>
@@ -11,7 +11,7 @@
 </tr>
 </table>
 <h2>Morocco versus Norway</h2>
-<table cellpadding="5" border="1" bgcolor="#cccccc">
+<table border="1">
 <tr>
 <td><b>Date</b></td><td><b>Home Team</b></td><td><b>Away Team</b></td><td><b>Result</b></td>
 </tr>
@@ -20,7 +20,7 @@
 </tr>
 </table>
 <h2>Scotland versus Norway</h2>
-<table cellpadding="5" border="1" bgcolor="#cccccc">
+<table border="1">
 <tr>
 <td><b>Date</b></td><td><b>Home Team</b></td><td><b>Away Team</b></td><td><b>Result</b></td>
 </tr>
@@ -29,7 +29,7 @@
 </tr>
 </table>
 <h2>Brazil versus Morocco</h2>
-<table cellpadding="5" border="1" bgcolor="#cccccc">
+<table border="1">
 <tr>
 <td><b>Date</b></td><td><b>Home Team</b></td><td><b>Away Team</b></td><td><b>Result</b></td>
 </tr>
@@ -38,7 +38,7 @@
 </tr>
 </table>
 <h2>Brazil versus Norway</h2>
-<table cellpadding="5" border="1" bgcolor="#cccccc">
+<table border="1">
 <tr>
 <td><b>Date</b></td><td><b>Home Team</b></td><td><b>Away Team</b></td><td><b>Result</b></td>
 </tr>
@@ -47,7 +47,7 @@
 </tr>
 </table>
 <h2>Scotland versus Morocco</h2>
-<table cellpadding="5" border="1" bgcolor="#cccccc">
+<table border="1">
 <tr>
 <td><b>Date</b></td><td><b>Home Team</b></td><td><b>Away Team</b></td><td><b>Result</b></td>
 </tr>

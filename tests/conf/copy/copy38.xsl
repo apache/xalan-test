@@ -38,7 +38,7 @@
 
         <h2><xsl:value-of select="concat(team[1], ' versus ', team[2])"/></h2>
 
-        <table bgcolor="#cccccc" border="1" cellpadding="5">
+        <table border="1">
           <xsl:copy-of select="$table-heading"/><!-- This is the test! -->
           <tr>
             <td><xsl:value-of select="date"/>&#xa0;</td>
