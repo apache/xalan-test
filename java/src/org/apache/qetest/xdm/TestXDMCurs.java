@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000-2003 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,42 +54,44 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  *
- * TestDTMIter.java
+ * TestXDMCurs.java
  *
  */
-package org.apache.qetest.dtm;
+package org.apache.qetest.xdm;
 
+// Support for test reporting and harness classes
+import org.apache.qetest.*;
+import org.apache.qetest.xsl.*;
+
+// java classes
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringReader;
+import java.io.FileOutputStream;
 import java.util.Properties;
 
+// Needed SAX, DOM, JAXP, Xalan classes
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.qetest.FileBasedTest;
-import org.apache.qetest.LinebyLineCheckService;
-import org.apache.qetest.OutputNameManager;
-import org.apache.qetest.xsl.XSLTestfileInfo;
-import org.apache.xml.xdm.Axis;
-import org.apache.xml.dtm.DTM;
-import org.apache.xml.dtm.DTMAxisIterator;
-import org.apache.xml.dtm.DTMManager;
-import org.apache.xml.dtm.ref.DTMManagerDefault;
+import org.apache.xml.xdm.*;
+import org.apache.xml.xdm.ref.*;
 import org.apache.xpath.objects.XMLStringFactoryImpl;
 
 //-------------------------------------------------------------------------
 
 /**
-* This test creates a DTM and then walks it with axisIterators 
+* This test creates an XDM and then walks it with axisIterators 
 * for each axis within XPATH
-* - execute 'build package.trax', 'traxapitest TestDTMIter.java'
+* - execute 'build package.trax', 'traxapitest TestXDMCurs.java'
 * - a bunch of convenience variables/initializers are included, 
 *   use or delete as is useful
 * @author Paul Dick
+* @author Joe Kesselman (adapted from DTM to XDM)
 * @version $Id$
 */
-public class TestDTMIter extends FileBasedTest
+public class TestXDMCurs extends FileBasedTest
 {
     /**
      * Provides nextName(), currentName() functionality for tests 
@@ -105,8 +107,8 @@ public class TestDTMIter extends FileBasedTest
     protected XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
-    public static final String DTM_SUBDIR = "dtm";
-	public static final String ITER_Prefix = "Iter_";
+    public static final String XDM_SUBDIR = "xdm";
+	public static final String CURS_Prefix = "Curs_";
 
 	public static final String defaultSource=
  		"<?xml version=\"1.0\"?>\n"+
@@ -136,23 +138,23 @@ public class TestDTMIter extends FileBasedTest
 	    "NAMESPACE"
 	};
 
-	private int lastNode = 0;	// Set by first axis,  used by subsequent axis.
+	private XDMCursor lastNode;	// Set by first axis,  used by subsequent axis.
 	private String lastName;
 
-	private int lastNode2 = 0;	// Set by DESCENDANTORSELF, used in 11 & 12 
+	private XDMCursor lastNode2;	// Set by DESCENDANTORSELF, used in 11 & 12 
 	private String lastName2;
 
-	private int ANode = 0;		// Used in testcase 7 - 10
+	private XDMCursor ANode;		// Used in testcase 7 - 10
 	private String ANodeName;
 
-	private static dtmWSStripper stripper = new dtmWSStripper();
+	private static xdmWSStripper stripper = new xdmWSStripper();
 
     /** Just initialize test name, comment, numTestCases. */
-    public TestDTMIter()
+    public TestXDMCurs()
     {
         numTestCases = 12;
-        testName = "TestDTMIter";
-        testComment = "Function test of DTM iterators";
+        testName = "TestXDMCurs";
+        testComment = "Function test of XDMCursors";
     }
 
     /**
@@ -164,24 +166,24 @@ public class TestDTMIter extends FileBasedTest
      */
     public boolean doTestFileInit(Properties p)
     {
-        // Used for all tests; just dump files in dtm subdir
-        File outSubDir = new File(outputDir + File.separator + DTM_SUBDIR);
+        // Used for all tests; just dump files in xdm subdir
+        File outSubDir = new File(outputDir + File.separator + XDM_SUBDIR);
         if (!outSubDir.mkdirs())
             reporter.logWarningMsg("Could not create output dir: " + outSubDir);
 
         // Initialize an output name manager to that dir with .out extension
-        outNames = new OutputNameManager(outputDir + File.separator + DTM_SUBDIR
+        outNames = new OutputNameManager(outputDir + File.separator + XDM_SUBDIR
                                          + File.separator + testName, ".out");
 
         String testBasePath = inputDir 
                               + File.separator 
-                              + DTM_SUBDIR
+                              + XDM_SUBDIR
                               + File.separator;
         String goldBasePath = goldDir 
                               + File.separator 
-                              + DTM_SUBDIR
+                              + XDM_SUBDIR
                               + File.separator
-                              + ITER_Prefix;
+                              + CURS_Prefix;
 
         //testFileInfo.inputName = testBasePath + "REPLACE_xslxml_filename.xsl";
         //testFileInfo.xmlName = testBasePath + "REPLACE_xslxml_filename.xml";
@@ -203,42 +205,48 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk CHILD axis.
+    * Create AxisCursor and walk CHILD axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase1()
     {
-		reporter.testCaseInit("Walk CHILD AxisIterator");
+		reporter.testCaseInit("Walk CHILD AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase1.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Create xdm and generate initial context
+		XDMCursor doc = generateXDM();
 
 	  	// Get various nodes to use as context nodes.
-	  	int dtmRoot = dtm.getDocument();				// #document
-	  	String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
-	  	int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
-	  	String DNodeName = dtm.getNodeName(DNode);
-	  	int CNode = dtm.getFirstChild(DNode);			// <Comment>
-	  	int PINode = dtm.getNextSibling(CNode);			// <PI>
-	  	ANode = dtm.getNextSibling(PINode);				// <A>, used in testcase 7 - 10
-	  	ANodeName = dtm.getNodeName(ANode);
+	  XDMCursor xdmRoot = doc;					// #document
+	  String xdmRootName = xdmRoot.getNodeName();	// Used for output
+	  XDMCursor DNode = xdmRoot.getAxisCursor(Axis.CHILD);	// <Document>
+	  String DNodeName = DNode.getNodeName();
+	  XDMCursor CNode = DNode.getAxisCursor(Axis.CHILD); // <Comment>
+
+	  // Use the cursor as an iterator, pulling a SELF 
+	  // cursor off the PINode to save state.
+	  XDMCursor cNodeSibs=CNode.getAxisCursor(Axis.FOLLOWINGSIBLING);
+	  XDMCursor PINode = cNodeSibs.singleNode();			// <PI>
+	  cNodeSibs.nextNode();
+	  ANode = cNodeSibs;			// <A>
+	  String ANodeName = ANode.getNodeName();
 
 
-		// Get a Iterator for CHILD:: axis and query it's direction.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.CHILD);
-      	iter.setStartNode(DNode);
-		buf.append("#### CHILD from "+DNodeName+", Reverse Axis:" + iter.isReverse() + "\n");
+		// Get a Cursor for CHILD:: axis and query it's direction.
+      	XDMCursor iter = DNode.getAxisCursor(Axis.CHILD);
+      	lastNode=DNode.singleNode();
 
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
 		{ 
-			buf.append(getNodeInfo(dtm, itNode, " "));
-			lastNode = itNode;			// Setting this GLOBAL IS BAD, but easy. Investigate!!
+			buf.append(getNodeInfo(iter, " "));
+			lastNode.setIterationRoot(iter,null);			// Setting this GLOBAL IS BAD, but easy. Investigate!!
 		}
-		lastName = dtm.getNodeName(lastNode);
+		lastName = lastNode.getNodeName();
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -253,29 +261,24 @@ public class TestDTMIter extends FileBasedTest
     }
 
     /**
-     * Create AxisIterator and walk PARENT axis.
+     * Create AxisCursor and walk PARENT axis.
      * @return false if we should abort the test; true otherwise
      */
     public boolean testCase2()
     {
-		reporter.testCaseInit("Walk PARENT AxisIterator");
+		reporter.testCaseInit("Walk PARENT AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase2.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for PARENT:: axis.
+      	XDMCursor iter = lastNode.getAxisCursor(Axis.PARENT);
 
-		// Get a Iterator for PARENT:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PARENT);
-      	iter.setStartNode(lastNode);
-
-		// Print out info about the axis
-		buf.append("#### PARENT from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-			 buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+			 buf.append(getNodeInfo(iter, " "));
 		 		
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -291,29 +294,24 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk SELF axis.
+    * Create AxisCursor and walk SELF axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase3()
     {
-		reporter.testCaseInit("Walk SELF AxisIterator");
+		reporter.testCaseInit("Walk SELF AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase3.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for CHILD:: axis.
+      	XDMCursor iter = lastNode.getAxisCursor(Axis.SELF);
 
-		// Get a Iterator for CHILD:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.SELF);
-      	iter.setStartNode(lastNode);
-
-		// Print out info about the axis
-		buf.append("#### SELF from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-		  buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+		  buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -329,29 +327,24 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk NAMESPACE axis.
+    * Create AxisCursor and walk NAMESPACE axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase4()
     {
-		reporter.testCaseInit("Walk NAMESPACE AxisIterator");
+		reporter.testCaseInit("Walk NAMESPACE AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase4.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for NAMESPACE:: axis.
+      	XDMCursor iter = lastNode.getAxisCursor(Axis.NAMESPACE);
 
-		// Get a Iterator for NAMESPACE:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.NAMESPACE);
-      	iter.setStartNode(lastNode);
-
-		// Print out info about the axis
-		buf.append("#### NAMESPACE from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-		     buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+		     buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -367,29 +360,25 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk PRECEDING axis.
+    * Create AxisCursor and walk PRECEDING axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase5()
     {
-		reporter.testCaseInit("Walk PRECEDING AxisIterator");
+		reporter.testCaseInit("Walk PRECEDING AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase5.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for PRECEDING:: axis.
+      	XDMCursor iter = lastNode.getAxisCursor(Axis.PRECEDING);
 
-		// Get a Iterator for PRECEDING:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PRECEDING);
-      	iter.setStartNode(lastNode);
 
-		// Print out info about the axis
-		buf.append("#### PRECEDING from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-		     buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+		     buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -406,29 +395,24 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk PRECEDINGSIBLING axis.
+    * Create AxisCursor and walk PRECEDINGSIBLING axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase6()
     {
-		reporter.testCaseInit("Walk PRECEDINGSIBLING AxisIterator");
+		reporter.testCaseInit("Walk PRECEDINGSIBLING AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase6.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for PRECEDINGSIBLING:: axis.
+      	XDMCursor iter = lastNode.getAxisCursor(Axis.PRECEDINGSIBLING);
 
-		// Get a Iterator for PRECEDINGSIBLING:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.PRECEDINGSIBLING);
-      	iter.setStartNode(lastNode);
-
-		// Print out info about the axis
-		buf.append("#### PRECEDINGSIBLING from "+lastName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-		     buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+		     buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -443,29 +427,24 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk FOLLOWING axis.
+    * Create AxisCursor and walk FOLLOWING axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase7()
     {
-		reporter.testCaseInit("Walk FOLLOWING AxisIterator");
+		reporter.testCaseInit("Walk FOLLOWING AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase7.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for FOLLOWING:: axis.
+      	XDMCursor iter = ANode.getAxisCursor(Axis.FOLLOWING);
 
-		// Get a Iterator for FOLLOWING:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.FOLLOWING);
-      	iter.setStartNode(ANode);
-
-		// Print out info about the axis
-		buf.append("#### FOLLOWING from "+ANodeName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-		     buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+		     buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -480,29 +459,24 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk FOLLOWINGSIBLING axis.
+    * Create AxisCursor and walk FOLLOWINGSIBLING axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase8()
     {
-		reporter.testCaseInit("Walk FOLLOWINGSIBLING AxisIterator");
+		reporter.testCaseInit("Walk FOLLOWINGSIBLING AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase8.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for FOLLOWINGSIBLING:: axis.
+      	XDMCursor iter = ANode.getAxisCursor(Axis.FOLLOWINGSIBLING);
 
-		// Get a Iterator for FOLLOWINGSIBLING:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.FOLLOWINGSIBLING);
-      	iter.setStartNode(ANode);
-
-		// Print out info about the axis
-		buf.append("#### FOLLOWINGSIBLING from "+ANodeName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-		{ buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+		{ buf.append(getNodeInfo(iter, " "));
 		  //lastNode = itNode;
 		}
 
@@ -520,29 +494,24 @@ public class TestDTMIter extends FileBasedTest
 
 
    /**
-    * Create AxisIterator and walk DESCENDANT axis.
+    * Create AxisCursor and walk DESCENDANT axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase9()
     {
-		reporter.testCaseInit("Walk DESCENDANT AxisIterator");
+		reporter.testCaseInit("Walk DESCENDANT AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase9.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for DESCENDANT:: axis.
+      	XDMCursor iter = ANode.getAxisCursor(Axis.DESCENDANT);
 
-		// Get a Iterator for DESCENDANT:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.DESCENDANT);
-      	iter.setStartNode(ANode);
-
-		// Print out info about the axis
-		buf.append("#### DESCENDANT from "+ANodeName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-		     buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+		     buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -557,31 +526,28 @@ public class TestDTMIter extends FileBasedTest
     }
 
    /**
-    * Create AxisIterator and walk DESCENDANTORSELF axis.
+    * Create AxisCursor and walk DESCENDANTORSELF axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase10()
     {
-		reporter.testCaseInit("Walk DESCENDANTORSELF AxisIterator");
+		reporter.testCaseInit("Walk DESCENDANTORSELF AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase10.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for DESCENDANTORSELF:: axis.
+      	XDMCursor iter = ANode.getAxisCursor(Axis.DESCENDANTORSELF);
+		lastNode2=iter.singleNode();      	
 
-		// Get a Iterator for DESCENDANTORSELF:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.DESCENDANTORSELF);
-      	iter.setStartNode(ANode);
 
-		// Print out info about the axis
-		buf.append("#### DESCENDANTORSELF from "+ANodeName+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
 	   	{
-	   		buf.append(getNodeInfo(dtm, itNode, " "));
-		  	lastNode2 = itNode;
+	   		buf.append(getNodeInfo(iter, " "));
+		  	lastNode2.setIterationRoot(iter,null);
 		}
 
 		// Write results and close output file.
@@ -598,31 +564,25 @@ public class TestDTMIter extends FileBasedTest
 
 
    /**
-    * Create AxisIterator and walk ANCESTOR axis.
+    * Create AxisCursor and walk ANCESTOR axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase11()
     {
-		reporter.testCaseInit("Walk ANCESTOR AxisIterator");
+		reporter.testCaseInit("Walk ANCESTOR AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase11.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for ANCESTOR:: axis.
+		lastName2 = lastNode2.getNodeName();
+      	XDMCursor iter = lastNode2.getAxisCursor(Axis.ANCESTOR);
 
-		// Get a Iterator for ANCESTOR:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.ANCESTOR);
-      	iter.setStartNode(lastNode2);
-
-		lastName2 = dtm.getNodeName(lastNode2);
-
-		// Print out info about the axis
-		buf.append("#### ANCESTOR from "+lastName2+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-			 buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+			 buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -639,29 +599,24 @@ public class TestDTMIter extends FileBasedTest
 
 
    /**
-    * Create AxisIterator and walk ANCESTORORSELF axis.
+    * Create AxisCursor and walk ANCESTORORSELF axis.
     * @return false if we should abort the test; true otherwise
     */
     public boolean testCase12()
     {
-		reporter.testCaseInit("Walk ANCESTORORSELF AxisIterator");
+		reporter.testCaseInit("Walk ANCESTORORSELF AxisCursor");
 		StringBuffer buf = new StringBuffer();
 		FileOutputStream fos = openFileStream(outNames.nextName());
         String gold = testFileInfo.goldName + "testcase12.out";
 
-		// Create dtm and generate initial context
-		DTM dtm = generateDTM();
+		// Get a Cursor for ANCESTORORSELF:: axis.
+      	XDMCursor iter = lastNode2.getAxisCursor(Axis.ANCESTORORSELF);
 
-		// Get a Iterator for ANCESTORORSELF:: axis.
-      	DTMAxisIterator iter = dtm.getAxisIterator(Axis.ANCESTORORSELF);
-      	iter.setStartNode(lastNode2);
-
-		// Print out info about the axis
-		buf.append("#### ANCESTORORSELF from "+lastName2+", Reverse Axis:" + iter.isReverse() + "\n");
-
-	  	// Iterate the axis and write node info to output file
-      	for (int itNode = iter.next(); DTM.NULL != itNode; itNode = iter.next())
-			 buf.append(getNodeInfo(dtm, itNode, " "));
+	  	// scan the axis and write node info to output file
+      for (boolean more=!iter.isEmpty();
+      		more;
+      		more=iter.nextNode())
+			 buf.append(getNodeInfo(iter, " "));
 
 		// Write results and close output file.
 		writeClose(fos, buf);
@@ -677,7 +632,7 @@ public class TestDTMIter extends FileBasedTest
 
 public String usage()
 {
-	return ("Common [optional] options supported by TestDTMIter:\n"
+	return ("Common [optional] options supported by TestXDMCurs:\n"
              + "(Note: assumes inputDir=.\\tests\\api)\n");
 }
 
@@ -694,15 +649,16 @@ FileOutputStream openFileStream(String name)
 	return fos;
 }
 
-// This routine generates a new DTM for each testcase
-DTM generateDTM()
+// This routine generates a new root XDMCursor for each testcase
+XDMCursor generateXDM()
 {
-	// Create DTM and generate initial context
+	// Create XDM and generate initial context
+	// %REVIEW% We'll need to generalize this.
 	Source source = new StreamSource(new StringReader(defaultSource));
-	DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
-	DTM dtm=manager.getDTM(source, true, stripper, false, true);
+	XDMManager manager= new XDMManagerDTM().newInstance(new XMLStringFactoryImpl());
+	XDMCursor xdm=manager.getXDM(source, true, stripper, false, true);
    
-	return dtm;
+	return xdm;
 }
 
 void writeClose(FileOutputStream fos, StringBuffer buf)
@@ -710,7 +666,7 @@ void writeClose(FileOutputStream fos, StringBuffer buf)
 	// Write results and close output file.
 	try
 	{
-               fos.write(buf.toString().getBytes("UTF-8"));
+		fos.write(buf.toString().getBytes());
 		fos.close();
 	}
 
@@ -718,23 +674,24 @@ void writeClose(FileOutputStream fos, StringBuffer buf)
 	{  reporter.checkFail("Failure writing output."); 	}
  }
     
-String getNodeInfo(DTM dtm, int nodeHandle, String indent)
+String getNodeInfo(XDMCursor node, String indent)
 {
     // Formatting hack -- suppress quotes when value is null, to distinguish
     // it from "null".
 	String buf = new String("null");
-    String value=dtm.getNodeValue(nodeHandle);
+    String value=node.getNodeValue();
     String vq = (value==null) ? "" : "\"";
 
     // Skip outputing of text nodes. In most cases they clutter the output, 
-	// besides I'm only interested in the elemental structure of the dtm. 
-    if( TYPENAME[dtm.getNodeType(nodeHandle)] != "TEXT" )
+	// besides I'm only interested in the elemental structure of the xdm. 
+    if( node.getNodeType() != node.TEXT_NODE )
 	{
+		// node.toString() does most of this better...
     	buf = new String(indent+
-		       nodeHandle+": "+
-		       TYPENAME[dtm.getNodeType(nodeHandle)]+" "+
-			   dtm.getNodeName(nodeHandle)+" "+
-			   " Level=" + dtm.getLevel(nodeHandle)+" "+
+		       //nodeHandle+": "+
+		       TYPENAME[node.getNodeType()]+" "+
+			   node.getNodeName()+" "+
+			   //" Level=" + xdm.getLevel(nodeHandle)+" "+
 		       "\tValue=" + vq + value + vq	+ "\n"
 		       ); 
 	}
@@ -747,7 +704,7 @@ String getNodeInfo(DTM dtm, int nodeHandle, String indent)
      */
     public static void main(String[] args)
     {
-        TestDTMIter app = new TestDTMIter();
+        TestXDMCurs app = new TestXDMCurs();
         app.doMain(args);
     }
 }

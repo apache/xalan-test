@@ -70,7 +70,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.xsl.XSLTestfileInfo;
-import org.apache.xml.dtm.Axis;
+import org.apache.xml.xdm.Axis;
 import org.apache.xml.dtm.DTM;
 import org.apache.xml.dtm.DTMAxisTraverser;
 import org.apache.xml.dtm.DTMManager;

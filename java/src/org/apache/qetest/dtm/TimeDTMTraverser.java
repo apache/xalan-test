@@ -56,7 +56,7 @@
  */
 package org.apache.qetest.dtm;
 
-import org.apache.xml.dtm.Axis;
+import org.apache.xml.xdm.Axis;
 import org.apache.xml.dtm.DTM;
 
 
