@@ -91,6 +91,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import org.w3c.tidy.*;
+import java.net.URLConnection;
+
 /**
  * Defines XSLTC's XML/HTML/Text diff comparator to check or diff two files.
  * This comparator uses the expanded name instead of the qname to compare
@@ -105,6 +108,130 @@ import org.xml.sax.SAXParseException;
  */
 public class XHTComparatorXSLTC extends XHTComparator
 {
+    /**
+     * Simple worker method to parse filename to a Document.  
+     *
+     * <p>Attempts XML parse, if that throws an exception, then 
+     * we attempt an HTML parse (when parser available), if 
+     * that throws an exception, then we parse as text: 
+     * we construct a faux document element to hold it all, 
+     * and then parse by readLine() and put each line of 
+     * text into a &lt;line> element.</p>
+     *
+     * @param filename to parse as a local path
+     * @param reporter PrintWriter to dump status info to
+     * @param which either TEST or GOLD file being parsed
+     * @param attributes name=value pairs to set on the 
+     * DocumentBuilderFactory that we use to parse
+     *
+     * @return Document object with contents of the file; 
+     * otherwise throws an unchecked RuntimeException if there 
+     * is any fatal problem
+     */
+    Document parse(String filename, PrintWriter reporter, String which, Properties attributes)
+    {
+        // Force filerefs to be URI's if needed: note this is independent of any other files
+        String docURI = QetestUtils.filenameToURL(filename);
+        
+        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+        // Always set namespaces on
+        dfactory.setNamespaceAware(true);
+        // Set other attributes here as needed
+        applyAttributes(dfactory, attributes);
+        
+        // Local class: cheap non-printing ErrorHandler
+        // This is used to suppress validation warnings which 
+        //  would otherwise clutter up the console
+        ErrorHandler nullHandler = new ErrorHandler() {
+            public void warning(SAXParseException e) throws SAXException {}
+            public void error(SAXParseException e) throws SAXException {}
+            public void fatalError(SAXParseException e) throws SAXException 
+            {
+                throw e;
+            }
+        };
+
+        String parseType = which + PARSE_TYPE + "[xml];";
+        Document doc = null;
+        try
+        {
+            // First, attempt to parse as XML (preferred)...
+            DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+            docBuilder.setErrorHandler(nullHandler);
+            doc = docBuilder.parse(new InputSource(docURI));
+        }
+        catch (Throwable se)
+        {
+            // ... if we couldn't parse as XML, attempt parse as HTML...
+            reporter.println(WARNING + se.toString());
+            parseType = which + PARSE_TYPE + "[html];";
+
+            try
+            {
+	        Tidy tidy = new Tidy();
+	        tidy.setXHTML(true);
+	        tidy.setTidyMark(false);
+	        tidy.setShowWarnings(false);
+	        tidy.setQuiet(true);
+	        doc  = tidy.parseDOM(new URL(docURI).openStream(), null);
+
+                // @todo need to find an HTML to DOM parser we can use!!!
+                // doc = someHTMLParser.parse(new InputSource(filename));
+                // throw new RuntimeException("XHTComparator no HTML parser!");
+            }
+            catch (Exception e)
+            {
+                // ... if we can't parse as HTML, then just parse the text
+                try
+                {
+                    reporter.println(WARNING + e.toString());
+                    parseType = which + PARSE_TYPE + "[text];";
+
+                    // First build a faux document with parent element
+                    DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+                    doc = docBuilder.newDocument();
+                    Element outElem = doc.createElement("out");
+
+                    // Parse as text, line by line
+                    //   Since we already know it should be text, this should 
+                    //   work better than parsing by bytes.
+                    FileReader fr = new FileReader(filename);
+                    BufferedReader br = new BufferedReader(fr);
+                    for (;;)
+                    {
+                        String tmp = br.readLine();
+
+                        if (tmp == null)
+                        {
+                            break;
+                        }
+                        // An additional thing we could do would 
+                        //  be to put in the line number in the 
+                        //  file in here somehow, so when users 
+                        //  view reports, they get that info
+                        Element lineElem = doc.createElement("line");
+                        outElem.appendChild(lineElem);
+                        Text textNode = doc.createTextNode(tmp);
+                        lineElem.appendChild(textNode);
+                    }
+                    // Now stick the whole element into the document to return
+                    doc.appendChild(outElem);
+                }
+                catch (Throwable throwable)
+                {
+                    reporter.println(OTHER_ERROR + filename + SEPARATOR
+                                   + "threw:" + throwable.toString());
+                }
+            }
+        }
+
+        // Output a newline here for readability
+        reporter.println(parseType);
+
+        return doc;
+    }  // end of parse()
+
+
     /**
      * The contract is: when you enter here the gold and test nodes are the same type,
      * both non-null, and both in the same basic position in the tree.
