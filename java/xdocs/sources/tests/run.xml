@@ -11,21 +11,38 @@
 
     <anchor name="how-to-run"/>
     <s2 title="How-to: Run tests">
-
+    <p>Nearly all tests for Xalan are independent Java classes built 
+    into testxsl.jar that 
+    can be run either standalone on the command line, programmatically 
+    from your application, or from 
+    <jump href="apidocs/org/apache/qetest/xsl/XSLTestHarness.html">XSLTestHarness</jump>.
+    There really isn't any magic to them: you can just set your classpath and 
+    execute java.exe to run them.  However we have provided a couple of more 
+    convenient ways to run the most common tests:</p>
     <p>1: <link idref="getstarted" anchor="how-to-build">Build a fresh copy of testxsl.jar.</link>
     <br/></p>
     <p>2: Set the JARDIR environment variable, and put <code>testxsl.jar</code> and the other required JAR files in the JARDIR directory.<br/></p>
+    <note>The tests will now default to using Xalan-J 2.x if JARDIR is not set, 
+    presuming that you have the tests in the same tree as xml-xalan\java (just like 
+    you get if you checkout the tree).</note>
     <p>3: cd xml-xalan\test<br/></p>
     <p>4: Run any of the convenience batch files (see below) or run java.exe with the desired test class.<br/></p>
     <p>
-      <code>traxapitest.bat TRAXAPITestClassName [<link anchor="test-options">options</link>]</code> 
-      <br/>(runs TRAX interface tests with Xalan-J 2.x, equivalent to 
-        <code>runtest trax.TRAXAPITestClassName -load APITest.properties [<link anchor="test-options">options</link>]</code><br/><br/>
-      <code>xalanj1apitest.bat ParamTest [<link anchor="test-options">options</link>]</code>
-      <br/>(runs Xalan-J 1.x API tests, equivalent to 
-        <code>runtest xalanj1.ParamTest -load APITest.properties [<link anchor="test-options">options</link>]</code><br/><br/>
       <code>contribtest.bat [<link anchor="test-options">options</link>]</code>
-        <br/>(runs ConformanceTest driver over contrib test tree)<br/><br/>
+        <br/>(runs ConformanceTest driver over tests\contrib test tree)<br/><br/>
+      <code>ConformanceTest.bat [<link anchor="test-options">options</link>]</code>
+        <br/>(runs ConformanceTest driver over tests\conf test tree)<br/><br/>
+      <code>PerformanceTest.bat [<link anchor="test-options">options</link>]</code>
+        <br/>(runs PerformanceTest driver over tests\perf test tree)<br/><br/>
+      <code>traxapitest.bat TRAXAPITestClassName [<link anchor="test-options">options</link>]</code> 
+      <br/>(runs TRAX interface tests with Xalan-J 2.x, equivalent to <br/>
+        <code>runtest trax.TRAXAPITestClassName -load APITest.properties [<link anchor="test-options">options</link>]</code><br/>
+        For example:<code>traxapitest TransformerAPITest</code>
+        <br/><br/>
+
+      <code>xalanj1apitest.bat ParamTest [<link anchor="test-options">options</link>]</code>
+      <br/>(runs Xalan-J 1.x API tests, equivalent to <br/>
+        <code>runtest xalanj1.ParamTest -load APITest.properties [<link anchor="test-options">options</link>]</code><br/><br/>
       <code>runtest.bat end_pkg.AnyTestClassName [<link anchor="test-options">options</link>]</code>
         <br/>(see batch file for comments) This is a generic way to run any tests - 
         it assumes org.apache.qetest as the start of the package; you may 
@@ -39,10 +56,21 @@
     simply pass all arguments to the tests on the command line, etc.</p>
     <p>Sorry! We don't have .sh equivalents for the convenience .bat files - 
     submissions of ports of these files are welcomed!</p>
+    <p>We are also working on integrating the running of tests into 
+    the various Ant build.xml files, both for the testing build.xml 
+    file as well as the one for Xalan-J 2.x itself.  For example, to run 
+    the Xalan-J 2.x Minitest, you may now do:<br/>
+    <code>cd xml-xalan\java</code><br/>
+    <code>build minitest</code><br/>
+    And this will build Xalan-J 2.x, then build a subset of the tests, 
+    and then run just the Minitest and print Pass (or Fail!).
+    </p>
     <note>Running tests with alternate JAXP parsers: all org.apache.qetest.trax.* 
     tests can be run with Xalan-J 2.x and any JAXP 1.1 compatible parser, like 
     crimson.jar.  Be sure to manually set the appropriate system properties to use 
     your parser instead of xerces.jar, which is the default for Xalan-J.</note>
+    <note>Most of the above batch files now accept a first argument '-crimson' 
+    to run the test with crimson.jar instead of xerces.jar automatically.</note>
     </s2>
       
     <anchor name="how-to-view-results"/>
