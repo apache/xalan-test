@@ -43,7 +43,7 @@
         -->
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}/xsl/XSLTestAntTask.java" 
+               includes="${test.root}xsl/XSLTestAntTask.java" 
                debug="${debug}" />
     </target>
 
