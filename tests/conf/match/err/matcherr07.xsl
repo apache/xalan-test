@@ -8,6 +8,7 @@
   <!-- Purpose: Put a disallowed attribute on xsl:apply-templates. -->
   <!-- Creator: David Marston -->
   <!-- ExpectedException: XSL Error: xsl:apply-templates has an illegal attribute: name -->
+  <!-- ExpectedException: "name" attribute is not allowed on the xsl:apply-templates element -->
 
 <xsl:template match="doc">
   <out>

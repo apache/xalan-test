@@ -8,6 +8,7 @@
   <!-- Purpose: Put a disallowed attribute on xsl:template. -->
   <!-- Creator: David Marston -->
   <!-- ExpectedException: XSL Error: xsl:template has an illegal attribute: level -->
+  <!-- ExpectedException: "level" attribute is not allowed on the xsl:template element! -->
 
 <xsl:template match="doc">
   <out>

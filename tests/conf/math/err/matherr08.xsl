@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of sum() with zero arguments. -->
   <!-- ExpectedException: one argument expected -->
+  <!-- ExpectedException: FuncSum only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

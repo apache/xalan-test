@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Put xsl:with-param in a template, which is illegal. -->
   <!-- ExpectedException: xsl:with-param must be child of xsl:apply-templates or xsl:call-template -->
+  <!-- ExpectedException: xsl:with-param is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <xsl:with-param name="par1" select="'foo'"/>

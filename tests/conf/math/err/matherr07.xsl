@@ -9,6 +9,7 @@
   <!-- Purpose: Test of sum() with too many arguments. -->
   <!-- ExpectedException: sum() has too many arguments. -->
   <!-- ExpectedException: sum only allows 1 argument -->
+  <!-- ExpectedException: FuncSum only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

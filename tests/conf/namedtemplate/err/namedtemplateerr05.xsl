@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test param lacking name attribute. -->
   <!-- ExpectedException: XSL Error: xsl:param must have a name attribute. -->
+  <!-- ExpectedException: xsl:param requires attribute: name -->
 
 <xsl:template match="doc">
   <out>

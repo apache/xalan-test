@@ -10,6 +10,7 @@
   <!-- ExpectedException: Can not add #text to xsl:call-template -->
   <!-- ExpectedException: ElemTemplateElement error: Can not add #text to xsl:call-template -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: ElemTemplateElement error: Can not add #text to xsl:call-template -->
+  <!-- ExpectedException: xsl:text is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

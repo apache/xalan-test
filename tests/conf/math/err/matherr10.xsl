@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of floor() with zero arguments. -->
   <!-- ExpectedException: one argument expected -->
+  <!-- ExpectedException: FuncFloor only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -9,6 +9,7 @@
      with the same name and same import precedence. -->
   <!-- Author: Paul Dick -->
   <!-- ExpectedException: There is already a template named: a -->
+  <!-- ExpectedException: Found more than one template named: a -->
 
 <xsl:import href="a.xsl"/>
 

@@ -9,6 +9,7 @@
   <!-- Creator: David Marston -->
   <!-- ExpectedException: ElemTemplateElement error: Can not add #text to xsl:apply-templates -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: ElemTemplateElement error: Can not add #text to xsl:apply-templates -->
+  <!-- ExpectedException: xsl:text is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

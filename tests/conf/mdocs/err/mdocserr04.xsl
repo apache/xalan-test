@@ -9,6 +9,7 @@
   <!-- Purpose: Top-level elements must have some namespace. -->
   <!-- Creator: David Marston -->
   <!-- ExpectedException: top-level element test has no namespace -->
+  <!-- ExpectedException: test is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out><xsl:text>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of round() with zero arguments. -->
   <!-- ExpectedException: one argument expected -->
+  <!-- ExpectedException: FuncRound only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

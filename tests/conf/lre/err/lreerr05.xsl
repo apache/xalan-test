@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to put out literal output without a template. -->
   <!-- ExpectedException: Illegal top-level element -->
+  <!-- ExpectedException: out is not allowed in this position in the stylesheet! -->
 
 <out>Data</out>
 

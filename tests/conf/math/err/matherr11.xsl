@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of ceiling() with too many arguments. -->
   <!-- ExpectedException: ceiling() has too many arguments. -->
+  <!-- ExpectedException: FuncCeiling only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

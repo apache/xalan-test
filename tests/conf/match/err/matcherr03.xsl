@@ -9,6 +9,7 @@
   <!-- Purpose: Test for error when xsl:template is nested in another top-level element. -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:template is not allowed inside a template! -->
   <!-- Author: David Marston -->
+  <!-- ExpectedException: xsl:template is not allowed in this position in the stylesheet! -->
 
 <xsl:param name="bad">
   <xsl:template match="letters">

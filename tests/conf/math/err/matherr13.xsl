@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of round() with too many arguments. -->
   <!-- ExpectedException: round() has too many arguments. -->
+  <!-- ExpectedException: FuncRound only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

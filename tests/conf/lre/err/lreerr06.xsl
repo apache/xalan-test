@@ -8,6 +8,7 @@
   <!-- Purpose: Try to put out value of a variable without a template. -->
   <!-- ExpectedException: Illegal top-level element -->
   <!-- Creator: David Marston -->
+  <!-- ExpectedException: out is not allowed in this position in the stylesheet! -->
 
 <xsl:variable name="var" select="Data"/>
 

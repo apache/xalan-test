@@ -9,6 +9,7 @@
   <!-- Purpose: Try to use xsl:template as something other than a top-level element. -->
   <!-- ExpectedException: (StylesheetHandler) xsl:template is not allowed inside a template! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:template is not allowed inside a template! -->
+  <!-- ExpectedException: xsl:template is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="letters">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of floor() with too many arguments. -->
   <!-- ExpectedException: floor() has too many arguments. -->
+  <!-- ExpectedException: FuncFloor only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>
