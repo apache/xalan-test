@@ -10,7 +10,6 @@
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     version="1.0"
-    xmlns:xalan="http://xml.apache.org/xslt"
     xmlns:xf="http://xml.apache.org/cocoon/xmlform/2002">
     
     <xsl:template match="/doc">
