@@ -1,41 +1,41 @@
 <out>
   
-    &alpha;aaa
-    &beta;bbb
-    &gamma;ccc
-    &delta;ddd
-    &epsilon;eee
-    &zeta;fff
-    &eta;ggg
-    &theta;hhh
-    &iota;iii
-    &kappa;jjj
-    &lambda;kkk
-    &mu;lll
-    &nu;mmm
-    &xi;nnn
-    &omicron;ooo
-    &pi;ppp
-    &rho;qqq
-    &sigmaf;rrr
-    &sigma;sss
-    &tau;ttt
-    &upsilon;uuu
-    &phi;vvv
-    &chi;www
-    &psi;xxx
-    &omega;yyy
-    &alpha;&alpha;zzz
-    &alpha;&beta;aab
-    &alpha;&gamma;aac
-    &alpha;&delta;aad
-    &alpha;&epsilon;aae
-    &alpha;&zeta;aaf
-    &alpha;&eta;aag
+    &#945;aaa
+    &#946;bbb
+    &#947;ccc
+    &#948;ddd
+    &#949;eee
+    &#950;fff
+    &#951;ggg
+    &#952;hhh
+    &#953;iii
+    &#954;jjj
+    &#955;kkk
+    &#956;lll
+    &#957;mmm
+    &#958;nnn
+    &#959;ooo
+    &#960;ppp
+    &#961;qqq
+    &#962;rrr
+    &#963;sss
+    &#964;ttt
+    &#965;uuu
+    &#966;vvv
+    &#967;www
+    &#968;xxx
+    &#969;yyy
+    &#945;&#945;zzz
+    &#945;&#946;aab
+    &#945;&#947;aac
+    &#945;&#948;aad
+    &#945;&#949;aae
+    &#945;&#950;aaf
+    &#945;&#951;aag
   
   
-    &alpha;ddd
-    &beta;eee
-    &gamma;fff
+    &#945;ddd
+    &#946;eee
+    &#947;fff
   
 </out>
