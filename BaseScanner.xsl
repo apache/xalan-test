@@ -55,7 +55,7 @@
 
 <xsl:template name="printScannerName">
   <xsl:element name="a">
-    <xsl:attribute name="href"><xsl:text>src/xsl/BaseScanner.xsl</xsl:text></xsl:attribute>
+    <xsl:attribute name="href"><xsl:text>BaseScanner.xsl</xsl:text></xsl:attribute>
     <xsl:text>BaseScanner</xsl:text>
   </xsl:element>
 </xsl:template>

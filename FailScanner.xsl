@@ -26,7 +26,7 @@
 
 <xsl:template name="printScannerName">
   <xsl:element name="a">
-    <xsl:attribute name="href"><xsl:text>src/xsl/FailScanner.xsl</xsl:text></xsl:attribute>
+    <xsl:attribute name="href"><xsl:text>FailScanner.xsl</xsl:text></xsl:attribute>
     <xsl:text>FailScanner</xsl:text>
   </xsl:element>
 </xsl:template>
