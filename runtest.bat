@@ -56,7 +56,12 @@ goto dojardir
 
 :dojardir
 @REM If PARSER_JAR blank, default to xerces
-if "%PARSER_JAR%" == "" set PARSER_JAR=xerces.jar
+set _PARSER_JAR=%PARSER_JAR%
+if "%_PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xerces.jar
+@REM Set other jars by environment variables as well
+if "%_XALAN_JAR%" == "" set _XALAN_JAR=..\java\build\xalan.jar
+if "%_BSF_JAR%" == "" set _BSF_JAR=..\java\bin\bsf.jar
+if "%_JS_JAR%" == "" set _JS_JAR=..\..\js.jar
 
 @REM If JARDIR is blank, assume default Xalan-J 2.x locations
 @REM Note that this will probably fail miserably if you're trying 
@@ -66,7 +71,7 @@ if "%PARSER_JAR%" == "" set PARSER_JAR=xerces.jar
 @REM Note also that this assumes that js.jar is in the directory 
 @REM    above xml-xalan, for lack of a better place
 if "%JARDIR%" == "" echo NOTE! JARDIR is not set, defaulting to Xalan-J 2.x!
-if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;..\java\bin\%PARSER_JAR%;..\java\build\xalan.jar;..\java\bin\bsf.jar;..\..\js.jar;%CLASSPATH%
+if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;%_PARSER_JAR%;%_XALAN_JAR%;%_BSF_JAR%;%_JS_JAR%;%CLASSPATH%
 
 @REM If JARDIR set, put those references first then default classpath
 if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
@@ -92,7 +97,10 @@ echo "%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1
 set TEST_CP=
 set JAVA_EXE=
 set CMDCP=
-set PARSER_JAR=
+set _PARSER_JAR=
+set _XALAN_JAR=
+set _BSF_JAR=
+set _JS_JAR=
 set JAVA_OPTS=%SAVED_JAVA_OPTS%
 if '%END_PKG%' == 'xsl' set END_PKG=
 :end
