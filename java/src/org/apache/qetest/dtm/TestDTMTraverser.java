@@ -226,7 +226,7 @@ static final String[] TYPENAME=
               atNode = at.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
 
-	  // Get a traverser for Preceding:: axis.
+	  // Get a traverser for PRECEDING-SIBLING:: axis.
 	  System.out.println("\n#### PRECEDINGSIBLING from "+"<"+lastNodeName+">");			   
       at = dtm.getAxisTraverser(Axis.PRECEDINGSIBLING);
 
@@ -235,6 +235,14 @@ static final String[] TYPENAME=
               atNode = at.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
 
+	  // Get a traverser for PRECEDINGANDANCESTOR:: axis.
+	  System.out.println("\n#### PRECEDINGANDANCESTOR from "+"<"+lastNodeName+">");			   
+      at = dtm.getAxisTraverser(Axis.PRECEDINGANDANCESTOR);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
       
 	  // Get a traverser for Attribute:: axis.
 	  System.out.println("\n#### ATTRIBUTE from "+"<"+DNodeName+">");			   
@@ -304,9 +312,19 @@ static final String[] TYPENAME=
               atNode = at.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
 
-	  // Get a traverser for ALL:: axis.
-	  // NOTE: Calling first() is a bit irrelvant here.  It will always default to 
-	  //       the root of the tree, regardless of what we pass to first(). 
+	  // Get a traverser for ALLFROMNODE:: axis.
+	  System.out.println("\n#### ALL-FROM-NODE from "+"<"+lastNodeName+">");
+      at = dtm.getAxisTraverser(Axis.ALLFROMNODE);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
+
+	  // ABSOLUTE AXIS TESTS
+	  // These next axis are all Absolute. They all default to the root of the dtm
+	  // tree,  regardless of what we call first() with. 
+	  // Get a traverser for ALL:: axis. 
 	  System.out.println("\n#### ALL(absolute) from "+"<"+dtmRootName+">");
       at = dtm.getAxisTraverser(Axis.ALL);
 
