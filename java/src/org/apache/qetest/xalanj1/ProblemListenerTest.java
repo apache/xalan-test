@@ -91,12 +91,6 @@ import java.util.Properties;
  */
 public class ProblemListenerTest extends XSLProcessorTestBase
 {
-
-    /** Our own copy of a ProblemListener, for diagnostics.  */
-    protected LoggingProblemListener problemListener;
-
-    /** The processor we're testing and attaching the ProblemListener to.  */
-    protected org.apache.xalan.xslt.XSLTEngineImpl processor;
     /**
      * Provides nextName(), currentName() functionality for tests 
      * that may produce any number of output files.
@@ -116,7 +110,7 @@ public class ProblemListenerTest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public ProblemListenerTest()
     {
-        numTestCases = 1;  // REPLACE_num
+        numTestCases = 3;  // REPLACE_num
         testName = "ProblemListenerTest";
         testComment = "Verifying that ProblemListeners function with the processor";
     }
@@ -150,7 +144,18 @@ public class ProblemListenerTest extends XSLProcessorTestBase
         testFileInfo.inputName = testBasePath + "ProblemListenerTest1.xsl";
         testFileInfo.xmlName = testBasePath + "ProblemListenerTest1.xml";
         testFileInfo.goldName = goldBasePath + "ProblemListenerTest1.out";
-        // Create a processor to test with
+        return true;
+    }
+
+
+    /**
+     * set/getProblemListener API Coverage.
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase1()
+    {
+        reporter.testCaseInit("set/getProblemListener API Coverage");
+        XSLTEngineImpl processor = null;
         try
         {
             if ((liaison == null)
@@ -165,26 +170,139 @@ public class ProblemListenerTest extends XSLProcessorTestBase
         }
         catch (Exception e)
         {
-            reporter.checkFail("Could not create processor, threw: " + e.toString());
+            reporter.checkErr("Could not create processor, threw: " + e.toString());
             reporter.logThrowable(Logger.ERRORMSG, e, "Could not create processor");
-            setAbortTest(true);
             return false;
         }        
+
+        // Create the ProblemListener here
+        LoggingProblemListener problemListener = new LoggingProblemListener(reporter);
+        reporter.logTraceMsg("problemListener: " + problemListener.toString());
+        ProblemListener cachePL = null;
+        try
+        {
+            // Save previous problem listener, if any
+            cachePL = processor.getProblemListener(); // SPR SCUU4T9L4D throws npe compatibility
+            reporter.checkPass("getProblemListener is: " + cachePL);
+        } 
+        catch (Throwable t)
+        {
+            reporter.checkErr("getProblemListener threw: " + t.toString());
+            reporter.logThrowable(Logger.ERRORMSG, t, "getProblemListener threw");
+        }
+        // Add our problemListener
+        processor.setProblemListener(problemListener);
+        ProblemListener gotPL = processor.getProblemListener();
+        reporter.checkObject(problemListener, gotPL, "set/getProblemListener API Coverage");
+        
+        String problemReport1 = problemListener.getCounterString();
+        reporter.logInfoMsg("After adding, problemListener reports: " + problemReport1);
+
+        reporter.testCaseClose();
         return true;
     }
 
 
     /**
-     * Basic functionality of a ProblemListener.
+     * Basic functionality of a ProblemListener; message() and error().
      * @return false if we should abort the test; true otherwise
      */
-    public boolean testCase1()
+    public boolean testCase2()
     {
-        reporter.testCaseInit("Basic functionality of a ProblemListener");
+        reporter.testCaseInit("Basic functionality of a ProblemListener; message() and error()");
+        XSLTEngineImpl processor = null;
+        try
+        {
+            if ((liaison == null)
+                || ("".equals(liaison)))
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessor();
+            }
+            else
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
+            }
+        }
+        catch (Exception e)
+        {
+            reporter.checkErr("Could not create processor, threw: " + e.toString());
+            reporter.logThrowable(Logger.ERRORMSG, e, "Could not create processor");
+            return false;
+        }        
 
-        // Create the ProblemListener here, for later use in the testcases
-        problemListener = new LoggingProblemListener();
-        problemListener.setLogger(reporter);
+        // Create the ProblemListener here
+        LoggingProblemListener problemListener = new LoggingProblemListener(reporter);
+        reporter.logTraceMsg("problemListener: " + problemListener.toString());
+
+		// Verify we have no problems or messages yet
+		reporter.check(problemListener.getProblemCtr(), 0, "problemCtr is 0 to start");        
+		reporter.check(problemListener.getMessageCtr(), 0, "messageCtr is 0 to start");        
+
+        // Add problemListener and test individual message(), error() calls
+		int mCtr = problemListener.getMessageCtr();
+        processor.setProblemListener(problemListener);
+        try
+        {
+            processor.message("This is the message()");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("message() should not throw");
+            reporter.logThrowable(Logger.ERRORMSG, t, "message() should not throw threw");
+        }
+        reporter.check(problemListener.getMessageCtr(), (mCtr + 1), "message() logged one message");
+
+		int pCtr = problemListener.getProblemCtr();
+        // Tell the problemListener to never throw exceptions
+		problemListener.setHaltOnError(problemListener.NEVER_HALT);
+        // Tell the problemListener to call checkPass if error() is called
+		problemListener.setExpectProblem(true);
+        try
+        {
+            processor.error("This is the error()");
+            reporter.checkPass("problemListener.error() prevented throwing exception");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("problemListener.error() prevented throwing exception");
+            reporter.logThrowable(Logger.ERRORMSG, t, "problemListener.error() prevented throwing exception threw");
+        }
+        reporter.check(problemListener.getProblemCtr(), (pCtr + 1), "error() logged one problem");
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Basic functionality of a ProblemListener; hearing about xsl problems.
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("Basic functionality of a ProblemListener; hearing about xsl problems");
+        XSLTEngineImpl processor = null;
+        try
+        {
+            if ((liaison == null)
+                || ("".equals(liaison)))
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessor();
+            }
+            else
+            {
+                processor = (XSLTEngineImpl) XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
+            }
+        }
+        catch (Exception e)
+        {
+            reporter.checkErr("Could not create processor, threw: " + e.toString());
+            reporter.logThrowable(Logger.ERRORMSG, e, "Could not create processor");
+            return false;
+        }        
+
+        // Create the ProblemListener here
+        LoggingProblemListener problemListener = new LoggingProblemListener(reporter);
         reporter.logTraceMsg("problemListener: " + problemListener.toString());
 
 		// Verify we have no problems or messages yet
@@ -193,75 +311,33 @@ public class ProblemListenerTest extends XSLProcessorTestBase
 
         try
         {
-            XSLTInputSource xmlSource = new XSLTInputSource(testFileInfo.xmlName);
-            XSLTInputSource xslStylesheet = new XSLTInputSource(testFileInfo.inputName);
-
             // Add our problemListener
             processor.setProblemListener(problemListener);
-            ProblemListener gotPL = processor.getProblemListener();
-            reporter.checkObject(problemListener, gotPL, "set/getProblemListener API Coverage");
-            
             String problemReport1 = problemListener.getCounterString();
             reporter.logInfoMsg("After adding, problemListener reports: " + problemReport1);
 
-            // Now process a stylesheet
+            // Now process a stylesheet with an error
+            // We rely on the problemListener to call check, since 
+            //  we tell it here to expect a problem
 			problemListener.setExpectProblem(true);
             try
             {
+                reporter.logTraceMsg("About to process (xsl with error)(1): " + testFileInfo.inputName);
                 // Use inner try-catch in case it throws an exception anyway
-                processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
+                processor.process(new XSLTInputSource(testFileInfo.xmlName), 
+                                  new XSLTInputSource(testFileInfo.inputName), 
+                                  new XSLTResultTarget(outNames.nextName()));
             }
             catch (Throwable t)
             {
-                reporter.logThrowable(Logger.WARNINGMSG, t, "processing(1) threw:");
+                reporter.logThrowable(Logger.ERRORMSG, t, "processing with ProblemListener(1) threw:");
             }
-
 			problemListener.setExpectProblem(false);
             String problemReport2 = problemListener.getCounterString();
             reporter.logInfoMsg("After running, problemListener reports: " + problemReport2);
             // SPR SCUU4T5QMH This problem listener never got 
             //  got notified of problems in the last process()
             reporter.check(problemReport1.equals(problemReport2), false, "Some problems were found");
-
-            // Remove problemListener and make sure we don't get the problems/messages
-            processor.setProblemListener(null);
-            try
-            {
-               processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
-            }
-            catch (Throwable t)
-            {
-                reporter.logThrowable(Logger.WARNINGMSG, t, "processing(2) threw:");
-            }
-            String problemReport3 = problemListener.getCounterString();
-            reporter.check(problemReport3.equals(problemReport2), true, "Problems not logged when problemListener removed");
-            
-			int mCtr = problemListener.getMessageCtr();
-            try
-            {
-                processor.message("message() causes one message");
-                reporter.check(problemListener.getMessageCtr(), (mCtr + 1), "message() causes one message");
-            }
-            catch (org.xml.sax.SAXException sax)
-            {
-                reporter.logWarningMsg("message() threw: " + sax.toString());
-                reporter.checkFail("message() causes one message");
-            }
-
-			int pCtr = problemListener.getProblemCtr();
-			int prevHalt = problemListener.getHaltOnError();
-			problemListener.setHaltOnError(problemListener.NEVER_HALT);
-            try
-            {
-                processor.error("error() causes one problem");
-                reporter.check(problemListener.getProblemCtr(), (pCtr + 1), "error() causes one problem");
-            }
-            catch (org.xml.sax.SAXException sax)
-            {
-                reporter.logWarningMsg("error() threw: " + sax.toString());
-                reporter.checkFail("error() threw exception when it should not have");
-            }
-			problemListener.setHaltOnError(prevHalt);
 
         } 
         catch (Exception e)
@@ -273,7 +349,6 @@ public class ProblemListenerTest extends XSLProcessorTestBase
         reporter.testCaseClose();
         return true;
     }
-
 
     /**
      * Convenience method to print out usage information - update if needed.  
