@@ -186,6 +186,30 @@ public class FileDatalet implements Datalet
     public void setOptions(Properties p) { options = p; }
 
 
+    /** 
+     * Accessor method for optional properties that are ints.  
+     * Convenience method to take care of parse/cast to int. 
+     *
+     * @param name of property to try to get
+     * @param defValue value if property not available
+     * @return integer value of property, or the default
+     */
+    public int getIntOption(String name, int defValue)
+    {
+        if (null == options)
+            return defValue;
+            
+        try
+        {
+            return Integer.parseInt(options.getProperty(name));
+        }
+        catch (Exception e) 
+        {
+            return defValue;
+        }
+    }
+
+
     /** Description of what this Datalet tests.  */
     protected String description = "FileDatalet: default description";
 
