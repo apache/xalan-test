@@ -103,7 +103,7 @@ public class XSLTestHarness
         return ("XSLTestHarness - execute multiple Tests in sequence and log results:\n"
                 + "    Usage: java XSLTestHarness [-load] properties.prop\n"
                 + "    Reads in all options from a Properties file:\n"
-                + "    " + OPT_TESTS + "=<semicolon;delimited;list;of FQCNs tests to run>\n"
+                + "    " + OPT_TESTS + "=semicolon;delimited;list;of FQCNs tests to run\n"
                 + "    Most other options (in prop file only) are identical to XSLProcessorTestBase:\n"
                 + tmp.usage()
                 );
@@ -239,15 +239,15 @@ public class XSLTestHarness
                 tests[i] = DEFAULT_PACKAGE + s;
             }
         }
-        // Munge the inputDir and goldDir each to be fully qualified for all tests
-        //      This is necessary since they may be specified as relative 
-        //      directories, but we reset the user.dir for each test
+        // Munge the inputDir and goldDir to use platform path 
+        //  separators if needed
+
         String tempS = harnessProps.getProperty(FileBasedTest.OPT_INPUTDIR);
+        tempS = swapPathDelimiters(tempS);
         File tempF = new File(tempS);
         if (tempF.exists())
         {
-            // HACKout what happens if we don't do this?
-            // HACKout harnessProps.put(FileBasedTest.OPT_INPUTDIR, tempF.getAbsolutePath());
+            harnessProps.put(FileBasedTest.OPT_INPUTDIR, tempS);
         }
         else
         {
@@ -255,18 +255,60 @@ public class XSLTestHarness
             return null;
         }
         tempS = harnessProps.getProperty(FileBasedTest.OPT_GOLDDIR);
+        tempS = swapPathDelimiters(tempS);
         tempF = new File(tempS);
         if (tempF.exists())
         {
-            // HACKout what happens if we don't do this?
-            // HACKout harnessProps.put(FileBasedTest.OPT_GOLDDIR, tempF.getAbsolutePath());
+            harnessProps.put(FileBasedTest.OPT_GOLDDIR, tempS);
         }
         else
         {
             System.err.println("WARNING! " + FileBasedTest.OPT_GOLDDIR + " property does not exist! " + tempS);
         }
 
+        // Also swap around path on outputDir, logFile
+        tempS = harnessProps.getProperty(FileBasedTest.OPT_OUTPUTDIR);
+        tempS = swapPathDelimiters(tempS);
+        tempF = new File(tempS);
+        if (tempF.exists())
+        {
+            harnessProps.put(FileBasedTest.OPT_OUTPUTDIR, tempS);
+        }
+        else
+        {
+            System.err.println("WARNING! " + FileBasedTest.OPT_OUTPUTDIR + " property does not exist! " + tempS);
+        }
+
+        tempS = harnessProps.getProperty(Logger.OPT_LOGFILE);
+        tempS = swapPathDelimiters(tempS);
+        harnessProps.put(Logger.OPT_LOGFILE, tempS);
         return tests;
+    }
+
+    /**
+     * Update a path to use system-dependent delimiter.  
+     *
+     * Allow user to specify a system-dependent path in the 
+     * properties file we're loaded from, but then let another 
+     * user run the same files on another environment.
+     *
+     * I'm drawing a complete blank today on the classic way to 
+     * do this, so don't be disappointed if you look at the code 
+     * and it's goofy.
+     */
+    protected String swapPathDelimiters(String s)
+    {
+        if (null == s)
+            return null;
+        // If we're not on Windows, swap an apparent Windows-based 
+        //  backslash separator with a forward slash separator
+        // This is because I'm lazy and checkin .properties files 
+        //  with Windows based paths, but want unix-based people 
+        //  to be able to run the tests as-is
+        if (File.separatorChar != '\\') 
+            return s.replace('\\', File.separatorChar);
+        else
+            return s;
     }
 
     /**
@@ -591,7 +633,7 @@ public class XSLTestHarness
         String tests[] = doTestHarnessInit(args);
         if (tests == null)
         {
-            System.err.println("ERROR is usage: Problem during initialization - no tests!");
+            System.err.println("ERROR in usage: Problem during initialization - no tests!");
             System.err.println(usage());
             return;
         }
