@@ -10,7 +10,7 @@
 <!-- Creator: Gary L Peskin, based on test case from Jens Lautenbacher -->
 <!-- Purpose: Verify that namespace-alias is honored in included stylesheets. -->
 
-   <xsl:include href="namespace113a.xsl"/>
+   <xsl:include href="incnamespace113.xsl"/>
    <xsl:namespace-alias stylesheet-prefix="ixsl" result-prefix="xsl"/>
 
 <xsl:template match="/"> 

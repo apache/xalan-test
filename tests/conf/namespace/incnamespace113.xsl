@@ -3,7 +3,7 @@
      xmlns:ixsl="http://www.w3.org/1999/XSL/TransformAlias"
      xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<!-- FileName: namespace113a -->
+<!-- FileName: incnamespace113 -->
 <!-- Purpose: Included stylesheet for test case namespace113. -->
 
 <xsl:template match="gen_a">
