@@ -1,27 +1,24 @@
-<?xml version="1.0"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-<xsl:output cdata-section-elements="test"/>
-<xsl:output method="html" 
-            doctype-public="-//W3C//DTD HTML 4.0 Transitional"
-			cdata-section-elements="example"/>
 
-
-  <!-- FileName: outp46 -->
+  <!-- FileName: output46 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 16 Output -->
-  <!-- Purpose: All xsl:output elements are merged into a single element.
-       cdata-section-elements will contain the union of the specified values.
-       It is an error if there is more than one such value for an attribute.
-       The processor may signal an error; or recover by using the value
-       that occurs last in the stylesheet.
-       
-       Both example and test should be wrapped by CDATA, and the output should
-       be HTML. -->
+  <!-- Purpose: All xsl:output elements are merged into a single element. While repeats of
+    most attributes are just tested for conflicts, cdata-section-elements will contain the
+    union of the specified values. Both example and test should be wrapped by CDATA, and
+    the output should be XML (since cdata-section-elements only applies to XML). -->
+
+<xsl:output cdata-section-elements="test" encoding="UTF-8" indent="no"/>
+<xsl:output method="xml" cdata-section-elements="example"/>
 
 <xsl:template match="/">
-	<example>&lt;foo></example>
-	<test>]]&gt;</test>
+  <out>
+    <example>&lt;foo></example>
+    <plain>bar &amp; ban</plain>
+    <test>!&gt;</test>
+  </out>
 </xsl:template>
- 
+
 </xsl:stylesheet>

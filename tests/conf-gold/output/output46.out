@@ -1,3 +1,2 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional">
-<example><![CDATA[<foo>]]></example>
-<test><![CDATA[]]]]><![CDATA[>]]></test>
+<?xml version="1.0" encoding="UTF-8"?>
+<out><example><![CDATA[<foo>]]></example><plain>bar &amp; ban</plain><test><![CDATA[!>]]></test></out>
