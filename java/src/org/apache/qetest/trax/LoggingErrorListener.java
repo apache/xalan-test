@@ -304,6 +304,8 @@ public class LoggingErrorListener extends LoggingHandler implements ErrorListene
 
     /**
      * Grab basic info out of a TransformerException.
+     * Worker method to hide implementation; currently just calls 
+     * exception.getMessageAndLocation().
      *
      * @param exception to get information from
      * @return simple string describing the exception (getMessageAndLocation())
@@ -340,7 +342,8 @@ public class LoggingErrorListener extends LoggingHandler implements ErrorListene
         // Also re-throw the exception if asked to
         if ((throwWhen & THROW_ON_WARNING) == THROW_ON_WARNING)
         {
-            throw new TransformerException(exception);
+            // Note: re-throw the SAME exception, not a new one!
+            throw exception;
         }
     }
 
@@ -367,7 +370,8 @@ public class LoggingErrorListener extends LoggingHandler implements ErrorListene
         // Also re-throw the exception if asked to
         if ((throwWhen & THROW_ON_ERROR) == THROW_ON_ERROR)
         {
-            throw new TransformerException(exception);
+            // Note: re-throw the SAME exception, not a new one!
+            throw exception;
         }
     }
 
@@ -396,7 +400,8 @@ public class LoggingErrorListener extends LoggingHandler implements ErrorListene
         // Also re-throw the exception if asked to
         if ((throwWhen & THROW_ON_FATAL) == THROW_ON_FATAL)
         {
-            throw new TransformerException(exception);
+            // Note: re-throw the SAME exception, not a new one!
+            throw exception;
         }
     }
 
