@@ -292,6 +292,7 @@ public class DOMResultAPITest extends XSLProcessorTestBase
             reporter.logThrowable(reporter.ERRORMSG, t,
                                   "Problem with blank results");
         }
+        boolean reusePass = false;
         try
         {
             DOMSource xmlSource = new DOMSource(xmlNode);
@@ -306,22 +307,18 @@ public class DOMResultAPITest extends XSLProcessorTestBase
             serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reuseable1 DOMResult");
             
             // Get a new transformer just to avoid extra complexity
-            reporter.logTraceMsg("About to re-use DOMResult from previous transform as-is");
+            reporter.logTraceMsg("About to re-use DOMResult from previous transform, should throw");
             transformer = templates.newTransformer();
+            reusePass = true; // Next line should throw an exception
             transformer.transform(xmlSource, reuseResult); // SPR SCUU4RJKG4 throws DOM006
-            reuseNode = reuseResult.getNode();
-            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reused1 DOMResult");
-
-            // Reuse again, with the same transformer
-            transformer.transform(xmlSource, reuseResult);
-            reuseNode = reuseResult.getNode();
-            serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reused1 DOMResult again");
+            reporter.checkFail("Re-using DOMResult should have thrown exception", "SCUU4RJKG4");
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with re-using results(1)", "SCUU4RJKG4");
+            reporter.check(reusePass, true, "Re-using DOMResult throws exception properly");
             reporter.logThrowable(reporter.ERRORMSG, t,
-                                  "Problem with re-using results(1)");
+                                  "Re-using DOMResult throws exception properly");
+            reporter.logTraceMsg("@todo Should validate specific kind of error above");
         }
         try
         {
