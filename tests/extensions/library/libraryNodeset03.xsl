@@ -36,59 +36,59 @@
 		</docelem>
 	  </xsl:variable>
 
-	  <xsl:value-of select="xalan:nodeset($rtf)/docelem/elem1"/><xsl:text>&#10;</xsl:text>
+	  <xsl:value-of select="xalan:nodeset($rtf)/default:docelem/default:elem1"/><xsl:text>&#10;</xsl:text>
 
-	  <xsl:for-each select="xalan:nodeset($rtf)/docelem/*">
+	  <xsl:for-each select="xalan:nodeset($rtf)/default:docelem/*">
 		  <xsl:value-of select="name(.)"/><xsl:text>,</xsl:text>
 	  </xsl:for-each><xsl:text>&#10;</xsl:text>
 	   
-	  <xsl:for-each select="xalan:nodeset($rtf)/docelem/elem2/*">
+	  <xsl:for-each select="xalan:nodeset($rtf)/default:docelem/default:elem2/*">
 		  <xsl:value-of select="name(.)"/><xsl:text>,</xsl:text>
 	  </xsl:for-each><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>Apply-templates match=elem4: </xsl:text>
-	  <xsl:apply-templates select="xalan:nodeset($rtf)/docelem/elem4"/>
+	  <xsl:apply-templates select="xalan:nodeset($rtf)/default:docelem/default:elem4"/>
 
 	  <xsl:text>Sum: </xsl:text> 	  
-	  <xsl:value-of select="sum(xalan:nodeset($rtf)/docelem/elem3)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:value-of select="sum(xalan:nodeset($rtf)/default:docelem/default:elem3)"/><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>Count: </xsl:text> 	  
-	  <xsl:value-of select="count(xalan:nodeset($rtf)/docelem/elem3)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:value-of select="count(xalan:nodeset($rtf)/default:docelem/default:elem3)"/><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>Number: </xsl:text> 	  
-	  <xsl:value-of select="number(xalan:nodeset($rtf)/docelem/elem3[2])"/><xsl:text>&#10;</xsl:text>
+	  <xsl:value-of select="number(xalan:nodeset($rtf)/default:docelem/default:elem3[2])"/><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>Name: </xsl:text>  
 	  <xsl:value-of select="name(xalan:nodeset($rtf)/*)"/><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>generate-id: </xsl:text>  
-	  <xsl:value-of select="generate-id(xalan:nodeset($rtf)/docelem/elem4)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:value-of select="generate-id(xalan:nodeset($rtf)/default:docelem/default:elem4)"/><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>Local-name: </xsl:text>
 	  <xsl:value-of select="local-name(xalan:nodeset($rtf)/*)"/><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>Namespace-uri: </xsl:text>
-	  <xsl:value-of select="namespace-uri(xalan:nodeset($rtf)/docelem)"/>,
+	  <xsl:value-of select="namespace-uri(xalan:nodeset($rtf)/default:docelem)"/>,
 	  <xsl:value-of select="namespace-uri(xalan:nodeset($rtf)/default:docelem/default:elem1)"/>,
 	  <xsl:value-of select="namespace-uri(xalan:nodeset($rtf)/default:docelem/test:elem3)"/>: <xsl:value-of select="(xalan:nodeset($rtf)/default:docelem/test:elem3)"/>
 
 	  <xsl:text>&#10;</xsl:text>
 	  <xsl:text>&#10;</xsl:text>
 	  <xsl:text>xsl:copy-of($rtf): &#10; </xsl:text>
-	  <xsl:copy-of select="xalan:nodeset($rtf)/docelem"/><xsl:text>&#10;</xsl:text>
+	  <xsl:copy-of select="xalan:nodeset($rtf)/default:docelem"/><xsl:text>&#10;</xsl:text>
 
 	  <xsl:text>&#10;</xsl:text>
 	  <xsl:text>xsl:copy-of(elem1b): &#10; </xsl:text>
-	  <xsl:copy-of select="xalan:nodeset($rtf)/docelem/elem1/elem1b"/><xsl:text>&#10;</xsl:text>
+	  <xsl:copy-of select="xalan:nodeset($rtf)/default:docelem/default:elem1/default:elem1b"/><xsl:text>&#10;</xsl:text>
 	  
 	  <xsl:text>&#10;</xsl:text>
 	  <xsl:text>xsl:copy-of(test:elem3): &#10; </xsl:text>
-	  <xsl:copy-of select="xalan:nodeset($rtf)/docelem/test:elem3"/><xsl:text>&#10;</xsl:text>
+	  <xsl:copy-of select="xalan:nodeset($rtf)/default:docelem/test:elem3"/><xsl:text>&#10;</xsl:text>
 
    </out>
 </xsl:template>
 
-<xsl:template match="elem4">
+<xsl:template match="default:elem4">
 	  <xsl:value-of select="."/>,
 </xsl:template>
   
