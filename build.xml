@@ -48,22 +48,22 @@
     <property name="debug" value="on"/>
 
     <!-- Specific locations related to building test code/docs -->
-    <property name="src.dir" value="java/src"/>
+    <property name="test.src.dir" value="java/src"/>
     <property name="test.root" value="org/apache/qetest/"/>
-    <property name="test.dir" value="${src.dir}/${test.root}"/>
-    <property name="build.dir" value="java/build"/>
-    <property name="build.docs" value="${build.dir}/docs"/>
-    <property name="build.apidocs" value="${build.docs}/apidocs"/>
+    <property name="test.dir" value="${test.src.dir}/${test.root}"/>
+    <property name="test.build.dir" value="java/build"/>
+    <property name="test.build.docs" value="${test.build.dir}/docs"/>
+    <property name="test.build.apidocs" value="${test.build.docs}/apidocs"/>
     <property name="testxsl.jar.name" value="${name}.jar"/>
     <property name="qetest.jar.name" value="qetest.jar"/>
-    <property name="testxsl.jar" value="${build.dir}/${testxsl.jar.name}"/>
-    <property name="qetest.jar" value="${build.dir}/${qetest.jar.name}"/>
+    <property name="testxsl.jar" value="${test.build.dir}/${testxsl.jar.name}"/>
+    <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
 
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
-    <property name="xalan.reldir" value="../java"/>
-    <property name="xalan.bin.dir" value="${xalan.reldir}/bin"/> 
-    <property name="xalan.build.dir" value="${xalan.reldir}/build"/> 
-    <property name="xalan.xdocs.dir" value="${xalan.reldir}/xdocs"/>
+    <property name="xalan.relpath" value="../java"/>
+    <property name="xalan.bin.dir" value="${xalan.relpath}/bin"/> 
+    <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
+    <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/>
     <property name="xalan.generator.styletargz" value="${xalan.xdocs.dir}/xml-site-style.tar.gz"/>
 
     <!-- Various names/locations of dependent jars -->
@@ -83,7 +83,7 @@
     <property name="test.xdocs.book" value="${test.xdocs.dir}/sources/xalantest.xml"/>
     <property name="test.xdocs.style" value="${test.xdocs.dir}/style"/>
     <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
-    <path id="docs.class.path">
+    <path id="test.docs.class.path">
         <pathelement location="${bsf.jar}" />
         <pathelement location="${stylebook.jar}" />
         <pathelement location="${doclet.jar}" />
@@ -150,7 +150,7 @@
                  is checked in: normally at runtime, it should come 
                  from the testxsl.jar file instead of below.
            -->
-            <pathelement location="${src.dir}" />
+            <pathelement location="${test.src.dir}" />
             <pathelement location="${testxsl.jar}" />
         </classpath>
     </taskdef>
@@ -170,10 +170,10 @@
     <target name="init.build" depends="init.test"
         description="Prepare build output tree, copy prebuilts">
         <echo message="JVM Classpath is ${java.class.path}" />
-        <mkdir dir="${build.dir}" />
-        <mkdir dir="${build.dir}/${test.root}" />
+        <mkdir dir="${test.build.dir}" />
+        <mkdir dir="${test.build.dir}/${test.root}" />
         <!-- Also copy over precompiled external processor wrapper classes -->
-        <copy todir="${build.dir}/${test.root}/xslwrapper" >
+        <copy todir="${test.build.dir}/${test.root}/xslwrapper" >
             <fileset dir="${test.dir}xslwrapper">
                 <include name="**/*.class" />
                 <include name="**/*.properties" />
@@ -183,7 +183,7 @@
          
     <target name="init.docs" depends="init.build"
         description="Prepare output tree for documentation">
-        <mkdir dir="${build.apidocs}" />
+        <mkdir dir="${test.build.apidocs}" />
         <!-- Copy the Xalan-specific version of doc files and untargz them -->
         <gunzip src="${xalan.generator.styletargz}" dest="${test.generator.styletar}"/>
         <untar src="${test.generator.styletar}" dest="${test.xdocs.dir}"/>
@@ -307,7 +307,10 @@
     <target name="smoketest" 
             description="Run the Xalan-J 2.x Smoketest"
             depends="minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
-        <echo message="About to execute the Minitest..." />
+    </target>
+    <target name="smoketest.gump" 
+            description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies"
+            depends="jar,minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass,smoketest-results-dist">
     </target>
 
     <target name="smoketest-execute">
@@ -345,13 +348,21 @@
         <echo message=" [minitest] See details in ${smoketest.api.logFile}" />
     </target>
 
+    <target name="smoketest-results-dist" if="smoketest.results.dist" depends="init.test">
+        <!-- Create a cheap .zip file of just the results from the smoketest -->
+        <zip zipfile="${test.build.dir}/smoketest-results-${DSTAMP}.zip" 
+             includes="xml-xalan/test/smoketest/"
+             basedir="../.."
+             />
+    </target>
+
     <!-- ================================================================== -->
     <!-- Build Tests: Compile/jar targets for each 'layer' of testing code  -->
     <!-- ================================================================== -->
     <target name="compile.qetest" depends="init.build"
         description="Compile base qetest files; no Xalan dependencies">
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}*.java" 
                debug="${debug}" />
     </target>
@@ -359,7 +370,7 @@
     <target name="jar.qetest" depends="compile.qetest"
         description="Jar base qetest files; no Xalan dependencies">
         <jar jarfile="${qetest.jar}" 
-             basedir="${build.dir}" 
+             basedir="${test.build.dir}" 
              includes="${test.root}*.java,${test.root}*.properties" />
     </target>
 
@@ -372,13 +383,13 @@
         description="Compile TransformWrapper and associated classes">
         <!-- This javac has no dependencies -->
         <!-- @deprecated ProcessorWrapper.java to be removed! -->
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}xslwrapper/ProcessorWrapper.java,${test.root}xslwrapper/TransformWrapperHelper.java,${test.root}xslwrapper/TransformWrapper.java,${test.root}xslwrapper/TransformWrapperFactory.java"
                debug="${debug}" />
         <!-- This javac depends on JAXP, SAX, DOM; hence the specific classpathref -->
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}xsl/*.java"
                debug="${debug}" 
                classpathref="compiletest.class.path" />
@@ -387,8 +398,8 @@
     <target name="compile.trax.xslwrappers" depends="compile.xsl"
         description="Compile Trax*Wrapper xslwrappers only">
         <!-- Should only be dependent on JAXP, not Xalan specifically -->
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
@@ -398,23 +409,23 @@
         description="Compile various JAXP-based API tests">
         <!-- Should only be dependent on JAXP, not Xalan specifically -->
         <!-- Separate javac steps to avoid compiler oddities -->
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}trax/*.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}trax/stream/*.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}trax/dom/*.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}trax/sax/*.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
@@ -422,8 +433,8 @@
 
     <target name="compile" depends="compile.trax">
         <echo message="Compile Xalan-J 2.x specific tests" />
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}xalanj2/*.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
@@ -432,13 +443,13 @@
     <target name="jar" depends="compile"
         description="Build testxsl.jar with all available tests">
         <jar jarfile="${testxsl.jar}" 
-             basedir="${build.dir}" 
+             basedir="${test.build.dir}" 
              includes="**/*.class,**/*.properties" />
     </target>
 
     <target name="clean"
         description="Clean up the compiled tests and docs">
-        <delete dir="${build.dir}"/>
+        <delete dir="${test.build.dir}"/>
         <delete dir="${xdocs.style}"/> <!-- init.build.docs creates this tree -->
     </target>
 
@@ -450,8 +461,8 @@
         description="Build the framework/overview docs for tests">
         <java fork="yes" 
             classname="${doc.generator}" 
-            classpathref="docs.class.path" >
-            <arg line="targetDirectory=${build.docs} ${test.xdocs.book} ${test.xdocs.style}"/>
+            classpathref="test.docs.class.path" >
+            <arg line="targetDirectory=${test.build.docs} ${test.xdocs.book} ${test.xdocs.style}"/>
         </java>	 
     </target>
 
@@ -465,7 +476,7 @@
         <!-- But: Ant 1.3 fails if you *don't* provide destdir attr... curcuru-->    
         <javadoc
              classpath="${java.class.path};${xalan.jar}"
-             sourcepath="${src.dir}"
+             sourcepath="${test.src.dir}"
              packagenames="${javadocs.packages}"
              protected="true"
              author="true"
@@ -474,9 +485,9 @@
              windowtitle="${Name}" 
              doctitle="${Name}"
              bottom="${copyright}"
-             destdir="${build.apidocs}">
+             destdir="${test.build.apidocs}">
                <doclet name="xalanjdoc.Standard" path="${doclet.jar}">
-                  <param name="-d" value="${build.apidocs}"/>
+                  <param name="-d" value="${test.build.apidocs}"/>
                </doclet>             
         </javadoc>
     </target>
@@ -489,13 +500,13 @@
         description="Build a simple distribution module">
         <echo message="Subject to change! Just a simple way to zip it all up for now" />
         <!-- Zip just the xml/xsl/out test files -->
-        <zip zipfile="${build.dir}/xalan-tests-${DSTAMP}.zip" 
+        <zip zipfile="${test.build.dir}/xalan-tests-${DSTAMP}.zip" 
              excludes="**/*.zip"
              includes="test/tests/"
              basedir=".."
              />
         <!-- Zip the automation and batch files, etc. -->
-        <zip zipfile="${build.dir}/xalan-automation-${DSTAMP}.zip" 
+        <zip zipfile="${test.build.dir}/xalan-automation-${DSTAMP}.zip" 
              excludes="**/*.zip"
              includes="test/*.*,test/java/"
              basedir=".." 
@@ -522,8 +533,8 @@
     </path>
     <target name="compile.xsltc.xslwrappers" depends="compile.xsl"
         description="Compile Xsltc*Wrapper xslwrappers only">
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}xslwrapper/Xsltc*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
                debug="${debug}">
             <classpath refid="xsltc.class.path" />
@@ -532,8 +543,8 @@
 
     <target name="compile.xsltc" depends="compile.xsltc.xslwrappers"
         description="Compile xsltc native API tests only">
-        <javac srcdir="${src.dir}" 
-               destdir="${build.dir}" 
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.build.dir}" 
                includes="${test.root}xsltc/*.java"
                debug="${debug}">
             <classpath refid="xsltc.class.path" />
@@ -542,8 +553,8 @@
 
     <target name="jar.xsltc" depends="compile.xsltc"
         description="Build testxsl.jar with xsltc-specific tests">
-        <jar jarfile="${build.dir}/${testxsl.jar.name}" 
-             basedir="${build.dir}" 
+        <jar jarfile="${test.build.dir}/${testxsl.jar.name}" 
+             basedir="${test.build.dir}" 
              includes="**/*.class,**/*.properties" />
     </target>
 
