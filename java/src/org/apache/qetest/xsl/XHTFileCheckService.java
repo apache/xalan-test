@@ -195,9 +195,18 @@ public class XHTFileCheckService implements CheckService
         {
             pw.println("XHTFileCheckService whitespace diff warning!");
             pw.flush();
-            reporter.checkFail(msg, id);
-
-            return Reporter.FAIL_RESULT;
+            if (allowWhitespaceDiff)
+            {
+                reporter.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, passing!");
+                reporter.checkPass(msg, id);
+                return Reporter.PASS_RESULT;
+            }
+            else
+            {
+                reporter.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, failing!");
+                reporter.checkFail(msg, id);
+                return Reporter.FAIL_RESULT;
+            }
         }
         else
         {
@@ -252,6 +261,34 @@ public class XHTFileCheckService implements CheckService
     public String getDescription()
     {
         return ("Uses an XML/HTML/Text diff comparator to check or diff two files.");
+    }
+
+    /**
+     * Whether whitespace differences will cause a fail or not.  
+     * setFeature("allow-whitespace-diff", "true"|"false")
+     * true=whitespace-only diff will pass;
+     * false, whitespace-only diff will fail
+     */
+    protected boolean allowWhitespaceDiff = false;  // default; backwards compatible
+
+    /**
+     * Set a custom option or feature.  
+     * @param feature name
+     * @param feature value
+     */
+    public void setFeature(String name, String value)
+    {
+        if ("allow-whitespace-diff".equals(name))
+        {
+            if ("true".equals(value) || "yes".equals(value))
+            {
+                allowWhitespaceDiff = true;
+            }
+            else if ("false".equals(value) || "no".equals(value))
+            {
+                allowWhitespaceDiff = false;
+            }
+        }
     }
 }  // end of class XHTFileCheckService
 
