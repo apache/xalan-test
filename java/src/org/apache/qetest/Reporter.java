@@ -817,6 +817,8 @@ public class Reporter implements Logger
      * Calls back into a Test to run test cases in order.
      * <p>Use reflection to call back and execute each testCaseXX method
      * in the calling test in order, catching exceptions along the way.</p>
+     * //@todo rename to 'executeTestCases' or something
+     * //@todo implement options: either an inclusion or exclusion list
      * @author Shane Curcuru
      * @param testObject the test object itself.
      * @param numTestCases number of consecutively numbered test cases to execute.
@@ -887,6 +889,24 @@ public class Reporter implements Logger
                 logThrowable(ERRORMSG, t, tmpErrString);
             }  // end of catch
         }  // end of for
+
+        // Convenience functionality: remind user if they appear to 
+        //  have set numTestCases too low 
+        try
+        {  
+            // Get a reference to the *next* test case after numTestCases
+            int moreTestCase = numTestCases + 1;
+            currTestCase = testClass.getMethod("testCase" + moreTestCase, noParams);
+
+            // If we get here, we found another testCase - warn the user
+            logWarningMsg("executeTests: extra testCase"+ moreTestCase
+                          + " found, perhaps numTestCases is too low?");
+        }
+        catch (Throwable t)
+        {
+            // Ignore errors: we don't care, since they didn't 
+            //  ask us to look for this method anyway
+        }
 
         // Return true only if everything passed
         if (testResult == PASS_RESULT)
