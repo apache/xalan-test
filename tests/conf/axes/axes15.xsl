@@ -16,11 +16,13 @@
        <xsl:text>
 ------------------------------------------------
 </xsl:text>
-       <xsl:text>From </xsl:text>
+<xsl:variable name="ename">
+       <xsl:text>From-</xsl:text>
        <xsl:value-of select="name()"/>
-       <xsl:text>: 
-</xsl:text>
+</xsl:variable>
+<xsl:element name="{$ename}"><xsl:text>&#10;</xsl:text>
        <xsl:call-template name="show-four-directions"/>
+</xsl:element>
     </xsl:for-each>
   </out>
 </xsl:template>
