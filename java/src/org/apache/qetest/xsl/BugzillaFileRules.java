@@ -216,8 +216,17 @@ public class BugzillaFileRules implements FilenameFilter
             return false;
 
         File file = new File(dir, name);
-        // Skip any dirs or non-matching names
-        if (file.isDirectory() || !(name.toLowerCase().startsWith(dir.getName().toLowerCase())))
+        // Skip any dirs
+        if (file.isDirectory())
+            return false;
+    
+        // Only accept files that start with 'bugzilla'
+        // HACK: we should really look at the last part of the 
+        //  directory name here, but in this one case it's much 
+        //  easier to just hard-code the name (this is in 
+        //  response to specifying inputDir=tests/bugzilla 
+        //  on a Windows platform)
+        if (!(name.toLowerCase().startsWith("bugzilla")))
             return false;
             
         // Accept any .java files
@@ -236,6 +245,5 @@ public class BugzillaFileRules implements FilenameFilter
             
         // Fall-through: doesn't match, return false
         return false;
-           
     }
 }
