@@ -122,7 +122,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public TransformerFactoryAPITest()
     {
-        numTestCases = 6;  // REPLACE_num
+        numTestCases = 7;  // REPLACE_num
         testName = "TransformerFactoryAPITest";
         testComment = "API Coverage test for TransformerFactory class of TRAX";
     }
@@ -437,7 +437,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.checkErr("Coverage of get/setURIResolver threw: " + t.toString());
             reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setURIResolver threw:");
         }
-        reporter.logStatusMsg("@todo feature testing for URIResolver");
+        reporter.logStatusMsg("//@todo feature testing for URIResolver: see URIResolverTest.java");
 
         try
         {
@@ -472,7 +472,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.checkErr("Coverage of get/setErrorListener threw: " + t.toString());
             reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setErrorListener threw:");
         }
-        reporter.logStatusMsg("@todo feature testing for ErrorListener");
+        reporter.logStatusMsg("//@todo feature testing for ErrorListener: see ErrorListenerAPITest.java, ErrorListenerTest.java");
 
         reporter.testCaseClose();
         return true;
@@ -562,6 +562,89 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.checkErr("Miscellaneous getAssociatedStylesheets tests threw: " + t.toString());
             reporter.logThrowable(reporter.STATUSMSG, t, "Miscellaneous getAssociatedStylesheets tests threw");
         }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Coverage tests for getFeature, set/getAttribute API's.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase7()
+    {
+        reporter.testCaseInit("Coverage tests for getFeature, set/getAttribute API's");
+        // This test case should be JAXP-generic, and must not rely on Xalan-J 2.x functionality
+        reporter.logInfoMsg("Note: only simple validation: most are negative tests");
+        TransformerFactory factory = null;
+        final String BOGUS_NAME = "fnord:this/feature/does/not/exist";
+
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            try
+            {
+                reporter.logStatusMsg("Calling: factory.getFeature(BOGUS_NAME)");
+                boolean b = factory.getFeature(BOGUS_NAME);
+                reporter.checkPass("factory.getFeature(BOGUS_NAME) did not throw exception");
+                reporter.logStatusMsg("factory.getFeature(BOGUS_NAME) = " + b);
+            }
+            catch (IllegalArgumentException iae1)
+            {
+                // This isn't documented, but is what I might expect
+                reporter.checkPass("factory.getFeature(BOGUS_NAME) threw expected IllegalArgumentException");
+            }
+
+            try
+            {
+                reporter.logStatusMsg("Calling: factory.setAttribute(BOGUS_NAME,...)");
+                factory.setAttribute(BOGUS_NAME, "on");
+                reporter.checkFail("factory.setAttribute(BOGUS_NAME,...) did not throw expected exception");
+            }
+            catch (IllegalArgumentException iae2)
+            {
+                reporter.checkPass("factory.setAttribute(BOGUS_NAME,...) threw expected IllegalArgumentException");
+            }
+
+            try
+            {
+                reporter.logStatusMsg("Calling: factory.getAttribute(BOGUS_NAME)");
+                Object o = factory.getAttribute(BOGUS_NAME);
+                reporter.checkFail("factory.getAttribute(BOGUS_NAME) did not throw expected exception");
+                reporter.logStatusMsg("factory.getAttribute(BOGUS_NAME) = " + o);
+            }
+            catch (IllegalArgumentException iae3)
+            {
+                reporter.checkPass("factory.getAttribute(BOGUS_NAME) threw expected IllegalArgumentException");
+            }
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("getFeature/Attribute() tests threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "getFeature/Attribute() tests threw");
+        }
+
+        try
+        {
+            reporter.logWarningMsg("Note testing assumption: all factories must support Streams");
+            factory = TransformerFactory.newInstance();
+            reporter.logStatusMsg("Calling: factory.getFeature(StreamSource.FEATURE)");
+            boolean b = factory.getFeature(StreamSource.FEATURE);
+            reporter.check(b, true, "factory.getFeature(StreamSource.FEATURE)");
+
+            reporter.logStatusMsg("Calling: factory.getFeature(StreamResult.FEATURE)");
+            b = factory.getFeature(StreamResult.FEATURE);
+            reporter.check(b, true, "factory.getFeature(StreamResult.FEATURE)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("getFeature/Attribute()2 tests threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "getFeature/Attribute()2 tests threw");
+        }
+
+
 
         reporter.testCaseClose();
         return true;
