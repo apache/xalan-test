@@ -641,6 +641,10 @@ public class FileTestletDriver extends XSLProcessorTestBase
     protected String getDefaultTestlet()
     { return "org.apache.qetest.FileTestlet"; }
 
+    /** Default list of packages to search for classes.   */
+    protected String[] getDefaultPackages()
+    { return QetestUtils.defaultPackages; }
+
     /** Cached Testlet Class; used for life of this test.   */
     protected Class cachedTestletClazz = null;
 
@@ -657,7 +661,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
         if (null == cachedTestletClazz)
         {
             cachedTestletClazz = QetestUtils.testClassForName(testlet, 
-                                                              QetestUtils.defaultPackages,
+                                                              getDefaultPackages(),
                                                               getDefaultTestlet());
         }
         try
@@ -686,7 +690,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
     {
         // Find a FilenameFilter class to use
         Class clazz = QetestUtils.testClassForName(dirFilter, 
-                                                   QetestUtils.defaultPackages,
+                                                   getDefaultPackages(),
                                                    getDefaultDirFilter());
         try
         {
@@ -731,7 +735,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
     {
         // Find a FilenameFilter class to use
         Class clazz = QetestUtils.testClassForName(fileFilter, 
-                                                   QetestUtils.defaultPackages,
+                                                   getDefaultPackages(),
                                                    getDefaultFileFilter());
         try
         {
