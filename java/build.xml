@@ -153,8 +153,10 @@
                destdir="${build.dir}" 
                includes="TraxWrapper.java"
                debug="${debug}" />
+        <echo message="Do just base trax directory first" />
         <javac srcdir="${test.dir}/trax" 
                destdir="${build.dir}" 
+               includes="*.java" 
                debug="${debug}" />
         <echo message="Do [dom|sax|stream] subdirectories as well" />
         <javac srcdir="${test.dir}/trax/stream" 
