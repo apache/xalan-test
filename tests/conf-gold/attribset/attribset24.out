@@ -1,4 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<root xmlns:bdd="http://bdd.test.com" xmlns:ped="http://ped.test.com">
-<Out xmlns:xyz="http://ped.test.com" xyz:Attr1="YoBaby" bdd:Attr2="jaminben"/>
-</root>
+<out xmlns:bdd="http://bdd.test.com"><jam xmlns:bdd="http://xyz.com" bdd:attr="jaminben"/></out>
