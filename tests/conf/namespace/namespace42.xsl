@@ -6,9 +6,10 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.2 Creating Elements -->
   <!-- Creator: Scott Boag -->
-  <!-- Purpose: Test to make sure xsl:attribute isn't added to the containing element when an xsl:element is ignored. -->
-  <!-- Should see a warning that xyz:foo was not created.
-     The <yyy/> element is placed directly within out, but the attribute isn't. -->
+  <!-- Purpose: Test to make sure xsl:attribute isn't added to the containing 
+       element when an xsl:element is ignored. Should see a warning that xyz:foo 
+       was not created.	The <yyy/> element is placed directly within out, but the 
+       attribute isn't. -->
 
 <xsl:template match = "/">
   <out>
