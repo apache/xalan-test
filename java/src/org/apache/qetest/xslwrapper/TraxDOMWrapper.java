@@ -55,27 +55,25 @@
  * <http://www.apache.org/>.
  */
 package org.apache.qetest.xslwrapper;
-import org.apache.qetest.QetestUtils;
+import java.util.Hashtable;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
+import org.apache.qetest.QetestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
-
-import java.util.Hashtable;
-import java.util.Properties;
 
 /**
  * Implementation of TransformWrapper that uses the TrAX API and 

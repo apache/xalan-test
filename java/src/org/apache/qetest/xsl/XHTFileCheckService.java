@@ -62,16 +62,17 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.*;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
+
+import org.apache.qetest.CheckService;
+import org.apache.qetest.ConsoleLogger;
+import org.apache.qetest.Logger;
+import org.apache.qetest.XMLFileLogger;
 
 /**
  * Uses an XML/HTML/Text diff comparator to check or diff two files.

@@ -61,17 +61,17 @@
  *
  */
 package org.apache.qetest.xsl;
-import org.apache.qetest.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.Reporter;
 
 //-------------------------------------------------------------------------
 

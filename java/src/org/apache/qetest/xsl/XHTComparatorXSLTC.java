@@ -57,39 +57,12 @@
 
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.Logger;  // Only for PASS_RESULT, etc.
-import org.apache.qetest.QetestUtils;
-
 import java.io.PrintWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.BufferedReader;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-
 import java.util.Vector;
-import java.util.Properties;
-import java.util.StringTokenizer;
 
-// DOM imports
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Text;
-
-// Needed JAXP classes
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-// SAX2 imports
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import org.w3c.dom.Node;
 
 /**
  * Defines XSLTC's XML/HTML/Text diff comparator to check or diff two files.

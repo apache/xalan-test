@@ -62,58 +62,51 @@
  */
 package org.apache.qetest.trax;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Properties;
 
-// Import all relevant TRAX packages
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
-
-// Use Xalan's own serializers for SAX ContentHandler output
-import org.apache.xalan.serialize.SerializerFactory;
-import org.apache.xalan.serialize.Serializer;
-import org.apache.xalan.templates.OutputProperties;
-
-// Needed SAX, DOM, JAXP classes
-// Needed SAX classes
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.Parser;
-import org.xml.sax.helpers.ParserAdapter;
-import org.xml.sax.XMLReader;
-import org.xml.sax.XMLFilter;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.ext.DeclHandler;
-
-// Needed DOM classes
-import org.w3c.dom.Node;
-
-// Needed JAXP classes
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
-import java.io.BufferedInputStream;    // dml
-// java classes
-import java.io.File;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-// import java.io.FileReader; @DEM - changes for better encoding support
-import java.io.InputStreamReader;  //@DEM
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-
-import java.util.Properties;
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xalan.serialize.Serializer;
+import org.apache.xalan.serialize.SerializerFactory;
+import org.apache.xalan.templates.OutputProperties;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLFilter;
+import org.xml.sax.XMLReader;
 
 //-------------------------------------------------------------------------
 

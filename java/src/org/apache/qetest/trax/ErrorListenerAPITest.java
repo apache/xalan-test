@@ -62,20 +62,12 @@
  */
 package org.apache.qetest.trax;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
+import java.util.Properties;
 
-// Import all relevant TRAX packages
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
-// java classes
-import java.io.File;
-import java.util.Properties;
+import org.apache.qetest.FileBasedTest;
 
 //-------------------------------------------------------------------------
 

@@ -57,14 +57,11 @@
 
 package org.apache.qetest;
 
-///import org.apache.qetest.xsl.XSLProcessorTestBase;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
 /**

@@ -62,8 +62,6 @@
  */
 package org.apache.qetest.xsl;
 import org.apache.qetest.Logger;
-import org.apache.qetest.CheckService;
-import org.apache.qetest.xsl.StylesheetDatalet;
 
 
 /**

@@ -64,12 +64,8 @@ package org.apache.qetest;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
 //-------------------------------------------------------------------------
 

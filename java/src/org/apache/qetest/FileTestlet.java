@@ -58,7 +58,6 @@
 package org.apache.qetest;
 
 import java.io.File;
-import java.util.Hashtable;
 
 /**
  * Testlet superclass for testing URI or file based resources.

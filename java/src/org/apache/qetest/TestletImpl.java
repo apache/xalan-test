@@ -62,7 +62,7 @@
  */
 package org.apache.qetest;
 
-import java.lang.reflect.Constructor;
+
 
 /**
  * Simple implementation of a testlet, a sort of mini-test.

@@ -62,23 +62,11 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.CheckService;
+import java.io.File;
+import java.lang.reflect.Method;
+
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
-import org.apache.qetest.QetestUtils;
-import org.apache.qetest.TestletImpl;
-import org.apache.qetest.xsl.StylesheetDatalet;
-import org.apache.qetest.xsl.StylesheetTestlet;
-import org.apache.qetest.xsl.XHTFileCheckService;
-import org.apache.qetest.xslwrapper.TransformWrapper;
-import org.apache.qetest.xslwrapper.TransformWrapperFactory;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.util.Hashtable;
 
 /**
  * Testlet for testing xsl stylesheet extensions.  

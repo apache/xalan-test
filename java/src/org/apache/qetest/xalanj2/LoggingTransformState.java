@@ -62,23 +62,20 @@
  */
 package org.apache.qetest.xalanj2;
 
-import org.apache.qetest.*;
-import java.io.IOException;
+import java.lang.reflect.Method;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.apache.xalan.templates.ElemTemplateElement;
+import org.apache.qetest.Logger;
+import org.apache.qetest.LoggingHandler;
 import org.apache.xalan.templates.ElemLiteralResult;
-import org.apache.xalan.transformer.TransformerClient;
+import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.transformer.TransformState;
+import org.apache.xalan.transformer.TransformerClient;
 import org.apache.xpath.XPath;
 import org.w3c.dom.Node;
-
-import java.lang.reflect.Method;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 
 /**

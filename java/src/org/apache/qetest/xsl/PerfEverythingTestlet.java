@@ -61,14 +61,17 @@
  *
  */
 package org.apache.qetest.xsl;
-import org.apache.qetest.*;
-import org.apache.qetest.xslwrapper.TransformWrapper;
-import org.apache.qetest.xslwrapper.TransformWrapperFactory;
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Hashtable;
+
+import org.apache.qetest.CheckService;
+import org.apache.qetest.Datalet;
+import org.apache.qetest.Logger;
+import org.apache.qetest.TestletImpl;
+import org.apache.qetest.xslwrapper.TransformWrapper;
+import org.apache.qetest.xslwrapper.TransformWrapperFactory;
 
 /**
  * Testlet to capture specific timing performance data.

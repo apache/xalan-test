@@ -57,9 +57,9 @@
 
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.Datalet;
-import org.apache.qetest.Logger;
 import java.io.File;
+
+import org.apache.qetest.Datalet;
 
 /**
  * Testlet for conformance testing of xsl stylesheet files using 

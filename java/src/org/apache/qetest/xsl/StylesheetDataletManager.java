@@ -57,17 +57,14 @@
 
 package org.apache.qetest.xsl;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-
-// java classes
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.Vector;
+
+import org.apache.qetest.Logger;
 
 /**
  * Simple services for getting lists of StylesheetDatalets.

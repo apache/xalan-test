@@ -55,14 +55,12 @@
  * <http://www.apache.org/>.
  */
 package org.apache.qetest.xslwrapper;
-import org.apache.qetest.QetestUtils;
-
-import org.apache.xalan.xslt.Process;
-
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
+import org.apache.qetest.QetestUtils;
 
 /**
  * Implementation of TransformWrapper that calls Xalan's default 

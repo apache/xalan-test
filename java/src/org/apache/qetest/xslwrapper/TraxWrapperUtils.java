@@ -56,15 +56,15 @@
  */
 package org.apache.qetest.xslwrapper;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
-import javax.xml.transform.ErrorListener;
-
 import java.lang.reflect.Field;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
+
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
 
 /**
  * Cheap-o utilities for Trax*Wrapper implementations.

@@ -62,11 +62,11 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.Datalet;
-
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import org.apache.qetest.Datalet;
 
 /**
  * Datalet for conformance testing of xsl stylesheet files.

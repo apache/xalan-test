@@ -57,44 +57,31 @@
 
 package org.apache.qetest.xsltc;
 
-import java.io.StringReader;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.MalformedURLException;
 
-import java.net.MalformedURLException; 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
+import org.apache.xalan.xsltc.DOM;
+import org.apache.xalan.xsltc.NodeIterator;
+import org.apache.xalan.xsltc.Translet;
+import org.apache.xalan.xsltc.TransletException;
+import org.apache.xalan.xsltc.compiler.Constants;
+import org.apache.xalan.xsltc.compiler.XSLTC;
+import org.apache.xalan.xsltc.dom.Axis;
+import org.apache.xalan.xsltc.dom.DOMImpl;
+import org.apache.xalan.xsltc.dom.DTDMonitor;
+import org.apache.xalan.xsltc.runtime.AbstractTranslet;
 import org.apache.xalan.xsltc.runtime.DefaultSAXOutputHandler;
 import org.apache.xalan.xsltc.runtime.TextOutput;
-import org.apache.xalan.xsltc.runtime.AbstractTranslet;
-import org.apache.xalan.xsltc.TransletException;
-import org.apache.xalan.xsltc.DOM;
-
-
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.XMLReader;
 import org.xml.sax.SAXException;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
-
-import org.apache.xalan.xsltc.compiler.Constants;
-import org.apache.xalan.xsltc.dom.DTDMonitor;
-
-
-import org.apache.xalan.xsltc.compiler.XSLTC;
-import org.apache.xalan.xsltc.Translet;
-import org.apache.xalan.xsltc.dom.DOMImpl;
-import org.apache.xalan.xsltc.dom.Axis;
-import org.apache.xalan.xsltc.NodeIterator;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
+import org.xml.sax.XMLReader;
 
 
 public class TimeXSLTCDom 

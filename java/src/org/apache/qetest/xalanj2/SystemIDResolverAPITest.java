@@ -56,12 +56,8 @@
  */
 package org.apache.qetest.xalanj2;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-
+import org.apache.qetest.FileBasedTest;
 import org.apache.xml.utils.SystemIDResolver;
-import java.util.Properties;
 
 /**
  * Functionality/system/integration tests for SystemIDResolver.

@@ -62,47 +62,35 @@
  */
 package org.apache.qetest.trax;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
-
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
-// Needed SAX classes
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-// Needed DOM classes
-import org.w3c.dom.Node;
-import org.w3c.dom.Document;
-
-// For optional URI/URLs instead of string filenames
-import java.net.URL;
-import java.net.MalformedURLException;
-
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;    // We assume Features.STREAM for some tests
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
-// HACK: Use Xalan's Serializers - should be changed
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.SAXException;
 
 //-------------------------------------------------------------------------
 

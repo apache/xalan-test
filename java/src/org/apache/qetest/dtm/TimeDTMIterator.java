@@ -56,19 +56,8 @@
  */
 package org.apache.qetest.dtm;
 
-import java.io.StringReader;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.xpath.objects.XMLStringFactoryImpl;
-
-import org.apache.xml.dtm.*;
-import org.apache.xml.dtm.ref.*;
-
-import org.apache.qetest.dtm.QeDtmUtils;
-import org.apache.qetest.dtm.dtmWSStripper;
+import org.apache.xml.dtm.Axis;
+import org.apache.xml.dtm.DTM;
 
 
 public class TimeDTMIterator

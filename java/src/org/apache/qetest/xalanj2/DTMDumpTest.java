@@ -62,34 +62,23 @@
  */
 package org.apache.qetest.xalanj2;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
-
-// Relevant Xalan-J 2.x classes
-import org.apache.xalan.processor.TransformerFactoryImpl;
-import org.apache.xalan.extensions.ExpressionContext;
-import org.apache.xml.dtm.*;
-import org.apache.xml.dtm.ref.*;
-import org.apache.xpath.NodeSet;
-import org.apache.xpath.objects.XObject;
-import org.apache.xpath.objects.XBoolean;
-import org.apache.xpath.objects.XNumber;
-
-// Needed SAX, DOM, JAXP classes
-import org.w3c.dom.*;
-import org.w3c.dom.traversal.NodeIterator;
-
-// java classes
 import java.io.File;
 import java.util.Properties;
-import java.util.Vector;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.xsl.TraxDatalet;
+import org.apache.xalan.extensions.ExpressionContext;
+import org.apache.xml.dtm.ref.DTMNodeProxy;
+import org.apache.xpath.NodeSet;
+import org.w3c.dom.Node;
+import org.w3c.dom.traversal.NodeIterator;
 
 //-------------------------------------------------------------------------
 

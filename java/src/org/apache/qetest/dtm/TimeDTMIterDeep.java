@@ -56,20 +56,15 @@
  */
 package org.apache.qetest.dtm;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-import org.apache.qetest.dtm.*;
-import org.apache.xml.dtm.*;
-
-// java classes
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
-// Needed SAX, DOM, JAXP, Xalan classes
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.dtm.Axis;
+import org.apache.xml.dtm.DTM;
 
 
 public class TimeDTMIterDeep extends FileBasedTest

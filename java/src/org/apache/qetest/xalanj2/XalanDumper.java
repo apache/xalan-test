@@ -56,31 +56,24 @@
  */
 
 package org.apache.qetest.xalanj2;
-import org.apache.qetest.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.util.Properties;
 
+import javax.xml.transform.Transformer;
+
+import org.apache.xalan.templates.ElemLiteralResult;
+import org.apache.xalan.templates.ElemTemplate;
+import org.apache.xalan.templates.ElemTemplateElement;
+import org.apache.xalan.templates.ElemTextLiteral;
+import org.apache.xalan.transformer.TransformerImpl;
+import org.apache.xml.dtm.ref.DTMNodeProxy;
+import org.apache.xpath.XPath;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.xml.transform.Transformer;
-import org.apache.xalan.trace.GenerateEvent;
-import org.apache.xalan.trace.SelectionEvent;
-import org.apache.xalan.trace.TracerEvent;
-import org.apache.xalan.templates.ElemTemplate;
-import org.apache.xalan.templates.ElemTemplateElement;
-import org.apache.xalan.templates.ElemTextLiteral;
-import org.apache.xalan.templates.ElemLiteralResult;
-import org.apache.xalan.templates.Constants;
-import org.apache.xalan.transformer.TransformerImpl;
-import org.apache.xml.dtm.ref.DTMNodeProxy;
-import org.apache.xml.utils.QName;
-import org.apache.xpath.XPath;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Properties;
-import java.lang.reflect.Method;
 
 /**
  * Static utility for dumping info about common Xalan objects.

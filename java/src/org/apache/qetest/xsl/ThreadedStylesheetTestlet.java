@@ -62,19 +62,14 @@
  */
 package org.apache.qetest.xsl;
 
+import java.io.File;
+
 import org.apache.qetest.CheckService;
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
-import org.apache.qetest.QetestUtils;
 import org.apache.qetest.TestletImpl;
 import org.apache.qetest.xslwrapper.TransformWrapper;
 import org.apache.qetest.xslwrapper.TransformWrapperFactory;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Hashtable;
 
 /**
  * Testlet for basic thread testing of xsl stylesheet files.

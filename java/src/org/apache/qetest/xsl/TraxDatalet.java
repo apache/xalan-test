@@ -62,17 +62,15 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.Datalet;
-import org.apache.qetest.QetestUtils;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.Result;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
-
 import java.io.StringReader;
 import java.util.Hashtable;
 import java.util.Properties;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.qetest.Datalet;
+import org.apache.qetest.QetestUtils;
 
 /**
  * Datalet for holding TrAX-like Sources and Results.

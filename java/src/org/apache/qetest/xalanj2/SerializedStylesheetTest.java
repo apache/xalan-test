@@ -62,21 +62,24 @@
  */
 package org.apache.qetest.xalanj2;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-
-// java classes
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Properties;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.xsl.XSLTestfileInfo;
 
 //-------------------------------------------------------------------------
 

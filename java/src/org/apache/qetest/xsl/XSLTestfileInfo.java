@@ -62,10 +62,10 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.TestfileInfo;
-
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import org.apache.qetest.TestfileInfo;
 
 /**
  * Simple data-holding class specifying info about one 'testfile'.

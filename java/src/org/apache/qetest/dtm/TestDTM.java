@@ -56,24 +56,21 @@
  */
 package org.apache.qetest.dtm;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-
-// java classes
 import java.io.File;
-import java.io.StringReader;
 import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.util.Properties;
 
-// Needed SAX, DOM, JAXP, Xalan classes
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.xml.dtm.*;
-import org.apache.xml.dtm.ref.*;
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.LinebyLineCheckService;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.dtm.DTM;
+import org.apache.xml.dtm.DTMManager;
+import org.apache.xml.dtm.ref.DTMManagerDefault;
 import org.apache.xpath.objects.XMLStringFactoryImpl;
 
 /**

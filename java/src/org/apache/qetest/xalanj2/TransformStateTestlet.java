@@ -62,36 +62,29 @@
  */
 package org.apache.qetest.xalanj2;
 
-import org.apache.qetest.*;
+import java.util.Hashtable;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import javax.xml.transform.sax.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
 
-// Needed Xalan-J 2.x specific classes
-import org.apache.xalan.templates.ElemLiteralResult;
+import org.apache.qetest.Datalet;
+import org.apache.qetest.Logger;
+import org.apache.qetest.LoggingHandler;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.TestletImpl;
+import org.apache.qetest.XMLFileLogger;
 import org.apache.xalan.templates.ElemTemplate;
 import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.transformer.TransformState;
 import org.apache.xalan.transformer.TransformerClient;
-import org.apache.xpath.XPath;
-import org.apache.xml.utils.QName;
-
-// Needed SAX, DOM, JAXP classes
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Hashtable;
 
 /**
  * Testlet for testing TransformState of a stylesheet.

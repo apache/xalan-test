@@ -57,33 +57,30 @@
 
 package org.apache.qetest.trax;
 
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;    // We assume Features.STREAM for some tests
-
-// javax JAXP classes for parser pluggability
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-// Needed SAX classes
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.Parser;
-
-// Needed DOM classes
-import org.w3c.dom.Node;
-import org.w3c.dom.Document;
-
-// java classes
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Enumeration;
-import java.util.Properties;
 import java.util.Hashtable;
+import java.util.Properties;
+
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.qetest.Datalet;
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.TestletImpl;
+import org.apache.qetest.xsl.XSLTestfileInfo;
 
 //-------------------------------------------------------------------------
 

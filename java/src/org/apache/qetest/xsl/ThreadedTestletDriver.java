@@ -62,23 +62,14 @@
  */
 package org.apache.qetest.xsl;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
+import java.util.Properties;
+import java.util.Vector;
+
+import org.apache.qetest.Logger;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.Reporter;
 import org.apache.qetest.xslwrapper.TransformWrapper;
 import org.apache.qetest.xslwrapper.TransformWrapperFactory;
-
-// java classes
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
 //-------------------------------------------------------------------------
 

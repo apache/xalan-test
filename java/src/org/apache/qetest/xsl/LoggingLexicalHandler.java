@@ -62,9 +62,8 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.LoggingHandler;
 import org.apache.qetest.Logger;
-
+import org.apache.qetest.LoggingHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 

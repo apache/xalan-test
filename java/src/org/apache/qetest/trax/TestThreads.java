@@ -62,32 +62,20 @@
  */
 package org.apache.qetest.trax;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
-
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
-// Needed SAX classes
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-// For optional URI/URLs instead of string filenames
-import java.net.URL;
-import java.net.MalformedURLException;
-
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;    // We assume Features.STREAM for some tests
-
+import javax.xml.transform.Result;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 //-------------------------------------------------------------------------
 
 /**

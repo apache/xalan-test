@@ -57,15 +57,16 @@
 package org.apache.qetest.dtm;
 
 import java.io.StringReader;
+
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.xml.dtm.Axis;
+import org.apache.xml.dtm.DTM;
+import org.apache.xml.dtm.DTMAxisIterator;
+import org.apache.xml.dtm.DTMManager;
+import org.apache.xml.dtm.ref.DTMManagerDefault;
 import org.apache.xpath.objects.XMLStringFactoryImpl;
-
-import org.apache.xml.dtm.*;
-import org.apache.xml.dtm.ref.*;
 
 
 /**

@@ -62,32 +62,35 @@
  */
 package org.apache.qetest.trax.sax;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
-import javax.xml.parsers.DocumentBuilder; // for testCase3
-import javax.xml.parsers.DocumentBuilderFactory; // for testCase3
-
-// Needed SAX, DOM, JAXP classes
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.DeclHandler;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import org.w3c.dom.Node;
-
-// java classes
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Properties;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Result;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.xsl.LoggingContentHandler;
+import org.apache.qetest.xsl.LoggingLexicalHandler;
+import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.w3c.dom.Node;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.ext.LexicalHandler;
 
 //-------------------------------------------------------------------------
 

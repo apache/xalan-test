@@ -57,29 +57,18 @@
 
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.CheckService;
+import java.lang.reflect.Constructor;
+
+import javax.xml.transform.ErrorListener;
+
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
 import org.apache.qetest.LoggingHandler;
 import org.apache.qetest.QetestUtils;
-import org.apache.qetest.TestletImpl;
 import org.apache.qetest.trax.LoggingErrorListener;
 import org.apache.qetest.xslwrapper.TransformWrapper;
 import org.apache.qetest.xslwrapper.TransformWrapperFactory;
-import org.apache.qetest.xslwrapper.TraxWrapperUtils; // semi-HACK: should make this more generic
-
-import javax.xml.transform.ErrorListener;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.lang.reflect.Constructor;
+import org.apache.qetest.xslwrapper.TraxWrapperUtils;
 
 /**
  * Testlet for testing of xsl stylesheets using a custom 

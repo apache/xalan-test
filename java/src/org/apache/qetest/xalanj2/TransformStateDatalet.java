@@ -62,11 +62,10 @@
  */
 package org.apache.qetest.xalanj2;
 
-import org.apache.qetest.Datalet;
-
 import java.util.Hashtable;
 import java.util.Properties;
-import java.util.StringTokenizer;
+
+import org.apache.qetest.Datalet;
 
 /**
  * Datalet for holding ExpectedTransformState objects.

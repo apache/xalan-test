@@ -63,33 +63,10 @@
  */
 package org.apache.qetest.xalanj2;
 
-// import common testing framework stuff
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-
-// java classes
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import org.apache.xml.dtm.DTM;
-import org.apache.xml.dtm.DTMIterator;
-import org.apache.xml.dtm.DTMManager;
-import org.apache.xml.utils.PrefixResolverDefault;
-import org.apache.xpath.objects.XObject;
-import org.apache.xpath.XPathAPI;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.traversal.NodeIterator;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-
-// JAXP classes
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -97,6 +74,22 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.dtm.DTM;
+import org.apache.xml.dtm.DTMIterator;
+import org.apache.xml.dtm.DTMManager;
+import org.apache.xml.utils.PrefixResolverDefault;
+import org.apache.xpath.XPathAPI;
+import org.apache.xpath.objects.XObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.traversal.NodeIterator;
+import org.xml.sax.InputSource;
 
 /**
  * Basic functionality test of the public XPathAPI methods.

@@ -57,33 +57,27 @@
 
 package org.apache.qetest.trax;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-import org.apache.qetest.xslwrapper.TransformWrapper;
-import org.apache.qetest.xslwrapper.TransformWrapperFactory;
-import org.apache.qetest.xslwrapper.TransformWrapperHelper;
-
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
-
-// Needed SAX, DOM, JAXP classes
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-// java classes
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.QetestUtils;
+import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.qetest.xslwrapper.TransformWrapper;
+import org.apache.qetest.xslwrapper.TransformWrapperFactory;
+import org.apache.qetest.xslwrapper.TransformWrapperHelper;
 
 /**
  * Minitest - developer check-in test for Xalan-J 2.x.  

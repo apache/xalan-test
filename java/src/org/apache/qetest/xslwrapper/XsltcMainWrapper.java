@@ -55,17 +55,15 @@
  * <http://www.apache.org/>.
  */
 package org.apache.qetest.xslwrapper;
-import org.apache.qetest.QetestUtils;
-
-import org.apache.xalan.xsltc.cmdline.Compile;
-import org.apache.xalan.xsltc.cmdline.Transform;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Hashtable;
 import java.util.Properties;
+
+import org.apache.xalan.xsltc.cmdline.Compile;
+import org.apache.xalan.xsltc.cmdline.Transform;
 
 /**
  * Implementation of TransformWrapper that uses the command line 

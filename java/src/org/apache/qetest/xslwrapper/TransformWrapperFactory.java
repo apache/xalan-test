@@ -56,12 +56,10 @@
  */
 package org.apache.qetest.xslwrapper;
 
-import org.apache.qetest.QetestUtils;
-
 import java.io.InputStream;
-import java.io.IOException;
-
 import java.util.Properties;
+
+import org.apache.qetest.QetestUtils;
 
 /**
  * Factory static class for creating TransformWrappers.

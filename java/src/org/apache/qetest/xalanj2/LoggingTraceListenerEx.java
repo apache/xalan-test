@@ -61,28 +61,15 @@
  *
  */
 package org.apache.qetest.xalanj2;
-import org.apache.qetest.*;
-
-import java.io.IOException;
 import java.util.Hashtable;
 
+import org.apache.qetest.Logger;
+import org.apache.xalan.templates.ElemTemplateElement;
+import org.apache.xalan.trace.EndSelectionEvent;
+import org.apache.xalan.trace.TraceListenerEx;
+import org.apache.xpath.axes.ContextNodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
-
-import org.apache.xalan.trace.TraceListener;
-import org.apache.xalan.trace.TraceListenerEx;
-import org.apache.xalan.trace.GenerateEvent;
-import org.apache.xalan.trace.SelectionEvent;
-import org.apache.xalan.trace.EndSelectionEvent;
-import org.apache.xalan.trace.TracerEvent;
-import org.apache.xalan.templates.ElemTemplate;
-import org.apache.xalan.templates.ElemTemplateElement;
-import org.apache.xalan.templates.ElemTextLiteral;
-import org.apache.xalan.templates.Constants;
-import org.apache.xml.dtm.ref.DTMNodeIterator;
-import org.apache.xml.utils.QName;
-import org.apache.xpath.axes.ContextNodeList;
-import org.apache.xpath.XPath;
 
 /**
  * Logging TraceListenerEx interface.

@@ -62,13 +62,12 @@
  */
 package org.apache.qetest;
 
-import java.io.File;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;

@@ -56,7 +56,6 @@
  */
 package org.apache.qetest;
 
-import java.io.FilenameFilter;
 import java.io.File;
 
 /**

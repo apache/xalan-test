@@ -62,10 +62,11 @@
  */
 package org.apache.qetest.trax;
 
-import org.apache.qetest.*;
-
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
+
+import org.apache.qetest.Logger;
+import org.apache.qetest.LoggingHandler;
 
 /**
  * Cheap-o ErrorListener for use by API tests.

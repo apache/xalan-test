@@ -62,27 +62,21 @@
  */
 package org.apache.qetest.xalanj2;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
-import org.apache.qetest.trax.LoggingErrorListener;
+import java.io.File;
+import java.util.Properties;
 
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.xsl.TraxDatalet;
 import org.apache.xalan.trace.TraceListener;
-import org.apache.xalan.trace.TraceListenerEx;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.transformer.TransformerImpl;
 import org.apache.xalan.transformer.XalanProperties;
-
-// Needed SAX, DOM, JAXP classes
-
-// java classes
-import java.io.File;
-import java.util.Properties;
 
 //-------------------------------------------------------------------------
 

@@ -62,40 +62,33 @@
  */
 package org.apache.qetest.xalanj2;
 
-// Support for test reporting and harness classes
-import org.apache.qetest.*;
-import org.apache.qetest.xsl.*;
+import java.io.File;
+import java.util.Hashtable;
+import java.util.Properties;
 
-// Import all relevant TRAX packages
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
 
-// Needed Xalan-J 2.x specific classes
-import org.apache.xalan.templates.ElemLiteralResult;
+import org.apache.qetest.FileBasedTest;
+import org.apache.qetest.Logger;
+import org.apache.qetest.LoggingHandler;
+import org.apache.qetest.OutputNameManager;
+import org.apache.qetest.Reporter;
+import org.apache.qetest.XMLFileLogger;
+import org.apache.qetest.xsl.TraxDatalet;
 import org.apache.xalan.templates.ElemTemplate;
 import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.transformer.TransformState;
 import org.apache.xalan.transformer.TransformerClient;
-import org.apache.xpath.XPath;
-import org.apache.xml.utils.QName;
-
-// Needed SAX, DOM, JAXP classes
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-
-// java classes
-import java.io.File;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.lang.reflect.Method;
 
 //-------------------------------------------------------------------------
 

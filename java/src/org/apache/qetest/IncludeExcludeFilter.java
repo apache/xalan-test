@@ -56,9 +56,8 @@
  */
 package org.apache.qetest;
 
-import java.io.FilenameFilter;
 import java.io.File;
-
+import java.io.FilenameFilter;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 

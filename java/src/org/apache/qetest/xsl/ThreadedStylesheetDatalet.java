@@ -62,14 +62,11 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.Datalet;
-import org.apache.qetest.xslwrapper.TransformWrapper;
-import org.apache.qetest.xslwrapper.TransformWrapperFactory;
-import javax.xml.transform.Templates;
-
 import java.util.Hashtable;
 import java.util.Properties;
-import java.util.StringTokenizer;
+
+import org.apache.qetest.Datalet;
+import org.apache.qetest.xslwrapper.TransformWrapper;
 
 /**
  * Datalet for conformance testing of xsl stylesheet files.

@@ -56,9 +56,10 @@
  */
 package org.apache.qetest.xslwrapper;
 
-import org.apache.qetest.Configurable;
 import java.util.Hashtable;
 import java.util.Properties;
+
+import org.apache.qetest.Configurable;
 
 /**
  * Helper interface to wrapper various XSLT processors for testing.

@@ -57,7 +57,8 @@
 package org.apache.qetest.dtm;
 
 
-import org.apache.xml.dtm.*;
+import org.apache.xml.dtm.DTM;
+import org.apache.xml.dtm.DTMWSFilter;
 /**
  * Impl of DTMWSFilter
  *

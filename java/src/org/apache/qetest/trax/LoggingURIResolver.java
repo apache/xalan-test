@@ -62,19 +62,17 @@
  */
 package org.apache.qetest.trax;
 
-import org.apache.qetest.*;
+import java.util.Hashtable;
+
 import javax.xml.transform.Source;
-import javax.xml.transform.URIResolver;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.qetest.Logger;
+import org.apache.qetest.LoggingHandler;
 import org.apache.xml.utils.SystemIDResolver;
-
-import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-
-import java.util.Hashtable;
 //-------------------------------------------------------------------------
 
 /**

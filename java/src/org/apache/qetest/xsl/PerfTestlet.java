@@ -57,15 +57,15 @@
 
 package org.apache.qetest.xsl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.DecimalFormat;
+import java.util.Hashtable;
+
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
 import org.apache.qetest.xslwrapper.TransformWrapper;
 import org.apache.qetest.xslwrapper.TransformWrapperHelper;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Hashtable;
-import java.text.DecimalFormat;
 
 /**
  * Testlet to capture specific timing performance data.
