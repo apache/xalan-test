@@ -6,22 +6,22 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.3 Creating Attributes -->
   <!-- Creator: Philip Strube -->
-  <!-- Purpose: Test for resetting of a specified default namespace. -->
+  <!-- Purpose: Create attribute with NCName and newly-introduced namespace. -->
+  <!-- Processor will have to invent a prefix because none has been established for that namespace. -->
 
-
-<xsl:output method="xml"/> 
+<xsl:output method="xml"/>
 
 <xsl:template match="/">
-   <xsl:apply-templates/>
+  <xsl:apply-templates/>
 </xsl:template>
 
 <xsl:template match="*">
-   <xsl:copy>
-	  <xsl:attribute name="objectID" namespace="http://www.fiscus.de">
-        <xsl:number level="any" count="*"/>
-      </xsl:attribute>            
-      <xsl:apply-templates select="@*|node()|comment()|processing-instruction()"/>
-   </xsl:copy>
+  <xsl:copy>
+    <xsl:attribute name="objectID" namespace="http://www.fiscus.de">
+      <xsl:number level="any" count="*"/>
+    </xsl:attribute>
+    <xsl:apply-templates select="@*|node()|comment()|processing-instruction()"/>
+  </xsl:copy>
 </xsl:template>
 
 </xsl:stylesheet>

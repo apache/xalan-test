@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding="ISO-8859-1"?>
-<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'                 
+<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'
                 xmlns:fiscus="http://www.fiscus.de">
 
   <!-- FileName: namespace45 -->
@@ -7,9 +7,9 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.3 Creating Attributes -->
   <!-- Creator: Philip Strube -->
-  <!-- Purpose: Test for resetting of a specified default namespace. -->
+  <!-- Purpose: Create attribute with QName whose prefix is known. -->
 
-<xsl:output method="xml"/> 
+<xsl:output method="xml"/>
 
 <xsl:template match="/">
   <xsl:apply-templates/>
@@ -17,9 +17,9 @@
 
 <xsl:template match="*">
   <xsl:copy>
-	<xsl:attribute name="fiscus:objectID">
-       <xsl:number level="any" count="*"/>
-     </xsl:attribute>            
+    <xsl:attribute name="fiscus:objectID">
+      <xsl:number level="any" count="*"/>
+    </xsl:attribute>
     <xsl:apply-templates select="@*|node()|comment()|processing-instruction()"/>
   </xsl:copy>
 </xsl:template>
