@@ -9,6 +9,8 @@
   <!-- Purpose: Incorrect value for order attribute on sort. -->
   <!-- ExpectedException: Sorting order must be "ascending" or "descending" -->
   <!-- ExpectedException: Attribute: order has an illegal value: sideways -->
+  <!-- ExpectedException: Illegal value: sideways used for ENUM attribute: order.  Valid values are: ascending descending. -->
+
 
 <xsl:template match="doc">
   <out>

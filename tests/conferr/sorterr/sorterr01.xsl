@@ -9,6 +9,7 @@
   <!-- Purpose: Undefined value for data-type attribute on sort. -->
   <!-- ExpectedException: Sorting data-type must be "text" or "number" -->
   <!-- ExpectedException: Attribute: data-type has an illegal value: badtype -->
+  <!-- ExpectedException: Illegal value: badtype used for ENUM attribute: data-type.  Valid values are: text number <qname-but-not-ncname>. -->
 
 <xsl:template match="doc">
   <out>

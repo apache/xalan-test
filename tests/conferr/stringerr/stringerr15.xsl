@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'string-length()' with too many arguments -->
   <!-- ExpectedException: string-length() has too many arguments. -->
-  <!-- ExpectedException: FuncStringLength only allows 1 arguments -->
+  <!-- ExpectedException: FuncStringLength only allows 0 or 1 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'normalize-space()' function with too many arguments -->
   <!-- ExpectedException: normalize-space() has too many arguments -->
-  <!-- ExpectedException: FuncNormalizeSpace only allows 1 arguments -->
+  <!-- ExpectedException: FuncNormalizeSpace only allows 0 or 1 arguments -->
 
 <xsl:template match="/doc">
   <out>
