@@ -339,13 +339,15 @@ public class XSLTestAntTask extends Task
      * access to local dir; support dir-switching attribute 
      * when forking from Ant task; etc.
      * @param altPrefix alternate prefix of Ant properties to also 
-     * pass thru in addition to ANT_PASSTHRU_PREFIX
+     * pass thru in addition to ANT_PASSTHRU_PREFIX; these will 
+     * override any of the default prefix ones
      */
     protected void writePassThruProps(String altPrefix)
     {
         Hashtable antProps = this.getProject().getProperties();
 
         Properties passThru = new Properties();
+        // Passthru any of the default prefixed properties..
         for (Enumeration enum = antProps.keys();
                 enum.hasMoreElements(); 
                 /* no increment portion */ )
@@ -357,7 +359,15 @@ public class XSLTestAntTask extends Task
                 //  rip off the prefix first
                 passThru.put(key.substring(ANT_PASSTHRU_PREFIX.length()), antProps.get(key));
             }
-            else if (key.startsWith(altPrefix))
+        }
+        //.. Then also passthru any alternate prefix properties
+        //  this ensures alternate prefixes will overwrite default ones
+        for (Enumeration enum = antProps.keys();
+                enum.hasMoreElements(); 
+                /* no increment portion */ )
+        {
+            String key = enum.nextElement().toString();
+            if (key.startsWith(altPrefix))
             {
                 // Also move alternate prefixed properties too
                 passThru.put(key.substring(altPrefix.length()), antProps.get(key));
@@ -365,10 +375,10 @@ public class XSLTestAntTask extends Task
         }
         try
         {
-            log("Attempting to write out properties to " + passThruProps, Project.MSG_VERBOSE);
+            log("writePassThruProps attempting to write to " + passThruProps, Project.MSG_VERBOSE);
             // If we can write the props out to disk...
             passThru.save(new FileOutputStream(passThruProps), 
-                    "XSLTestAntTask.writePassThruProps() for use by test " + testClass);
+                    "XSLTestAntTask.writePassThruProps() generated for use by test " + testClass);
             
             // ... then also force -load of this file into test's command line
             commandLineJava.createArgument().setLine("-load " + passThruProps);
