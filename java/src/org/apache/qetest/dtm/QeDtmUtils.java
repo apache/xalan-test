@@ -132,6 +132,19 @@ public static final String defaultSource2=
  	"   </Sub-Doc>"+
 	"  </bdd:dummyDocument>\n";
 
+public static final String simpleFlatFile=
+ 	"<?xml version=\"1.0\"?>\n"+
+ 	"<Doc>\n"+
+	"<item>XSLT</item>\n"+
+	"<item>processors</item>\n"+
+	"<item>must</item>\n"+
+	"<item>use</item>\n"+
+	"<item>XML</item>\n"+
+	"<item>Namespaces</item>\n"+
+	"<item>mechanism</item>\n"+
+ 	"</Doc>";
+
+
 public static final String[] TYPENAME=
   { "NULL",
     "ELEMENT",
@@ -213,8 +226,7 @@ public static DTM createDTM(int method, String theSource, StringBuffer buf)
     DTMAxisIterator iter = dtm.getAxisIterator(axis);
     iter.setStartNode(context);
 
-    for (atNode = iter.next(); DTM.NULL != atNode;
-                  atNode = iter.next())
+    for (atNode = iter.next(); DTM.NULL != atNode; atNode = iter.next())
 		{ 
           lastNode = atNode;
 		  numOfNodes = numOfNodes + 1;	// Need to know that we Iterated the whole tree
@@ -222,7 +234,8 @@ public static DTM createDTM(int method, String theSource, StringBuffer buf)
 
     iterTime = System.currentTimeMillis() - startTime;
 
-	getNodeInfo(dtm, lastNode, " ");
+	if (lastNode != 0)
+		getNodeInfo(dtm, lastNode, " ");
 
 	rtdata[0] = (int)iterTime;
 	rtdata[1] = lastNode;
@@ -243,8 +256,7 @@ static void timeAxisTraverser(DTM dtm, int axis, int context, int[] rtdata)
 
   	DTMAxisTraverser at = dtm.getAxisTraverser(axis);
 
-    for (atNode = at.first(context); DTM.NULL != atNode;
-                  atNode = at.next(context, atNode))
+    for (atNode = at.first(context); DTM.NULL != atNode; atNode = at.next(context, atNode))
 		{ 
           lastNode = atNode;
 		  numOfNodes = numOfNodes + 1;
@@ -252,7 +264,8 @@ static void timeAxisTraverser(DTM dtm, int axis, int context, int[] rtdata)
 
     travTime = System.currentTimeMillis() - startTime;
 
-	getNodeInfo(dtm, lastNode, " ");
+	if (lastNode != 0)
+		getNodeInfo(dtm, lastNode, " ");
 
 	rtdata[0] = (int)travTime;
 	rtdata[1] = lastNode;
@@ -273,7 +286,7 @@ public static String getNodeInfo(DTM dtm, int nodeHandle, String indent)
     // Skip outputing of text nodes. In most cases they clutter the output, 
 	// besides I'm only interested in the elemental structure of the dtm. 
     if( TYPENAME[dtm.getNodeType(nodeHandle)] != "TEXT" )
-	{
+	{ 
     	buf = new String(indent+
 		       nodeHandle+": "+
 		       TYPENAME[dtm.getNodeType(nodeHandle)]+" "+
