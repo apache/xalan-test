@@ -446,19 +446,22 @@ public class TraxWrapper extends ProcessorWrapper
 
         // Parse in the xml data into a DOM
         dfactory = DocumentBuilderFactory.newInstance();
+        dfactory.setNamespaceAware(true);
         docBuilder = dfactory.newDocumentBuilder();
         Node xmlDoc = docBuilder.parse(new InputSource(xmlSource));
 
         // Prepare a result and transform it into a DOM
         org.w3c.dom.Document outNode = docBuilder.newDocument();
         applyParams(transformer, params);
-        transformer.transform(new DOMSource(xmlDoc), 
+        transformer.transform(new DOMSource(xmlDoc, xmlSource), 
                               new DOMResult(outNode));
         // Stop timing now
-        endTime = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();        
 
         // Now serialize output to disk with identity transformer
         Transformer serializer = processor.newTransformer();
+        Properties serializationProps = templates.getOutputProperties();
+        serializer.setOutputProperties(serializationProps);
         serializer.transform(new DOMSource(outNode), 
                              new StreamResult(resultStream));
 
