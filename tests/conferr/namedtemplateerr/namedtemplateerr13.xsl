@@ -8,6 +8,8 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to set name attribute to null string. -->
   <!-- ExpectedException: Invalid template name -->
+  <!-- ExpectedException: Illegal value:  used for QNAME attribute: name -->
+
 
 <xsl:template match="doc">
   <out>

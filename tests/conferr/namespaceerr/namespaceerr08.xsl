@@ -9,7 +9,7 @@
   <!-- Section: 4.1 Node Set Functions -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'name()' with too many arguments. -->
-  <!-- ExpectedException: name only allows 1 argument -->
+  <!-- ExpectedException: FuncQname only allows 0 or 1 arguments -->
 
 <xsl:template match="baz2:doc">
   <out>

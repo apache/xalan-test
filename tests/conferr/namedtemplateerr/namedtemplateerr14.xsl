@@ -9,6 +9,8 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to set local part of QName to null string. -->
   <!-- ExpectedException: Invalid template name -->
+  <!-- ExpectedException: Illegal value: foo: used for QNAME attribute: name -->
+
 
 <xsl:template match="doc">
   <out>

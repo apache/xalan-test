@@ -10,7 +10,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'local-name()' with too many arguments. -->
   <!-- ExpectedException: local-name() has too many arguments. -->
-  <!-- ExpectedException: FuncLocalPart only allows 1 arguments -->
+  <!-- ExpectedException: FuncLocalPart only allows 0 or 1 arguments -->
 
 <xsl:template match="baz2:doc">
   <out>

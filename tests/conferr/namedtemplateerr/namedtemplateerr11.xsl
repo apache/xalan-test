@@ -9,6 +9,7 @@
   <!-- Purpose: Try to use an AVT for the template name when invoking. -->
   <!-- ExpectedException: Could not find template named: {$tocall} -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: Could not find template named: {$tocall} -->
+  <!-- ExpectedException: Illegal value: {$tocall} used for QNAME attribute: name -->
 
 <xsl:template match="doc">
   <out>

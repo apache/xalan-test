@@ -10,7 +10,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'namespace-uri()' with too many arguments. -->
   <!-- ExpectedException: namespace-uri() has too many arguments. -->
-  <!-- ExpectedException: FuncNamespace only allows 1 arguments --><!-- Note: why isn't the error about FuncNamespaceURI? -sc -->
+  <!-- ExpectedException: FuncNamespace only allows 0 or 1 arguments --><!-- Note: why isn't the error about FuncNamespaceURI? -sc -->
 
 <xsl:template match="baz2:doc">
   <out>
