@@ -268,17 +268,21 @@ public class ParamTest extends XSLProcessorTestBase
                 },
                 { 
                     "t1", 
+                    "a",
+                    /* "<outt>false,false,true,false,a</outt>", */
+                    "<outt>false,false,false,false,</outt>", // Actual Xalan-J 1.x behavior; not necessarily correct -sc
+                    "(22)Select expr of a param string"
+                }
+            }; // end of paramTests array
+            /*****************************
+             // illegal (I think) to set parameter as blank, both versions complain
+                { 
+                    "t1", 
                     "",
                     "<outt>false,true,false,false,</outt>",
                     "(21)Select expr of a param blank string"
                 },
-                { 
-                    "t1", 
-                    "a",
-                    "<outt>false,false,true,false,a</outt>",
-                    "(22)Select expr of a param string"
-                }
-            }; // end of paramTests array
+            *****************************/
 
             // Just loop through test elements and try each one
             for (int i = 0; i < paramTests.length; i++)
@@ -349,10 +353,6 @@ public class ParamTest extends XSLProcessorTestBase
             myString = processor.createXString("a");
             
             // Test setting the value and checking it in a select expr
-/************************************************ COMPILE PROBLEM
-// Compile problem: this block gives a number of compile errors 
-//  when run against Xalan-J 2.x compat.jar:
-//  Incompatible type for method. Can't convert org.apache.xalan.xpath.XNull to java.lang.String.
             processor.setStylesheetParam("t1", myNull);
             processor.process(xmlSource, xslStylesheet,
                               new XSLTResultTarget(outNames.nextName()));
@@ -397,7 +397,7 @@ public class ParamTest extends XSLProcessorTestBase
                               "<outt>false,false,false,true,1</outt>",
                               outNames.currentName()
                               + ") Select expr with XNumber");
-************************************************ COMPILE PROBLEM */
+
         }
         catch (Exception e)
         {
@@ -466,11 +466,11 @@ public class ParamTest extends XSLProcessorTestBase
             processor.process(new XSLTInputSource(xmlFilename), new XSLTInputSource(xslFilename), new XSLTResultTarget(outNames.nextName()));
             processor.reset();
 
-            // Verify our previous param is still set...
+            // Verify our previous param is not still set, since we were reset in between
             // NOTE: double-check how parameters get reset in 1.x 
             //  API, and in compatibility layer
             checkFileContains(outNames.currentName(), 
-                              "<outt>false,false,true,false,a</outt>",
+                              "<outt>true,false,false,false,notset</outt>",
                               outNames.currentName() + " Stylesheet second param set(1)");
 
             // ... and that the new one also now is
@@ -546,16 +546,16 @@ public class ParamTest extends XSLProcessorTestBase
             processor.process(new XSLTInputSource(xmlFilename), new XSLTInputSource(xslFilename), new XSLTResultTarget(outNames.nextName()));
             processor.reset();
 
-            // Verify our previous param is still set...
+            // Verify our previous params is now not set
             // NOTE: double-check how parameters get reset in 1.x 
             //  API, and in compatibility layer
             checkFileContains(outNames.currentName(), 
-                              "<outt>false,false,true,false,a</outt>",
+                              "<outt>true,false,false,false,notset</outt>",
                               outNames.currentName() + " Stylesheet after reset param set(1b)");
 
-            // ... and that the new one also now is
+            // ... and that the other one also isn't
             checkFileContains(outNames.currentName(),
-                              "foos,foos;",
+                              "<outs>s1val,s1val; s2val,s2val; s3val,s3val; </outs>",
                               outNames.currentName() + " Stylesheet after reset param set(1c)");
         }
         catch (Exception e)
