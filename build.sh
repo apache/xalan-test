@@ -27,8 +27,8 @@ if [ "$ANT_HOME" = "" ] ; then
     ANT_HOME=${HOME}/opt/ant
   fi
 
-  # Otherwise, just default to our local one
-  ANT_HOME=java
+  # Otherwise, just default the one over in java
+  ANT_HOME=../java
 fi
 
 if [ "$JAVA_HOME" != "" ] ; then

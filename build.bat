@@ -5,7 +5,7 @@ rem     Author: shane_curcuru@lotus.com
 rem     See:    build.xml
 :usage
 @echo build.bat - compiles and executes Xalan Java-based test automation
-@echo   Usage:   test [target] [-D options]
+@echo   Usage:   test [target] [-Doption=value ...]
 @echo   Example: test api -DtestClass=TransformerAPITest -Dqetest.loggingLevel=99
 @echo.
 @echo   EITHER: set environment variable JARDIR to point to dir 
@@ -18,11 +18,12 @@ rem     See:    build.xml
 @echo   Note that even when JARDIR is set, normal .jar files may still be 
 @echo     on the end of the classpath; see build.xml for details
 @echo.
-@echo   You should have JAVA_HOME/lib/tools.jar, etc. in your CLASSPATH
+@echo   You should have set JAVA_HOME
 @echo   You may set PARSER_JAR to specific path/filename.jar of parser
 @echo     Note: PARSER_JAR is ignored when JARDIR is set
 @echo   You may set JAVA_OPTS to be passed to java program
 @echo   All other command line opts are passed to Ant
+@echo.
 @echo   build -projecthelp   will show you Ant help and build targets
 @echo.
 
@@ -61,13 +62,10 @@ goto setupArgs
 rem This label provides a place for the argument list loop to break out 
 rem and for NT handling to skip to.
 
-rem default ANT_HOME
-if "%ANT_HOME%"=="" set _ANT_HOME=.
+rem Default ANT_HOME to the one in the java dir
+if "%ANT_HOME%"=="" set _ANT_HOME=..\java
 if not "%ANT_HOME%"=="" set _ANT_HOME=%ANT_HOME%
-goto checkJava
 
-:checkJava
-set _JAVACMD=%JAVACMD%
 rem Note: classpath handling is special for testing Xalan
 rem If PARSER_JAR blank, default to xerces in the xalan dir
 if "%PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xercesImpl.jar
@@ -120,6 +118,7 @@ set _ANT_HOME=
 set _ANT_OPTS=
 set _JAVACMD=
 set _PARSER_JAR=
+set _XML-APIS_JAR=
 set ANT_CMD_LINE_ARGS=
 
 if not "%OS%"=="Windows_NT" goto mainEnd
