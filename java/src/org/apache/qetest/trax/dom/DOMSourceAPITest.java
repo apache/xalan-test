@@ -310,16 +310,15 @@ public class DOMSourceAPITest extends FileBasedTest
             reporter.logTraceMsg("@todo validate the dom in memory as well");
 
             // A blank DOM as source doc of the transform - should 
-            //  throw exception (new functionality Dec-00)
+            // create an empty source Document using 
+            // DocumentBuilder.newDocument(). 
             DOMSource blankSource = new DOMSource();
             Node emptyNode = docBuilder.newDocument();
             DOMResult emptyNodeDOM = new DOMResult(emptyNode);
             reporter.logTraceMsg("About to transform(blankSource, emptyNodeDOM)");
-            transformerXSL.transform(blankSource, emptyNodeDOM); // SPR SCUU4R5KLL throws TransformerException
-            // Note: functionality (and hopefully Javadoc too) have 
-            //  been updated to make it illegal to use a DOMSource 
-            //  with a null node as the input document -sc 18-Dec-00
-            reporter.checkFail("transform(blankDOM, result) should throw exception", "SCUU4R5KLL");
+            transformerXSL.transform(blankSource, emptyNodeDOM); 
+
+            reporter.check(emptyNodeDOM.getNode().toString(),"[#document: null]","transform(blankDOM, result) should create an empty document");
         }
         catch (Throwable t)
         {
