@@ -83,7 +83,7 @@ rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files
 rem    in the classpath first from that one dir
 rem Note: Does not yet support xsltc testing! TBD -sc
 rem Note: Does not yet support using crimson from JARDIR (forces xerces.jar)! TBD -sc
-if not "%JARDIR%" == "" set _ANT_CP=%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set _ANT_CP=%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%CLASSPATH%
 
 if "%JAVA_HOME%" == "" goto noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=%JAVA_HOME%\bin\java
