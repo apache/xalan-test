@@ -197,22 +197,23 @@ public static DTM createDTM(int method, String theSource, StringBuffer buf)
 
 
 	buf.append("\nInit of DTM took: \t"+ (dtmStop-dtmStart) + "\n");
+	System.out.println(buf);
 	return dtm;
 }
 
- public static void timeAxis(DTM dtm, int axis, int context, int[] rtdata)
+ public static void timeAxisIterator(DTM dtm, int axis, int context, int[] rtdata)
   {	
     long startTime = 0;
-    long travTime = 0;
+    long iterTime = 0;
 	int atNode = 0;
 	int lastNode = 0;							
 	int numOfNodes =0;
 
+	// Time creation and iteration.
+	startTime = System.currentTimeMillis();
+
     DTMAxisIterator iter = dtm.getAxisIterator(axis);
     iter.setStartNode(context);
-
-	// Time the iteration.
-	startTime = System.currentTimeMillis();
 
     for (atNode = iter.next(); DTM.NULL != atNode;
                   atNode = iter.next())
@@ -221,14 +222,45 @@ public static DTM createDTM(int method, String theSource, StringBuffer buf)
 		  numOfNodes = numOfNodes + 1;	// Need to know that we Iterated the whole tree
     	}
 
+    iterTime = System.currentTimeMillis() - startTime;
+
+	getNodeInfo(dtm, lastNode, " ");
+
+	rtdata[0] = (int)iterTime;
+	rtdata[1] = lastNode;
+	rtdata[2] = numOfNodes;
+  }
+
+  
+static void timeAxisTraverser(DTM dtm, int axis, int context, int[] rtdata)
+  {	
+    long startTime = 0;
+    long travTime = 0;
+	int atNode = 0;
+	int lastNode = 0;
+	int numOfNodes =0;
+
+	// Time the creation and traversal.
+	startTime = System.currentTimeMillis();
+
+  	DTMAxisTraverser at = dtm.getAxisTraverser(axis);
+
+    for (atNode = at.first(context); DTM.NULL != atNode;
+                  atNode = at.next(context, atNode))
+		{ 
+          lastNode = atNode;
+		  numOfNodes = numOfNodes + 1;
+    	}
+
     travTime = System.currentTimeMillis() - startTime;
 
-	QeDtmUtils.getNodeInfo(dtm, lastNode, " ");
+	getNodeInfo(dtm, lastNode, " ");
 
 	rtdata[0] = (int)travTime;
 	rtdata[1] = lastNode;
 	rtdata[2] = numOfNodes;
-  }
+
+ }
 
 // This routine gathers up all the important info about a node, concatenates
 // in all together into a single string and returns it. 
