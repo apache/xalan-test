@@ -680,6 +680,16 @@
         description="Alias for alltest">
     </target>
 
+    <target name="scan"
+        description="Run a simple ResultScanner on a tree of test results">
+        <property name="scan.outputDir" value="results-alltest" />
+        <property name="scan.logFile" value="${scan.outputDir}/ResultReport" />
+        <java classname="org.apache.qetest.xsl.ResultScanner" 
+              classpathref="conf.class.path" 
+              fork="yes" >
+              <arg line="${scan.outputDir} ${scan.logFile}"/>
+        </java>	 
+    </target>
     <!-- ================================================================== -->
     <!-- Build Tests: Compile/jar targets for each 'layer' of testing code  -->
     <!-- ================================================================== -->

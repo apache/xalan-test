@@ -28,9 +28,10 @@
       <!-- A table of all fail results -->
       <h3>All bad results:</h3>
       <xsl:for-each select="testgroup/teststatus[@status = $badResult]">
+          <xsl:variable name="linkname" select="concat(../@href, '/', @href)" />
           <xsl:element name="a">
-            <xsl:attribute name="href">#<xsl:value-of select="concat(../@href, '/', @href)"/></xsl:attribute>
-            <xsl:value-of select="@href"/>
+            <xsl:attribute name="href">#<xsl:value-of select="$linkname"/></xsl:attribute>
+            <xsl:value-of select="$linkname"/>
           </xsl:element>
           <br/>
       </xsl:for-each>
