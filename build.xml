@@ -1081,7 +1081,7 @@
         description="Compile xsltc native API tests only">
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}xsltc/*.java,${test.root}dtm/*.java"
+               includes="${test.root}xsltc/*.java"
                debug="${debug}">
             <classpath refid="xsltc.compile.class.path" />
         </javac>               
