@@ -246,6 +246,22 @@
     </target>
 
     <!-- ================================================================== -->
+    <!-- Run tests: the StylesheetErrorTestlet on the conferr suite         -->
+    <!-- ================================================================== -->
+    <target name="conferr" description="Run TestletDriver over the conferr negative test tree"
+        depends="init.test">
+        <!-- Set the default conformance test driver, user may override -->
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <echo message="Executing Xalan conf test: ${testClass}" />
+        <property name="testType" value="conferr." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="conf.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" />
+    </target>
+
+    <!-- ================================================================== -->
     <!-- Run tests: the normal StylesheetTestletDriver on the perf suite    -->
     <!-- ================================================================== -->
     <target name="perf" description="Run TestletDriver over the perf tree"
