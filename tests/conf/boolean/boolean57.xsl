@@ -3,7 +3,7 @@
 
   <!-- FileName: boolean57 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991008 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 3.4 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test that "or" doesn't evaluate right operand if left is true -->
