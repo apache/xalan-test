@@ -2,7 +2,7 @@
 <!-- 
 /**
  * test.xml
- * Ant 1.3.x build script for compiling and running Xalan-J tests.  
+ * Ant 1.4.1+ build script for compiling and running Xalan-J tests.  
  * 
  * Note that this is a slightly unusual Ant build.xml file, since we 
  * support both compiling/packaging the Xalan-J tests themselves, as 
@@ -481,11 +481,22 @@
     <!-- ================================================================== -->
     <!-- Run tests: A whole bunch of tests - used before posting builds, etc-->
     <!-- ================================================================== -->
-    <property name="alltest.resultDir" value="results-alltest" />
     <target name="alltest" 
             description="Run nearly *all* available Xalan-J 2.x tests"
             depends="all,alltest-execute">
         <!-- Currently don't bother checking results, -pass, -notpass -->
+    </target>
+    <target name="allfeaturetest" 
+            description="Re-Run nearly *all* available Xalan-J 2.x tests with setAttribute features set"
+            depends="all">
+        <antcall target="alltest-execute">
+            <param name="alltest.resultDir" value="results-alltest-inctrue"/>
+            <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/incremental" value="true"/>
+        </antcall>
+        <antcall target="alltest-execute">
+            <param name="alltest.resultDir" value="results-alltest-optfalse"/>
+            <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/optimize" value="false"/>
+        </antcall>
     </target>
 
 
@@ -494,6 +505,7 @@
          and other tests all in one target.
      -->
     <target name="alltest-execute">
+        <property name="alltest.resultDir" value="results-alltest" />
         <echo message="About to execute LOTS of tests, results into ${alltest.resultDir}/..." />
         <!-- Run all individual API tests through the harness -->
         <antcall target="harness">
@@ -503,35 +515,47 @@
         <!-- Run full conf test with each major available flavor into 
              specific output directories; note any user options will 
              override for all test calls.
+             Also exclude the currently failing tests in the 
+             smoketest if use.excludes is set.
         -->
+        <condition property="conf.excludes" value="${smoketest.conf.excludes}">
+            <equals arg1="${use.excludes}" arg2="true" />
+        </condition>
+
         <antcall target="conf">
             <param name="conf.flavor" value="trax.systemId"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
             <param name="conf.outputDir" value="${alltest.resultDir}/systemId"/>
             <param name="conf.logFile" value="${alltest.resultDir}/systemId/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.file"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
             <param name="conf.outputDir" value="${alltest.resultDir}/file"/>
             <param name="conf.logFile" value="${alltest.resultDir}/file/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.dom"/>
-            <param name="conf.excludes" value="${trax.dom.excludes}"/>
+            <!-- Note DOM always has additional exclusions -->
+            <param name="conf.excludes" value="${trax.dom.excludes};${conf.excludes}"/>
             <param name="conf.outputDir" value="${alltest.resultDir}/dom"/>
             <param name="conf.logFile" value="${alltest.resultDir}/dom/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.sax"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
             <param name="conf.outputDir" value="${alltest.resultDir}/sax"/>
             <param name="conf.logFile" value="${alltest.resultDir}/sax/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.localPath"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
             <param name="conf.outputDir" value="${alltest.resultDir}/localPath"/>
             <param name="conf.logFile" value="${alltest.resultDir}/localPath/results.xml"/>
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.stream"/>
+            <param name="conf.excludes" value="${conf.excludes}"/>
             <param name="conf.outputDir" value="${alltest.resultDir}/stream"/>
             <param name="conf.logFile" value="${alltest.resultDir}/stream/results.xml"/>
         </antcall>
