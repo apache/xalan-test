@@ -22,6 +22,7 @@ if "%1" == "-?" goto usage
 
 @REM -crimson: Use crimson.jar instead of xerces.jar
 @REM    shift to get rid of -crimson arg; just pass rest of args along
+@REM FutureWork: for maintenance, consider dropping crimson support
 set SAVED_JAVA_OPTS=%JAVA_OPTS%
 if '%1' == '-crimson' set JAVA_OPTS=-Djavax.xml.parsers.DocumentBuilderFactory=org.apache.crimson.jaxp.DocumentBuilderFactoryImpl -Dorg.xml.sax.driver=org.apache.crimson.jaxp.SAXParserFactoryImpl %JAVA_OPTS%
 if '%1' == '-crimson' set PARSER_JAR=crimson.jar
@@ -33,36 +34,35 @@ if not "%JAVA_HOME%" == "" set JAVA_EXE=%JAVA_HOME%\bin\java
 
 :dojardir
 @REM If PARSER_JAR blank, default to xerces
-if "%PARSER_JAR%" == "" set PARSER_JAR=xerces.jar
+if "%PARSER_JAR%" == "" set PARSER_JAR=xercesImpl.jar
 
 @REM If JARDIR is blank, assume default Xalan-J 2.x locations
-@REM Note that this will probably fail miserably if you're trying 
-@REM    to test Xalan-J 1.x: in that case, you must set JARDIR
 @REM Note also that this assumes that crimson.jar is co-located 
 @REM    with the xerces.jar checked into Xalan-J 2.x
 @REM Note also that this assumes that js.jar is in the directory 
 @REM    above xml-xalan, for lack of a better place
 if "%JARDIR%" == "" echo NOTE! JARDIR is not set, defaulting to Xalan-J 2.x!
-if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;..\java\bin\%PARSER_JAR%;..\java\build\xalan.jar;..\java\bin\bsf.jar;..\..\js.jar;%CLASSPATH%
+if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;..\java\bin\%PARSER_JAR%;..\java\bin\xml-apis.jar;..\java\build\xalan.jar;..\java\bin\bsf.jar;..\..\js.jar;%CLASSPATH%
 
 @REM If JARDIR set, put those references first then default classpath
-if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xml-apis.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
 
 @REM Set our output filename
-if "%2" == "" set ROUT=results.html
-if not "%2" == "" set ROUT=%2
-if "%VSXSL%" == "" set VSXSL=viewResults.xsl
+if "%2" == "" set _OUTNAME=results.html
+if not "%2" == "" set _OUTNAME=%2
+set _XSLNAME=%RESULTSCANNER%
+if "%_XSLNAME%" == "" set _XSLNAME=FailScanner.xsl
                              
 @REM @todo find OS-independent way to send 'all remaining args' instead of just up to %9
-echo "%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%VSXSL%" -out "%ROUT%" %3 %4 %5 %6 %7 %8 %9
-"%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%VSXSL%" -out "%ROUT%" %3 %4 %5 %6 %7 %8 %9
+echo "%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%_XSLNAME%" -out "%_OUTNAME%" %3 %4 %5 %6 %7 %8 %9
+"%JAVA_EXE%" %JAVA_OPTS% -classpath "%TEST_CP%" org.apache.xalan.xslt.Process -in "%1" -xsl "%_XSLNAME%" -out "%_OUTNAME%" %3 %4 %5 %6 %7 %8 %9
 
 :done
 @echo %0 complete!
 set TEST_CP=
 set JAVA_EXE=
-set ROUT=
-set VSXSL=
+set _OUTNAME=
+set _XSLNAME=
 set PARSER_JAR=
 set JAVA_OPTS=%SAVED_JAVA_OPTS%
 :end
