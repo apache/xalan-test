@@ -267,14 +267,10 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             //  to the general problem of having a String denoting a 
             //  path/filename, that may be absolute or relative,
             //  and may or may not exist, and to get a valid file: URL?
-            File f = new File(testFileInfo.inputName);
-            String tmp = f.getCanonicalPath();
-            xslID = (new URL("file", "", tmp)).toExternalForm();
-            reporter.logTraceMsg("URL-ized names(1) xslID=" + xslID + ", xmlID=" + xmlID);
-            f = new File(testFileInfo.xmlName);
-            tmp = f.getCanonicalPath();
-            xmlID = (new URL("file", "", tmp)).toString();
-            reporter.logTraceMsg("URL-ized names(2) xslID=" + xslID + ", xmlID=" + xmlID);
+            reporter.logTraceMsg("Original names xslID=" + xslID + ", xmlID=" + xmlID);
+            xslID = filenameToURI(xslID);
+            xmlID = filenameToURI(xmlID);
+            reporter.logTraceMsg("URL-ized names xslID=" + xslID + ", xmlID=" + xmlID);
         }
         catch (Throwable t)
         {
@@ -299,7 +295,7 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             FileOutputStream fos1 = new FileOutputStream(outName1);
             Result result1 = new StreamResult(fos1);
 
-            reporter.logTraceMsg("Transform into " + outName1);
+            reporter.logInfoMsg("Transform into " + outName1);
             Templates templates1 = factory.newTemplates(xslSource1);
             Transformer transformer1 = templates1.newTransformer();
             transformer1.transform(xmlSource1, result1);
@@ -319,7 +315,7 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             FileOutputStream fos2 = new FileOutputStream(outName2);
             Result result2 = new StreamResult(fos2);
 
-            reporter.logTraceMsg("Transform into " + outName2);
+            reporter.logInfoMsg("Transform into " + outName2);
             Templates templates2 = factory.newTemplates(xslSource2);
             Transformer transformer2 = templates2.newTransformer();
             transformer2.transform(xmlSource2, result2);
@@ -331,8 +327,8 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with transform-streams(1)");
-            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(1)");
+            reporter.checkFail("Problem with transform-streams(2)");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(2)");
         }
 
         try
@@ -340,9 +336,10 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             // Do a transform without systemId set
             // Note: is affected by user.dir property; if we're 
             //  already in the correct place, this won't be different
+            // But: most people will run from xml-xalan\test, so this should fail
             try
             {
-                reporter.logTraceMsg("System.getProperty(user.dir) = " + System.getProperty("user.dir"));
+                reporter.logStatusMsg("System.getProperty(user.dir) = " + System.getProperty("user.dir"));
             }
             catch (SecurityException e) // in case of Applet context
             {
@@ -357,20 +354,42 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             FileOutputStream fos3 = new FileOutputStream(outName3);
             Result result3 = new StreamResult(fos3);
 
-            reporter.logTraceMsg("Transform into " + outName3);
+            reporter.logInfoMsg("Transform into " + outName3);
             Templates templates3 = factory.newTemplates(xslSource3);
             Transformer transformer3 = templates3.newTransformer();
             transformer3.transform(xmlSource3, result3);
+            reporter.checkFail("The above transform should probably have thrown an exception");
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with transform-streams(1)");
-            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(1)");
+            reporter.checkPass("Transforming with include/import and wrong SystemId throws exception");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Transforming with include/import and wrong SystemId");
         }
 
         reporter.testCaseClose();
         return true;
     }
+
+
+    /**
+     * Worker method to translate String to URI.  
+     * Note: Xerces and Crimson appear to handle some URI references 
+     * differently - this method needs further work once we figure out 
+     * exactly what kind of format each parser wants (esp. considering 
+     * relative vs. absolute references).
+     * @param String path\filename of test file
+     * @return URL to pass to SystemId
+     */
+    public String filenameToURI(String filename)
+    {
+        File f = new File(filename);
+        String tmp = f.getAbsolutePath();
+	    if (File.separatorChar == '\\') {
+	        tmp = tmp.replace('\\', '/');
+	    }
+        return "file:///" + tmp;
+    }
+
 
     /**
      * Convenience method to print out usage information - update if needed.  
