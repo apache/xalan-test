@@ -66,9 +66,11 @@ import org.apache.qetest.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.xml.utils.SystemIDResolver;
 
 import org.w3c.dom.Node;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -80,184 +82,266 @@ import org.xml.sax.XMLReader;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class LoggingURIResolver implements URIResolver
+public class LoggingURIResolver extends LoggingHandler implements URIResolver
 {
 
-    /** No-op ctor since it's often useful to have one. */
-    public LoggingURIResolver(){}
-
-    /**
-     * Ctor that calls setReporter automatically.  
-     *
-     * NEEDSDOC @param r
-     */
-    public LoggingURIResolver(Reporter r)
+    /** No-op sets logger to default.  */
+    public LoggingURIResolver()
     {
-        setReporter(r);
-    }
-
-    /** Our Reporter, who we tell all our secrets to. */
-    private Reporter reporter;
-
-    /**
-     * Accesor methods for our Reporter.  
-     *
-     * NEEDSDOC @param r
-     */
-    public void setReporter(Reporter r)
-    {
-        if (r != null)
-            reporter = r;
+        setLogger(getDefaultLogger());
     }
 
     /**
-     * Accesor methods for our Reporter.  
+     * Ctor that calls setLogger automatically.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @param l Logger we should log to
      */
-    public Reporter getReporter()
+    public LoggingURIResolver(Logger l)
     {
-        return (reporter);
+        setLogger(l);
     }
 
-    /** Prefixed to all reporter msg output. */
-    private String prefix = "UR:";
-
-    /** Counters for how many URIs we've 'resolved'. */
-    private int URICtr = 0;
 
     /**
-     * Accesor methods for URI counter.  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * Our default handler that we pass all events through to.
      */
-    public int getURICtr()
+    protected URIResolver defaultHandler = null;
+
+
+    /**
+     * Set a default handler for us to wrapper.
+     * Set a URIResolver for us to use.
+     * // Note that we don't currently have a default URIResolver, 
+     * //  so the LoggingURIResolver class will just attempt 
+     * //  to use the SystemIDResolver class instead
+     *
+     * @param default Object of the correct type to pass-through to;
+     * throws IllegalArgumentException if null or incorrect type
+     */
+    public void setDefaultHandler(Object defaultU)
     {
-        return URICtr;
+        try
+        {
+            defaultHandler = (URIResolver)defaultU;
+        }
+        catch (Throwable t)
+        {
+            throw new java.lang.IllegalArgumentException("setDefaultHandler illegal type: " + t.toString());
+        }
+    }
+
+
+    /**
+     * Accessor method for our default handler.
+     *
+     * @return default (Object) our default handler; null if unset
+     */
+    public Object getDefaultHandler()
+    {
+        return (Object)defaultHandler;
+    }
+
+
+    /** Prefixed to all logger msg output.  */
+    public static final String prefix = "LUR:";
+
+
+    /** 
+     * Counter for how many URIs we've resolved.  
+     */
+    protected int[] counters = { 0 };
+
+
+    /**
+     * Get a list of counters of all items we've logged.
+     * Only a single array item is returned.
+     *
+     * @return array of int counter for each item we log
+     */
+    public int[] getCounters()
+    {
+        return counters;
+    }
+
+
+    /**
+     * Really Cheap-o string representation of our state.  
+     *
+     * @return String of getCounters() rolled up in minimal space
+     */
+    public String getQuickCounters()
+    {
+        return (prefix + "(" + counters[0] + ")");
+    }
+
+
+    /** Cheap-o string representation of last URI we resolved.  */
+    protected String lastItem = NOTHING_HANDLED;
+
+
+    /**
+     * Accessor for string representation of last event we got.  
+     * @param s string to set
+     */
+    protected void setLastItem(String s)
+    {
+        lastItem = s;
+    }
+
+
+    /**
+     * Accessor for string representation of last event we got.  
+     * @return last event string we had
+     */
+    public String getLast()
+    {
+        return lastItem;
+    }
+
+
+    /** Expected value(s) for URIs we may resolve, default=ITEM_DONT_CARE. */
+    protected String[] expected = { ITEM_DONT_CARE };
+
+
+    /** Counter used when expected is an ordered array. */
+    protected int expectedCtr = 0;
+
+
+    /**
+     * Ask us to report checkPass/Fail for certain URIs we resolve.
+     *
+     * @param itemType ignored, we only do one type
+     * @param containsString a string to look for within whatever 
+     * item we handle - usually checked for by seeing if the actual 
+     * item we handle contains the containsString
+     */
+    public void setExpected(int itemType, String containsString)
+    {
+        // Default to don't care on null
+        if (null == containsString)
+            containsString = ITEM_DONT_CARE;
+
+        expected = new String[1];
+        expected[0] = containsString;
     }
 
     /**
-     * Cheap-o string representation of our state.  
+     * Ask us to report checkPass/Fail for an ordered list of URIs 
+     * we may resolve.
      *
-     * NEEDSDOC ($objectName$) @return
+     * Users can specify an array of expected URIs we should be 
+     * resolving in order.  Both the specific items and the exact 
+     * order must occour for us to call checkPass for each URI; 
+     * we call checkFail for any URI that doesn't match or is out 
+     * of order.  After we run off the end of the array, we 
+     * go back to the defaul of ITEM_DONT_CARE.
+     * Reset by reset(), of course.
+     *
+     * @param containsStrings[] and array of items to look for in 
+     * order: this allows you to test a stylesheet that has 
+     * three xsl:imports, for example
      */
-    public String getCounterString()
+    public void setExpected(String[] containsStrings)
     {
-        return (prefix + "URIs: " + getURICtr());
-    }
-
-    /** Cheap-o string representation of last entity we resolved. */
-    private String lastURI = null;
-
-    /**
-     * NEEDSDOC Method setLastURI 
-     *
-     *
-     * NEEDSDOC @param s
-     */
-    protected void setLastURI(String s)
-    {
-        lastURI = s;
-    }
-
-    /**
-     * Accessor for string representation of last entity we resolved.  
-     *
-     * NEEDSDOC ($objectName$) @return
-     */
-    public String getLastURI()
-    {
-        return lastURI;
-    }
-
-    /** What loggingLevel to use for reporter.logMsg(). */
-    private int level = Reporter.DEFAULT_LOGGINGLEVEL;
-
-    /**
-     * Accesor methods; don't think it needs to be synchronized.  
-     *
-     * NEEDSDOC @param l
-     */
-    public void setLoggingLevel(int l)
-    {
-        level = l;
+        // Default to don't care on null
+        if ((null == containsStrings) || (0 == containsStrings.length))
+        {
+            expected = new String[1];
+            expected[0] = ITEM_DONT_CARE;
+        }
+        else
+        {
+            expected = new String[containsStrings.length];
+            System.arraycopy(containsStrings, 0, expected, 0, containsStrings.length);
+        }
+        expectedCtr = 0;
     }
 
     /**
-     * Accesor methods; don't think it needs to be synchronized.  
+     * Cheap-o worker method to get a string value.
+     * //@todo improve string return value
      *
-     * NEEDSDOC ($objectName$) @return
-     */
-    public int getLoggingLevel()
-    {
-        return level;
-    }
-
-    /**
-     * Cheap-o utility to get a string value.
-     * @todo improve string return value
-     *
-     * NEEDSDOC @param i
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param i InputSource to get a string from
+     * @return some String representation thereof
      */
     private String getString(InputSource i)
     {
         return i.toString();
     }
 
-    /**
-     * Implement this method: just returns null for now.
-     * Also saves the last entity for later retrieval, and counts
-     * how many entities we've 'resolved' overall.
-     * @todo have a settable property to actually return as the InputSource
-     * @param inputSource The value returned from the EntityResolver.
-     * @return (null currently) a DOM node that represents the resolution of the URI
-     * @exception TransformerException never thrown currently
-     */
-    public Node getDOMNode(InputSource inputSource) throws TransformerException
-    {
-
-        URICtr++;
-
-        setLastURI(getString(inputSource));
-
-        if (reporter != null)
-        {
-            reporter.logMsg(level,
-                            prefix + getLastURI() + " " + getCounterString());
-        }
-
-        return null;
-    }
 
     /**
-     * Implement this method: just returns null for now.
-     * Also saves the last entity for later retrieval, and counts
-     * how many entities we've 'resolved' overall.
-     * @todo have a settable property to actually return as the InputSource
-     * @param inputSource The value returned from the EntityResolver.
-     * @return (null currently) a SAX2 parser to use with the InputSource.
-     * @exception TransformerException never thrown currently
+     * Reset all items or counters we've handled.  
      */
-    public XMLReader getXMLReader(InputSource inputSource)
-            throws TransformerException
+    public void reset()
     {
-
-        URICtr++;
-
-        setLastURI(getString(inputSource));
-
-        if (reporter != null)
-        {
-            reporter.logMsg(level,
-                            prefix + getLastURI() + " " + getCounterString());
-        }
-
-        return null;
+        setLastItem(NOTHING_HANDLED);
+        counters[0] = 0;
+        expected = new String[1];
+        expected[0] = ITEM_DONT_CARE;
+        expectedCtr = 0;
     }
 
 
+    /**
+     * Worker method to either log or call check* for this event.  
+     * A simple way to validate for any kind of event.
+     *
+     * @param desc detail info from this kind of message
+     */
+    protected void logOrCheck(String desc)
+    {
+        String tmp = getQuickCounters() + " " + desc;
+        if (expectedCtr > expected.length)
+        {
+            // Sanity check: prevent AIOOBE 
+            expectedCtr = expected.length;
+            logger.logMsg(Logger.WARNINGMSG, getQuickCounters() 
+                          + " error: array overbounds " + expectedCtr);
+        }
+        // Either log the exception or call checkPass/checkFail 
+        //  as requested by setExpected for this type
+        if (ITEM_DONT_CARE == expected[expectedCtr])
+        {
+            // We don't care about this, just log it
+            logger.logMsg(level, tmp);
+        }
+        else if (ITEM_CHECKFAIL == expected[expectedCtr])
+        {
+            // We shouldn't have been called here, so fail
+            logger.checkFail(tmp + " was unexpected");
+        }
+        else if ((null != desc) 
+                  && (desc.indexOf(expected[expectedCtr]) > -1))
+        {   
+            // We got a warning the user expected, so pass
+            logger.checkPass(tmp + " matched");
+            // Also reset this counter
+            expected[expectedCtr] = ITEM_DONT_CARE;
+        }
+        else
+        {
+            // We got a warning the user didn't expect, so fail
+            logger.checkFail(tmp + " did not match");
+            // Also reset this counter
+            expected[expectedCtr] = ITEM_DONT_CARE;
+        }
+        // If we have a list of expected items, increment
+        if (expected.length > 1)
+        {
+            expectedCtr++;
+            // If we run off the end, reset all expected
+            if (expectedCtr >= expected.length)
+            {
+                expected = new String[1];
+                expected[0] = ITEM_DONT_CARE;
+                expectedCtr = 0;
+            }
+        }
+    }
+
+
+    ////////////////// Implement URIResolver ////////////////// 
     /**
      * This will be called by the processor when it encounters
      * an xsl:include, xsl:import, or document() function.
@@ -272,18 +356,23 @@ public class LoggingURIResolver implements URIResolver
     public Source resolve(String href, String base) 
             throws TransformerException
     {
-
-        URICtr++;
-
-        setLastURI("{" + base + "}" + href);
-
-        if (reporter != null)
+        counters[0]++;
+        setLastItem("{" + base + "}" + href);
+        logOrCheck(getLast());
+        if (null != defaultHandler)
         {
-            reporter.logMsg(level,
-                            prefix + getLastURI() + " " + getCounterString());
+            logger.logMsg(level, prefix + " resolved by: " + defaultHandler);
+            return defaultHandler.resolve(href, base);
         }
-
-        return null;    // @todo do we need to return anything here?
-
+        else
+        {
+            // Note that we don't currently have a default URIResolver, 
+            //  so the LoggingURIResolver class will just attempt 
+            //  to use the SystemIDResolver class instead
+            String sysId = SystemIDResolver.getAbsoluteURI(href, base);
+            logger.logMsg(level, prefix + " resolved into new StreamSource(" 
+                        + sysId + ")");
+            return new StreamSource(sysId);
+        }
     }
 }

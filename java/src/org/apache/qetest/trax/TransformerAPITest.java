@@ -1084,7 +1084,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             LoggingURIResolver myURIResolver = new LoggingURIResolver(reporter);
             transformer.setURIResolver(myURIResolver);
             reporter.checkObject(transformer.getURIResolver(), myURIResolver, "set/getURIResolver API coverage");
-            reporter.logTraceMsg("myURIres.getCounterString = " + myURIResolver.getCounterString());
+            reporter.logTraceMsg("myURIres.getQuickCounters = " + myURIResolver.getQuickCounters());
 
             // Assumes we support Streams
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
@@ -1101,7 +1101,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
                    )
                     reporter.logInfoMsg("transform(Stream, Stream) failure reason:" + fileChecker.getExtendedInfo());
             }
-            reporter.logTraceMsg("myURIres.getCounterString = " + myURIResolver.getCounterString());
+            reporter.logTraceMsg("myURIres.getQuickCounters = " + myURIResolver.getQuickCounters());
 
             reporter.logStatusMsg("@todo basic URIResolver functionality test (i.e. does it get used in a transform)");
         }
