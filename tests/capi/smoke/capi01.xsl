@@ -4,8 +4,8 @@
 				xmlns:weston="http://www.weston.com"
 				exclude-result-prefixes="dick weston">
 
-<xsl:import href="capisubdir/famimp.xsl"/>
-<xsl:include href="capisubdir/faminc.xsl"/>
+<xsl:import href="smokesubdir/famimp.xsl"/>
+<xsl:include href="smokesubdir/faminc.xsl"/>
 
 <xsl:output indent="yes"/>
 
