@@ -43,8 +43,11 @@ public class Bugzilla4336 extends TestletImpl
         // Use logger.logMsg(...) instead of System.out.println(...)
         logger.logMsg(Logger.STATUSMSG, "Reproducing Bugzilla#4336: Xalan 2.2.D11 adds a strange Attribute");
 
-        logger.logMsg(Logger.STATUSMSG, "Apache Xerces "
-                      + org.apache.xerces.framework.Version.fVersion);
+        // Comment out ref to Xerces 1.x class for upcoming Xerces 2.x checkin
+        // When running via 'build bugzilla.classes bugzilla', the Xerces 
+        //  version will already be reported by the test harness
+        // logger.logMsg(Logger.STATUSMSG, "Apache Xerces "
+        //              + org.apache.xerces.framework.Version.fVersion);
         logger.logMsg(Logger.STATUSMSG, "Apache Xalan  "
                       + org.apache.xalan.Version.getVersion());
         try
