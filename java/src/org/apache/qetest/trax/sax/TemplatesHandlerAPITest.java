@@ -280,15 +280,18 @@ public class TemplatesHandlerAPITest extends XSLProcessorTestBase
             reporter.check((transformer != null), true, "getTemplates().newTransformer() returns non-null with valid stylesheet");
 
             // Validate that this transformer actually works
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
             Source xmlSource = new StreamSource(xmlURI);
             transformer.transform(xmlSource, result);
-            int res = fileChecker.check(reporter, 
-                              new File(outNames.currentName()), 
-                              new File(testFileInfo.goldName), 
-                              "SAX-built simple transform into: " + outNames.currentName());
-            if (res == reporter.FAIL_RESULT)
-                reporter.logInfoMsg("SAX-built simple transform failure reason:" + fileChecker.getExtendedInfo());
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
+                        new File(outNames.currentName()), 
+                        new File(testFileInfo.goldName), 
+                        "SAX-built simple transform into: " + outNames.currentName())
+                )
+                 reporter.logInfoMsg("SAX-built simple transform failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
         {
@@ -320,15 +323,18 @@ public class TemplatesHandlerAPITest extends XSLProcessorTestBase
             reporter.check((transformer != null), true, "getTemplates().newTransformer() returns non-null with impincl stylesheet");
 
             // Validate that this transformer actually works
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
             Source xmlSource = new StreamSource(xmlImpInclURI);
             transformer.transform(xmlSource, result);
-            int res = fileChecker.check(reporter, 
-                              new File(outNames.currentName()), 
-                              new File(impInclFileInfo.goldName), 
-                              "SAX-built impincl transform OK into: " + outNames.currentName());
-            if (res == reporter.FAIL_RESULT)
-                reporter.logInfoMsg("SAX-built impincl transform failure reason:" + fileChecker.getExtendedInfo());
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
+                        new File(outNames.currentName()), 
+                        new File(impInclFileInfo.goldName), 
+                        "SAX-built impincl transform into: " + outNames.currentName())
+                )
+                 reporter.logInfoMsg("SAX-built impincl transform failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
         {

@@ -327,14 +327,16 @@ public class SAXResultAPITest extends XSLProcessorTestBase
             //  the stylesheet's output properties into it
             Properties outProps = streamTemplates.getOutputProperties();
             Serializer serializer = SerializerFactory.getSerializer(outProps);
-            reporter.logTraceMsg("serializer.setOutputStream(new FileOutputStream(" + outNames.nextName() + ")");
-            serializer.setOutputStream(new FileOutputStream(outNames.currentName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            reporter.logTraceMsg("serializer.setOutputStream(new FileOutputStream(" + outNames.currentName() + ")");
+            serializer.setOutputStream(fos);
             SAXResult saxResult = new SAXResult(serializer.asContentHandler());
             
             // Just do a normal transform to this result
             Transformer transformer = streamTemplates.newTransformer();
             reporter.logTraceMsg("transform(new StreamSource(" + xmlURI + "), saxResult)");
             transformer.transform(new StreamSource(xmlURI), saxResult);
+            fos.close(); // must close ostreams we own
             fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(testFileInfo.goldName), 

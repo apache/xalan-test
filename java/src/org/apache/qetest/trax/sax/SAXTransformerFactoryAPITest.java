@@ -244,7 +244,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest001: This tests newTransformerhandler() method which takes StreamSource as argument. This is a positive test");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -256,7 +255,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
                         new StreamSource(filenameToURL(xslName)));
             //Result result = new StreamResult(System.out);
             // Send results out to the next output name
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
 
             handler.setResult(result);
             reader.setContentHandler(handler);
@@ -264,17 +264,14 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logInfoMsg("reader.parse() into: " + outNames.currentName());
             reader.parse(filenameToURL(xmlName));
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
-                                            new File(outNames.currentName()), 
-                                            new File(goldName), 
-                                            "SAXTFactoryTest001: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
+                        new File(outNames.currentName()), 
+                        new File(goldName), 
+                        "SAXTFactoryTest001: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest001: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -292,7 +289,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest002: This tests newTransformerhandler() method which takes SAXSource as argument. This is a positive test");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -305,7 +301,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             ss.setInputSource(is);
 
             TransformerHandler handler =  saxTFactory.newTransformerHandler(ss);
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
 
             handler.setResult(result);
             reader.setContentHandler(handler);
@@ -315,17 +312,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(goldName), 
-                                            "SAXTFactoryTest002: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest002: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest002: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -343,7 +336,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest003: This tests newTransformerhandler() method which takes DOMSource as argument. No relative URIs used. This is a positive test");
         reporter.logStatusMsg("Note: Need to verify that URI's are still correct from porting -sc");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         LoggingErrorListener loggingErrListener = new LoggingErrorListener(reporter);
@@ -362,7 +354,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory)tfactory;
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
             handler.setResult(result);
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -373,17 +366,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(goldName), 
-                                            "SAXTFactoryTest003: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest003: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest003: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -403,7 +392,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         reporter.logStatusMsg("SAXTFactoryTest004: This tests newTransformerhandler() method which takes DOMSource as argument. Here a relative URI is used in citiesinclude.xsl file. setSystemId is not used for DOMSource. It should throw an exception. This is a negative test");
         // Grab an extra outName, so the numbers line up - purely cosmetic, not really needed
         String tmpOutName = outNames.nextName();
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         LoggingErrorListener loggingErrListener = new LoggingErrorListener(reporter);
@@ -422,7 +410,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
-            Result result = new StreamResult(new FileOutputStream(tmpOutName));
+            FileOutputStream fos = new FileOutputStream(tmpOutName);
+            Result result = new StreamResult(fos);
             handler.setResult(result);
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -431,13 +420,9 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // Log what output is about to be created
             reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
             reader.parse(filenameToURL(xmlName));
+            fos.close(); // just to be complete
 
             reporter.checkFail("Should have thrown exception because systemId not set!");
-            // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
-                                            new File(outNames.currentName()), 
-                                            new File(goldName), 
-                                            "SAXTFactoryTest004: into " + outNames.currentName());
         } 
         catch (Throwable t) 
         {
@@ -456,7 +441,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest005: This tests newTransformerhandler() method which takes DOMSource as argument.  Here a relative URI is used in citiesinclude.xsl file. setSystemId is used for DOMSource. It should run well. This is a positive test");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         LoggingErrorListener loggingErrListener = new LoggingErrorListener(reporter);
@@ -477,7 +461,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
             handler.setResult(result);
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -488,17 +473,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(goldName), 
-                                            "SAXTFactoryTest005: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest005: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest005: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -516,7 +497,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest006: This tests newTransformerhandler() method which takes DOMSource as argument.  Here a relative URI is used in citiesinclude.xsl file. setSystemId is used for DOMSource. Here Constructor that takes systemId as argument is used for creating DOMSource. It should run well. This is a positive test");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -534,7 +514,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
             handler.setResult(result);
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -545,17 +526,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(goldName), 
-                                            "SAXTFactoryTest006: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest006: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest006: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -573,7 +550,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest007: This tests newTransformerhandler() method which takes DOMSource as argument.  Here a relative URI is used in citiesinclude.xsl file. setSystemId is used for DOMSource. Here Constructor that takes systemId as argument is used for creating DOMSource. It should run well. This is a positive test");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -599,7 +575,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             TransformerHandler handler = saxTFactory.newTransformerHandler();
             Transformer transformer = handler.getTransformer();
 
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
 
             // Log what output is about to be created
             reporter.logTraceMsg("transformer.transform(xmlDomSource, StreamResult) into: " + outNames.currentName());
@@ -608,17 +585,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // Validate the output by comparing against gold
             // 18-Dec-00 Note: need to check what we should be 
             //  validating first - this test case seems incomplete
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(NOT_DEFINED), 
-                                            "SAXTFactoryTest007: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest007: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest007: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -636,7 +609,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest008: XDESCRIPTION");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -651,7 +623,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             TransformerHandler tfhandler = saxTFactory.newTransformerHandler(thandler.getTemplates());
 
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
 
             tfhandler.setResult(result);
             reader.setContentHandler(tfhandler);
@@ -660,17 +633,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(goldName), 
-                                            "SAXTFactoryTest008: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest008: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest008: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -688,7 +657,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest009: XDESCRIPTION");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -707,7 +675,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             TransformerHandler tfhandler =
                 saxTFactory.newTransformerHandler(thandler.getTemplates());
 
-            Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            Result result = new StreamResult(fos);
             tfhandler.setResult(result);
             reader.setContentHandler(tfhandler);
 
@@ -716,17 +685,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(goldName), 
-                                            "SAXTFactoryTest009: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest009: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest009: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -744,7 +709,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest010: The transformer will use a SAX parser as it's reader");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -754,7 +718,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // Set the result handling to be a serialization to the file output stream.
             Serializer serializer = SerializerFactory.getSerializer
                                     (OutputProperties.getDefaultMethodProperties("xml"));
-            serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            serializer.setOutputStream(fos);
 //            reader.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
             reader.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
 
@@ -772,17 +737,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             filter.parse(new InputSource(filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(citiesSerializedFileName), 
-                                            "SAXTFactoryTest010: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest010: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest010: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -800,7 +761,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest011: The transformer will use a SAX parser as it's reader");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -821,7 +781,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // Set the result handling to be a serialization to the file output stream.
             Serializer serializer = SerializerFactory.getSerializer
                                     (OutputProperties.getDefaultMethodProperties("xml"));
-            serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            serializer.setOutputStream(fos);
 //            reader.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
             reader.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
 
@@ -836,17 +797,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             filter.parse(new InputSource(filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(citiesSerializedFileName), 
-                                            "SAXTFactoryTest011: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest011: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest011: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -864,7 +821,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest012: The transformer will use a SAX parser as it's reader");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -883,7 +839,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // Set the result handling to be a serialization to the file output stream.
             Serializer serializer = SerializerFactory.getSerializer
                                     (OutputProperties.getDefaultMethodProperties("xml"));
-            serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            serializer.setOutputStream(fos);
 //            reader.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
             reader.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
             filter.setParent(reader);
@@ -896,17 +853,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             filter.parse(new InputSource(filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(citiesSerializedFileName), 
-                                            "SAXTFactoryTest012: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest012: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest012: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {
@@ -924,7 +877,6 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
     {
         // Log the test we're about to do
         reporter.logStatusMsg("SAXTFactoryTest013: The transformer will use a SAX parser as it's reader");
-        int returnValue = Logger.INCP_RESULT;
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
         try 
@@ -949,7 +901,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // Set the result handling to be a serialization to the file output stream.
             Serializer serializer = SerializerFactory.getSerializer
                                     (OutputProperties.getDefaultMethodProperties("xml"));
-            serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
+            serializer.setOutputStream(fos);
 //            filter.setContentHandler(new ExampleContentHandler(outNames.nextName())); // @todo update content handler!!!!
             filter.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
 
@@ -958,17 +911,13 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             filter.parse(new InputSource(new FileInputStream(xmlName)));
 
             // Validate the output by comparing against gold
-            returnValue = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT != fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
                                             new File(citiesSerializedFileName), 
-                                            "SAXTFactoryTest013: into " + outNames.currentName());
-            // If validation failed or had a problem, also log out
-            //  the reason for the fail or error
-            if ((returnValue == Logger.FAIL_RESULT)
-                || (returnValue == Logger.ERRR_RESULT))
-            {
+                                            "SAXTFactoryTest013: into " + outNames.currentName())
+               )
                 reporter.logStatusMsg("SAXTFactoryTest013: failure reason:" + fileChecker.getExtendedInfo());
-            }
         } 
         catch (Throwable t) 
         {

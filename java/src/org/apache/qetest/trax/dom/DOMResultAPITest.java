@@ -377,10 +377,12 @@ public class DOMResultAPITest extends XSLProcessorTestBase
             {
                 // Use identity transformer to serialize
                 Transformer identityTransformer = factory.newTransformer();
-                StreamResult streamResult = new StreamResult(new FileOutputStream(outNames.nextName()));
+                FileOutputStream fos = new FileOutputStream(outNames.nextName());
+                StreamResult streamResult = new StreamResult(fos);
                 DOMSource nodeSource = new DOMSource(dom);
                 reporter.logTraceMsg("serializeDOMAndCheck() into " + outNames.currentName());
                 identityTransformer.transform(nodeSource, streamResult);
+                fos.close(); // must close ostreams we own
                 fileChecker.check(reporter, 
                                   new File(outNames.currentName()), 
                                   new File(goldFileName), 

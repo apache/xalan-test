@@ -453,15 +453,20 @@ public class TransformerAPITest extends XSLProcessorTestBase
             transformer.setParameter(PARAM1N, new Integer(1234));
             // Verify basic params actually affect transformation
             //   Use the transformer we set the params onto above!
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
             if (doTransform(transformer,
                             new StreamSource(paramTest.xmlName), 
-                            new StreamResult(new FileOutputStream(outNames.nextName()))))
+                            new StreamResult(fos)))
             {
+                fos.close(); // must close ostreams we own
                 // @todo should update goldFile!
-                fileChecker.check(reporter, 
-                                  new File(outNames.currentName()), 
-                                  new File(paramTest.goldName), 
-                                  "transform with param1s,param1n into: " + outNames.currentName());
+                if (Logger.PASS_RESULT
+                    != fileChecker.check(reporter, 
+                        new File(outNames.currentName()), 
+                        new File(paramTest.goldName), 
+                        "transform with param1s,param1n into: " + outNames.currentName())
+                   )
+                    reporter.logInfoMsg("transform with param1s,param1n failure reason:" + fileChecker.getExtendedInfo());
             }
             String gotStr = (String)transformer.getParameter(PARAM1S);
             reporter.check(gotStr, "'test-param-1s'", 
@@ -615,15 +620,20 @@ public class TransformerAPITest extends XSLProcessorTestBase
             reporter.check(encoding, "UTF-8", "outputTransformer set/getOutputProperty value to ?" + encoding + "?");
             // Try doing another transform (will be UTF-8), to get some output
             // Verify that other output properties stay the same
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
             if (doTransform(outputTransformer, 
                             new StreamSource(outputFormatTest.xmlName), 
-                            new StreamResult(new FileOutputStream(outNames.nextName()))))
+                            new StreamResult(fos)))
             {
+                fos.close(); // must close ostreams we own
                 // @todo should update goldFile!
-                fileChecker.check(reporter, 
-                                  new File(outNames.currentName()), 
-                                  new File(outputFormatTestUTF8), 
-                                  "transform(UTF-8) outputParams into: " + outNames.currentName());
+                if (Logger.PASS_RESULT
+                    != fileChecker.check(reporter, 
+                        new File(outNames.currentName()), 
+                        new File(outputFormatTestUTF8), 
+                        "transform(UTF-8) outputParams into: " + outNames.currentName())
+                   )
+                    reporter.logInfoMsg("transform(UTF-8) outputParams failure reason:" + fileChecker.getExtendedInfo());
             }
             // Try getting the whole block and logging it out, just to see what's there
             Properties moreOutProps = outputTransformer.getOutputProperties();
@@ -773,14 +783,19 @@ public class TransformerAPITest extends XSLProcessorTestBase
             reporter.logTraceMsg("myURIres.getCounterString = " + myURIResolver.getCounterString());
 
             // Assumes we support Streams
+            FileOutputStream fos = new FileOutputStream(outNames.nextName());
             if (doTransform(transformer, 
                             new StreamSource(simpleTest.xmlName), 
-                            new StreamResult(new FileOutputStream(outNames.nextName()))))
+                            new StreamResult(fos)))
             {
-                fileChecker.check(reporter, 
+                fos.close(); // must close ostreams we own
+                if (Logger.PASS_RESULT
+                    != fileChecker.check(reporter, 
                                   new File(outNames.currentName()), 
                                   new File(simpleTest.goldName), 
-                                  "transform(Stream, Stream) into: " + outNames.currentName());
+                                  "transform(Stream, Stream) into: " + outNames.currentName())
+                   )
+                    reporter.logInfoMsg("transform(Stream, Stream) failure reason:" + fileChecker.getExtendedInfo());
             }
             reporter.logTraceMsg("myURIres.getCounterString = " + myURIResolver.getCounterString());
 

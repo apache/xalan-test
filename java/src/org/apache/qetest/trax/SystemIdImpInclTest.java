@@ -256,11 +256,13 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             Transformer transformer1 = templates1.newTransformer();
             reporter.logInfoMsg("About to transform, systemId(level1)");
             transformer1.transform(xmlSource1, result1);
-            int result = fileChecker.check(reporter, 
+            fos1.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(goldFileLevel1), 
-                              "transform after setSystemId(level1) into " + outNames.currentName());
-            if (result == reporter.FAIL_RESULT)
+                              "transform after setSystemId(level1) into " + outNames.currentName())
+               )
                 reporter.logInfoMsg("transform after setSystemId(level1)... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
@@ -290,11 +292,13 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             Transformer transformer1 = templates1.newTransformer();
             reporter.logInfoMsg("About to transform, systemId(level0)");
             transformer1.transform(xmlSource1, result1);
-            int result = fileChecker.check(reporter, 
+            fos1.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(goldFileLevel0), 
-                              "transform after setSystemId(level0) into " + outNames.currentName());
-            if (result == reporter.FAIL_RESULT)
+                              "transform after setSystemId(level0) into " + outNames.currentName())
+               )
                 reporter.logInfoMsg("transform after setSystemId(level0)... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
@@ -324,11 +328,13 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             Transformer transformer1 = templates1.newTransformer();
             reporter.logInfoMsg("About to transform, systemId(level2)");
             transformer1.transform(xmlSource1, result1);
-            int result = fileChecker.check(reporter, 
+            fos1.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(goldFileLevel2), 
-                              "transform after setSystemId(level2) into " + outNames.currentName());
-            if (result == reporter.FAIL_RESULT)
+                              "transform after setSystemId(level2) into " + outNames.currentName())
+               )
                 reporter.logInfoMsg("transform after setSystemId(level2)... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
@@ -358,11 +364,13 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             Transformer transformer1 = templates1.newTransformer();
             reporter.logInfoMsg("About to transform, systemId(xslonly level2)");
             transformer1.transform(xmlSource1, result1);
-            int result = fileChecker.check(reporter, 
+            fos1.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(goldFileLevel2), 
-                              "transform after setSystemId(xslonly level2) into " + outNames.currentName());
-            if (result == reporter.FAIL_RESULT)
+                              "transform after setSystemId(xslonly level2) into " + outNames.currentName())
+               )
                 reporter.logInfoMsg("transform after setSystemId(xslonly level2)... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
@@ -816,11 +824,13 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             Templates templates = factory.newTemplates(xslSrc);
             Transformer transformer = templates.newTransformer();
             transformer.transform(xmlSrc, outputResult);
-            int result = fileChecker.check(reporter, 
+            fos.close(); // must close ostreams we own
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(goldFileName), 
-                              desc + " (" + systemId + ") into: " + outNames.currentName());
-            if (result == reporter.FAIL_RESULT)
+                              desc + " (" + systemId + ") into: " + outNames.currentName())
+               )
                 reporter.logInfoMsg(desc + "... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)

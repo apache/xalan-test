@@ -297,6 +297,7 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             Transformer transformer1 = templates1.newTransformer();
             reporter.logTraceMsg("about to transform to streams after setSystemId");
             transformer1.transform(xmlSource1, result1);
+            fos1.close(); // must close ostreams we own
             int result = fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(testFileInfo.goldName), 
@@ -323,6 +324,7 @@ public class StreamSourceAPITest extends XSLProcessorTestBase
             Templates templates2 = factory.newTemplates(xslSource2);
             Transformer transformer2 = templates2.newTransformer();
             transformer2.transform(xmlSource2, result2);
+            fos2.close(); // must close ostreams we own
             int result = fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(testFileInfo.goldName), 
