@@ -615,7 +615,8 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             // Verify basic transforms with with various systemId
             //  and a DOMSource(InputSource(String))
             // level0: one level up
-            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
             xslSource = new DOMSource(xslNode);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -626,7 +627,8 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
                                     "DOMSource(inpSrc(str)).systemId(level0: one up)");
 
             // level1: same systemId as actual file
-            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
             xslSource = new DOMSource(xslNode);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -637,7 +639,8 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
                                     "DOMSource(inpSrc(str)).systemId(level1: same level)");
 
             // level2: one level down
-            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
             xslSource = new DOMSource(xslNode);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -651,7 +654,8 @@ public class SystemIdImpInclTest extends XSLProcessorTestBase
             //  differently in the constructor - tests that you can 
             //  later call setSystemId and have it work
             // level0: one level up
-            xslNode = docBuilder.parse(new InputSource(testFileInfo.inputName));
+            reporter.logTraceMsg("about to parse(InputSource(" + filenameToURL(testFileInfo.inputName) + "))");
+            xslNode = docBuilder.parse(new InputSource(filenameToURL(testFileInfo.inputName)));
             // Set the original systemId to itself, or level1
             xslSource = new DOMSource(xslNode, filenameToURL(testFileInfo.inputName));
 

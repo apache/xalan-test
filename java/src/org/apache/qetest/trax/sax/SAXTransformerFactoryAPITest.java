@@ -253,7 +253,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory)tfactory;
             TransformerHandler handler = saxTFactory.newTransformerHandler(
-                        new StreamSource(xslName));
+                        new StreamSource(filenameToURL(xslName)));
             //Result result = new StreamResult(System.out);
             // Send results out to the next output name
             Result result = new StreamResult(new FileOutputStream(outNames.nextName()));
@@ -262,7 +262,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
             // Log what output is about to be created
             reporter.logInfoMsg("reader.parse() into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reader.parse(filenameToURL(xmlName));
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
@@ -312,7 +312,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             // Log what output is about to be created
             reporter.logInfoMsg("SAXTFactoryTest002 into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -369,8 +369,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + xmlName + ") into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -429,8 +429,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + xmlName + ") into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(filenameToURL(xmlName));
 
             reporter.checkFail("Should have thrown exception because systemId not set!");
             // Validate the output by comparing against gold
@@ -473,7 +473,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             DOMSource domSource = new DOMSource(node);
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo: update to new names
             // domSource.setSystemId("file:///" + testDirPath); // @todo: update to new names
-            domSource.setSystemId(citiesIncludeFileName);
+            domSource.setSystemId(filenameToURL(citiesIncludeFileName));
 
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
@@ -484,8 +484,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + xmlName + ") into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -530,7 +530,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             Node node = (Node) document;
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo update systemId
             // DOMSource domSource = new DOMSource(node, "file:///" + testDirPath); // @todo update systemId
-            DOMSource domSource = new DOMSource(node, citiesIncludeFileName);
+            DOMSource domSource = new DOMSource(node, filenameToURL(citiesIncludeFileName));
 
             TransformerHandler handler = saxTFactory.newTransformerHandler(domSource);
 
@@ -541,8 +541,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(handler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + xmlName + ") into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -646,8 +646,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
             reader.setContentHandler(thandler);
-            reporter.logTraceMsg("reader.parse(" + xslName + ")");
-            reader.parse(xslName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xslName) + ")");
+            reader.parse(filenameToURL(xslName));
 
             TransformerHandler tfhandler = saxTFactory.newTransformerHandler(thandler.getTemplates());
 
@@ -656,8 +656,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             tfhandler.setResult(result);
             reader.setContentHandler(tfhandler);
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + xmlName + ") into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -698,11 +698,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             TemplatesHandler thandler = saxTFactory.newTemplatesHandler();
             // String testDirPath = System.getProperty("Tests_Dir"); // @todo update systemId
             // thandler.setSystemId("file:///" + testDirPath); // @todo update systemId
-            thandler.setSystemId(citiesIncludeFileName); // @todo update systemId
+            thandler.setSystemId(filenameToURL(citiesIncludeFileName)); // @todo update systemId
 
             reader.setContentHandler(thandler);
-            reporter.logTraceMsg("reader.parse(" + citiesIncludeFileName + ")");
-            reader.parse(citiesIncludeFileName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(citiesIncludeFileName) + ")");
+            reader.parse(filenameToURL(citiesIncludeFileName));
 
             TransformerHandler tfhandler =
                 saxTFactory.newTransformerHandler(thandler.getTemplates());
@@ -712,8 +712,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(tfhandler);
 
             // Log what output is about to be created
-            reporter.logTraceMsg("reader.parse(" + xmlName + ") into: " + outNames.currentName());
-            reader.parse(xmlName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            reader.parse(filenameToURL(xmlName));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -759,8 +759,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             reader.setContentHandler(serializer.asContentHandler()); // @todo update content handler!!!!
 
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
-            reporter.logTraceMsg("saxTFactory.newXMLFilter(new StreamSource(" + xslName + "))");
-            XMLFilter filter = saxTFactory.newXMLFilter(new StreamSource(xslName));
+            reporter.logTraceMsg("saxTFactory.newXMLFilter(new StreamSource(" + filenameToURL(xslName) + "))");
+            XMLFilter filter = saxTFactory.newXMLFilter(new StreamSource(filenameToURL(xslName)));
 
             filter.setParent(reader);
 
@@ -768,8 +768,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // the content handler for the parser object (it's "parent"), and
             // will then call the parse method on the parser.
             // Log what output is about to be created
-            reporter.logTraceMsg("filter.parse(" + xmlName + ") into: " + outNames.currentName());
-            filter.parse(new InputSource(xmlName));
+            reporter.logTraceMsg("filter.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            filter.parse(new InputSource(filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -832,8 +832,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // will then call the parse method on the parser.
 
             // Log what output is about to be created
-            reporter.logTraceMsg("filter.parse(" + xmlName + ") into: " + outNames.currentName());
-            filter.parse(new InputSource(xmlName));
+            reporter.logTraceMsg("filter.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            filter.parse(new InputSource(filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -892,8 +892,8 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             // the content handler for the parser object (it's "parent"), and
             // will then call the parse method on the parser.
             // Log what output is about to be created
-            reporter.logTraceMsg("filter.parse(" + xmlName + ") into: " + outNames.currentName());
-            filter.parse(new InputSource(xmlName));
+            reporter.logTraceMsg("filter.parse(" + filenameToURL(xmlName) + ") into: " + outNames.currentName());
+            filter.parse(new InputSource(filenameToURL(xmlName)));
 
             // Validate the output by comparing against gold
             returnValue = fileChecker.check(reporter, 
@@ -937,11 +937,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
 
             // I have put this as it was complaining about systemid
             // thandler.setSystemId("file:///" + testDirPath); // @todo update systemId
-            thandler.setSystemId(xslName); // @todo update systemId
+            thandler.setSystemId(filenameToURL(xslName)); // @todo update systemId
 
             reader.setContentHandler(thandler);
-            reporter.logTraceMsg("reader.parse(" + xslName + ")");
-            reader.parse(xslName);
+            reporter.logTraceMsg("reader.parse(" + filenameToURL(xslName) + ")");
+            reader.parse(filenameToURL(xslName));
 
             XMLFilter filter = saxTFactory.newXMLFilter(thandler.getTemplates());
 
