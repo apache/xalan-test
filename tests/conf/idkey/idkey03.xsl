@@ -5,7 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 12.2 -->
-  <!-- Purpose: Test for key() in template pattern matching. -->
+  <!-- Purpose: Test for key() in template pattern matching. --> 
 
 <xsl:key name="mykey" match="div" use="title"/>
 
