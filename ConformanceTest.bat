@@ -1,3 +1,7 @@
+@echo This batch file is deprecated; for an equivalent try:
+@echo build conf
+@goto end
+
 @echo off
 @goto start
 @REM	Name:   ConformanceTest.bat
@@ -21,5 +25,5 @@ set END_PKG=
 call viewResults.bat %DASHCRIMSON% results-conf\ConformanceTest.xml results-conf\ConformanceTest.html
 results-conf\ConformanceTest.html
 
-:end
 set DASHCRIMSON=
+:end

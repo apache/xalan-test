@@ -1,3 +1,7 @@
+@echo Xalan-J 1.x tests are deprecated, and will be removed soon!
+@echo If you still have need of them, contact me about volunteering to maintain them.
+@goto end
+
 @echo off
 @goto start
 @REM	Name:   xalanj1apitest.bat

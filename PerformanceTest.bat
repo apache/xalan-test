@@ -1,3 +1,8 @@
+@echo This batch file is deprecated; for an equivalent try:
+@echo set JAVA_OPTS=-mx64M
+@echo build perf
+@goto end
+
 @echo off
 @goto start
 @REM	Name:   PerformanceTest.bat

@@ -1,3 +1,7 @@
+@echo This batch file is deprecated; for an equivalent try:
+@echo build api -DtestClass=NameOfAPITest -Dqetest.otherOption=value
+@goto end
+
 @echo off
 @goto start
 @REM	Name:   runtest.bat

@@ -1,3 +1,7 @@
+@echo This batch file is deprecated; for an equivalent try:
+@echo build harness
+@goto end
+
 @echo off
 @goto start
 @REM	Name:   harness.bat
