@@ -3,37 +3,37 @@
 elem1,elem2,elem3,elem3,test:elem3,elem3,elem3,elem4,
 elem2a,elem2b,
 Apply-templates match=elem4: Yahoo,
-Sum: 15
-Count: 5
+Sum: 12
+Count: 4
 Number: 2
 Name: docelem
-generate-id: N1efdc1
+generate-id: N800018
 Local-name: docelem
-Namespace-uri: ,
-	  ,
-	  : 
+Namespace-uri: http://www.hello.com,
+	  http://www.hello.com,
+	  http://www.cnn.com: 3
 
 xsl:copy-of($rtf): 
  <docelem xmlns="http://www.hello.com">
-        <elem1>
-            <elem1a>ELEMENT1A</elem1a>
-            <elem1b>,ELEMENT1B</elem1b>
-        </elem1>
-        <elem2>
-            <elem2a>ELEMENT2A</elem2a>
-            <elem2b/>
-        </elem2>
-        <elem3>1</elem3>
-        <elem3>2</elem3>
-        <test:elem3>3</test:elem3>
-        <elem3>4</elem3>
-        <elem3>5</elem3>
-        <elem4>Yahoo</elem4>
-    </docelem>
+<elem1>
+<elem1a>ELEMENT1A</elem1a>
+<elem1b>,ELEMENT1B</elem1b>
+</elem1>
+<elem2>
+<elem2a>ELEMENT2A</elem2a>
+<elem2b/>
+</elem2>
+<elem3>1</elem3>
+<elem3>2</elem3>
+<test:elem3 xmlns:test="http://www.cnn.com">3</test:elem3>
+<elem3>4</elem3>
+<elem3>5</elem3>
+<elem4>Yahoo</elem4>
+</docelem>
 
 xsl:copy-of(elem1b): 
  <elem1b xmlns="http://www.hello.com">,ELEMENT1B</elem1b>
 
 xsl:copy-of(test:elem3): 
- 
+ <test:elem3 xmlns:test="http://www.cnn.com" xmlns="http://www.hello.com">3</test:elem3>
 </out>
