@@ -63,7 +63,9 @@ import org.apache.qetest.xslwrapper.TransformWrapper;
 import org.apache.qetest.xslwrapper.TransformWrapperHelper;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Hashtable;
+import java.text.DecimalFormat;
 
 /**
  * Testlet to capture specific timing performance data.
@@ -217,7 +219,29 @@ public class PerfTestlet extends StylesheetTestlet
         attrs.put("unparsedxml", new Long(unparsedxml)); // First stylesheet process during iterations
         attrs.put("avgunparsedxml", new Long(avgunparsedxml / iterations)); // Average of stylesheet process during iterations
 
+		// Additional metrics for data throughput
+		File fIn = new File(datalet.inputName);
+		long btIn = iterations * fIn.length();
+		attrs.put("BytesIn", new Long(btIn));
+
+		// Due to unknown reasons the output needs to be filtered through a FileInputStream to get it's size.
+		File fOut = new File(datalet.outputName);
+		FileInputStream fOutStrm = new FileInputStream(fOut);
+
+		int len = fOutStrm.available();
+		long btOut = iterations * fOut.length();
+		attrs.put("BytesOut", new Long(btOut));
+		fOutStrm.close();
+
+		// Calculate thruput as Kb/sec. This is based on DataPower code.
+		double thruPut = (double)(1000 * (btIn + btOut)) / (double)(1024 * 2 * avgparsexsl);
+
+		DecimalFormat fmt = new DecimalFormat("####.##");
+		StringBuffer x = new StringBuffer( fmt.format(thruPut));
+		attrs.put("KBs", x); 
+
         logger.logElement(Logger.STATUSMSG, "perf", attrs, "PItr;");
+
     }
 
     /**
