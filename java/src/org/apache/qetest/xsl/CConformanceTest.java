@@ -85,6 +85,7 @@ import java.util.Vector;
  * Automatically validates output files against golds, but may not
  * validate error or exception conditions yet.</p>
  * @author shane_curcuru@lotus.com
+ * @version $Id$
  */
 public class CConformanceTest extends XSLDirectoryIterator
 {
@@ -266,7 +267,7 @@ public class CConformanceTest extends XSLDirectoryIterator
      *
      * NEEDSDOC ($objectName$) @return
      */
-    public String getProcessorDescription()
+    public String getDescription()
     {
         return "ProcessorVersion;command line TestXSLT.exe:Xalan only";
     }
