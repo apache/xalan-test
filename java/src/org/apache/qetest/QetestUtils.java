@@ -126,9 +126,9 @@ public abstract class QetestUtils
         }
 
         // URLs must explicitly use only forward slashes
-	    if (File.separatorChar == '\\') {
-	        tmp = tmp.replace('\\', '/');
-	    }
+        if (File.separatorChar == '\\') {
+            tmp = tmp.replace('\\', '/');
+        }
         // Note the presumption that it's a file reference
         // Ensure we have the correct number of slashes at the 
         //  start: we always want 3 /// if it's absolute
@@ -216,6 +216,34 @@ public abstract class QetestUtils
             // You can't always get you what you want
             return null;
         }
+    }
+
+
+    /**
+     * Utility method to get a class name of a test.  
+     * This is mainly a bit of syntactic sugar built on 
+     * top of testClassForName.
+     *
+     * @param String classname FQCN or partially specified classname
+     * that you wish to load
+     * @param String[] rootPackages a list of packages to search 
+     * for the classname specified in array order; if null then 
+     * we don't search any additional packages
+     * @param String defaultClassname a default known-good FQCN to 
+     * return if the classname was not found
+     *
+     * @return name of class that testClassForName returns; 
+     * or null if an error occoured
+     */
+    public static String testClassnameForName(String classname, 
+                                         String[] rootPackages,
+                                         String defaultClassname)
+    {
+        Class clazz = testClassForName(classname, rootPackages, defaultClassname);
+        if (null == clazz)
+            return null;
+        else
+            return clazz.getName();
     }
 
 

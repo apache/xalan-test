@@ -218,15 +218,6 @@ public class XSLTestHarness
         for (int i = 0; st.hasMoreTokens(); i++)
         {
             String s = st.nextToken();
-            // @todo use some intelligent way to prepend the 'right' 
-            //  package name on the front: we might have tests in 
-            //  various subpackages under org.apache.qetest: in .xsl; 
-            //  in .trax; in .xalanj1; etc.
-            // HACK: if it doesn't start with org, then prepend the 
-            //  default package - otherwise assume it's FQCN
-            //  thus 'trax.TransformerAPITest' becomes
-            //  'org.apache.qetest.trax.TransformerAPITest'
-            //@todo use QetestUtils.testClassForName instead!
             if (s.startsWith("org"))
             {   
                 // Assume user specified complete package.ClassName
@@ -234,9 +225,8 @@ public class XSLTestHarness
             }
             else
             {
-                // Assume user specified (just ClassName or 
-                //  subpackage.Classname) under org.apache.qetest.
-                tests[i] = DEFAULT_PACKAGE + s;
+                // Use QetestUtils to find the correct name.
+                tests[i] = QetestUtils.testClassnameForName(s, QetestUtils.defaultPackages, null);
             }
         }
         // Munge the inputDir and goldDir to use platform path 
