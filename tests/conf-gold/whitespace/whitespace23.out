@@ -1,11 +1,10 @@
-<html>
-<a href="value%20xx">value xx</a>
+<?xml version="1.0" encoding="UTF-8"?>
+<out><a href="value xx">value xx</a>
 <a href="value">value</a>
-<a href="value%20zz">value zz</a>
-<a href="value%20yy">value yy</a>
-<a href="value%20xx">value xx</a>
+<a href="value zz">value zz</a>
+<a href="value yy">value yy</a>
+<a href="value xx">value xx</a>
 <a href="value">value</a>
-<a href="value%20zz">value zz</a>
-<a href="value%20yy">value yy</a>
-
-</html>
+<a href="value zz">value zz</a>
+<a href="value yy">value yy</a>
+</out>

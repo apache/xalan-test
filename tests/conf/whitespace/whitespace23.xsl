@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" 
-                xmlns:ns1="www.ns1.com" xmlns:ns2="www.ns2.com"
-                exclude-result-prefixes="ns1 ns2">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <!-- FileName: whitespace23 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
@@ -11,7 +9,7 @@
   <!-- Purpose: Another test for the normalize-space function, this one really testing handling of the newline. -->
 
 <xsl:template match = "doc">
-   <html>
+   <out>
 	<xsl:for-each select="link">
 		 <a>
 		 		 <xsl:attribute name="href"><xsl:value-of
@@ -28,7 +26,7 @@
 		 <xsl:text>&#10;</xsl:text>
 	</xsl:for-each>
 
-   </html>
+   </out>
 </xsl:template>
 
 </xsl:stylesheet>
