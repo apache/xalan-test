@@ -21,7 +21,13 @@
 
 <project name="testxsl" default="jar" basedir=".">
 
-<!-- Installation, usage instructions TBD -sc -->
+<!-- Note: A number of property names may seem a little odd.  I've 
+     explicitly tried to reduce property name collisions between 
+     this file and xml-xalan/java/build.xml to try to simplify 
+     maintenance (or at least to separate the dev stuff from the 
+     testing stuff).  Suggestions for improvements (along with 
+     maintenance strategies) accepted. 
+-->
 
     <!-- ================================================================== -->
     <!-- Initialize: define various properties about locations, jars, etc.  -->
@@ -37,13 +43,7 @@
    -->
     <property environment="ENV" />
 
-    <property name="name" value="testxsl"/>
-    <property name="Name" value="Testxsl"/>
     <property name="year" value="2000-2001"/>
-    <property name="copyright" value="Copyright &#169; ${year} The Apache Software Foundation.  All rights reserved."/>
-    <property name="javadocs.packages" 
-              value="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.trax.dom,org.apache.qetest.trax.sax,org.apache.qetest.trax.stream,org.apache.qetest.xalanj2"/>
-
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -342,6 +342,10 @@
             depends="minitest-execute,minitest-notpass,minitest-pass">
     </target>
 
+    <target name="minitest.gump" 
+            description="Compile and Run the Xalan-J 2.x Minitest"
+            depends="jar,minitest">
+    </target>
     <target name="minitest-execute">
         <echo message="About to execute the Minitest..." />
         <antcall target="api">
@@ -567,20 +571,24 @@
         <!-- Ant 1.2 ignores destdir arg if doclet is set, so must send to doclet in doclet subelement dleslie-->    
         <!-- But: Ant 1.3 fails if you *don't* provide destdir attr... curcuru-->    
         <javadoc
-             classpath="${java.class.path};${xalan.jar}"
              sourcepath="${test.src.dir}"
-             packagenames="${javadocs.packages}"
+             packagenames="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.trax.dom,org.apache.qetest.trax.sax,org.apache.qetest.trax.stream,org.apache.qetest.xalanj2"
              protected="true"
              author="true"
              version="true"
              use="true"
-             windowtitle="${Name}" 
-             doctitle="${Name}"
-             bottom="${copyright}"
+             windowtitle="Xalan Testing Framework" 
+             doctitle="Xalan Testing Framework"
+             bottom="Copyright &#169; ${year} The Apache Software Foundation.  All rights reserved."
              destdir="${test.build.apidocs}">
+             <classpath refid="test.docs.class.path" />
                <doclet name="xalanjdoc.Standard" path="${doclet.jar}">
                   <param name="-d" value="${test.build.apidocs}"/>
-               </doclet>             
+               </doclet>
+               <group title="QETEST Independent Framework" packages="org.apache.qetest*"/>
+               <group title="Xalan Framework and Base tests" packages="org.apache.qetest.xsl:org.apache.qetest.xslwrapper"/>
+               <group title="JAXP/TrAX Specific Tests" packages="org.apache.trax*"/>
+               <group title="Xalan-J 2.x Specific Tests" packages="org.apache.xalanj2*"/>
         </javadoc>
     </target>
 
