@@ -102,30 +102,31 @@ public class XSLProcessorTestBase extends FileBasedTest
      * @author Shane Curcuru
      *
      * @return String describing our usage; includes most of the 
-     * flags we support and our parent class' usage
+     * flags we support and our parent class' usage; note avoidance 
+     * of &lt; and &gt; for Ant and xml-based output
      */
     public String usage()
     {
 
         return ("Common options supported by XSLProcessorTestBase:\n"
                 + "    -" + OPT_CATEGORY
-                + "  <name of single subdir within testDir to run>\n"
+                + "  (name of single subdir within testDir to run)\n"
                 + "    -" + OPT_EXCLUDES
-                + "  <list;of;specific file.xsl tests to skip>\n" 
+                + "  (list;of;specific file.xsl tests to skip)\n" 
                 + "    -" + OPT_EMBEDDED
-                + "  <list;of;specific file.xml embedded tests to run>\n" 
+                + "  (list;of;specific file.xml embedded tests to run)\n" 
                 + "    -" + OPT_LIAISON 
-                + "   <liaisonClassName>\n" 
+                + "   (liaisonClassName)\n" 
                 + "    -" + OPT_FLAVOR
-                + "    <xalan|lotusxsl|xt|etc... - which kind of Processor to test>\n"
+                + "    (xalan|lotusxsl|xt|etc...)  which kind of Processor to test\n"
                 + "    -" + OPT_DIAGNOSTICS
-                + "  <root filename for diagnostics output>\n" 
+                + "  (root filename for diagnostics output)\n" 
                 + "    -" + OPT_NOREUSE
-                + "   (will force recreate processor each time)\n" 
+                + "    will force recreate processor each time\n" 
                 + "    -" + OPT_PRECOMPILE
-                + " (will use precompiled stylesheet, if applicable)\n"
+                + "  will use precompiled stylesheet, if applicable\n"
                 + "    -" + OPT_NOERRTEST
-                + "  (will skip running 'err' tests, if applicable)\n"
+                + "   will skip running 'err' tests, if applicable\n"
                 + super.usage());
     }
 
