@@ -59,6 +59,8 @@ package org.apache.qetest;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Hashtable;
 
 /**
  * Static utility class for both general-purpose testing methods 
@@ -270,6 +272,58 @@ public abstract class QetestUtils
             return formatter.format(new java.util.Date())+ ";" + baseId;
         else
             return formatter.format(new java.util.Date());
+    }
+
+
+    /**
+     * Utility method to get info about the environment.  
+     * 
+     * This is a simple way to get a Hashtable about the current 
+     * JVM's environment from either Xalan's EnvironmentCheck 
+     * utility or from org.apache.env.Which.
+     *
+     * @return Hashtable with info about the environment
+     */
+    public static Hashtable getEnvironmentHash()
+    {
+        Hashtable hash = new Hashtable();
+        // Attempt to use Which, which will be better supported
+        Class clazz = testClassForName("org.apache.env.Which", null, null);
+
+        try
+        {
+            if (null != clazz)
+            {
+                // Call Which's method to fill hash
+                final Class whichSignature[] = 
+                        { Hashtable.class, String.class, String.class };
+                Method which = clazz.getMethod("which", whichSignature);
+                String projects = "";
+                String options = "";
+                Object whichArgs[] = { hash, projects, options };
+                which.invoke(null, whichArgs);
+            }
+            else
+            {
+                // Use Xalan's EnvironmentCheck
+                clazz = testClassForName("org.apache.xalan.xslt.EnvironmentCheck", null, null);
+                if (null != clazz)
+                {
+                    Object envCheck = clazz.newInstance();
+                    final Class getSignature[] = { };
+                    Method getHash = clazz.getMethod("getEnvironmentHash", getSignature);
+
+                    Object getArgs[] = { }; // empty
+                    hash = (Hashtable)getHash.invoke(envCheck, getArgs);
+                }
+            }
+        } 
+        catch (Throwable t)
+        {
+            hash.put("FATAL-ERROR", "QetestUtils.getEnvironmentHash no services available; " + t.toString());
+            t.printStackTrace();
+        }
+        return hash;
     }
 
 
