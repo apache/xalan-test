@@ -128,8 +128,6 @@ dependencies - users must manually 'build jar' first.
     <path id="compiletest.class.path">
         <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
-	<pathelement location="${xsltc.jar}" />
-	<pathelement location="${bcel.jar}" />
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${jtidy.jar}" />
@@ -457,9 +455,8 @@ dependencies - users must manually 'build jar' first.
             bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
-        <antcall target="scan">
-            <param name="scan.outputDir" value="${extensions.outputDir}"/>
-        </antcall>
+        <property name="scan.outputDir" value="${extensions.outputDir}"/>
+        <antcall target="scan"/>            
         <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
     </target>
 
@@ -1104,8 +1101,7 @@ dependencies - users must manually 'build jar' first.
 
     <!-- Note that this target must *not* depend on any XSLTC tests, 
          which have to be compiled separately; otherwise the 
-         smoketest will fail.  Please see compile.xsltc and 
-         jar.xsltc targets instead.
+         smoketest will fail.
     -->
     <target name="jar" depends="compile"
         description="Build testxsl.jar with all available tests">
@@ -1330,7 +1326,7 @@ dependencies - users must manually 'build jar' first.
 
     <path id="xsltc.runtime.class.path">
         <pathelement path="${java.class.path}" />
-        <pathelement location="${xalan.build.dir}/xsltc.jar" />
+        <pathelement location="${xalan.build.dir}/xalan.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
@@ -1338,7 +1334,7 @@ dependencies - users must manually 'build jar' first.
     </path>
     <path id="xsltc.compile.class.path">
         <pathelement path="${java.class.path}" />
-        <pathelement location="${xalan.build.dir}/xsltc.jar" />
+        <pathelement location="${xalan.build.dir}/xalan.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
@@ -1349,33 +1345,6 @@ dependencies - users must manually 'build jar' first.
         -->
         <pathelement location="." />
     </path>
-
-    <target name="compile.xsltc.xslwrappers" depends="compile.xsl"
-        description="Compile Xsltc*Wrapper xslwrappers only">
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
-               includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java,${test.root}xslwrapper/Xsltc*Wrapper.java,${test.root}dtm/xsltcDocCode.java"
-               debug="${debug}">
-            <classpath refid="xsltc.compile.class.path" />
-        </javac>               
-    </target>
-
-    <target name="compile.xsltc" depends="compile.trax"
-        description="Compile xsltc native API tests only">
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
-               includes="${test.root}xsltc/*.java"
-               debug="${debug}">
-            <classpath refid="xsltc.compile.class.path" />
-        </javac>               
-    </target>
-
-    <target name="jar.xsltc" depends="compile.xsltc"
-        description="Build testxsl.jar with xsltc-specific tests">
-        <jar jarfile="${test.build.dir}/${testxsl.jar.name}" 
-             basedir="${test.build.dir}" 
-             includes="**/*.class,**/*.properties" />
-    </target>
 
     <target name="conf.xsltc" description="Run TestletDriver over the conf tree using xsltc">
         <!-- Set the default conformance test driver, user may override -->
