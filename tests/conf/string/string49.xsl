@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: str49 -->
+  <!-- FileName: string49 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 4.2 String Functions -->
-  <!-- Purpose: Test of 'starts-with()' function. -->
+  <!-- Purpose: If the second argument to starts-with is the empty string, then true is returned. -->
+
+<xsl:output method="xml" encoding="UTF-8" indent="no"/>
 
 <xsl:template match="doc">
-	<out>
-		<xsl:value-of select="starts-with('','')"/>
-	</out>
+  <out>
+    <xsl:value-of select="starts-with('','')"/>
+  </out>
 </xsl:template>
 
 </xsl:stylesheet>
