@@ -238,6 +238,9 @@
             classpathref="conf.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${conf.outputDir}"/>
+        </antcall>
     </target>
     <target name="conf.dom" description="Run TestletDriver over conf with DOMs">
         <antcall target="conf">
@@ -265,6 +268,9 @@
             classpathref="conf.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${conferr.outputDir}"/>
+        </antcall>
     </target>
 
     <!-- ================================================================== -->
@@ -281,6 +287,9 @@
             classpathref="perf.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${perf.outputDir}"/>
+        </antcall>
     </target>
 
     <!-- ================================================================== -->
@@ -297,6 +306,9 @@
             classpathref="contrib.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${contrib.outputDir}"/>
+        </antcall>
     </target>
 
     <!-- ================================================================== -->
@@ -329,6 +341,9 @@
             classpathref="api.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${api.outputDir}"/>
+        </antcall>
     </target>
 
     <!-- ================================================================== -->
@@ -467,6 +482,9 @@
                 <available file="${smoketest.extensions.passFile}" />
             </and>
         </condition>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="smoketest"/>
+        </antcall>
     </target>
 
     <target name="smoketest-notpass" unless="smoketest-passed">
@@ -530,6 +548,9 @@
             <param name="alltest.resultDir" value="results-alltest/optfalse"/>
             <param name="conf.Processor.setAttribute.http://xml.apache.org/xalan/features/optimize" value="false"/>
         </antcall>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="results-alltest"/>
+        </antcall>
     </target>
 
     <target name="alltest.other">
@@ -560,7 +581,9 @@
             <param name="perf.outputDir" value="${alltest.resultDir}/perf"/>
             <param name="perf.logFile" value="${alltest.resultDir}/perf/results.xml"/>
         </antcall>
-        
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${alltest.resultDir}"/>
+        </antcall>
     </target>
 
     <target name="alltest.contrib">
