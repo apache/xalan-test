@@ -210,7 +210,7 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         long xslBuild = 0;
         long xmlRead = 0;
         long transform = 0;
-        long resultWrite = 0;
+        long resultWrite = 0;		
    
         File xslFile = new File(xslName);
         int xslLength = new Long(xslFile.length()).intValue(); //@todo warning: possible overflow
@@ -376,6 +376,7 @@ public class TraxStreamWrapper extends TransformWrapperHelper
             throw new IllegalStateException("transformWithStylesheet() when isStylesheetReady() == false");
 
         preventFootShooting();
+		long getTransformer = 0; // This is timed in DataPower's xsltMark
         long startTime = 0;
         long xslRead = 0;
         long xslBuild = 0;
@@ -383,8 +384,10 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         long transform = 0;
         long resultWrite = 0;
    
-        // UNTimed: get Transformer from Templates
+        // Timed: get Transformer from Templates
+		startTime = System.currentTimeMillis();
         Transformer transformer = builtTemplates.newTransformer();
+		getTransformer = System.currentTimeMillis() - startTime;
 
         File xmlFile = new File(xmlName);
         int xmlLength = new Long(xmlFile.length()).intValue(); //@todo warning: possible overflow
@@ -425,7 +428,7 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         long[] times = getTimeArray();
         times[IDX_OVERALL] = xmlRead + transform + resultWrite;
         times[IDX_XMLREAD] = xmlRead;
-        times[IDX_TRANSFORM] = transform;
+        times[IDX_TRANSFORM] = getTransformer + transform;
         times[IDX_RESULTWRITE] = resultWrite;
         return times;
     }
