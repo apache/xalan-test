@@ -992,6 +992,7 @@
         <pathelement location="${xalan.bin.dir}/JLex.jar" />
         <pathelement location="${xalan.bin.dir}/java_cup.jar" />
         <pathelement location="${xalan.bin.dir}/runtime.jar" />
+        <pathelement location="${xalan.bin.dir}/jakarta-regexp-1.2.jar" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
@@ -1055,6 +1056,9 @@
             <!-- Explicitly set TransformerFactory property to use xsltc -->
             <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
         </xalantest>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${conf.outputDir}"/>
+        </antcall>
     </target>
 
     <!-- ================================================================== -->
