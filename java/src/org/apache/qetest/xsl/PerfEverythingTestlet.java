@@ -86,7 +86,7 @@ public class PerfEverythingTestlet extends TestletImpl
     static { thisClassName = "org.apache.qetest.xsl.PerfEverythingTestlet"; }
 
     // Initialize our defaultDatalet
-    { defaultDatalet = (Datalet)new PerformanceDatalet(); }
+    { defaultDatalet = (Datalet)new StylesheetDatalet(); }
 
     /**
      * Accesor method for a brief description of this test.  
@@ -141,7 +141,7 @@ public class PerfEverythingTestlet extends TestletImpl
         }
         catch (ClassCastException e)
         {
-            logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue");
+            logger.checkErr("Incorrect Datalet type provided, threw:" + e.toString());
             return;
         }
         

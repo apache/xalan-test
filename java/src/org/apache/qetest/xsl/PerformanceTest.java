@@ -68,6 +68,7 @@ import org.apache.qetest.xslwrapper.*;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import java.util.Hashtable;
 import java.util.Properties;
 
 //-------------------------------------------------------------------------
@@ -219,6 +220,7 @@ public class PerformanceTest extends XSLDirectoryIterator
                                  String OutName)
     {
 
+        long aggregate = 0L;
         long fileTime = ProcessorWrapper.ERROR;
 
         try
@@ -296,7 +298,6 @@ public class PerformanceTest extends XSLDirectoryIterator
 
             logMemory(true);  // dumps Runtime.freeMemory/totalMemory
 
-            long aggregate = 0L;
             int j;
 
             for (j = 1; j <= iterations; j++)
@@ -327,6 +328,24 @@ public class PerformanceTest extends XSLDirectoryIterator
             reporter.logPerfMsg(PERF_AVERAGE, (aggregate / iterations),
                                 "Average of (" + iterations
                                 + ") iterations of::" + XSLName);
+            // Log special performance element with our timing
+            Hashtable attrs = new Hashtable();
+            // idref is the individual filename
+            attrs.put("idref", (new File(XSLName)).getName());
+            // inputName is the actual name we gave to the processor
+            attrs.put("inputName", XSLName);
+            // preload.onetime is the one time it took in the preload stage
+            if (preload)
+                attrs.put("singletransform", new Long(fileTime));
+            // process.avg is the average processing time...
+            attrs.put("avgetoe", new Long(aggregate / iterations));
+            // ... over a number of iterations
+            attrs.put("iterations", new Integer(iterations));
+            // The hackish buf at the end is simply a semicolon
+            //  delimited list of individual timings, just for 
+            //  fun - I'm not even sure we're going to use it
+            logger.logElement(Logger.STATUSMSG, "perf", attrs, PERF_ITERATION);
+
         }
 
         // Catch any throwable and log an error
