@@ -69,9 +69,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 
-import org.apache.xalan.trace.PrintTraceListener;
-import org.apache.xalan.trace.TraceManager;
-import org.apache.xalan.transformer.TransformerImpl;
+//import org.apache.xalan.trace.PrintTraceListener;
+//import org.apache.xalan.trace.TraceManager;
+//import org.apache.xalan.transformer.TransformerImpl;
 
 /**
  * Cheap-o utilities for Trax*Wrapper implementations.
@@ -292,24 +292,25 @@ public abstract class TraxWrapperUtils
         {
             transformer.setErrorListener((ErrorListener)value);
         }
-        else if (SET_TRACE_LISTENER.equals(key) && transformer instanceof TransformerImpl)
-        {
-            TraceManager traceManager = ((TransformerImpl)transformer).getTraceManager();
-            try {
-                FileOutputStream writeStream = new FileOutputStream((String)value);
-                PrintWriter printWriter = new PrintWriter(writeStream, true);
-                PrintTraceListener traceListener = new PrintTraceListener(printWriter);
-                traceListener.m_traceElements = true;
-                traceListener.m_traceGeneration = true;
-                traceListener.m_traceSelection = true;
-                traceListener.m_traceTemplates = true;
-                traceManager.addTraceListener(traceListener);        
-            } catch (FileNotFoundException fnfe) {
-                System.out.println("File not found: " + fnfe);
-            } catch (Exception e) {
-                System.out.println("Exception: " + e);
-            }
-        }
+// %TODO%:  Enable trace listeners for XSLTC
+//        else if (SET_TRACE_LISTENER.equals(key) && transformer instanceof TransformerImpl)
+//        {
+//            TraceManager traceManager = ((TransformerImpl)transformer).getTraceManager();
+//            try {
+//                FileOutputStream writeStream = new FileOutputStream((String)value);
+//                PrintWriter printWriter = new PrintWriter(writeStream, true);
+//                PrintTraceListener traceListener = new PrintTraceListener(printWriter);
+//                traceListener.m_traceElements = true;
+//                traceListener.m_traceGeneration = true;
+//                traceListener.m_traceSelection = true;
+//                traceListener.m_traceTemplates = true;
+//                traceManager.addTraceListener(traceListener);        
+//            } catch (FileNotFoundException fnfe) {
+//                System.out.println("File not found: " + fnfe);
+//            } catch (Exception e) {
+//                System.out.println("Exception: " + e);
+//            }
+//        }
         else
         {
             // General case; no-op; no equivalent
