@@ -60,8 +60,8 @@
 	  <xsl:text>Name: </xsl:text>  
 	  <xsl:value-of select="name(cextend:nodeset($rtf)/*)"/><xsl:text>&#10;</xsl:text>
 
-	  <xsl:text>generate-id: </xsl:text>  
-	  <xsl:value-of select="generate-id(cextend:nodeset($rtf)/default:docelem/default:elem4)"/><xsl:text>&#10;</xsl:text>
+	  <!-- xsl:text>generate-id: </xsl:text>  
+	  <xsl:value-of select="generate-id(cextend:nodeset($rtf)/default:docelem/default:elem4)"/><xsl:text>&#10;</xsl:text -->
 
 	  <xsl:text>Local-name: </xsl:text>
 	  <xsl:value-of select="local-name(cextend:nodeset($rtf)/*)"/><xsl:text>&#10;</xsl:text>

@@ -7,7 +7,6 @@ Sum: 12
 Count: 4
 Number: 2
 Name: docelem
-generate-id: N18
 Local-name: docelem
 Namespace-uri: http://www.hello.com,
 	  http://www.hello.com,
