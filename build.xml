@@ -232,6 +232,12 @@
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
     </target>
+    <target name="conf.dom" description="Run TestletDriver over conf with DOMs">
+        <antcall target="conf">
+            <param name="conf.excludes" value="${trax.dom.excludes}"/>
+            <param name="conf.flavor" value="trax.dom"/>
+        </antcall>
+    </target>
 
     <!-- ================================================================== -->
     <!-- Run tests: the normal StylesheetTestletDriver on the perf suite    -->
@@ -504,6 +510,7 @@
         </antcall>
         <antcall target="conf">
             <param name="conf.flavor" value="trax.dom"/>
+            <param name="conf.excludes" value="${trax.dom.excludes}"/>
             <param name="conf.outputDir" value="${alltest.resultDir}/dom"/>
             <param name="conf.logFile" value="${alltest.resultDir}/dom/results.xml"/>
         </antcall>
