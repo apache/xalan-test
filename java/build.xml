@@ -556,9 +556,7 @@
     <target name="apitests-xalan1" depends="compile.xsl"> 
         <echo message=" [apitests] SORRY! apitests.xalan1 is not implemented yet!" />
     </target>
-    <target name="apitests-xalan2" depends="compile.trax" >
-        <property name="known-good-apitests" 
-                  value="trax.TemplatesAPITest;trax.TransformerAPITest;trax.TransformerFactoryAPITest;trax.stream.StreamResultAPITest;trax.stream.StreamSourceAPITest;trax.dom.DOMResultAPITest;trax.dom.DOMSourceAPITest;trax.sax.SAXResultAPITest;trax.sax.SAXSourceAPITest;trax.sax.SAXTransformerFactoryAPITest;trax.sax.TemplatesHandlerAPITest;trax.sax.TransformerHandlerAPITest;trax.SystemIdTest;trax.SystemIdImpInclTest;trax.EmbeddedStylesheetTest;trax.OutputPropertiesTest;trax.URIResolverTest;trax.ErrorListenerAPITest;trax.ErrorListenerTest;trax.ExamplesTest" />
+    <target name="apitests-xalan2" depends="compile.xalan2" >
         <property name="apitests-results.dir" value="../results-apitests" />
         <property name="apitests-results.xml" value="${apitests-results.dir}/Harness.xml" />
         <property name="apitests-results.html" value="${apitests-results.dir}/Harness.html" />
