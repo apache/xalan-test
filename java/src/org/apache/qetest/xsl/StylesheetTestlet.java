@@ -206,7 +206,7 @@ public class StylesheetTestlet extends TestletImpl
         catch (Throwable t)
         {
             logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " newWrapper/newProcessor threw");
-            logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
+            logger.checkErr(getCheckDescription(datalet) + " newWrapper/newProcessor threw: " + t.toString());
             return null;
         }
         return transformWrapper;
@@ -275,7 +275,7 @@ public class StylesheetTestlet extends TestletImpl
             != fileChecker.check(logger,
                                  new File(datalet.outputName), 
                                  new File(datalet.goldName), 
-                                 getDescription() + " " + datalet.getDescription())
+                                 getCheckDescription(datalet))
            )
         {
             // Log a custom element with all the file refs
@@ -313,8 +313,24 @@ public class StylesheetTestlet extends TestletImpl
         // Put the logThrowable first, so it appears before 
         //  the Fail record, and gets color-coded
         logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " " + datalet.getDescription());
-        logger.checkErr(getDescription() + " " + datalet.getDescription() 
+        logger.checkErr(getCheckDescription(datalet) 
                          + " threw: " + t.toString());
+    }
+
+
+    /** 
+     * Worker method to construct a description.  
+     *
+     * Simply concatenates useful info to override getDescription().
+     *
+     * @param datalet to test with
+     * @param e Throwable that was thrown
+     */
+    protected String getCheckDescription(StylesheetDatalet datalet)
+    {
+        return getDescription() 
+                + "{" + datalet.flavor + "} "
+                + datalet.getDescription();
     }
 }  // end of class StylesheetTestlet
 
