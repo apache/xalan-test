@@ -55,13 +55,9 @@ set CMDCP=/cp
 goto dojardir
 
 :dojardir
-@REM If PARSER_JAR blank, default to xerces
+@REM Sorry for the confusion: we're trying to override too many 
+@REM  things here in a batch file.  Needs work (or to use Ant instead)
 set _PARSER_JAR=%PARSER_JAR%
-if "%_PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xerces.jar
-@REM Set other jars by environment variables as well
-if "%_XALAN_JAR%" == "" set _XALAN_JAR=..\java\build\xalan.jar
-if "%_BSF_JAR%" == "" set _BSF_JAR=..\java\bin\bsf.jar
-if "%_JS_JAR%" == "" set _JS_JAR=..\..\js.jar
 
 @REM If JARDIR is blank, assume default Xalan-J 2.x locations
 @REM Note that this will probably fail miserably if you're trying 
@@ -70,10 +66,20 @@ if "%_JS_JAR%" == "" set _JS_JAR=..\..\js.jar
 @REM    with the xerces.jar checked into Xalan-J 2.x
 @REM Note also that this assumes that js.jar is in the directory 
 @REM    above xml-xalan, for lack of a better place
+@REM If PARSER_JAR blank, default to xerces for non-JARDIR case
+if "%_PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xerces.jar
+@REM Set other jars by environment variables as well
+if "%_XALAN_JAR%" == "" set _XALAN_JAR=..\java\build\xalan.jar
+if "%_BSF_JAR%" == "" set _BSF_JAR=..\java\bin\bsf.jar
+if "%_JS_JAR%" == "" set _JS_JAR=..\..\js.jar
 if "%JARDIR%" == "" echo NOTE! JARDIR is not set, defaulting to Xalan-J 2.x!
+@REM _Note: use relative _path_.jar names
 if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;%_PARSER_JAR%;%_XALAN_JAR%;%_BSF_JAR%;%_JS_JAR%;%CLASSPATH%
 
 @REM If JARDIR set, put those references first then default classpath
+@REM If PARSER_JAR blank, default to xerces for JARDIR case
+if "%PARSER_JAR%" == "" set PARSER_JAR=xerces.jar
+@REM _Note: with exception of parser, use hardcode .jar names
 if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
 
 @REM Wrappers use EXTRA_CP to add items to our classpath; if set, prepend
