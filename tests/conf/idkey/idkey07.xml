@@ -1,7 +1,5 @@
-<?xml version="1.0"?>
-<doc>
-<a/>
-<a/>
-<b/>
-<c/>
+<?xml version="1.0" encoding="UTF-8"?>
+<doc att="gulp">text1
+  <a/>
+  <b/>
 </doc>
