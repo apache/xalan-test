@@ -1102,6 +1102,9 @@
         <echo message="Executing Xalan-xsltc conf test: ${testClass}" />
         <!-- Special: allow explicit test.properties overrides for inputDir, etc for xsltc -->
         <property name="testType" value="conf.xsltc." />
+	<!-- Set indent-number to 0 to match Xalan's default indentation -->
+	<property name="conf.xsltc.Processor.setAttribute.indent-number" value="0"/>
+
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="xsltc.runtime.class.path"
