@@ -105,7 +105,7 @@ static final String[] TYPENAME=
   {
   	long dtmStart = 0;		// Time the creation of dtmManager, and dtm initialization.
 
-  	System.out.println("\nTesting Traversal of DEEP documents.");
+  	System.out.println("\n#### Testing Traversal of DEEP documents. ####");
   	try
     {
 		// Pick our input source
@@ -148,12 +148,13 @@ static final String[] TYPENAME=
 	  // Time the creation of the dtm
 
 
-	  System.out.println("Pre-DTM free memory:" + Runtime.getRuntime().freeMemory());
 	  dtmStart = System.currentTimeMillis();
       DTMManager manager= new DTMManagerDefault().newInstance(new XMLStringFactoryImpl());
       DTM dtm=manager.getDTM(source, true, stripper, false, true);
+	  System.out.println("DTM initialization took: "+ (System.currentTimeMillis() - dtmStart)+ "\n");
+
+	  System.out.println("Pre-DTM free memory:" + Runtime.getRuntime().freeMemory());
 	  System.out.println("Post-DTM free memory:" + Runtime.getRuntime().freeMemory());
-	  System.out.println("DTM initialization took: "+ (System.currentTimeMillis() - dtmStart));
 	  Runtime.getRuntime().gc();
 	  System.out.println("Post-GC free memory:" + Runtime.getRuntime().freeMemory());
 
@@ -168,12 +169,12 @@ static final String[] TYPENAME=
 	  int[] rtData = {0,0,0};		// returns Traversal time, last node, number of nodes traversed 
 
 	  // Get a traverser for Descendant:: axis.
-	  System.out.println("\n#### DESCENDANT from "+"<"+DNodeName+">");
+	  System.out.println("\n* DESCENDANT from "+"<"+DNodeName+">");
 	  timeAxis(dtm, Axis.DESCENDANT, DNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	  // Get a traverser for Descendant:: axis.
-	  System.out.println("\n#### DESCENDANT-OR-SELF from "+"<"+DNodeName+">");
+	  System.out.println("\n* DESCENDANT-OR-SELF from "+"<"+DNodeName+">");
 	  timeAxis(dtm, Axis.DESCENDANTORSELF, DNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
@@ -182,12 +183,12 @@ static final String[] TYPENAME=
 	  String lastNodeName = dtm.getNodeName(lastNode);
 
 	  // Get a traverser for Ancestor:: axis.
-	  System.out.println("\n#### ANCESTOR from "+"<"+lastNodeName+">");	
+	  System.out.println("\n* ANCESTOR from "+"<"+lastNodeName+">");	
 	  timeAxis(dtm, Axis.ANCESTOR, lastNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	  // Get a traverser for Ancestor:: axis.
-	  System.out.println("\n#### ANCESTOR-OR-SELF from "+"<"+lastNodeName+">");	
+	  System.out.println("\n* ANCESTOR-OR-SELF from "+"<"+lastNodeName+">");	
 	  timeAxis(dtm, Axis.ANCESTORORSELF, lastNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 	}

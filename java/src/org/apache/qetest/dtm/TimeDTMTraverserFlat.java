@@ -104,7 +104,7 @@ static final String[] TYPENAME=
   public static void main(String argv[])
   {
     long dtmStart = 0;
-  	System.out.println("\nTesting Traversal of FLAT documents.");
+  	System.out.println("\n#### Testing Traversal of FLAT documents. ####");
     try
     {
 		// Pick our input source
@@ -160,22 +160,22 @@ static final String[] TYPENAME=
 	  int[] rtData = {0,0,0};				// holds return data from timing routine
 
 	  // Get a traverser for Child:: axis.
-	  System.out.println("\n#### CHILD from "+"<"+DNodeName+">");
+	  System.out.println("\n* CHILD from "+"<"+DNodeName+">");
 	  timeAxis(dtm, Axis.CHILD, DNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	  // Get a traverser for Following:: axis.
-	  System.out.println("\n#### FOLLOWING from "+"<"+ANodeName+">");
+	  System.out.println("\n* FOLLOWING from "+"<"+ANodeName+">");
 	  timeAxis(dtm, Axis.FOLLOWING,ANode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	  // Get a traverser for Following-sibling:: axis.
-	  System.out.println("\n#### FOLLOWINGSIBLING from "+"<"+ANodeName+">");
+	  System.out.println("\n* FOLLOWINGSIBLING from "+"<"+ANodeName+">");
 	  timeAxis(dtm, Axis.FOLLOWING,ANode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	  // Get a traverser for Descendant:: axis.
-	  System.out.println("\n#### DESCENDANT from "+"<"+DNodeName+">");
+	  System.out.println("\n* DESCENDANT from "+"<"+DNodeName+">");
 	  timeAxis(dtm, Axis.DESCENDANT, DNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
@@ -184,17 +184,17 @@ static final String[] TYPENAME=
 	  String lastNodeName = dtm.getNodeName(lastNode);
 
 	  // Get a traverser for Ancestor:: axis.
-	  System.out.println("\n#### ANCESTOR from "+"<"+lastNodeName+">");	
+	  System.out.println("\n* ANCESTOR from "+"<"+lastNodeName+">");	
 	  timeAxis(dtm, Axis.ANCESTOR, lastNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	  // Get a traverser for Preceding:: axis.
-	  System.out.println("\n#### PRECEDING from "+"<"+lastNodeName+">");			   
+	  System.out.println("\n* PRECEDING from "+"<"+lastNodeName+">");			   
 	  timeAxis(dtm, Axis.PRECEDING, lastNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	  // Get a traverser for Preceding:: axis.
-	  System.out.println("\n#### PRECEDING-SIBLING from "+"<"+lastNodeName+">");			   
+	  System.out.println("\n* PRECEDING-SIBLING from "+"<"+lastNodeName+">");			   
 	  timeAxis(dtm, Axis.PRECEDINGSIBLING, lastNode, rtData);
 	  System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
