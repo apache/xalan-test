@@ -453,13 +453,11 @@ public class SAXResultAPITest extends XSLProcessorTestBase
             reporter.logTraceMsg("transform(new StreamSource(" + xmlURI + "), loggingSaxResult)");
             transformer.transform(new StreamSource(xmlURI), saxResult);
             fos.close(); // must close ostreams we own
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            reporter.logStatusMsg("Closed result stream from loggingSaxResult, about to check result");
+            fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(dtdFileInfo.goldName), 
-                              "transform loggingSaxResult into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("transform loggingSaxResult failure reason:" + fileChecker.getExtendedInfo());
+                              "transform loggingSaxResult into: " + outNames.currentName());
             reporter.logWarningMsg("//@todo validate that llh got lexical events: Bugzilla#888");
             reporter.logWarningMsg("//@todo validate that lch got content events");
         }
@@ -493,13 +491,11 @@ public class SAXResultAPITest extends XSLProcessorTestBase
             reporter.logTraceMsg("identityTransform(new StreamSource(" + xmlURI + "), loggingSaxResult)");
             identityTransformer.transform(new StreamSource(xmlURI), saxResult);
             fos.close(); // must close ostreams we own
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            reporter.logStatusMsg("Closed result stream from loggingSaxResult, about to check result");
+            fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(dtdFileInfo.xmlName), 
-                              "identity transform loggingSaxResult into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("identity transform loggingSaxResult failure reason:" + fileChecker.getExtendedInfo());
+                              "identity transform loggingSaxResult into: " + outNames.currentName());
             reporter.logWarningMsg("//@todo validate that llh got lexical events: Bugzilla#888");
             reporter.logWarningMsg("//@todo validate that lch got content events");
         }
@@ -544,13 +540,11 @@ public class SAXResultAPITest extends XSLProcessorTestBase
             reporter.logTraceMsg("transform(new DOMSource(" + xmlURI + "), loggingSaxResult)");
             transformer.transform(new DOMSource(xmlNode), saxResult);
             fos.close(); // must close ostreams we own
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            reporter.logStatusMsg("Closed result stream from loggingSaxResult, about to check result");
+            fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(dtdFileInfo.goldName), 
-                              "transform DOM-loggingSaxResult into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("transform DOM-loggingSaxResult failure reason:" + fileChecker.getExtendedInfo());
+                              "transform DOM-loggingSaxResult into: " + outNames.currentName());
             reporter.logWarningMsg("//@todo validate that llh got lexical events: Bugzilla#888");
             reporter.logWarningMsg("//@todo validate that lch got content events");
         }
