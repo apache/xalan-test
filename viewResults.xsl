@@ -143,10 +143,12 @@
          then print this for checkresults where the id is found in 
          bugs.xml somewhere
          /Sprs/Spr/Name
-          -->
+    COMMENT OUT 09-Jul-01 SC since we no longer use bugs.xml.
+    Eventually we should replace this with a better mechanisim
       <xsl:when test="@id = document($bugfile)/Sprs/Spr/Name">
         <TD bgcolor="{$knownfailcolor}"><B><xsl:text>Bug #</xsl:text><xsl:value-of select="@id"/></B></TD>
       </xsl:when>
+    -->
       <xsl:when test="@id = 'known-bug'">
         <TD bgcolor="{$knownfailcolor}"><B><xsl:text>Reported bug</xsl:text></B></TD>
       </xsl:when>
