@@ -449,6 +449,8 @@ dependencies - users must manually 'build jar' first.
             bootclasspathref="boot.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
+        <property name="scan.outputDir" value="${extensions.outputDir}"/>
+        <antcall target="scan"/>            
         <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
     </target>
 
