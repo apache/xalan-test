@@ -64,6 +64,7 @@ package org.apache.qetest.xalanj2;
 import org.apache.qetest.*;
 
 import java.io.IOException;
+import java.util.Hashtable;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
@@ -219,6 +220,10 @@ public class LoggingTraceListener extends LoggingHandler
     /** setExpected, etc. not yet implemented.  */
 
     ////////////////// Implement TraceListener ////////////////// 
+
+    /** Name of custom logElement each event outputs: traceListenerDump.  */
+    public static final String TRACE_LISTENER_DUMP = "traceListenerDump";
+
     /**
      * Logging implementation of TraceListener method.
      * Method that is called when a trace event occurs.
@@ -230,29 +235,36 @@ public class LoggingTraceListener extends LoggingHandler
     {
         counters[TYPE_TRACE]++;
 
-        StringBuffer buf = new StringBuffer("trace:");
-        int dumpLevel = XalanDumper.DUMP_DEFAULT;
-        if (null != tracerEvent.m_mode) // not terribly elegant way to do it
-            dumpLevel = XalanDumper.DUMP_NOCLOSE;
+        Hashtable attrs = new Hashtable();
+        attrs.put("event", "trace");
+        attrs.put("location", "L" + tracerEvent.m_styleNode.getLineNumber()
+                  + "C" + tracerEvent.m_styleNode.getColumnNumber());
+
+        StringBuffer buf = new StringBuffer("  <styleNode>");
         switch (tracerEvent.m_styleNode.getXSLToken())
         {
             // Specific handling for most common 'interesting' items
             case Constants.ELEMNAME_TEXTLITERALRESULT :
-                buf.append(XalanDumper.dump((ElemTextLiteral) tracerEvent.m_styleNode, dumpLevel));
+                buf.append(XalanDumper.dump((ElemTextLiteral) tracerEvent.m_styleNode, XalanDumper.DUMP_DEFAULT));
                 break;
 
             case Constants.ELEMNAME_TEMPLATE :
-                buf.append(XalanDumper.dump((ElemTemplate) tracerEvent.m_styleNode, dumpLevel));
+                buf.append(XalanDumper.dump((ElemTemplate) tracerEvent.m_styleNode, XalanDumper.DUMP_DEFAULT));
                 break;
 
             default :
-                buf.append(XalanDumper.dump((ElemTemplateElement) tracerEvent.m_styleNode, dumpLevel));
+                buf.append(XalanDumper.dump((ElemTemplateElement) tracerEvent.m_styleNode, XalanDumper.DUMP_DEFAULT));
         }
-        if (null != tracerEvent.m_mode)
-            buf.append(XalanDumper.SEP + "m_mode=" + tracerEvent.m_mode + XalanDumper.RBRACKET);
+        buf.append("  </styleNode>\n");
+        // Always add the mode value; will either use toString() 
+        //  automatically or will print 'null'
+        buf.append("  <m_mode>" + tracerEvent.m_mode + "</m_mode>\n");
+
+        // Also dump the sourceNode too!
+        buf.append("  <m_sourceNode>" + XalanDumper.dump(tracerEvent.m_sourceNode, XalanDumper.DUMP_DEFAULT) + "</m_sourceNode>\n");
 
         setLastItem(buf.toString());
-        logger.logMsg(level, prefix + getLast());
+        logger.logElement(level, TRACE_LISTENER_DUMP, attrs, buf.toString());
     }
 
     /**
@@ -267,7 +279,12 @@ public class LoggingTraceListener extends LoggingHandler
     {
         counters[TYPE_SELECTED]++;
 
-        StringBuffer buf = new StringBuffer("selected:");
+        Hashtable attrs = new Hashtable();
+        attrs.put("event", "selected");
+        attrs.put("location", "L" + selectionEvent.m_styleNode.getLineNumber()
+                  + "C" + selectionEvent.m_styleNode.getColumnNumber());
+
+        StringBuffer buf = new StringBuffer("  <styleNode>");
         ElemTemplateElement styleNodeElem = (ElemTemplateElement) selectionEvent.m_styleNode;
         ElemTemplateElement parent = (ElemTemplateElement) styleNodeElem.getParentNode();
         if (parent == styleNodeElem.getStylesheetRoot().getDefaultRootRule())
@@ -283,14 +300,15 @@ public class LoggingTraceListener extends LoggingHandler
             buf.append("[default-rule]");
         }
         else
-            buf.append(XalanDumper.dump(styleNodeElem, XalanDumper.DUMP_NOCLOSE));
+            buf.append(XalanDumper.dump(styleNodeElem, XalanDumper.DUMP_DEFAULT));
+        buf.append("  </styleNode>\n");
 
-        buf.append(selectionEvent.m_attributeName + "="
-                   + selectionEvent.m_xpath.getPatternString() + ";");
+        buf.append("  <m_xpath>" + selectionEvent.m_attributeName + "="
+                   + selectionEvent.m_xpath.getPatternString() + "</m_xpath>\n");
 
+        buf.append("  <m_selection>");
         if (selectionEvent.m_selection.getType() == selectionEvent.m_selection.CLASS_NODESET)
         {
-            // Must create as DTMNodeIterator for DTM_EXP merge 13-Jun-01
             NodeIterator nl = selectionEvent.m_selection.nodeset();
 
             if (nl instanceof ContextNodeList)
@@ -327,9 +345,10 @@ public class LoggingTraceListener extends LoggingHandler
         {
             buf.append("[" + selectionEvent.m_selection.str() +"]");
         }
-        buf.append(XalanDumper.RBRACKET);   // Since we said DUMP_NOCLOSE above
+        buf.append("</m_selection>\n");
+        buf.append("  <m_sourceNode>" + XalanDumper.dump(selectionEvent.m_sourceNode, XalanDumper.DUMP_DEFAULT) + "</m_sourceNode>\n");
         setLastItem(buf.toString());
-        logger.logMsg(level, prefix + getLast());
+        logger.logElement(level, TRACE_LISTENER_DUMP, attrs, buf.toString());
     }
 
     /**
@@ -342,52 +361,56 @@ public class LoggingTraceListener extends LoggingHandler
     {
         counters[TYPE_GENERATED]++;
 
-        StringBuffer buf = new StringBuffer("generated:");
+        Hashtable attrs = new Hashtable();
+        attrs.put("event", "generated");
+
+        StringBuffer buf = new StringBuffer("  <eventtype ");
         switch (generateEvent.m_eventtype)
         {
             case GenerateEvent.EVENTTYPE_STARTDOCUMENT :
-                buf.append("STARTDOCUMENT");
+                buf.append("type=\"STARTDOCUMENT\">");
             break;
 
             case GenerateEvent.EVENTTYPE_ENDDOCUMENT :
-                buf.append("ENDDOCUMENT");
+                buf.append("type=\"ENDDOCUMENT\">");
             break;
 
             case GenerateEvent.EVENTTYPE_STARTELEMENT :
-                buf.append("STARTELEMENT[" + generateEvent.m_name + "]"); // just hardcode [ LBRACKET ] RBRACKET here
+                buf.append("type=\"STARTELEMENT\">" + generateEvent.m_name);
             break;
 
             case GenerateEvent.EVENTTYPE_ENDELEMENT :
-                buf.append("ENDELEMENT[" + generateEvent.m_name + "]");
+                buf.append("type=\"ENDELEMENT\">" + generateEvent.m_name);
             break;
 
             case GenerateEvent.EVENTTYPE_CHARACTERS :
                 String chars1 = new String(generateEvent.m_characters, generateEvent.m_start, generateEvent.m_length);
-                buf.append("CHARACTERS[" + chars1 + "]");
+                buf.append("type=\"CHARACTERS\">" + chars1);
             break;
 
             case GenerateEvent.EVENTTYPE_CDATA :
                 String chars2 = new String(generateEvent.m_characters, generateEvent.m_start, generateEvent.m_length);
-                buf.append("CDATA[" + chars2 + "]");
+                buf.append("type=\"CDATA\">" + chars2);
             break;
 
             case GenerateEvent.EVENTTYPE_COMMENT :
-                buf.append("COMMENT[" + generateEvent.m_data + "]");
+                buf.append("type=\"COMMENT\">" + generateEvent.m_data);
             break;
 
             case GenerateEvent.EVENTTYPE_PI :
-                buf.append("PI[" + generateEvent.m_name + ", " + generateEvent.m_data + "]");
+                buf.append("type=\"PI\">" + generateEvent.m_name + ", " + generateEvent.m_data);
             break;
 
             case GenerateEvent.EVENTTYPE_ENTITYREF :
-                buf.append("ENTITYREF[" + generateEvent.m_name + "]");
+                buf.append("type=\"ENTITYREF\">" + generateEvent.m_name);
             break;
 
             case GenerateEvent.EVENTTYPE_IGNORABLEWHITESPACE :
-                buf.append("IGNORABLEWHITESPACE");
+                buf.append("type=\"IGNORABLEWHITESPACE\">");
             break;
         }
+        buf.append("</eventtype>\n");
         setLastItem(buf.toString());
-        logger.logMsg(level, prefix + getLast());
+        logger.logElement(level, TRACE_LISTENER_DUMP, attrs, buf.toString());
     }
 }
