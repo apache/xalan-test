@@ -6,10 +6,13 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 12.4 -->
   <!-- Purpose: Invoke unparsed-entity-uri function -->
+  <!-- To avoid dealing with the top of the file path,
+     we just look for the part of the returned value that's in the supplied data. -->
 
 <xsl:template match="doc">
   <out>
-    <xsl:value-of select="unparsed-entity-uri('hatch-pic')"/>
+    <xsl:value-of select="contains(
+      unparsed-entity-uri('hatch-pic'),'grafix/OpenHatch.gif')"/>
   </out>
 </xsl:template>
 
