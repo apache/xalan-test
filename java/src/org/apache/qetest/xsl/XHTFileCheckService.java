@@ -116,8 +116,8 @@ public class XHTFileCheckService implements CheckService
      * @param description of what you're checking
      * @param msg comment to log out with this test point
      * @param id ID tag to log out with this test point
-     * @return Logger.*_RESULT code denoting status; each method may define
-     * it's own meanings for pass, fail, ambiguous, etc.
+     * @return Logger.*_RESULT code denoting status; each method may 
+     * define it's own meanings for pass, fail, ambiguous, etc.
      */
     public int check(Logger logger, Object actual, Object reference,
                      String msg, String id)
@@ -177,7 +177,7 @@ public class XHTFileCheckService implements CheckService
             // Note calling order (gold, act) is different than checkFiles()
             isEqual = comparator.compare(referenceFile.getCanonicalPath(),
                                          actualFile.getCanonicalPath(), pw,
-                                         warning);
+                                         warning, attributes);
             // Side effect: fills in pw/sw with info about the comparison
         }
         catch (Throwable t)
@@ -205,7 +205,7 @@ public class XHTFileCheckService implements CheckService
             pw.flush();
             if (allowWhitespaceDiff)
             {
-                logger.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, passing!");
+                logger.logMsg(Logger.STATUSMSG, "XHTFileCheckService whitespace diff warning, passing!");
                 logger.checkPass(msg, id);
                 return Logger.PASS_RESULT;
             }
@@ -279,13 +279,99 @@ public class XHTFileCheckService implements CheckService
      * @param reference (gold, or expected) File to check against
      * @param description of what you're checking
      * @param msg comment to log out with this test point
-     * @return Logger.*_RESULT code denoting status; each method may define
-     * it's own meanings for pass, fail, ambiguous, etc.
+     * @return Logger.*_RESULT code denoting status; each method may 
+     * define it's own meanings for pass, fail, ambiguous, etc.
      */
     public int check(Logger logger, Object actual, Object reference,
                      String msg)
     {
         return check(logger, actual, reference, msg, null);
+    }
+
+    /**
+     * Whether whitespace differences will cause a fail or not.  
+     */
+    public static final String ALLOW_WHITESPACE_DIFF = "urn:XHTFileCheckService:allowWhitespaceDiff";
+
+    /**
+     * Whether whitespace differences will cause a fail or not.  
+     * setAttribute("allow-whitespace-diff", true|false)
+     * true=whitespace-only diff will pass;
+     * false, whitespace-only diff will fail
+     */
+    protected boolean allowWhitespaceDiff = false;  // default; backwards compatible
+
+    /**
+     * Hash of parser-like attributes that have been set.  
+     */
+    protected Hashtable attributes = null;
+
+    /**
+     * Allows the user to set specific attributes on the testing 
+     * utility or it's underlying product object under test.
+     * 
+     * Supports basic JAXP DocumentBuilder attributes, plus our own 
+     * "allow-whitespace-diff" attribute.
+     * 
+     * @param name The name of the attribute.
+     * @param value The value of the attribute.
+     * @throws IllegalArgumentException thrown if the underlying
+     * implementation doesn't recognize the attribute and wants to 
+     * inform the user of this fact.
+     */
+    public void setAttribute(String name, Object value)
+        throws IllegalArgumentException
+    {
+        // Check for our own attributes first
+        if (ALLOW_WHITESPACE_DIFF.equals(name))
+        {
+            //@todo set allowWhitespaceDiff based on value here
+        }
+        else
+        {
+            if (null == attributes)
+            {
+                attributes = new Hashtable();
+            }
+            attributes.put(name, value);
+        }
+    }
+
+    /**
+     * Allows the user to retrieve specific attributes on the testing 
+     * utility or it's underlying product object under test.
+     *
+     * @param name The name of the attribute.
+     * @return value of supported attributes or null if not recognized.
+     * @throws IllegalArgumentException thrown if the underlying
+     * implementation doesn't recognize the attribute and wants to 
+     * inform the user of this fact.
+     */
+    public Object getAttribute(String name)
+        throws IllegalArgumentException
+    {
+        // Check for our own attributes first
+        if (ALLOW_WHITESPACE_DIFF.equals(name))
+        {
+            return new Boolean(allowWhitespaceDiff);
+            
+        }
+        else if (null != attributes)
+        {
+            return attributes.get(name);
+        }
+        else
+            return null;
+    }
+
+    /**
+     * Description of what this testing utility does.  
+     * 
+     * @return String description of extension
+     */
+    public String getDescription()
+    {
+        return ("Uses an XML/HTML/Text diff comparator to check or diff two files.");
     }
 
     /**
@@ -306,41 +392,5 @@ public class XHTFileCheckService implements CheckService
             return "XHTFileCheckService-no-info-available";
     }
 
-    /**
-     * Description of algorithim used to check file equivalence.  
-     * @return basic description of how we compare files
-     */
-    public String getDescription()
-    {
-        return ("Uses an XML/HTML/Text diff comparator to check or diff two files.");
-    }
-
-    /**
-     * Whether whitespace differences will cause a fail or not.  
-     * setFeature("allow-whitespace-diff", "true"|"false")
-     * true=whitespace-only diff will pass;
-     * false, whitespace-only diff will fail
-     */
-    protected boolean allowWhitespaceDiff = false;  // default; backwards compatible
-
-    /**
-     * Set a custom option or feature.  
-     * @param feature name
-     * @param feature value
-     */
-    public void setFeature(String name, String value)
-    {
-        if ("allow-whitespace-diff".equals(name))
-        {
-            if ("true".equals(value) || "yes".equals(value))
-            {
-                allowWhitespaceDiff = true;
-            }
-            else if ("false".equals(value) || "no".equals(value))
-            {
-                allowWhitespaceDiff = false;
-            }
-        }
-    }
 }  // end of class XHTFileCheckService
 

@@ -55,11 +55,6 @@
  * <http://www.apache.org/>.
  */
 
-/*
- *
- * SimpleFileCheckService.java
- *
- */
 package org.apache.qetest;
 
 import java.io.BufferedReader;
@@ -83,8 +78,8 @@ public class SimpleFileCheckService implements CheckService
      * @param description of what you're checking
      * @param msg comment to log out with this test point
      * @param id ID tag to log out with this test point
-     * @return Logger.*_RESULT code denoting status; each method may define
-     * it's own meanings for pass, fail, ambiguous, etc.
+     * @return Logger.*_RESULT code denoting status; each method may 
+     * define it's own meanings for pass, fail, ambiguous, etc.
      */
     public int check(Logger logger, Object actual, Object reference,
                      String msg, String id)
@@ -94,8 +89,7 @@ public class SimpleFileCheckService implements CheckService
         {
 
             // Must have File objects to continue
-            logger.checkErr(
-                "SimpleFileCheckService only takes files, with: " + msg, id);
+            logger.checkErr(msg + " :check() objects were not Files", id);
 
             return Logger.ERRR_RESULT;
         }
@@ -105,7 +99,7 @@ public class SimpleFileCheckService implements CheckService
         // Fail if Actual file doesn't exist
         if (fVal1 == null)
         {
-            logger.checkFail(msg, id);
+            logger.checkFail(msg + " :Actual file null", id);
 
             return Logger.FAIL_RESULT;
         }
@@ -115,7 +109,7 @@ public class SimpleFileCheckService implements CheckService
         // Ambiguous if gold or reference file doesn't exist
         if (fVal2 == null)
         {
-            logger.checkAmbiguous(msg, id);
+            logger.checkAmbiguous(msg + " :Gold file null", id);
 
             return Logger.AMBG_RESULT;
         }
@@ -143,56 +137,13 @@ public class SimpleFileCheckService implements CheckService
      * @param reference (gold, or expected) File to check against
      * @param description of what you're checking
      * @param msg comment to log out with this test point
-     * @return Logger.*_RESULT code denoting status; each method may define
-     * it's own meanings for pass, fail, ambiguous, etc.
+     * @return Logger.*_RESULT code denoting status; each method may 
+     * define it's own meanings for pass, fail, ambiguous, etc.
      */
     public int check(Logger logger, Object actual, Object reference,
                      String msg)
     {
         return check(logger, actual, reference, msg, null);
-    }
-
-    /**
-     * Compare two files for equivalence, and return appropriate *_RESULT flag.
-     * <b>Note:</b> Only provided for backwards compatibility!
-     * <p>Uses appropriate values from Logger for return values.</p>
-     * @param file1 Actual (current) file to check
-     * @param file2 Reference (gold, or expected) file to check against
-     * @return PASS if equal, FAIL if not, AMBG if gold does not exist
-     */
-    public int checkFiles(Logger logger, File file1, File file2)
-    {
-
-        String fVal1 = readFileIntoString(logger, file1);
-
-        // Fail if Actual file doesn't exist
-        if (fVal1 == null)
-            return Logger.FAIL_RESULT;
-
-        String fVal2 = readFileIntoString(logger, file2);
-
-        // Ambiguous if gold or reference file doesn't exist
-        if (fVal2 == null)
-            return Logger.AMBG_RESULT;
-
-        // Pass if they're equal, fail otherwise        
-        if (fVal1.equals(fVal2))
-            return Logger.PASS_RESULT;
-        else
-            return Logger.FAIL_RESULT;
-    }
-
-    /**
-     * Compare two files for equivalence, and return appropriate *_RESULT flag.
-     * <b>Note:</b> Only provided for backwards compatibility!
-     * @param file1 Actual (current) file to check
-     * @param file2 Reference (gold, or expected) file to check against
-     * @return PASS if equal, FAIL if not, AMBG if gold does not exist
-     */
-    public int checkFiles(File file1, File file2)
-    {
-
-        return checkFiles(null, file1, file2);
     }
 
     /**
@@ -239,25 +190,6 @@ public class SimpleFileCheckService implements CheckService
     }
 
     /**
-     * Read text file into string line-by-line.  
-     * For backwards compatibility.
-     * @param f File object to read
-     * @return String of file's contents
-     */
-    private String readFileIntoString(File f)
-    {
-        return readFileIntoString(null, f);
-    }
-    /**
-     * Description of algorithim used to check file equivalence.  
-     * @return String description of algorithim
-     */
-    public String getDescription()
-    {
-        return ("Reads in text files line-by-line as strings (ignoring newlines) and does String.equals()");
-    }
-
-    /**
      * Gets extended information about the last checkFiles call: NONE AVAILABLE.
      * @return null, since we don't support this
      */
@@ -265,5 +197,50 @@ public class SimpleFileCheckService implements CheckService
     {
         return null;
     }
+
+    /**
+     * Allows the user to set specific attributes on the testing 
+     * utility or it's underlying product object under test.
+     * 
+     * No-op; this class does not have any supported attributes.
+     * 
+     * @param name The name of the attribute.
+     * @param value The value of the attribute.
+     * @throws IllegalArgumentException thrown if the underlying
+     * implementation doesn't recognize the attribute and wants to 
+     * inform the user of this fact.
+     */
+    public void setAttribute(String name, Object value)
+        throws IllegalArgumentException
+    {
+        /* no-op */        
+    }
+
+    /**
+     * Allows the user to retrieve specific attributes on the testing 
+     * utility or it's underlying product object under test.
+     *
+     * @param name The name of the attribute.
+     * @return null, no attributes supported.
+     * @throws IllegalArgumentException thrown if the underlying
+     * implementation doesn't recognize the attribute and wants to 
+     * inform the user of this fact.
+     */
+    public Object getAttribute(String name)
+        throws IllegalArgumentException
+    {
+        return null;
+    }
+
+    /**
+     * Description of what this testing utility does.  
+     * 
+     * @return String description of extension
+     */
+    public String getDescription()
+    {
+        return ("Reads in text files line-by-line as strings (ignoring newlines) and does String.equals()");
+    }
+
 }  // end of class SimpleFileCheckService
 

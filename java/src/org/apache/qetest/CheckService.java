@@ -55,29 +55,35 @@
  * <http://www.apache.org/>.
  */
 
-/*
- *
- * CheckService.java
- *
- */
 package org.apache.qetest;
 
 /**
  * Interface for 'check'ing (validating) equivalence of two items.
+ *
  * Implementers provide their own algorithims for determining
- * equivalence.
+ * equivalence, including custom algorithims for complex objects. 
+ * CheckServices should log out both any pertinent information about 
+ * the checking they've performed, then log out a checkPass or 
+ * checkFail (or Ambg, etc.) record, as well as returning the 
+ * appropriate result constant to the caller.
+ *
+ * The Configurable interface also allows callers to attempt to 
+ * set attributes on either the CheckService or on any 
+ * underlying validation algorithims.
+ *
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
  */
-public interface CheckService
+public interface CheckService extends Configurable
 {
 
     /**
      * Compare two objects for equivalence, and return appropriate result.
      * Implementers should provide the details of their "equals"
-     * algorithim in getCheckMethod().  They must also call the 
+     * algorithim in getDescription().  They must also call the 
      * appropriate checkPass()/checkFail()/etc. method on the 
      * supplied Logger.
+     * 
      * Note that the order of actual, reference is usually 
      * important in determining the result.
      * <li>Typically:
@@ -93,11 +99,11 @@ public interface CheckService
      * @param reference (gold, or expected) Object to check against
      * @param description of what you're checking
      * @param msg comment to log out with this test point
-     * @return Reporter.*_RESULT code denoting status; each method may define
-     * it's own meanings for pass, fail, ambiguous, etc.
+     * @return Logger.*_RESULT code denoting status; each method may 
+     * define it's own meanings for pass, fail, ambiguous, etc.
      */
-    public abstract int check(Logger logger, Object actual,
-                              Object reference, String msg);
+    public int check(Logger logger, Object actual,
+                     Object reference, String msg);
 
     /**
      * Compare two objects for equivalence, and return appropriate result.
@@ -108,25 +114,24 @@ public interface CheckService
      * @param description of what you're checking
      * @param msg comment to log out with this test point
      * @param id ID tag to log out with this test point
-     * @return Reporter.*_RESULT code denoting status; each method may define
-     * it's own meanings for pass, fail, ambiguous, etc.
+     * @return Logger.*_RESULT code denoting status; each method may 
+     * define it's own meanings for pass, fail, ambiguous, etc.
      */
-    public abstract int check(Logger logger, Object actual,
-                              Object reference, String msg, String id);
-
-    /**
-     * Description of algorithim used to check equivalence.  
-     *
-     * @return String describing algorithim
-     */
-    public abstract String getDescription();
+    public int check(Logger logger, Object actual,
+                     Object reference, String msg, String id);
 
     /**
      * Gets extended information about the last check call.
+     * 
+     * This is somewhat optional, and may be removed.  CheckServices 
+     * should probably log out any additional info themselves to 
+     * their logger before calling checkPass, etc., thus removing 
+     * the need for callers to explicitly ask for this info.
      *
      * @return String describing any additional info about the last
-     * two Objects that were checked
+     * two Objects that were checked, or null if none available
      */
-    public abstract String getExtendedInfo();
+    public String getExtendedInfo();
+
 }  // end of class CheckService
 

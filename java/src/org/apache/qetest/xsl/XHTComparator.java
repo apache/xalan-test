@@ -62,7 +62,8 @@
  */
 package org.apache.qetest.xsl;
 
-import org.apache.qetest.Reporter;  // Only for PASS_RESULT, etc.
+import org.apache.qetest.Logger;  // Only for PASS_RESULT, etc.
+import org.apache.qetest.QetestUtils;
 
 import java.io.PrintWriter;
 import java.io.File;
@@ -72,6 +73,7 @@ import java.io.BufferedReader;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 // DOM imports
@@ -138,60 +140,60 @@ public class XHTComparator
     /** Constants for reporting out reason for failed diffs. */
     public static final String SEPARATOR = ";";
 
-    /** NEEDSDOC Field LBRACKET          */
+    /** LBRACKET '['  */
     public static final String LBRACKET = "[";
 
-    /** NEEDSDOC Field RBRACKET          */
+    /** RBRACKET ']'  */
     public static final String RBRACKET = "]";
 
-    /** NEEDSDOC Field TEST          */
+    /** TEST 'test', for the actual value.  */
     public static final String TEST = "test";
 
-    /** NEEDSDOC Field GOLD          */
+    /** GOLD 'gold' for the gold or expected value.  */
     public static final String GOLD = "gold";
 
-    /** NEEDSDOC Field PARSE_TYPE          */
+    /** PARSE_TYPE '-parse-type' */
     public static final String PARSE_TYPE = "-parse-type" + SEPARATOR;  // postpended to TEST or GOLD
 
-    /** NEEDSDOC Field OTHER_ERROR          */
+    /** OTHER_ERROR 'other-error'  */
     public static final String OTHER_ERROR = "other-error" + SEPARATOR;
 
-    /** NEEDSDOC Field WARNING          */
+    /** WARNING 'warning'  */
     public static final String WARNING = "warning" + SEPARATOR;
 
-    /** NEEDSDOC Field MISMATCH_NODE          */
+    /** MISMATCH_NODE  */
     public static final String MISMATCH_NODE = "mismatch-node" + SEPARATOR;
 
-    /** NEEDSDOC Field MISSING_TEST_NODE          */
+    /** MISSING_TEST_NODE  */
     public static final String MISSING_TEST_NODE = "missing-node-" + TEST
                                                        + SEPARATOR;
 
-    /** NEEDSDOC Field MISSING_GOLD_NODE          */
+    /** MISSING_GOLD_NODE  */
     public static final String MISSING_GOLD_NODE = "missing-node-" + GOLD
                                                        + SEPARATOR;
 
-    /** NEEDSDOC Field MISMATCH_ATTRIBUTE          */
+    /** MISMATCH_ATTRIBUTE */
     public static final String MISMATCH_ATTRIBUTE = "mismatch-attribute"
                                                         + SEPARATOR;
 
-    /** NEEDSDOC Field MISMATCH_VALUE          */
+    /** MISMATCH_VALUE  */
     public static final String MISMATCH_VALUE = "mismatch-value" + SEPARATOR;
 
-    /** NEEDSDOC Field MISMATCH_VALUE          */
+    /** MISMATCH_VALUE  */
     public static final String MISMATCH_VALUE_GOLD = "mismatch-value-gold" + SEPARATOR;
 
-    /** NEEDSDOC Field MISMATCH_VALUE          */
+    /** MISMATCH_VALUE  */
     public static final String MISMATCH_VALUE_TEXT = "mismatch-value-text" + SEPARATOR;
 
-    /** NEEDSDOC Field MISSING_TEST_VALUE          */
+    /** MISSING_TEST_VALUE  */
     public static final String MISSING_TEST_VALUE = "missing-value-" + TEST
                                                         + SEPARATOR;
 
-    /** NEEDSDOC Field MISSING_GOLD_VALUE          */
+    /** MISSING_GOLD_VALUE  */
     public static final String MISSING_GOLD_VALUE = "missing-value-" + GOLD
                                                         + SEPARATOR;
 
-    /** NEEDSDOC Field WHITESPACE_DIFF          */
+    /** WHITESPACE_DIFF  */
     public static final String WHITESPACE_DIFF = "whitespace-diff;";
 
     /**
@@ -201,18 +203,20 @@ public class XHTComparator
      * @param reporter PrintWriter to dump status info to
      * @param array of warning flags (for whitespace diffs, I think?)
      * NEEDSDOC @param warning
+     * @param attributes to attempt to set onto parsers
      * @return true if they match, false otherwise
      */
     public boolean compare(String goldFileName, String testFileName,
-                           PrintWriter reporter, boolean[] warning)
+                           PrintWriter reporter, boolean[] warning,
+                           Hashtable attributes)
     {
 
         // parse the gold doc
-        Document goldDoc = parse(goldFileName, reporter, GOLD);
+        Document goldDoc = parse(goldFileName, reporter, GOLD, attributes);
 
         // parse the test doc only if gold doc was parsed OK
         Document testDoc = (null != goldDoc)
-                           ? parse(testFileName, reporter, TEST) : null;
+                           ? parse(testFileName, reporter, TEST, attributes) : null;
 
         if (null == goldDoc)
         {
@@ -648,49 +652,48 @@ public class XHTComparator
      *
      * NEEDSDOC (parse) @return
      */
-    Document parse(String filename, PrintWriter reporter, String which)
+    Document parse(String filename, PrintWriter reporter, String which, Hashtable attributes)
     {
         // Force filerefs to be URI's if needed: note this is independent of any other files
-        // Remember: this only applies to the wacky Xerces parser, which we're presumably
-        //  using as our default DOMParser() below
-        String xercesFilename = filename;
+        String docURI = filename;
         if (useURI)
         {
-            try
-            {
+            // Use static worker method to get the correct format
+            docURI = QetestUtils.filenameToURL(filename);
+        }
 
-                // Use static worker method to get the correct format
-                // Note: this is copied straight from Xalan 1.x's org.apache.xalan.xslt.Process
-                // TODO verify this is the most correct and simplest way to munge the filename
-                xercesFilename = filenameToURL(filename);
-            }
-            catch (Exception e)
+        // Use JAXP instead of Xerces-specific calls
+        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+        // Always set namespaces on
+        dfactory.setNamespaceAware(true);
+        // Set other attributes here as needed
+        if (null != attributes)
+        {
+            Object tmp = attributes.get("setValidating");
+            if (null != tmp)
             {
-                reporter.print(WARNING + e.toString() + "\n");
+                if (tmp instanceof Boolean)
+                    dfactory.setValidating(((Boolean)tmp).booleanValue());
+                else if (tmp instanceof String)
+                    dfactory.setValidating(new Boolean((String)tmp).booleanValue());
             }
         }
 
         String parseType = which + PARSE_TYPE + "[xml];";
-        // Use JAXP instead of Xerces-specific calls
-        DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
-        dfactory.setNamespaceAware(true);
         Document doc = null;
-
         try
         {
-            // Use the Xerces-munged name specifically here!
             DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
-            doc = docBuilder.parse(new InputSource(xercesFilename));
+            doc = docBuilder.parse(new InputSource(docURI));
         }
         catch (Throwable se)
         {
+            // We couldn't parse as XML, attempt parse as HTML
             reporter.println(WARNING + se.toString());
-
             parseType = which + PARSE_TYPE + "[html];";
 
             try
             {
-
                 // @todo need to find an HTML to DOM parser we can use!!!
                 // doc = someHTMLParser.parse(new InputSource(filename));
                 throw new RuntimeException("We need an HTML to DOM parser!");
@@ -699,8 +702,8 @@ public class XHTComparator
             {
                 try
                 {
+                    // We couldn't parse as HTML, just compare as strings
                     reporter.println(WARNING + e.toString());
-
                     parseType = which + PARSE_TYPE + "[text];";
 
                     // Parse as text, line by line
@@ -749,20 +752,4 @@ public class XHTComparator
         return doc;
     }  // end of parse()
 
-    /**
-     * Worker method to translate a String filename to URL.  
-     * Note: This method is not necessarily proven to get the 
-     * correct URL for every possible kind of filename.
-     * @param String path\filename of test file
-     * @return URL to pass to SystemId
-     */
-    public static String filenameToURL(String filename)
-    {
-        File f = new File(filename);
-        String tmp = f.getAbsolutePath();
-	    if (File.separatorChar == '\\') {
-	        tmp = tmp.replace('\\', '/');
-	    }
-        return "file:///" + tmp;
-    }
 }
