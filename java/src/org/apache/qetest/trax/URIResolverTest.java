@@ -201,15 +201,12 @@ public class URIResolverTest extends XSLProcessorTestBase
 
             // Validate various URI's to be resolved during transform
             //  time with the loggingURIResolver
-            reporter.logTraceMsg("//@todo investigate why every document() call is resolved twice twice");
+            reporter.logWarningMsg("Bugzilla#2425 every document() call is resolved twice twice - two fails caused below");
             String[] expectedXmlUris = 
             {
                 "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
-                // "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
                 "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
-                // "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
                 "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl",
-                // "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl"
             };
             loggingURIResolver.setExpected(expectedXmlUris);
             reporter.logTraceMsg("about to transform(...)");
@@ -221,14 +218,10 @@ public class URIResolverTest extends XSLProcessorTestBase
 
             // Validate the actual output file as well: in this case, 
             //  the stylesheet should still work
-            if (Logger.PASS_RESULT
-                != fileChecker.check(reporter, 
+            fileChecker.check(reporter, 
                     new File(outNames.currentName()), 
                     new File(testFileInfo.goldName), 
-                    "transform of URI-filled xsl into: " + outNames.currentName())
-               )
-                reporter.logInfoMsg("transform of URI-filled xsl failure reason:" + fileChecker.getExtendedInfo());
-            
+                    "transform of URI-filled xsl into: " + outNames.currentName());
         }
         catch (Throwable t)
         {
