@@ -57,19 +57,18 @@
 
 /*
  *
- * LoggingTraceListener.java
+ * LoggingPrintTraceListener.java
  *
  */
 package org.apache.qetest.xalanj2;
 import org.apache.qetest.*;
 
 import java.io.IOException;
-import java.util.Hashtable;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
 
-import org.apache.xalan.trace.TraceListener;
+import org.apache.xalan.trace.PrintTraceListener;
 import org.apache.xalan.trace.GenerateEvent;
 import org.apache.xalan.trace.SelectionEvent;
 import org.apache.xalan.trace.TracerEvent;
@@ -86,29 +85,32 @@ import org.apache.xpath.XPath;
  * Logging TraceListener interface.
  * Implementation of the TraceListener interface that
  * prints each event to our logger as it occurs.
- * Future improvements: allow you to specify a set of 
- * expected events to validate.
+ * Future improvements: also implement LoggingHandler properly 
+ * so we can do both the PrintTraceListener-specific stuff while 
+ * still looking like other LoggingHandlers.
  * @author shane_curcuru@lotus.com
+ * @author myriam_midy@lotus.com
  * @version $Id$
  */
-public class LoggingTraceListener extends LoggingHandler 
-       implements TraceListener
+public class LoggingPrintTraceListener extends PrintTraceListener       
 {
 
     /**
      * Accesor method for a brief description of this service.  
-     * @return String "LoggingTraceListener: logs and counts trace events"
+     * @return String "LoggingPrintTraceListener: logs and counts trace events"
      */
     public String getDescription()
     {
-        return "LoggingTraceListener: logs and counts trace events";
+        return "LoggingPrintTraceListener: logs and counts trace events";
     }
 
 
     /** No-op sets logger to default.  */
-    public LoggingTraceListener()
+    public LoggingPrintTraceListener()
     {
+        super(new java.io.PrintWriter(System.err, true));
         setLogger(getDefaultLogger());
+        initTrace();
     }
 
     /**
@@ -116,11 +118,87 @@ public class LoggingTraceListener extends LoggingHandler
      *
      * @param r Logger we should log to
      */
-    public LoggingTraceListener(Logger l)
+    public LoggingPrintTraceListener(Logger l)
     {
+        super(new java.io.PrintWriter(System.err, true));
         setLogger(l);
+        initTrace();
     }
+    
 
+    /**
+     * Initialize trace fields from PrintTraceListener.
+     */
+    public void initTrace()
+	{
+        m_traceTemplates = true;
+        m_traceElements = true;
+        m_traceGeneration = true;
+        m_traceSelection = true;
+	}
+
+
+     /** Our Logger, who we tell all our secrets to. */
+    protected Logger logger = null;
+    
+    /**
+     * Accesor methods for our Logger.
+     *
+     * @param l the Logger to have this test use for logging 
+     * results; or null to use a default logger
+     */
+    public void setLogger(Logger l)
+	{
+        // if null, set a default one
+        if (null == l)
+            logger = getDefaultLogger();
+        else
+            logger = l;
+	}
+
+
+    /**
+     * Accesor methods for our Logger.  
+     *
+     * @return Logger we tell all our secrets to.
+     */
+    public Logger getLogger()
+	{
+        return logger;
+	}
+
+
+    /**
+     * Get a default Logger for use with this Handler.  
+     * Gets a default ConsoleLogger (only if a Logger isn't 
+     * currently set!).  
+     *
+     * @return current logger; if null, then creates a 
+     * Logger.DEFAULT_LOGGER and returns that; if it cannot
+     * create one, throws a RuntimeException
+     */
+    public Logger getDefaultLogger()
+    {
+        if (logger != null)
+            return logger;
+
+        try
+        {
+            Class rClass = Class.forName(Logger.DEFAULT_LOGGER);
+            return (Logger)rClass.newInstance();
+        } 
+        catch (Exception e)
+        {
+            // Must re-throw the exception, since returning 
+            //  null or the like could lead to recursion
+            e.printStackTrace();
+            throw new RuntimeException(e.toString());
+        }
+    }
+    
+    /** What loggingLevel to use for reporter.logMsg(). */
+    protected int level = Logger.DEFAULT_LOGGINGLEVEL;
+    
 
     /**
      * Set a default handler for us to wrapper - no-op.
@@ -144,8 +222,12 @@ public class LoggingTraceListener extends LoggingHandler
     }
 
 
+    /** Prefixed to all logger msg output for TraceListener.  */
+    public final String prefix = "LPTL:";
+
+
     /** Cheap-o string representation of last event we got.  */
-    protected String lastItem = NOTHING_HANDLED;
+    protected String lastItem = LoggingHandler.NOTHING_HANDLED;
 
 
     /**
@@ -198,7 +280,7 @@ public class LoggingTraceListener extends LoggingHandler
      */
     public int[] getCounters()
     {
-        return this.counters;
+        return counters;
     }
 
     /**
@@ -206,20 +288,16 @@ public class LoggingTraceListener extends LoggingHandler
      */
     public void reset()
     {
-        setLastItem(NOTHING_HANDLED);
-        for (int i = 0; i < this.counters.length; i++)
+        setLastItem(LoggingHandler.NOTHING_HANDLED);
+        for (int i = 0; i < counters.length; i++)
         {
-            this.counters[i] = 0;
+            counters[i] = 0;
         }
     }
 
     /** setExpected, etc. not yet implemented.  */
 
     ////////////////// Implement TraceListener ////////////////// 
-
-    /** Name of custom logElement each event outputs: traceListenerDump.  */
-    public static final String TRACE_LISTENER_DUMP = "traceListenerDump";
-
     /**
      * Logging implementation of TraceListener method.
      * Method that is called when a trace event occurs.
@@ -229,38 +307,32 @@ public class LoggingTraceListener extends LoggingHandler
      */
     public void trace(TracerEvent tracerEvent)
     {
+      super.trace(tracerEvent);
         counters[TYPE_TRACE]++;
 
-        Hashtable attrs = new Hashtable();
-        attrs.put("event", "trace");
-        attrs.put("location", "L" + tracerEvent.m_styleNode.getLineNumber()
-                  + "C" + tracerEvent.m_styleNode.getColumnNumber());
-
-        StringBuffer buf = new StringBuffer("  <styleNode>");
+        StringBuffer buf = new StringBuffer("trace:");
+        int dumpLevel = XalanDumper.DUMP_DEFAULT;
+        if (null != tracerEvent.m_mode) // not terribly elegant way to do it
+            dumpLevel = XalanDumper.DUMP_NOCLOSE;
         switch (tracerEvent.m_styleNode.getXSLToken())
         {
             // Specific handling for most common 'interesting' items
             case Constants.ELEMNAME_TEXTLITERALRESULT :
-                buf.append(XalanDumper.dump((ElemTextLiteral) tracerEvent.m_styleNode, XalanDumper.DUMP_DEFAULT));
+                buf.append(XalanDumper.dump((ElemTextLiteral) tracerEvent.m_styleNode, dumpLevel));
                 break;
 
             case Constants.ELEMNAME_TEMPLATE :
-                buf.append(XalanDumper.dump((ElemTemplate) tracerEvent.m_styleNode, XalanDumper.DUMP_DEFAULT));
+                buf.append(XalanDumper.dump((ElemTemplate) tracerEvent.m_styleNode, dumpLevel));
                 break;
 
             default :
-                buf.append(XalanDumper.dump((ElemTemplateElement) tracerEvent.m_styleNode, XalanDumper.DUMP_DEFAULT));
+                buf.append(XalanDumper.dump((ElemTemplateElement) tracerEvent.m_styleNode, dumpLevel));
         }
-        buf.append("  </styleNode>\n");
-        // Always add the mode value; will either use toString() 
-        //  automatically or will print 'null'
-        buf.append("  <m_mode>" + tracerEvent.m_mode + "</m_mode>\n");
-
-        // Also dump the sourceNode too!
-        buf.append("  <m_sourceNode>" + XalanDumper.dump(tracerEvent.m_sourceNode, XalanDumper.DUMP_DEFAULT) + "</m_sourceNode>\n");
+        if (null != tracerEvent.m_mode)
+            buf.append(XalanDumper.SEP + "m_mode=" + tracerEvent.m_mode + XalanDumper.RBRACKET);
 
         setLastItem(buf.toString());
-        logger.logElement(level, TRACE_LISTENER_DUMP, attrs, buf.toString());
+        logger.logMsg(level, prefix + getLast());
     }
 
     /**
@@ -273,14 +345,10 @@ public class LoggingTraceListener extends LoggingHandler
     public void selected(SelectionEvent selectionEvent) 
             throws javax.xml.transform.TransformerException
     {
+      super.selected(selectionEvent);
         counters[TYPE_SELECTED]++;
 
-        Hashtable attrs = new Hashtable();
-        attrs.put("event", "selected");
-        attrs.put("location", "L" + selectionEvent.m_styleNode.getLineNumber()
-                  + "C" + selectionEvent.m_styleNode.getColumnNumber());
-
-        StringBuffer buf = new StringBuffer("  <styleNode>");
+        StringBuffer buf = new StringBuffer("selected:");
         ElemTemplateElement styleNodeElem = (ElemTemplateElement) selectionEvent.m_styleNode;
         ElemTemplateElement parent = (ElemTemplateElement) styleNodeElem.getParentNode();
         if (parent == styleNodeElem.getStylesheetRoot().getDefaultRootRule())
@@ -296,15 +364,14 @@ public class LoggingTraceListener extends LoggingHandler
             buf.append("[default-rule]");
         }
         else
-            buf.append(XalanDumper.dump(styleNodeElem, XalanDumper.DUMP_DEFAULT));
-        buf.append("  </styleNode>\n");
+            buf.append(XalanDumper.dump(styleNodeElem, XalanDumper.DUMP_NOCLOSE));
 
-        buf.append("  <m_xpath>" + selectionEvent.m_attributeName + "="
-                   + selectionEvent.m_xpath.getPatternString() + "</m_xpath>\n");
+        buf.append(selectionEvent.m_attributeName + "="
+                   + selectionEvent.m_xpath.getPatternString() + ";");
 
-        buf.append("  <m_selection>");
         if (selectionEvent.m_selection.getType() == selectionEvent.m_selection.CLASS_NODESET)
         {
+            // Must create as DTMNodeIterator for DTM_EXP merge 13-Jun-01
             NodeIterator nl = selectionEvent.m_selection.nodeset();
 
             if (nl instanceof ContextNodeList)
@@ -341,10 +408,9 @@ public class LoggingTraceListener extends LoggingHandler
         {
             buf.append("[" + selectionEvent.m_selection.str() +"]");
         }
-        buf.append("</m_selection>\n");
-        buf.append("  <m_sourceNode>" + XalanDumper.dump(selectionEvent.m_sourceNode, XalanDumper.DUMP_DEFAULT) + "</m_sourceNode>\n");
+        buf.append(XalanDumper.RBRACKET);   // Since we said DUMP_NOCLOSE above
         setLastItem(buf.toString());
-        logger.logElement(level, TRACE_LISTENER_DUMP, attrs, buf.toString());
+        logger.logMsg(level, prefix + getLast());
     }
 
     /**
@@ -355,58 +421,55 @@ public class LoggingTraceListener extends LoggingHandler
      */
     public void generated(GenerateEvent generateEvent)
     {
+      super.generated(generateEvent);
         counters[TYPE_GENERATED]++;
 
-        Hashtable attrs = new Hashtable();
-        attrs.put("event", "generated");
-
-        StringBuffer buf = new StringBuffer("  <eventtype ");
+        StringBuffer buf = new StringBuffer("generated:");
         switch (generateEvent.m_eventtype)
         {
             case GenerateEvent.EVENTTYPE_STARTDOCUMENT :
-                buf.append("type=\"STARTDOCUMENT\">");
+                buf.append("STARTDOCUMENT");
             break;
 
             case GenerateEvent.EVENTTYPE_ENDDOCUMENT :
-                buf.append("type=\"ENDDOCUMENT\">");
+                buf.append("ENDDOCUMENT");
             break;
 
             case GenerateEvent.EVENTTYPE_STARTELEMENT :
-                buf.append("type=\"STARTELEMENT\">" + generateEvent.m_name);
+                buf.append("STARTELEMENT[" + generateEvent.m_name + "]"); // just hardcode [ LBRACKET ] RBRACKET here
             break;
 
             case GenerateEvent.EVENTTYPE_ENDELEMENT :
-                buf.append("type=\"ENDELEMENT\">" + generateEvent.m_name);
+                buf.append("ENDELEMENT[" + generateEvent.m_name + "]");
             break;
 
             case GenerateEvent.EVENTTYPE_CHARACTERS :
                 String chars1 = new String(generateEvent.m_characters, generateEvent.m_start, generateEvent.m_length);
-                buf.append("type=\"CHARACTERS\">" + chars1);
+                buf.append("CHARACTERS[" + chars1 + "]");
             break;
 
             case GenerateEvent.EVENTTYPE_CDATA :
                 String chars2 = new String(generateEvent.m_characters, generateEvent.m_start, generateEvent.m_length);
-                buf.append("type=\"CDATA\">" + chars2);
+                buf.append("CDATA[" + chars2 + "]");
             break;
 
             case GenerateEvent.EVENTTYPE_COMMENT :
-                buf.append("type=\"COMMENT\">" + generateEvent.m_data);
+                buf.append("COMMENT[" + generateEvent.m_data + "]");
             break;
 
             case GenerateEvent.EVENTTYPE_PI :
-                buf.append("type=\"PI\">" + generateEvent.m_name + ", " + generateEvent.m_data);
+                buf.append("PI[" + generateEvent.m_name + ", " + generateEvent.m_data + "]");
             break;
 
             case GenerateEvent.EVENTTYPE_ENTITYREF :
-                buf.append("type=\"ENTITYREF\">" + generateEvent.m_name);
+                buf.append("ENTITYREF[" + generateEvent.m_name + "]");
             break;
 
             case GenerateEvent.EVENTTYPE_IGNORABLEWHITESPACE :
-                buf.append("type=\"IGNORABLEWHITESPACE\">");
+                buf.append("IGNORABLEWHITESPACE");
             break;
         }
-        buf.append("</eventtype>\n");
         setLastItem(buf.toString());
-        logger.logElement(level, TRACE_LISTENER_DUMP, attrs, buf.toString());
+        logger.logMsg(level, prefix + getLast());
     }
 }
