@@ -303,30 +303,36 @@ public class TraxWrapper extends ProcessorWrapper
 
     /**
      * Get a description of the wrappered processor.
+     * Note: Now auto-creates a processor if needed: this could 
+     * have unintended side-effects in future applications, but 
+     * makes the current code much simpler.  In the future, we'll 
+     * probably get rid of the system property setting stuff and 
+     * just have subclasses for every flavor.
      * @return info-string describing the processor and possibly it's common options
      */
     public String getDescription()
     {
-
-        if (processor == null)
+        if (null == processor)
         {
-            return ("ERROR: must call createNewProcessor first from: "
-                    + getDescription());
+            try
+            {
+                createNewProcessor(null);
+            }
+            catch (Exception e)
+            {
+                /* no-op, let it fail: we can continue anyways */
+            }
         }
-        else
-        {
-            StringBuffer buf = new StringBuffer("TRaX");
 
-            buf.append(";");
-            buf.append("Java");
-            buf.append(";");
-            buf.append(
-                System.getProperties().getProperty(TRAX_PROCESSOR_XSLT));  // TODO - improve this
-            buf.append(";");
-            buf.append(System.getProperties().getProperty(TRAX_WRAPPER_TYPE));  // TODO - improve this
+        StringBuffer buf = new StringBuffer("TRaX");
+        buf.append(";");
+        buf.append("Java");
+        buf.append(";");
+        buf.append(System.getProperties().getProperty(TRAX_PROCESSOR_XSLT));  // TODO - improve this
+        buf.append(";");
+        buf.append(System.getProperties().getProperty(TRAX_WRAPPER_TYPE));  // TODO - improve this
 
-            return buf.toString();
-        }
+        return buf.toString();
     }
 
     /**
