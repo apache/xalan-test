@@ -191,6 +191,28 @@ public class QetestUtils
     }
 
 
+    /**
+     * Utility method to create a unique runId.  
+     * 
+     * This is used to construct a theoretically unique Id for 
+     * each run of a test script.  It is used later in some results 
+     * analysis stylesheets to create comparative charts showing 
+     * differences in results and timing data from one run of 
+     * a test to another.
+     * 
+     * @param String Id base to start with
+     * @return String Id to use; normally will include a timestamp
+     */
+    public static String createRunId(String baseId)
+    {
+        //@todo  Hmmm - what do we want in the runId?
+        // For now, just use milliseconds timer and some strings
+        String timeId = Long.toString(System.currentTimeMillis());
+        return "runId;" + baseId + ";" + timeId;
+
+    }
+
+
     /** 
      * Constructor is private on purpose; this class 
      * provides static utility methods only. 
