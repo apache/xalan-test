@@ -767,4 +767,21 @@ public class XSLTestAntTask extends Task
     {
         commandLineJava.clearJavaArgs();
     }
+    
+   /**
+     * Set the bootclasspathref to be used for this test.
+     *
+     * @param s bootclasspathref used for running the test
+     */
+    public void setBootclasspathref(Reference r)
+    {
+       // This is a hack.
+       // On JDK 1.4.x we need to bootclasspath to override
+       // the Xalan/Xerces in rt.jar.
+       if (System.getProperty("java.version", "0.0").substring(0,3).equals("1.4")) {
+               Path p = (Path)r.getReferencedObject(this.getProject());
+               log("Bootclasspath: " + p);
+               createJvmarg().setValue("-Xbootclasspath/p:" + p);
+       }
+    }    
 }
