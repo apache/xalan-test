@@ -20,17 +20,33 @@ if "%1" == "-H" goto usage
 if "%1" == "-?" goto usage
 @echo %0 beginning...
 
-@REM Trickery to guess appropriate location of java.exe program
+@REM -crimson: Use crimson.jar instead of xerces.jar
+@REM    shift to get rid of -crimson arg; just pass rest of args along
+set SAVED_JAVA_OPTS=%JAVA_OPTS%
+if '%1' == '-crimson' set JAVA_OPTS=-Djavax.xml.parsers.DocumentBuilderFactory=org.apache.crimson.jaxp.DocumentBuilderFactoryImpl -Dorg.xml.sax.driver=org.apache.crimson.jaxp.SAXParserFactoryImpl %JAVA_OPTS%
+if '%1' == '-crimson' set PARSER_JAR=crimson.jar
+if '%1' == '-crimson' shift
+
+@REM Non-jview: Trickery to guess appropriate location of java.exe program
 if "%JAVA_HOME%" == "" set JAVA_EXE=java
 if not "%JAVA_HOME%" == "" set JAVA_EXE=%JAVA_HOME%\bin\java
 
-@REM Same logic as runtest.bat
-@REM @todo improve so all relevant batch/shell files use same logic -sc
-if "%JARDIR%" == "" echo viewResults.bat must have JARDIR set!
-if "%JARDIR%" == "" goto done
+:dojardir
+@REM If PARSER_JAR blank, default to xerces
+if "%PARSER_JAR%" == "" set PARSER_JAR=xerces.jar
+
+@REM If JARDIR is blank, assume default Xalan-J 2.x locations
+@REM Note that this will probably fail miserably if you're trying 
+@REM    to test Xalan-J 1.x: in that case, you must set JARDIR
+@REM Note also that this assumes that crimson.jar is co-located 
+@REM    with the xerces.jar checked into Xalan-J 2.x
+@REM Note also that this assumes that js.jar is in the directory 
+@REM    above xml-xalan, for lack of a better place
+if "%JARDIR%" == "" echo NOTE! JARDIR is not set, defaulting to Xalan-J 2.x!
+if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;..\java\bin\%PARSER_JAR%;..\java\build\xalan.jar;..\java\bin\bsf.jar;..\..\js.jar;%CLASSPATH%
 
 @REM If JARDIR set, put those references first then default classpath
-if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
 
 @REM Set our output filename
 if "%2" == "" set ROUT=results.html
@@ -47,4 +63,6 @@ set TEST_CP=
 set JAVA_EXE=
 set ROUT=
 set VSXSL=
+set PARSER_JAR=
+set JAVA_OPTS=%SAVED_JAVA_OPTS%
 :end
