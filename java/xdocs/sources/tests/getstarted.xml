@@ -1,0 +1,75 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE s1 SYSTEM "sbk:/style/dtd/document.dtd">
+
+<s1 title="Getting Started">
+<ul>
+<li><link anchor="downloading">Downloading the code</link></li>
+<li><link anchor="how-to-build">Building the Tests</link></li>
+</ul>
+
+  <anchor name="downloading"/>
+  <s2 title="Downloading the code">
+    <note>Since these tests are primarily to help developers test their 
+    changes to Xalan source code, we don't currently provide prebuilt 
+    builds of the test code. Most tests also require Xalan-J, even 
+    if you are testing a Xalan-C build.</note>
+    <p>To use the tests, you will need both a working build of Xalan-J 
+    as well as the sources for the tests themselves.
+    </p><p>To download Xalan builds, see either:
+    <jump href="http://xml.apache.org/xalan-j/dist/">Xalan-J download page</jump> or the 
+    <jump href="http://xml.apache.org/xalan-c/dist/">Xalan-C download page</jump>
+    </p><p>To get the test sources, you can either:
+    <br/>Checkout the xml-xalan\test repository <jump href="http://xml.apache.org/cvs.html">directly from CVS</jump> 
+    (read-only access is available to all, not just committers), or:
+    <br/><br/>Get the latest <jump href="http://xml.apache.org/from-cvs/xml-xalan/">dev-snapshot</jump>: 
+    these are .tar.gz files of the entire xml-xalan repository, including both the 
+    development sources and the test sources (they are just source, however, and are not prebuilt).
+    </p>
+    
+  </s2>
+      
+  <anchor name="how-to-build"/>
+  <s2 title="Building the Tests">
+    <p>(This builds both the test harness/framework/etc. and the specific Java API test files)
+    Works the same for DOS/Windows or UNIXes; in most cases *.sh files are 
+    provided to match the *.bat files used here.</p>
+    <p>1: Checkout the whole xml-xalan repository locally
+    <br/><code>e:\builds\xml-xalan</code></p>
+    <p>2: Set an environment variable JARDIR to point to directory where you have all applicable jars.  
+      Be sure that you delete the testxsl.jar there, since you want to rebuild a new one!
+      <br/>Required: xalan.jar and  bsf.jar from a Xalan-J build;  
+      xerces.jar from the <ref>same</ref> Xalan-J build  (or your parser's JAXP-compatible jar instead of xerces.jar);
+      and js.jar (see <jump href="http://xml.apache.org/xalan-j/extensions.html#supported-lang">Xalan-J doc for information</jump>)
+      <br/><code>set JARDIR=e:\builds\myjars</code>
+    </p>
+    <p>3: Copy all product jars to the aforementioned JARDIR, obviously</p>
+    <p>4: cd to the test directory and be safe: cleanup the tests first</p>
+    <p><code>cd e:\builds\xml-xalan\test\java</code>
+      <br/><code>build.bat clean</code>
+    </p>
+    <p>5: Build the tests appropriate to your product
+      <br/>Xalan-J 1.x:  
+      <br/><code>build.bat package.xalan</code>
+      <br/>Xalan-J 2.x:  
+      <br/><code>build.bat package.trax</code>
+    </p>
+    <p>This will create <code>build\testxsl.jar</code>, which you should manually copy into your JARDIR set above before running any tests.</p>
+    <p>Note that ProcessorWrapper subclasses for XT and SAXON are currently checked in 
+    both as .java source files and as precompiled .class files - the .class files are 
+    merely copied into the jar by default, so you don't need the other processors 
+    on the classpath when building the jar. These classes aren't strictly necessary
+    unless you're running tests with those flavors.</p>
+    <p>Building the <link idref="run" anchor="how-to-run-c">CConformanceTest</link>
+    for testing Xalan-C currently is done with <code>build.bat package.xsl</code>.
+    Instructions for building/running other Xalan-C API tests is still to be written.</p>
+    <p>Building the Javadocs for the tests is done by <code>build.bat javadocs</code>, and 
+    is best done under JDK 1.2.2 or higher - they will build with JDK 1.1.8, but not 
+    all the links will work properly.</p>
+    <p>Building these top-level documents in the xdocs directory can 
+    be done with <code>build.bat docs</code> and must be done under JDK 1.2.2 or higher, 
+    since the Xalan-related stylebook code that we use requires that. Note also that 
+    building the docs may require a Xalan-J 1.x build, since we use Xalan to 
+    process the source XML documents into HTML (and we have it setup for the 1.x build 
+    currently for convenience).</p>
+  </s2>
+</s1>

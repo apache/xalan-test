@@ -1,0 +1,27 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE s1 SYSTEM "sbk:/style/dtd/document.dtd">
+
+<s1 title="Testing Design/Standards">
+<ul>
+<li><link anchor="standards-api-tests">Standards for API Tests</link></li>
+<li><link anchor="standards-xsl-tests">Standards for Stylesheet Tests</link></li>
+</ul>
+
+  <anchor name="standards-api-tests"/>
+  <s2 title="Standards for API Tests">
+    <p>In progress. Both the overall Java testing framework, the test drivers, 
+    and the specific API tests have a number of design decisions detailed 
+    in the javadoc 
+    <jump href="apidocs/org/apache/qetest/package-summary.html">here</jump> and 
+    <jump href="apidocs/org/apache/qetest/xsl/package-summary.html">here</jump>.</p>
+    <p>Please: if you plan to submit Java API tests, use the existing framework 
+    as <link idref="submit" anchor="write-API-tests">described</link>.</p>
+    <p>Contact <jump href="paul_dick@lotus.com">Paul_Dick@lotus.com</jump> if you'd 
+    like to help in the Xalan-C API testing effort.</p>
+  </s2>
+      
+  <anchor name="standards-xsl-tests"/>
+  <s2 title="Standards for Stylesheet Tests">
+    <p>In progress. See the <link idref="submit" anchor="write-xsl-tests">discussion about OASIS</link> for an overview.</p>
+  </s2>
+</s1>

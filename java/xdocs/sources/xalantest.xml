@@ -9,29 +9,33 @@
             label="Overview"
             source="tests/overview.xml"/>
 			
-  <!--document id="getstarted"
+  <document id="getstarted"
             label="Getting Started"
-            source="tests/getstarted.xml"/-->
+            source="tests/getstarted.xml"/>
 			
   <separator/>
   
-  <external href="apidocs/index.html"  label="Java API"/>
+  <external href="apidocs/index.html" label="Java API"/>
   
-  <!--separator/>
-  
+  <separator/>
+ 
   <document id="run"
             label="Running Tests"
             source="tests/run.xml"/>  
   
   <document id="submit"
-            label="Submitting New Tests"
+            label="Writing New Tests"
             source="tests/submit.xml"/>
 			
-  <separator/>
-  
   <document id="design"
-            label="Testing Design"
-            source="tests/design.xml"/-->
+            label="Test Standards"
+            source="tests/design.xml"/>
+
+  <separator/>
+  <!-- How do you create a separator or item with text, but no link? -->
+  <external href="http://xml.apache.org/xalan-j" label="Xalan-J 2.x"/>
+  <external href="http://xml.apache.org/xalan" label="Xalan-J 1.x"/>
+  <external href="http://xml.apache.org/xalan-c" label="Xalan-C 1.x"/>
 			
 </book>
   
