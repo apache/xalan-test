@@ -12,13 +12,7 @@
      The input should have only one namespace if you want consistent results across parsers. -->
 
 <xsl:template match="doc">
-  <out>
-    <xsl:apply-templates/>
-  </out>
-</xsl:template>
-
-<xsl:template match="item">
-  <xsl:value-of select="local-name(namespace::*[1])"/>
+  <out><xsl:value-of select="local-name(namespace::*[1])"/></out>
 </xsl:template>
 
 </xsl:stylesheet>
