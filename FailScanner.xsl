@@ -1,8 +1,15 @@
 <?xml version="1.0"?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    xmlns:lxslt="http://xml.apache.org/xslt"
+    xmlns:redirect="org.apache.xalan.lib.Redirect"
+    extension-element-prefixes="redirect"
     version="1.0">
 <xsl:output method="html"
           doctype-public="-//W3C//DTD HTML 4.0 Transitional"/>
+
+<lxslt:component prefix="redirect" elements="write open close" functions="">
+    <lxslt:script lang="javaclass" src="org.apache.xalan.lib.Redirect"/>
+</lxslt:component>  
 
 <!-- FileName: FailScanner.xsl -->
 <!-- Author: shane_curcuru@us.ibm.com -->
@@ -12,6 +19,9 @@
 <!-- Include constant definitions for results file elements, 
      attributes, and values, copied from relevant Java code -->
 <xsl:include href="resultsConstants.xsl"/>
+
+<!-- Name of file for mini-fails redirected output -->
+<xsl:param name="redirectFilename">FailScannerMini.html</xsl:param>
 
 <!-- ================================== -->
 <!-- Main template-standalone: output an HTML page -->
@@ -35,6 +45,13 @@
     <caption>
       <b><xsl:value-of select="@filename"/><xsl:text>: </xsl:text></b><xsl:value-of select="@desc"/>
     </caption>
+    <redirect:write select="$redirectFilename" append="true">
+      <hr/>
+      <h3><xsl:value-of select="@filename"/>
+      <xsl:text>: </xsl:text><xsl:value-of select="@desc"/>
+      <xsl:text> in </xsl:text><xsl:value-of select="../@logFile"/>
+      </h3>
+    </redirect:write>
     <!-- establish row widths here in our mini-summary -->
     <tr>
       <td width="7%"><xsl:text>Overall</xsl:text></td>
@@ -95,6 +112,15 @@
       <xsl:value-of select="@desc"/>
     </td>
   </tr>
+  <redirect:write select="$redirectFilename" append="true">
+    <p>
+      <b><xsl:value-of select="@result"/><xsl:text> </xsl:text></b>
+      <xsl:if test="@id">
+        <xsl:text>[</xsl:text><xsl:value-of select="@id"/><xsl:text>] </xsl:text>
+      </xsl:if>
+      <xsl:value-of select="@desc"/>    
+    </p>
+  </redirect:write>
 </xsl:template>
 
 <!-- Other Results that are not passes just get printed out as-is -->

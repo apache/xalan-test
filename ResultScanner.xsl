@@ -1,8 +1,15 @@
 <?xml version="1.0"?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    xmlns:lxslt="http://xml.apache.org/xslt"
+    xmlns:redirect="org.apache.xalan.lib.Redirect"
+    extension-element-prefixes="redirect"
     version="1.0">
   <xsl:output method="html"
               doctype-public="-//W3C//DTD HTML 4.0 Transitional"/>
+
+<lxslt:component prefix="redirect" elements="write open close" functions="">
+    <lxslt:script lang="javaclass" src="org.apache.xalan.lib.Redirect"/>
+</lxslt:component>  
 
 <!-- FileName: ResultScanner.xsl -->
 <!-- Author: shane_curcuru@us.ibm.com -->
@@ -11,6 +18,9 @@
 
 <!-- Basic scanning stylesheet for individual testfile results -->
 <xsl:include href="FailScanner.xsl"/>
+
+<!-- Name of file for mini-fails redirected output -->
+<xsl:param name="redirectFilename">ResultReportMini.html</xsl:param>
 
 <!-- ================================== -->
 <!-- Constants from org.apache.qetest.ResultScanner -->
@@ -36,7 +46,11 @@
           <xsl:call-template name="miniStatusTable" />
           <br/>
       </xsl:for-each>
-      <xsl:apply-templates/>
+
+      <redirect:open select="$redirectFilename" />
+        <xsl:apply-templates/>
+      <redirect:close select="$redirectFilename" />
+
     </body>
   </html>
 </xsl:template>
@@ -116,7 +130,9 @@
   </font>
 
   <!-- Now scan the actual underlying result file for stuff -->
-  <xsl:apply-templates select="$testresults/testfile"/>
+  <xsl:apply-templates select="$testresults/testfile">
+    <xsl:with-param name="redirectFilename" select="$redirectFilename" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <!-- Override default text node processing, so statistics, arbitrary messages, and other stuff is skipped -->
