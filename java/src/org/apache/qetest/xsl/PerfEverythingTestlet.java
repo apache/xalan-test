@@ -285,7 +285,7 @@ public class PerfEverythingTestlet extends TestletImpl
             attrs.put("idref", (new File(datalet.inputName)).getName());
             // inputName is the actual name we gave to the processor
             attrs.put("inputName", inputName);
-
+            attrs.put("iterations", new Integer(iterations));
             attrs.put("singletransform", new Long(singletransform)); // Very first Preload end-to-end transform
             attrs.put("etoe", new Long(etoe)); // First end-to-end transform during iterations
             attrs.put("avgetoe", new Long(avgetoe / iterations)); // Average of end-to-end transforms during iterations
