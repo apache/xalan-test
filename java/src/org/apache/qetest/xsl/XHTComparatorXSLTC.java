@@ -304,8 +304,15 @@ public class XHTComparatorXSLTC extends XHTComparator
             for (int i = 0; i < gn; i++)
             {
                 Attr goldAttr = (Attr) goldAttrs.item(i);
+                String goldAttrLocalName = goldAttr.getLocalName();
+                String goldAttrNamespaceURI = goldAttr.getNamespaceURI();
                 String goldAttrName = goldAttr.getName();
-                Node testAttr = testAttrs.getNamedItem(goldAttrName);
+                Node testAttr;
+                if (goldAttrNamespaceURI != null && goldAttrLocalName != null) {
+                        testAttr = testAttrs.getNamedItemNS(goldAttrNamespaceURI,goldAttrLocalName);
+                } else {
+                        testAttr = testAttrs.getNamedItem(goldAttrName);
+                }
 
                 if (null == testAttr)
                 {

@@ -99,6 +99,13 @@ public class Reporter implements Logger
 {
 
     /**
+     * Parameter: (optional) Name of results summary file.
+     * <p>This is a custom parameter optionally used in writeResultsStatus.</p>
+     */
+    public static final String OPT_SUMMARYFILE = "summaryFile";
+
+
+    /**
      * Constructor calls initialize(p).
      * @param p Properties block to initialize us with.
      */
@@ -1547,19 +1554,21 @@ public class Reporter implements Logger
     /** 
      * Utility method to write out overall result counters. 
      * 
-     * This writes out both a testsummary element as well as 
+     * <p>This writes out both a testsummary element as well as 
      * writing a separate marker file for the test's currently 
-     * rolled-up test results.
+     * rolled-up test results.</p>
      *
-     * Note if writeFile is true, we do a bunch of additional 
+     * <p>Note if writeFile is true, we do a bunch of additional 
      * processing, including deleting any potential marker 
-     * files, along with creating a new marker file.  
+     * files, along with creating a new marker file.  This section 
+     * of code explicitly does file creation and also includes 
+     * some basic XML-isms in it.</p>
      * 
-     * Marker files look like: [testStat][testName].log, where 
+     * <p>Marker files look like: [testStat][testName].xml, where 
      * testStat is the actual current status, like 
      * Pass/Fail/Ambg/Errr/Incp, and testName comes from the 
-     * currently executing test.
-     * Design comments welcome on this feature.  
+     * currently executing test; this may be overridden by 
+		  * setting OPT_SUMMARYFILE.</p>
      *
      * @param writeFile if we should also write out a separate 
      * Passname/Failname marker file as well
@@ -1608,6 +1617,8 @@ public class Reporter implements Logger
             logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, DEFAULT_SUMMARY_NAME))).getAbsolutePath();
         }
         logFileBase = (new File(logFileBase)).getParent();
+		 		 // Either use the testName or an optionally set summary name
+		 		 String summaryFileBase = reporterProps.getProperty(OPT_SUMMARYFILE, testName + ".xml");
         final File[] summaryFiles = 
         {
             // Note array is ordered; should be re-designed so this doesn't matter
@@ -1616,11 +1627,11 @@ public class Reporter implements Logger
             //  all show up together in dir listing; include 
             //  testName so you know where it came from; make it 
             //  .xml since it is an XML file
-            new File(logFileBase, INCP + "-" + testName + ".xml"),
-            new File(logFileBase, PASS + "-" + testName + ".xml"),
-            new File(logFileBase, AMBG + "-" + testName + ".xml"),
-            new File(logFileBase, FAIL + "-" + testName + ".xml"),
-            new File(logFileBase, ERRR + "-" + testName + ".xml")
+            new File(logFileBase, INCP + "-" + summaryFileBase),
+            new File(logFileBase, PASS + "-" + summaryFileBase),
+            new File(logFileBase, AMBG + "-" + summaryFileBase),
+            new File(logFileBase, FAIL + "-" + summaryFileBase),
+            new File(logFileBase, ERRR + "-" + summaryFileBase)
         };
         // Clean up any pre-existing files that might be confused 
         //  as markers from this testrun
@@ -1653,6 +1664,7 @@ public class Reporter implements Logger
                 summaryFile = summaryFiles[4];
                 break;
         }
+		 		 resultsHash.put(OPT_SUMMARYFILE, summaryFile.getPath());
         // Now actually write out the summary file
         try
         {

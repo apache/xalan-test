@@ -166,6 +166,25 @@ public class StylesheetTestletDriver extends FileBasedTest
     /** Parameter: Are there any embedded stylesheets in XML files?  */
     protected String embedded = null;
 
+    /**
+     * Parameter: Is there any preference to which gold file to use?
+     * <p>Default: null (use standard .out file)
+     * name of processor, could be XalanJ-I, XalanJ-C, or XalanC
+     * </p>
+     */
+    public static final String OPT_PROCESSOR = "processor";
+
+    /** Parameter: What processor is being used?  */
+    protected String processor = null;
+
+    /**
+     * Parameter: Name of test (Conf, Accept) as StylesheetTestletDriver
+     * can be used for more than one bucket
+     * <p>Default: null (use StylesheetTestletDriver)
+     * </p>
+     */
+    public static final String OPT_TESTNAME = "testName";
+
 
     /** Unique runId for each specific invocation of this test driver.  */
     protected String runId = null;
@@ -205,7 +224,8 @@ public class StylesheetTestletDriver extends FileBasedTest
         fileList = testProps.getProperty(OPT_FILELIST, fileList);
         flavor = testProps.getProperty(OPT_FLAVOR, flavor);
         embedded = testProps.getProperty(OPT_EMBEDDED, embedded);
-
+        processor = testProps.getProperty(OPT_PROCESSOR, processor);        
+        testName = testProps.getProperty(OPT_TESTNAME, testName);
         // Grab a unique runid for logging out with our tests 
         //  Used in results reporting stylesheets to differentiate 
         //  between different test runs
@@ -368,11 +388,12 @@ public class StylesheetTestletDriver extends FileBasedTest
             // Call worker method to process the individual directory
             //  and get a list of .xsl files to test
             Vector files = getFilesFromDir(subTestDir, getFileFilter(), embedded);
+            Hashtable goldFiles = getGoldsFromDir(subGoldDir, getGoldFileFilter(), processor);
 
             // 'Transform' the list of individual test files into a 
             //  list of Datalets with all fields filled in
             //@todo should getFilesFromDir and buildDatalets be combined?
-            Vector datalets = buildDatalets(files, subTestDir, subOutDir, subGoldDir);
+            Vector datalets = buildDatalets(files, subTestDir, subOutDir, subGoldDir, goldFiles);
 
             if ((null == datalets) || (0 == datalets.size()))
             {
@@ -506,6 +527,50 @@ public class StylesheetTestletDriver extends FileBasedTest
         return v;
     }
 
+    /**
+     * Use the supplied filter on given directory to return a list 
+     * of stylesheet tests to be run.
+     * Uses the normal filter for variations of *.xsl files, and 
+     * also constructs names for any -embedded tests found (which 
+     * may be .xml with xml-stylesheet PI's, not just .xsl)
+     *
+     * @param dir directory to scan
+     * @param filter to use on this directory; if null, uses default
+     * @param embeddedFiles special list of embedded files to find
+     * @return Vector of local path\filenames of tests to run;
+     * the tests themselves will exist; null if error
+     */
+    public Hashtable getGoldsFromDir(File dir, FilenameFilter filter, String processor)
+    {
+        // Validate arguments
+        if ((null == dir) || (!dir.exists()))
+        {
+            // Bad arguments, report it as an error
+            // Note: normally, this should never happen, since 
+            //  this class normally validates these arguments 
+            //  before calling us
+            reporter.logWarningMsg("getGoldsFromDir(" + dir.toString() + ") dir null or does not exist");
+            return null;
+        }
+        // Get the list of 'normal' test files
+        String[] files = dir.list(filter);
+        Hashtable h = new Hashtable();
+        for (int i = 0; i < files.length; i++)
+        {        
+        	// Check after the first .
+        	// if "out", assume to be 'default' file
+        	// if name of the processor, override default file.
+        	StringTokenizer strTok = new StringTokenizer(files[i],".");
+        	String testCase = strTok.nextToken();
+        	String procChk = strTok.nextToken();
+        	if (procChk.equals(processor) ||
+        	    (procChk.equals("out") && h.get(testCase) == null)) {
+        	  h.put(testCase,files[i]);
+      	    }
+        }
+        reporter.logTraceMsg("getGoldsFromDir(" + dir.toString() + ") found " + h.size() + " gold files to test");
+        return h;
+    }
 
     /**
      * Transform a vector of individual test names into a Vector 
@@ -529,7 +594,8 @@ public class StylesheetTestletDriver extends FileBasedTest
      * to inputName
      */
     public Vector buildDatalets(Vector files, File testLocation, 
-                                File outLocation, File goldLocation)
+                                File outLocation, File goldLocation,
+                                Hashtable goldFiles)
     {
         // Validate arguments
         if ((null == files) || (files.size() < 1))
@@ -568,8 +634,13 @@ public class StylesheetTestletDriver extends FileBasedTest
 
                 String fileNameRoot = file.substring(0, file.indexOf(XML_EXTENSION));
                 d.inputName = null;
+                
                 d.outputName = outLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
-                d.goldName = goldLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
+                if (goldFiles != null && goldFiles.get(fileNameRoot) != null) {
+                  d.goldName = goldLocation.getPath() + File.separator + goldFiles.get(fileNameRoot);
+                } else {
+                  d.goldName = goldLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
+                }                  
             }
             else if (file.endsWith(XSL_EXTENSION))
             {
@@ -579,6 +650,12 @@ public class StylesheetTestletDriver extends FileBasedTest
                 d.xmlName = testLocation.getPath() + File.separator + fileNameRoot + XML_EXTENSION;
                 d.outputName = outLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
                 d.goldName = goldLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
+                if (goldFiles != null && goldFiles.get(fileNameRoot) != null) {
+                  d.goldName = goldLocation.getPath() + File.separator + goldFiles.get(fileNameRoot);
+                } else {
+                  d.goldName = goldLocation.getPath() + File.separator + fileNameRoot + OUT_EXTENSION;
+                }                  
+                
             }
             else
             {
@@ -685,6 +762,10 @@ public class StylesheetTestletDriver extends FileBasedTest
     /** Default FilenameFilter FQCN for files.   */
     protected String defaultFileFilter = "org.apache.qetest.xsl.ConformanceFileRules";
 
+    /** Default GoldFilenameFilter FQCN for files.   */
+    protected String defaultGoldFileFilter = "org.apache.qetest.xsl.GoldFileRules";
+
+
     /** Default Testlet FQCN for executing stylesheet tests.   */
     protected String defaultTestlet = "org.apache.qetest.xsl.StylesheetTestlet";
 
@@ -772,6 +853,42 @@ public class StylesheetTestletDriver extends FileBasedTest
         Class clazz = QetestUtils.testClassForName(fileFilter, 
                                                    QetestUtils.defaultPackages,
                                                    defaultFileFilter);
+        try
+        {
+            // Create it, optionally with excludes
+            String excludes = testProps.getProperty(OPT_EXCLUDES);
+            if ((null != excludes) && (excludes.length() > 1))  // Arbitrary check for non-null, non-blank string
+            {
+                Class[] parameterTypes = { java.lang.String.class };
+                Constructor ctor = clazz.getConstructor(parameterTypes);
+
+                Object[] ctorArgs = { excludes };
+                return (FilenameFilter) ctor.newInstance(ctorArgs);
+            }
+            else
+            {
+                return (FilenameFilter)clazz.newInstance();
+            }
+        }
+        catch (Exception e)
+        {
+            // Ooops, none found!
+            return null;
+        }
+    }
+
+    /**
+     * Convenience method to get a default filter for files.  
+     * Uses excludes member variable if set.
+     * 
+     * @return FilenameFilter using ConformanceFileRules(excludes).
+     */
+    public FilenameFilter getGoldFileFilter()
+    {
+        // Find a FilenameFilter class to use
+        Class clazz = QetestUtils.testClassForName(fileFilter, 
+                                                   QetestUtils.defaultPackages,
+                                                   defaultGoldFileFilter);
         try
         {
             // Create it, optionally with excludes
