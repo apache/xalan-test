@@ -130,7 +130,7 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public SmoketestOuttakes()
     {
-        numTestCases = 4;  // REPLACE_num
+        numTestCases = 5;  // REPLACE_num
         testName = "SmoketestOuttakes";
         testComment = "Individual test points taken out of other automation files";
     }
@@ -600,6 +600,65 @@ public class SmoketestOuttakes extends XSLProcessorTestBase
         {
             reporter.checkFail("errorListener-DOM unexpectedly threw: " + t.toString());
             reporter.logThrowable(Logger.ERRORMSG, t, "errorListener-DOM unexpectedly threw");
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * From URIResolverTest.java testCase1
+     * Build a stylesheet/do a transform with lots of URIs to resolve.
+     * Verify that the URIResolver is called properly.
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase5()
+    {
+        reporter.testCaseInit("Build a stylesheet/do a transform with lots of URIs to resolve");
+
+        XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+        testFileInfo.inputName = inputDir + File.separator + "trax" + File.separator + "URIResolverTest.xsl";
+        testFileInfo.xmlName = inputDir + File.separator + "trax" + File.separator + "URIResolverTest.xml";
+        testFileInfo.goldName = goldDir + File.separator + "trax" + File.separator + "URIResolverTest.out";
+
+        TransformerFactory factory = null;
+        Templates templates = null;
+        Transformer transformer = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            // Set the URIResolver and validate it
+            reporter.logInfoMsg("About to factory.newTemplates(" + QetestUtils.filenameToURL(testFileInfo.inputName) + ")");
+            templates = factory.newTemplates(new StreamSource(QetestUtils.filenameToURL(testFileInfo.inputName)));
+            transformer = templates.newTransformer();
+
+            // Set the URIResolver and validate it
+            LoggingURIResolver loggingURIResolver = new LoggingURIResolver((Logger)reporter);
+            reporter.logTraceMsg("loggingURIResolver originally setup:" + loggingURIResolver.getQuickCounters());
+            transformer.setURIResolver(loggingURIResolver);
+            reporter.check((transformer.getURIResolver() == loggingURIResolver),
+                           true, "set/getURIResolver on transformer"); 
+
+            // Validate various URI's to be resolved during transform
+            //  time with the loggingURIResolver
+            reporter.logWarningMsg("Bugzilla#2425 every document() call is resolved twice twice - two fails caused below");
+            String[] expectedXmlUris = 
+            {
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
+                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl",
+            };
+            loggingURIResolver.setExpected(expectedXmlUris);
+            reporter.logTraceMsg("about to transform(...)");
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo.xmlName)), 
+                                  new StreamResult(outNames.nextName()));
+            reporter.logTraceMsg("after transform(...)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("URIResolver test unexpectedly threw: " + t.toString());
+            reporter.logThrowable(Logger.ERRORMSG, t, "URIResolver test unexpectedly threw");
         }
 
         reporter.testCaseClose();

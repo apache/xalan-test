@@ -390,6 +390,9 @@ public class StreamResultAPITest extends XSLProcessorTestBase
             FileWriter fw = new FileWriter(outNames.nextName());
             fw.write(data);
             fw.close();
+            // Explicitly ask that Validation be turned off, since 
+            //  we use bogus systemids
+            fileChecker.setAttribute(XHTFileCheckService.SETVALIDATING, "false");
             fileChecker.check(reporter, 
                               new File(outNames.currentName()), 
                               new File(goldFile),
