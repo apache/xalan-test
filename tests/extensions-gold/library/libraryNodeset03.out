@@ -45,6 +45,7 @@
 </Descendant-or-Self>
 <Following/>
 <Following-Sibling/>
+<Namespace xmlns:test="http://www.extension03.test" xmlns:BTM="www.btm.com"/>
 <Parent0/>
 <Parent1/>
 <Preceding>test:elem3</Preceding>
