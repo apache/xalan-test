@@ -43,7 +43,7 @@ dependencies - users must manually 'build jar' first.
    -->
     <property environment="ENV" />
 
-    <property name="year" value="2000-2002"/>
+    <property name="year" value="2000-2003"/>
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -101,6 +101,7 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${bsf.jar}" />
         <pathelement location="${stylebook.jar}" />
         <pathelement location="${doclet.jar}" />
+        <pathelement location="${jtidy.jar}" />
         <pathelement location="${xalan.jar}" />
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
