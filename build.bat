@@ -62,7 +62,7 @@ rem This label provides a place for the argument list loop to break out
 rem and for NT handling to skip to.
 
 rem default ANT_HOME
-if "%ANT_HOME%"=="" set _ANT_HOME=java
+if "%ANT_HOME%"=="" set _ANT_HOME=.
 if not "%ANT_HOME%"=="" set _ANT_HOME=%ANT_HOME%
 goto checkJava
 
