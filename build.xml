@@ -390,6 +390,15 @@
             description="Run the Xalan-J 2.x Smoketest"
             depends="minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
     </target>
+    <target name="smoketest.dev" 
+            description="Run the Xalan-J 2.x Smoketest with dependencies"
+            depends="jar,minitest-execute,smoketest-execute,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
+        <!-- This compiles the minimum to run the smoketests, runs them, 
+             and creates distros just of the results and existing tree, 
+             without actually running the docs - this is to ensure that 
+             doc build errors in the tests won't affect GUMP runs.
+        -->
+    </target>
     <target name="smoketest.gump" 
             description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies"
             depends="jar,minitest-execute,smoketest-execute,smoketest-results-dist,dist-nodeps,minitest-notpass,minitest-pass,smoketest-conf-notpass,smoketest-conf-pass,smoketest-api-notpass,smoketest-api-pass">
