@@ -826,6 +826,8 @@ class TestThreadsRunner implements Runnable
                     // transformer2.transform(new StreamSource(xmlName), result2);
                     processor.process(new XSLTInputSource(xmlName), 
                                       new XSLTInputSource(xslName), new XSLTResultTarget(resultStream2));
+                    processor.reset();
+
                     resultStream2.close();
                 }
 
