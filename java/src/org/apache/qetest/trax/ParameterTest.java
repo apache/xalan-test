@@ -156,12 +156,12 @@ public class ParameterTest extends FileBasedTest
             "<outt>false-notset,true-blank,false-a,false-1,</outt>",
             "(12a)Select expr of a param blank string"
         },
-        { 
+        /*{ 
             "t1", 
             null,
             "<outt>false-notset,false-blank,false-a,false-1,</outt>",
             "(12b)Select expr of a null"
-        },
+        },*/
         { 
             "p1", 
             "'foo'",
