@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<root><Out attr1=" Hello "/>
-<d level="3"> Hello </d></root>
+<out><d level="3">Hello
+        <e level="4">Success</e>
+        <!-- Me, too -->
+      </d>
+</out>
