@@ -87,28 +87,21 @@ public class LinebyLineCheckService implements CheckService
     {	
         if (!((actual instanceof File) & (expected instanceof File)))
         {
-
             // Must have File objects to continue
             logger.checkErr(msg + " :check() objects were not Files", id);
-
             return Logger.ERRR_RESULT;
         }
 
 		if (doCompare(logger, (File) actual, (File) expected))
         {
             logger.checkPass(msg, id);
-
             return Logger.PASS_RESULT;
         }
         else
         {
             logger.checkFail(msg, id);
-
             return Logger.FAIL_RESULT;
         }
-
-
-
     }
 
     /**
@@ -137,7 +130,6 @@ public class LinebyLineCheckService implements CheckService
      */
     private boolean doCompare(Logger logger, File act, File exp)
     {
-
         StringBuffer sb_act = new StringBuffer();
 		StringBuffer sb_exp = new StringBuffer();
 
@@ -193,7 +185,6 @@ public class LinebyLineCheckService implements CheckService
 
             return false;
         }
-
         return true;
     }
 
@@ -255,7 +246,6 @@ public class LinebyLineCheckService implements CheckService
 
     /**
      * Description of what this testing utility does.  
-     * 
      * @return String description of extension
      */
     public String getDescription()
@@ -263,5 +253,4 @@ public class LinebyLineCheckService implements CheckService
         return ("Reads in text files line-by-line as strings (ignoring newlines) and does String.equals()");
     }
 
-}  // end of class SimpleFileCheckService
-
+}  // end of class LinebyLineCheckService
