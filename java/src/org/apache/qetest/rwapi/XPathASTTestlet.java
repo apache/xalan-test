@@ -146,40 +146,50 @@ public class XPathASTTestlet extends FileTestlet
 
         // Perform any other general setup needed; 
         //  side effect of getting needed XPath data
-        testletInit(datalet);
-        try
+        if (testletInit(datalet))
         {
-            // Transform our supplied input file...
-            testDatalet(datalet);
-
-            // ...and compare with gold data
-            checkDatalet(datalet);
-        }
-        // Handle any exceptions from the testing
-        catch (Throwable t)
-        {
-            handleException(datalet, t);
-            return;
+            try
+            {
+                // Transform our supplied input file...
+                testDatalet(datalet);
+    
+                // ...and compare with gold data
+                checkDatalet(datalet);
+            }
+            // Handle any exceptions from the testing
+            catch (Throwable t)
+            {
+                handleException(datalet, t);
+                return;
+            }
         }
 	}
-
 
     // Since we're looking for attrs, they're not namespaced
     public static final String ATTR_URI = null;
     public static final String MATCH_PATTERNS = "match";
     public static final String SELECT_PATTERNS = "select";
+    
+    // Store collected patterns for our use
+    private Vector matchpats = new Vector();
+    private Vector selectpats = new Vector();
 
     /** 
      * Worker method to perform any pre-processing needed.  
      * <p>Overridden to gather XPaths from input stylesheets to test.</p>
      *
      * @param datalet to test with
+     * @return false if we should abort; true otherwise
      */
-    protected void testletInit(StylesheetDatalet datalet)
+    protected boolean testletInit(StylesheetDatalet datalet)
     {
-        Vector matchpats = new Vector();
-        Vector selectpats = new Vector();
-
+        if (null == datalet.inputName)
+        {
+            logger.logMsg(logger.WARNINGMSG, "Datalet had null inputName for "
+                    + datalet.xmlName);
+            return false;
+        }
+        
         // Find and parse the datalet.inputName file to a DOM
         // Search whole DOM for match attrs and save; select attrs too
         Document doc;
@@ -221,11 +231,10 @@ public class XPathASTTestlet extends FileTestlet
         catch (Exception e)
         {
             logger.logThrowable(Logger.ERRORMSG, e, getCheckDescription(datalet));
-            return;
+            return false;
         }
 
-        datalet.options.put(MATCH_PATTERNS, matchpats);
-        datalet.options.put(SELECT_PATTERNS, selectpats);
+        return true;
     }
 
 
@@ -244,21 +253,22 @@ public class XPathASTTestlet extends FileTestlet
         //@todo Should we log a custom logElement here instead?
         logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName);
 
-        // Get XPaths to test from datalet (see testletInit)
-        Vector matchpats = (Vector)datalet.options.get(MATCH_PATTERNS);
-        Vector selectpats = (Vector)datalet.options.get(SELECT_PATTERNS);
-
         // Cheap-o validation: ensure non-null, dump contents
-        for (Enumeration enum = matchpats.elements();
-                enum.hasMoreElements(); /* no increment portion */ )
+        if (null != matchpats)
         {
-            logXPath((String)enum.nextElement());
+            for (Enumeration enum = matchpats.elements();
+                    enum.hasMoreElements(); /* no increment portion */ )
+            {
+                logXPath((String)enum.nextElement());
+            }
         }
-
-        for (Enumeration enum = selectpats.elements();
-                enum.hasMoreElements(); /* no increment portion */ )
+        if (null != selectpats)
         {
-            logXPath((String)enum.nextElement());
+            for (Enumeration enum = selectpats.elements();
+                    enum.hasMoreElements(); /* no increment portion */ )
+            {
+                logXPath((String)enum.nextElement());
+            }
         }
     }
 
