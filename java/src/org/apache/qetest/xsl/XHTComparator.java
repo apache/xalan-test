@@ -64,6 +64,7 @@ import java.io.PrintWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
+import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -84,6 +85,10 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+
+// Tidy from w3c for parsing HTML
+import org.w3c.tidy.Tidy;
 
 /**
  * Uses an XML/HTML/Text diff comparator to check or diff two files.
@@ -722,9 +727,15 @@ public class XHTComparator
 
             try
             {
-                // @todo need to find an HTML to DOM parser we can use!!!
-                // doc = someHTMLParser.parse(new InputSource(filename));
-                throw new RuntimeException("XHTComparator no HTML parser!");
+                // Use the copy of Tidy that the XSLTC team has checked in
+                // Submitted by: Gunnar Klauberg <gklauberg@yahoo.de>
+                // Alternate by: Santiago.PericasGeertsen@sun.com
+    	        Tidy tidy = new Tidy();
+    	        tidy.setXHTML(true);
+    	        tidy.setTidyMark(false);
+    	        tidy.setShowWarnings(false);
+    	        tidy.setQuiet(true);
+    	        doc  = tidy.parseDOM(new URL(docURI).openStream(), null);
             }
             catch (Exception e)
             {
