@@ -8,7 +8,7 @@
   <!-- Purpose: Test document() function with too many arguments. -->
   <!-- Creator: David Marston -->
   <!-- ExpectedException: document() function requires 1 or 2 arguments -->
-  <!-- ExpectedException: FuncDocument only allows 2 arguments -->
+  <!-- ExpectedException: FuncDocument only allows 1 or 2 arguments -->
 
 <xsl:template match="defaultcontent">
   <out>

@@ -11,6 +11,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test error reporting if name attribute of xsl:element is empty. -->
   <!-- ExpectedException: Illegal element name -->
+  <!-- ExpectedException: Illegal value used for attribute name -->
 
 <xsl:template match="doc">
   <xsl:element name="">foo</xsl:element>

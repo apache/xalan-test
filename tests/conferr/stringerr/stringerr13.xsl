@@ -8,7 +8,8 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'substring()' with too many arguments -->
   <!-- ExpectedException: substring() has too many arguments -->
-  <!-- ExpectedException: FuncSubstring only allows 3 arguments --><!-- Note different msg than with stringerr12.xsl -sc -->
+  <!-- ExpectedException: FuncSubstring only allows 2 or 3 arguments -->
+  <!-- ExpectedException: FuncSubstring only allows 3 arguments --><!-- Old message to be removed when 2.4 ships -->
 
 <xsl:template match="/">
   <out>
