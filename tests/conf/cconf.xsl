@@ -39,6 +39,7 @@
 		<!-- td rowspan="1" colspan="1"></td -->
 		<th align="center">RunID</th>
 		<th align="center">Xerces</th>
+		<th align="center">TestBase</th>
 		<th align="center">Pass</th>
 		<th align="center">Fail</th>
 		<th align="center">Missing Gold</th>
@@ -46,6 +47,7 @@
 	<tr>
 	<td align="center"><b><xsl:value-of select="@UniqRunid"/></b></td>
 	<td align="center"><b><xsl:value-of select="@Xerces-Version"/></b></td>
+	<td align="center"><b><xsl:value-of select="@TestBase"/></b></td>
 	<td align="center"><b><xsl:value-of select="@Passed"/></b></td>
 	<td align="center" bgcolor="red"><b><xsl:value-of select="@Failed"/></b></td>
 	<td align="center"><b><xsl:value-of select="@No_Gold_Files"/></b></td>
