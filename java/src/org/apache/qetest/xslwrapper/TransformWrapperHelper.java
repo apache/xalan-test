@@ -359,14 +359,15 @@ public abstract class TransformWrapperHelper implements TransformWrapper
 
 
     /**
-     * Worker method to return default array of longs.
+     * Static worker method to return default array of longs.
      *
      * Simply returns long[] pre-filled to TIME_UNUSED, suitable 
-     * for returning from various transform API's.  
+     * for returning from various transform API's.  May be called 
+     * by external callers to get pre-sized array.
      *
      * @return long[] = TIME_UNUSED
      */
-    protected long[] getTimeArray()
+    public static long[] getTimeArray()
     {
         return new long[]
         {
@@ -379,5 +380,44 @@ public abstract class TransformWrapperHelper implements TransformWrapper
             TIME_UNUSED, /* IDX_RESULTWRITE */
             TIME_UNUSED  /* IDX_FIRSTLATENCY */
         };
+    }
+
+
+    /**
+     * Static worker method to return description of timing slots.
+     *
+     * @return String describing this idx slot in a getTimeArray
+     */
+    public static String getTimeArrayDesc(int idx)
+    {
+        switch (idx)
+        {
+            case IDX_OVERALL:
+                return "OVERALL";
+
+            case IDX_XSLREAD:
+                return "XSLREAD";
+                
+            case IDX_XSLBUILD:
+                return "XSLBUILD";
+                
+            case IDX_XMLREAD:
+                return "XMLREAD";
+                
+            case IDX_XMLBUILD:
+                return "XMLBUILD";
+                
+            case IDX_TRANSFORM:
+                return "TRANSFORM";
+                
+            case IDX_RESULTWRITE:
+                return "RESULTWRITE";
+                
+            case IDX_FIRSTLATENCY:
+                return "FIRSTLATENCY";
+                
+            default:
+                return "ERROR:unknown-getTimeArrayDesc-idx";
+        }
     }
 }
