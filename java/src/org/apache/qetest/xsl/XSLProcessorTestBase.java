@@ -300,6 +300,9 @@ public class XSLProcessorTestBase extends FileBasedTest
                 // If that didn't work, then ask for default one that does files
                 fileChecker = QetestFactory.newCheckService(reporter, QetestFactory.TYPE_FILES);
             }
+            // If we're creating a new one, also applyAttributes
+            // (Assume that if we already had one, it already had this done)
+            fileChecker.applyAttributes(testProps);
         }
 
         return true;
