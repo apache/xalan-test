@@ -3,10 +3,11 @@
                 xmlns:baz1="http://xsl.lotus.com/ns1"
                 xmlns:baz2="http://xsl.lotus.com/ns2">
 
-  <!-- FileName: NSPCerr06 -->
+  <!-- FileName: namespaceerr06 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.1 Node Set Functions. -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'local-name()' with too many arguments. -->
   <!-- ExpectedException: local-name() has too many arguments. -->
 

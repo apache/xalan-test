@@ -3,10 +3,11 @@
   xmlns:space="http://fictitious.com"
   version="1.0">
 
-  <!-- FileName: NSPC03 -->
+  <!-- FileName: namespace03 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.3 -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Adding an attribute to an element replaces any existing
      attribute of that element with the same expanded-name. For attribute L,
      there is only a local name. Attribute Q has a namespace. -->

@@ -7,6 +7,7 @@
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.3 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test for meaningful message when attempting to use namespace wildcard (*) -->
   <!-- ExpectedException: XSLT: ElemTemplateElement error: Can not resolve namespace prefix: -->
 

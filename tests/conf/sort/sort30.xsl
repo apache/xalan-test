@@ -7,6 +7,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test for xsl:sort using a local variable in the select, apply-templates. -->
 
 <xsl:template match="/">

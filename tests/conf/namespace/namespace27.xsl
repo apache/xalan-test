@@ -3,10 +3,11 @@
                 xmlns:baz1="http://xsl.lotus.com/ns1"
                 xmlns:baz2="http://xsl.lotus.com/ns2">
 
-  <!-- FileName: NSPC27 -->
+  <!-- FileName: namespace27 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.1 Node Set Functions. -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test of 'namespace-uri()' with no arguments. -->
 
 <xsl:template match="baz2:doc">

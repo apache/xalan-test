@@ -7,7 +7,8 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
-  <!-- Purpose: Reverse the order of the nodes using an expression that works. -->
+  <!-- Creator: David Marston -->
+  <!-- Purpose: Reverse the order of the nodes using an expression that is reliable. -->
 
 <xsl:template match="/">
   <xsl:for-each select="doc/alpha">

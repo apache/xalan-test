@@ -1,10 +1,11 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: POS70 -->
+  <!-- FileName: position70 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 5.4 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test that set of nodes changes when strip-space is in effect. -->
   <!-- "The xsl:apply-templates instruction processes all children of the current node,
         including text nodes. However, text nodes that have been stripped as specified

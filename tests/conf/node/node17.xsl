@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.2 Axes-->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test that 'namespace::node()' selects all namespaces. -->
 
 <xsl:template match="/">

@@ -6,10 +6,11 @@
 <xsl:variable name="joe">2</xsl:variable>
 <ped:param name="sam" select="' x 4'"/>
 
-  <!-- FileName: NSPC14 -->
+  <!-- FileName: namespace14 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991008 -->
-  <!-- Section: 2.1 XSLT Namespace. -->
+  <!-- DocVersion: 19991116 -->
+  <!-- Section: 2.1 XSLT Namespace -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Have more than one prefix bound to the URI of XSLT namespace. -->
 
 <ped:template match="doc">

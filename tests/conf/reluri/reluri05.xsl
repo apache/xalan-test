@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 3.2 Base URI (Stylesheet import/Inclusion) -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: This test verifies correct URI resolution with relative URI's. --> 
   <!-- Case: include, import, import, include -->
 

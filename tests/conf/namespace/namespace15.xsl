@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-				xmlns:help="xsl.lotus.com/help">
+     xmlns:help="xsl.lotus.com/help">
 
-  <!-- FileName: nspc15 -->
+  <!-- FileName: namespace15 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.2 Stylesheet Element. -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Stylesheet elements may contain any element not from the 
        XSLT namespace, provided that the expanded name of the element has 
        a non-null namespace URI. -->

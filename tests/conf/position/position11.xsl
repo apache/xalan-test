@@ -1,11 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: POS11 -->
+  <!-- FileName: position11 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.1 -->
-  <!-- Purpose: Test of position() and last() functions. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Test of position() and last() in xsl:if test. -->
 
 <xsl:template match="letters">
   <out>
@@ -19,5 +20,5 @@
     <xsl:text>, </xsl:text>
   </xsl:if>
 </xsl:template>
- 
+
 </xsl:stylesheet>

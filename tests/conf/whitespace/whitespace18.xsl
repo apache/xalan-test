@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: whte18 -->
+  <!-- FileName: whitespace18 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 3.4 Whitespace Stripping -->
@@ -16,4 +16,5 @@
 </out>
 
 </xsl:template>
+
 </xsl:stylesheet>

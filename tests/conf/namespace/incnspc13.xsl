@@ -2,13 +2,13 @@
 <jad:transform xmlns:jad="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <jad:output method="xml"/>
 
-  <!-- FileName: NSPC13inc -->
+  <!-- FileName: incnspc13 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991008 -->
-  <!-- Section: 2.1 XSLT Namespace. -->
-  <!-- Purpose: This stylesheet is being included by nspc13 which has the namespace
+  <!-- DocVersion: 19991116 -->
+  <!-- Section: 2.1 XSLT Namespace -->
+  <!-- Purpose: This stylesheet is being included by namespace13 which has the namespace
        prefix set to 'jad'. Testing that this setup with two different namespaces
-       is not evil.  -->
+       is allowed.  -->
 
 <jad:template match="doc">
   <out>

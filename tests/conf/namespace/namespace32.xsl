@@ -3,12 +3,12 @@
                 xmlns:tst="test"
                 exclude-result-prefixes="tst">
 
-  <!-- FileName: nspc32 -->
+  <!-- FileName: namespace32 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 5.4 -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test of local-name() on default namespace declaration. -->
-
 
 <xsl:template match="/tst:a">
   <out>

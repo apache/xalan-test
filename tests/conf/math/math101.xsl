@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.4 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test that mod has precedence over + and -. -->
 
 <xsl:variable name="anum" select="10"/>

@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: When can't sort on primary key, should not sort at all. Raise warning? -->
   <!-- ExpectedException: ??? -->
 

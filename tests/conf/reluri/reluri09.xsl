@@ -5,10 +5,10 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 12.1 Multiple Source Documents -->
-  <!-- Author: Paul Dick -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Testing document() function with two arguments: string, node-set: 
-       verifing that a relative url specified in first argument is resolved based
-	   on base uri of document in second argument nodeset.                     -->
+       verifying that a relative URL specified in first argument is resolved based
+	   on base URI of document in second argument nodeset. -->
 
 <xsl:output indent="yes"/>
 

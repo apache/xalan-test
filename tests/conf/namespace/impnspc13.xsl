@@ -2,13 +2,13 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <xsl:output method="xml"/>
 
-  <!-- FileName: NSPC13imp -->
+  <!-- FileName: impnspc13 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991008 -->
-  <!-- Section: 2.1 XSLT Namespace. -->
-  <!-- Purpose: This stylesheet is being imported by nspc13 which has the namespace
+  <!-- DocVersion: 19991116 -->
+  <!-- Section: 2.1 XSLT Namespace -->
+  <!-- Purpose: This stylesheet is being imported by namespace13 which has the namespace
        prefix set to 'ped'. Testing that this setup with two different namespaces
-       is not evil.  -->
+       is allowed. -->
 
 <xsl:template match="doc" priority="1.0">
   <out>

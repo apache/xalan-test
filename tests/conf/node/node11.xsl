@@ -1,13 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: NTST11 -->
+  <!-- FileName: node11 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.3 -->
-  <!-- Purpose: Test for node tests in match patterns. -->
-
-<!-- Should say "test" -->
+  <!-- Creator: David Marston -->
+  <!-- Purpose: Test for node tests in match patterns (and union in select). -->
 
 <xsl:template match="/doc">
   <out>

@@ -1,6 +1,6 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-                xmlns:axsl="http://www.w3.org/1999/XSL/TransAlias">
+      xmlns:axsl="http://www.w3.org/1999/XSL/TransAlias">
 
 <xsl:output method="xml" indent="yes"/>
 
@@ -8,9 +8,9 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991118 -->
   <!-- Section: 7.1.1 Literal Result Elements -->
-  <!-- Purpose: Test basic functionality of namespace-alias. Where xsl elements
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Test basic functionality of namespace-alias. Where XSL elements
        are created by using xsl:element command. -->
-
 
 <xsl:namespace-alias stylesheet-prefix="axsl" result-prefix="xsl"/>
 

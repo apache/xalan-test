@@ -3,9 +3,10 @@
 
   <!-- FileName: math87 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991666 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 4.4 -->
-  <!-- Purpose: Test of division. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Test of repeated division. -->
 
 <xsl:template match="doc">
   <out>

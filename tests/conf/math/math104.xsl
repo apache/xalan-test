@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: MATH104 -->
+  <!-- FileName: math104 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.4 -->
   <!-- Purpose: Test of is-a-number technique. -->
-  <!-- Author: David Marston -->
+  <!-- Creator: David Marston -->
 
 <xsl:template match="doc">
   <out>

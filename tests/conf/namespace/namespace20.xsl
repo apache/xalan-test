@@ -5,10 +5,11 @@
 		xmlns="bubba.com"
 	exclude-result-prefixes="ped #default">
 
-  <!-- FileName: nspc20 -->
+  <!-- FileName: namespace20 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.1 Literal Result Elements  -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test exclude-result-prefixes. -->
 
 <xsl:template match="doc">

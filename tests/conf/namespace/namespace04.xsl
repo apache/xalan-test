@@ -2,10 +2,11 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:bogus="http://bogus">
 
-  <!-- FileName: NSPC04 -->
+  <!-- FileName: namespace04 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.4 -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test that default namespaces do not apply directly to attributes. -->
 
 <xsl:template match="*[@up]">

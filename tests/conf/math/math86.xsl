@@ -3,9 +3,10 @@
 
   <!-- FileName: math86 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991666 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 4.4 -->
-  <!-- Purpose: Test of multiply. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Test of repeated use of * to multiply. -->
 
 <xsl:template match="doc">
   <out>

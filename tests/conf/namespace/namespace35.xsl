@@ -10,8 +10,9 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.4 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Get xmlns declaration attached to outermost LRE.
-     Still unclear if prefix "axsl" should also be literal. -->
+     Prefix "axsl" should also be literal. -->
 
 <xsl:template match="/">
   <axsl:template match="/"/>

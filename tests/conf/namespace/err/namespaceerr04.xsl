@@ -1,13 +1,14 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
 	xmlns:bogus="http://www.bogus_ns.com"
         xmlns:lotus="http://www.lotus.com"
 	xmlns:ped="www.ped.com">
 
-  <!-- FileName: nspcerr04 -->
+  <!-- FileName: namespaceerr04 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.1 XSLT Namespace -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose:  Testing an attribute not from the XSLT namespace, which is
        legal provided that the expanded name of the attribute has a non-null 
        namespace URI. This tests for many xslt TOP-LEVEL elements, apparent code path 
@@ -38,7 +39,6 @@ DefaultValueOfParam1
 <xsl:namespace-alias stylesheet-prefix="bogus" result-prefix="xsl" ped:k="k"/>
 <xsl:decimal-format decimal-separator="," grouping-separator=" " ped:l="l"/>
 
-
 <xsl:template match="docs" ped:m="m">
   <bogus:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<bogus:template match="/">
@@ -54,5 +54,5 @@ DefaultValueOfParam1
 	</bogus:template>
   </bogus:stylesheet>
 </xsl:template>
- 
+
 </xsl:stylesheet>

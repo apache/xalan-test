@@ -7,6 +7,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test the famous technique for choosing the sort key dynamically. -->
 
 <xsl:variable name="sortcol" select="'left'"/>

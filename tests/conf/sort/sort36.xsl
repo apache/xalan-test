@@ -6,7 +6,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
-  <!-- Author: David Marston -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test the famous technique for sorting with conditionals.
      In this case, we want to sort strings with and without "Re: " prefix by
      the rest of the string. Technique from Oliver Becker (obecker@informatik.hu-berlin.de). -->

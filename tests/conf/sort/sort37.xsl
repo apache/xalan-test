@@ -7,6 +7,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: If nothing comes through select, should get document order. -->
 
 <xsl:template match="/">

@@ -1,11 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <!-- FileName: SORT12 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
-  <!-- Purpose: Sort numbers withnleading zeroes and decimal points. -->
+  <!-- Creator: David Marston -->
+  <!-- Purpose: Sort numbers with leading zeroes and decimal points. -->
 
 <xsl:template match="doc">
   <out>

@@ -1,11 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: POS02 -->
+  <!-- FileName: position02 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 4.1 -->
-  <!-- Purpose: Test of 'position()' function with wildcard. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Test of position() function in predicate on wildcard. Look for last item. -->
 
 <xsl:template match="doc">
   <out>

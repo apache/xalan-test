@@ -1,11 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: POS12 -->
+  <!-- FileName: position12 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.1 -->
-  <!-- Purpose: Test of position() function. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Test of position() function in value-of select. -->
 
 <xsl:template match="doc">
   <out>

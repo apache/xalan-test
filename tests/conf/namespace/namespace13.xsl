@@ -6,10 +6,11 @@
 
 <ped:output method="xml"/>
 
-  <!-- FileName: NSPC13 -->
+  <!-- FileName: namespace13 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19991008 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 2.1 XSLT Namespace. -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Stylesheets are free to use any prefix, provided there is a namespace
        declaration that binds the prefix to the URI of XSLT namespace. -->
 

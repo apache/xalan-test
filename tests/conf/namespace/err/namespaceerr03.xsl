@@ -1,11 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
  xmlns:axsl="http://www.w3.org/1999/XSL/TransAlias">
 
-  <!-- FileName: NSPCerr03 -->
+  <!-- FileName: namespaceerr03 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.1 Literal Result Elements -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test missing attribute in namespace-alias. -->
   <!-- ExpectedException: XSLT: Missing namespace URI for specified prefix -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: Missing namespace URI for specified prefix -->

@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: POS77 -->
+  <!-- FileName: position77 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 5.4 -->
   <!-- AdditionalSpec: 4, 10 and "current node list" in 1 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test positional indexing in current node list passed
        via apply-templates with select that has predicate. -->
 

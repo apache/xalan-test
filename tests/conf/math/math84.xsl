@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19990922 -->
   <!-- Section: 4.4 Number Functions-->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test of sum(). -->
 
 <xsl:template match="doc">

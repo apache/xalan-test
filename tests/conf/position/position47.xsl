@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: POS47 -->
+  <!-- FileName: position47 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 2.4 -->
-  <!-- Purpose: Test of positional indexing when used with xsl:key. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Test of shorthand positional indexing on node-set from key(). Look for first. -->
 
 <xsl:key name="k" match="a" use="@test"/>
-<xsl:key name="k2" match="a" use="num"/>
 
 <xsl:template match="doc">
   <out>

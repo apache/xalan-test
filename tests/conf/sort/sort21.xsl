@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test for xsl:sort using a numeric expression for the select. -->
 
 <xsl:template match="/">

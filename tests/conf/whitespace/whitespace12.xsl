@@ -1,13 +1,14 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: WHTE12 -->
+  <!-- FileName: whitespace12 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
-  <!-- DocVersion: 19990922 -->
+  <!-- DocVersion: 19991116 -->
   <!-- Section: 16 -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test xsl:output with indent. -->
 
 <xsl:output indent="yes"/>
-  
+
 <xsl:strip-space elements="document"/>
 
 <xsl:template match="document">

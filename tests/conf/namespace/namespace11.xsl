@@ -4,10 +4,11 @@
                 xmlns:baz2="http://xsl.lotus.com/ns2"
                 exclude-result-prefixes="baz1 baz2">
 
-  <!-- FileName: NSPC11 -->
+  <!-- FileName: namespace11 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
-  <!-- Section: 4.1 Node Set Functions. -->
+  <!-- Section: 4.1 Node Set Functions -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Test of 'namespace-uri()' function, with hyphenated node name. -->
 
 <xsl:template match="baz2:doc-one">

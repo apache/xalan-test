@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Try to use an AVT for the select value. -->
   <!-- ExpectedException: select value for xsl:sort cannot contain {} -->
 

@@ -7,6 +7,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 10 -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test for xsl:sort using a numeric expression for the select. -->
   <!-- Note that we show that this sort does NOT do the expected rearrangement of nodes!
      Apparently, the conversion of the select expression to a string occurs at a bad time. -->

@@ -1,14 +1,14 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <xsl:output indent="yes"/>
 
-  <!-- FileName: NSPC02 -->
+  <!-- FileName: namespace02 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 2.4 -->
-  <!-- Purpose: Apply namespaces to elements. We differ from XT here due to the
-       fact that we declare necessary namespace nodes on parent nodes of 
-       subelements, this allows for simplier tracking of namespace nodes. -->
+  <!-- Creator: Paul Dick -->
+  <!-- Purpose: Apply namespaces to elements. Location of declaration is
+     allowed to vary, as long as it's in scope when needed. -->
 
 <xsl:template match="/">
   <out xmlns:anamespace="foo.com">
@@ -18,5 +18,5 @@
     </p>
   </out>
 </xsl:template>
- 
+
 </xsl:stylesheet>

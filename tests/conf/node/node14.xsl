@@ -1,10 +1,11 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: NTST14 -->
+  <!-- FileName: node14 -->
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 5.1 Root node -->
+  <!-- Creator: David Marston -->
   <!-- Purpose: Test for access to PIs hanging off the root. -->
 
 <xsl:template match="/">

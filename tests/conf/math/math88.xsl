@@ -5,6 +5,7 @@
   <!-- Document: http://www.w3.org/TR/xpath -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 4.4 -->
+  <!-- Creator: Paul Dick -->
   <!-- Purpose: Mini stress of x-way multiply and divide. -->
 
 <xsl:template match="doc">
