@@ -278,12 +278,18 @@ public class StylesheetTestlet extends TestletImpl
                                  getDescription() + " " + datalet.getDescription())
            )
         {
-            // Log a custom element with all the file refs first
+            // Log a custom element with all the file refs
             // Closely related to viewResults.xsl select='fileref"
             //@todo check that these links are valid when base 
             //  paths are either relative or absolute!
             Hashtable attrs = new Hashtable();
             attrs.put("idref", (new File(datalet.inputName)).getName());
+            try
+            {
+                attrs.put("baseref", System.getProperty("user.dir"));
+            } 
+            catch (Exception e) { /* no-op, ignore */ }
+            
             attrs.put("inputName", datalet.inputName);
             attrs.put("xmlName", datalet.xmlName);
             attrs.put("outputName", datalet.outputName);
