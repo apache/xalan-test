@@ -1,8 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<out><docs><xml>N10002</xml></docs>
-  <doc><ext>N10005</ext><xml>N10002</xml></doc>
-    <section><foo>N10008</foo><ext>N10005</ext><xml>N10002</xml></section>
-      <inner><foo>N10008</foo><ext>N10005</ext><whiz>N1000B</whiz><xml>N10002</xml></inner>
-    
-  
-</out>
+<out>Number of IDs accumulated: 10</out>
