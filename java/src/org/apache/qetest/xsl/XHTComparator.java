@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,10 +64,6 @@ import java.io.PrintWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -82,7 +78,6 @@ import org.w3c.dom.Text;
 // Needed JAXP classes
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 // SAX2 imports
 import org.xml.sax.ErrorHandler;
@@ -95,17 +90,26 @@ import org.xml.sax.SAXParseException;
  * <p>Given two files, an actual test result and a known good or 'gold'
  * test result, diff the two files to see if they are equal; if not, provide
  * some very basic info on where they differ.</p>
+ *
  * <p>Attempts to parse each file as an XML document using Xerces;
  * if that fails, attempt to parse each as an HTML document using
  * <i>NEED NEW HTML PARSER</i>; if that fails, pretend to parse each
- * doc as a single text node.</p>
+ * doc as text and construct a faux document node; then do 
+ * readLine() and construct a &lt;line> element for each line.</p>
+ *
+ * <p>The comparison routine then recursively compares the two 
+ * documents node-by-node; see the code for exactly how each 
+ * node type is handled.  Note that some node types are currently 
+ * ignored.</p>
+ *
  * //@todo document whitespace difference handling better -sc
- * //@todo check how namespaces are handled and diff'd -sc
  * //@todo check how XML decls are handled (or not) -sc
- * //@todo check how files of different encodings are handled in each parse type -sc
  * //@todo Allow param to define the type of parse we do (i.e. if a
  * testwriter knows their output file will be XML, we should only
  * attempt to parse it as XML, not other types)
+ * @see XHTComparatorXSLTC for an alternate implementation of 
+ * diff() which tests some things as QNames (which checks for the 
+ * true namespace, instead of just the prefix)
  * @author Scott_Boag@lotus.com
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
@@ -192,11 +196,19 @@ public class XHTComparator
 
     /**
      * Compare two files by parsing into DOMs and comparing trees.
+     *
+     * <p>Parses the goldFileName by using the 
+     * {@link #parse(String, PrintWriter, String, Properties) parse worker method}
+     * - if null, we bail and return false.  If non-null, we parse the 
+     * testFileName into a Document as well.  Then we call 
+     * {@link #diff(Node, Node, PrintWriter, boolean[]) diff worker method} 
+     * to do the real work of comparing.</p>
+     *
      * @param goldFileName expected file
      * @param testFileName actual file
      * @param reporter PrintWriter to dump status info to
-     * @param array of warning flags (for whitespace diffs, I think?)
-     * NEEDSDOC @param warning
+     * @param warning array of warning flags (for whitespace diffs, 
+     * item[0] is set to true if we find whitespace-only diffs)
      * @param attributes to attempt to set onto parsers
      * @return true if they match, false otherwise
      */
@@ -209,6 +221,10 @@ public class XHTComparator
         Document goldDoc = parse(goldFileName, reporter, GOLD, attributes);
 
         // parse the test doc only if gold doc was parsed OK
+        //@todo Jun-02 -sc Note the logic here might be improveable to 
+        //  actually report file missing problems better: i.e. 
+        //  in theory, if the actual is missing, it's a fail; if 
+        //  the gold (only) is missing, it's ambiguous
         Document testDoc = (null != goldDoc)
                            ? parse(testFileName, reporter, TEST, attributes) : null;
 
@@ -234,11 +250,17 @@ public class XHTComparator
     // REASON_CONSTANT;gold val;test val;reason description
 
     /**
-     * The contract is: when you enter here the gold and test nodes are the same type,
-     * both non-null, and both in the same basic position in the tree.
-     * //@todo verify caller really performs for the contract -sc
+     * Diff two Nodes recursively and report true if equal.  
      *
-     * @param gold gold or expected node
+     * <p>The contract is: when you enter here the gold and test nodes are the same type,
+     * both non-null, and both in the same basic position in the tree.
+     * //@todo verify caller really performs for the contract -sc</p>
+     *
+     * <p>See the code for how it's done; note that not all node 
+     * types are actually compared currently.  Also see 
+     * {@link XHTComparatorXSLTC} for an alternate implementation.</p>
+     *
+     * @param gold or expected node
      * @param test actual node
      * @param reporter PrintWriter to dump status info to
      * @param warning[] if any whitespace diffs found
@@ -286,20 +308,8 @@ public class XHTComparator
             reporter.println(MISMATCH_VALUE + nodeTypeString(gold) + "len="
                            + value1.length() + SEPARATOR
                            + nodeTypeString(test) + "len=" + value2.length()
-                           + SEPARATOR + "lengths do not match");
-
-            // Limit length we output to logs; extremely long values 
-            //  are more hassle than they're worth (at that point, 
-            //  it's either obvious what the problem is, or it's 
-            //  such a small problem that you'll need to manually
-            //  compare the files separately
-            if (value1.length() > maxDisplayLen)
-                value1 = value1.substring(0, maxDisplayLen);
-            if (value2.length() > maxDisplayLen)
-                value2 = value2.substring(0, maxDisplayLen);
-            reporter.println(MISMATCH_VALUE_GOLD + nodeTypeString(gold) + SEPARATOR + "\n" + value1);
-            reporter.println(MISMATCH_VALUE_TEXT + nodeTypeString(test) + SEPARATOR + "\n" + value2);
-
+                           + SEPARATOR + "values do not match");
+            printNodeDiff(gold, test, reporter);
             return false;
         }
         else if ((null != value1) && (null == value2))
@@ -462,13 +472,17 @@ public class XHTComparator
      * NEEDSDOC Method tryToAdvancePastWhitespace 
      *
      *
-     * NEEDSDOC @param n
+     * @param n node to check if it's whitespace
      * @param reporter PrintWriter to dump status info to
-     * NEEDSDOC @param warning
-     * NEEDSDOC @param next
-     * NEEDSDOC @param which
+     * @param warning set to true if we advance past a 
+     * whitespace node; note that this logic isn't quite 
+     * correct, I think (it should only be set if 
+     * we advance past whitespace that isn't equal in 
+     * both trees or something like that)
+     * @param next array of nodes to continue thru
+     * @param which index into next array
      *
-     * NEEDSDOC (tryToAdvancePastWhitespace) @return
+     * @return Node we should be at after advancing
      */
     Node tryToAdvancePastWhitespace(Node n, PrintWriter reporter,
                                     boolean[] warning, Node next[], int which)
@@ -572,6 +586,7 @@ public class XHTComparator
                 reporter.println(MISMATCH_NODE + nodeTypeString(gold)
                                + SEPARATOR + nodeTypeString(test) + SEPARATOR
                                + "node type mismatch");
+                printNodeDiff(gold, test, reporter);
 
                 return false;
             }
@@ -583,60 +598,79 @@ public class XHTComparator
     /**
      * Cheap-o text printout of a node.  By Scott.  
      *
-     * NEEDSDOC @param n
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param n node to print info for
+     * @return String of getNodeType plus getNodeName
      */
-    String nodeTypeString(Node n)
+    public static String nodeTypeString(Node n)
     {
-
-        String s;
-
         switch (n.getNodeType())
         {
         case Node.DOCUMENT_NODE :
-            s = "DOCUMENT_NODE(" + n.getNodeName() + ")";
-            break;
+            return "DOCUMENT(" + n.getNodeName() + ")";
         case Node.ELEMENT_NODE :
-            s = "ELEMENT_NODE(" + n.getNodeName() + ")";
-            break;
+            return "ELEMENT(" + n.getNodeName() + ")";
         case Node.CDATA_SECTION_NODE :
-            s = "CDATA_SECTION_NODE(" + n.getNodeName() + ")";
-            break;
+            return "CDATA_SECTION(" + n.getNodeName() + ")";
         case Node.ENTITY_REFERENCE_NODE :
-            s = "ENTITY_REFERENCE_NODE(" + n.getNodeName() + ")";
-            break;
+            return "ENTITY_REFERENCE(" + n.getNodeName() + ")";
         case Node.ATTRIBUTE_NODE :
-            s = "ATTRIBUTE_NODE(" + n.getNodeName() + ")";
-            break;
+            return "ATTRIBUTE(" + n.getNodeName() + ")";
         case Node.COMMENT_NODE :
-            s = "COMMENT_NODE(" + n.getNodeName() + ")";
-            break;
+            return "COMMENT(" + n.getNodeName() + ")";
         case Node.ENTITY_NODE :
-            s = "ENTITY_NODE(" + n.getNodeName() + ")";
-            break;
+            return "ENTITY(" + n.getNodeName() + ")";
         case Node.NOTATION_NODE :
-            s = "NOTATION_NODE(" + n.getNodeName() + ")";
-            break;
+            return "NOTATION(" + n.getNodeName() + ")";
         case Node.PROCESSING_INSTRUCTION_NODE :
-            s = "PROCESSING_INSTRUCTION_NODE(" + n.getNodeName() + ")";
-            break;
+            return "PROCESSING_INSTRUCTION(" + n.getNodeName() + ")";
         case Node.TEXT_NODE :
-            s = "TEXT_NODE(" + n.getNodeName() + ")";
-            break;
+            return "TEXT()"; // #text is all that's ever printed out, so skip it
         default :
-            s = "UNKNOWN_NODE(" + n.getNodeName() + ")";
+            return "UNKNOWN(" + n.getNodeName() + ")";
         }
-
-        return s;
     }  // end of nodeTypeString()
+
+
+    /**
+     * Cheap-o text printout of two different nodes.  
+     *
+     * @param goldNode or expected node to print info
+     * @param testNode or actual node to print info
+     * @param n node to print info for
+     * @param reporter PrintWriter to dump status info to
+     */
+    public void printNodeDiff(Node goldNode, Node testNode, PrintWriter reporter)
+    {
+        String goldValue = goldNode.getNodeValue();
+        String testValue = testNode.getNodeValue();
+        if (null == goldValue)
+            goldValue = "null";
+        if (null == testValue)
+            testValue = "null";
+
+        // Limit length we output to logs; extremely long values 
+        //  are more hassle than they're worth (at that point, 
+        //  it's either obvious what the problem is, or it's 
+        //  such a small problem that you'll need to manually
+        //  compare the files separately
+        if (goldValue.length() > maxDisplayLen)
+            goldValue = goldValue.substring(0, maxDisplayLen);
+        if (testValue.length() > maxDisplayLen)
+            testValue = testValue.substring(0, maxDisplayLen);
+        reporter.println(MISMATCH_VALUE_GOLD + nodeTypeString(goldNode) + SEPARATOR + "\n" + goldValue);
+        reporter.println(MISMATCH_VALUE_TEXT + nodeTypeString(testNode) + SEPARATOR + "\n" + testValue);
+    }
 
 
     /**
      * Simple worker method to parse filename to a Document.  
      *
-     * Attempts XML parse, then HTML parse (when parser available), 
-     * then just parses as text and sticks into a text node.
+     * <p>Attempts XML parse, if that throws an exception, then 
+     * we attempt an HTML parse (when parser available), if 
+     * that throws an exception, then we parse as text: 
+     * we construct a faux document element to hold it all, 
+     * and then parse by readLine() and put each line of 
+     * text into a &lt;line> element.</p>
      *
      * @param filename to parse as a local path
      * @param reporter PrintWriter to dump status info to
@@ -660,7 +694,8 @@ public class XHTComparator
         applyAttributes(dfactory, attributes);
         
         // Local class: cheap non-printing ErrorHandler
-        // This is used to suppress validation warnings
+        // This is used to suppress validation warnings which 
+        //  would otherwise clutter up the console
         ErrorHandler nullHandler = new ErrorHandler() {
             public void warning(SAXParseException e) throws SAXException {}
             public void error(SAXParseException e) throws SAXException {}
@@ -699,12 +734,16 @@ public class XHTComparator
                     reporter.println(WARNING + e.toString());
                     parseType = which + PARSE_TYPE + "[text];";
 
+                    // First build a faux document with parent element
+                    DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+                    doc = docBuilder.newDocument();
+                    Element outElem = doc.createElement("out");
+
                     // Parse as text, line by line
                     //   Since we already know it should be text, this should 
                     //   work better than parsing by bytes.
                     FileReader fr = new FileReader(filename);
                     BufferedReader br = new BufferedReader(fr);
-                    StringBuffer buffer = new StringBuffer();
                     for (;;)
                     {
                         String tmp = br.readLine();
@@ -713,28 +752,22 @@ public class XHTComparator
                         {
                             break;
                         }
-
-                        buffer.append(tmp);
-                        buffer.append("\n");  // Put in the newlines as well
+                        // An additional thing we could do would 
+                        //  be to put in the line number in the 
+                        //  file in here somehow, so when users 
+                        //  view reports, they get that info
+                        Element lineElem = doc.createElement("line");
+                        outElem.appendChild(lineElem);
+                        Text textNode = doc.createTextNode(tmp);
+                        lineElem.appendChild(textNode);
                     }
-
-                    DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
-                    doc = docBuilder.newDocument();
-                    Element outElem = doc.createElement("out");
-                    Text textNode = doc.createTextNode(buffer.toString());
-
-                    // Note: will this always be a valid node?  If we're parsing 
-                    //    in as text, will there ever be cases where the diff that's 
-                    //    done later on will fail becuase some really garbage-like 
-                    //    text has been put into a node?
-                    outElem.appendChild(textNode);
+                    // Now stick the whole element into the document to return
                     doc.appendChild(outElem);
                 }
                 catch (Throwable throwable)
                 {
                     reporter.println(OTHER_ERROR + filename + SEPARATOR
                                    + "threw:" + throwable.toString());
-                    // throwable.printStackTrace();
                 }
             }
         }
