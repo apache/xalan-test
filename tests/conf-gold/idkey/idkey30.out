@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<out>A(att):N400003;T:N400004,P(a-pi):N400005;T:N400006,C:N400007,T:N400008,
-  E(inner):N400009 has A(blat):N40000A;T:N40000B,C:N40000C,T:N40000D,
-  E(sub):N40000E has T:N40000F,
-T:N400010,
-T:N400011,</out>
+<out>A(att):N0.4;T:N0.5,P(a-pi):N0.6;T:N0.7,C:N0.8,T:N0.9,
+  E(inner):N0.A has A(blat):N0.B;T:N0.C,C:N0.D,T:N0.E,
+  E(sub):N0.F has T:N0.10,
+T:N0.11,
+T:N0.12,</out>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<out><docs><xml>N400002</xml></docs>
-  <doc><ext>N400005</ext><xml>N400002</xml></doc>
-    <section><foo>N400008</foo><ext>N400005</ext><xml>N400002</xml></section>
-      <inner><foo>N400008</foo><ext>N400005</ext><whiz>N40000B</whiz><xml>N400002</xml></inner>
+<out><docs><xml>N0.3</xml></docs>
+  <doc><ext>N0.6</ext><xml>N0.3</xml></doc>
+    <section><foo>N0.9</foo><ext>N0.6</ext><xml>N0.3</xml></section>
+      <inner><foo>N0.9</foo><ext>N0.6</ext><whiz>N0.C</whiz><xml>N0.3</xml></inner>
     
   
 </out>
