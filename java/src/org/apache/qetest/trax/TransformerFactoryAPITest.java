@@ -74,6 +74,7 @@ import javax.xml.transform.stream.*;
 
 // java classes
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Properties;
 
 //-------------------------------------------------------------------------
@@ -92,11 +93,11 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
      */
     protected OutputNameManager outNames;
 
-    /** 
-     * Information about an xsl/xml file pair for transforming.  
-     * Public members include inputName (for xsl); xmlName; goldName; etc.
-     */
+    /** Basic identity test file for newTransformer, newTemplates.  */
     protected XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+
+    /** Embedded identity test file for getEmbedded....  */
+    protected XSLTestfileInfo embeddedFileInfo = new XSLTestfileInfo();
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_SUBDIR = "trax";
@@ -147,9 +148,12 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
                               + TRAX_SUBDIR
                               + File.separator;
 
-        testFileInfo.inputName = testBasePath + "TransformerFactoryAPITest.xsl";
-        testFileInfo.xmlName = testBasePath + "TransformerFactoryAPITest.xml";
-        testFileInfo.goldName = goldBasePath + "TransformerFactoryAPITest.out";
+        testFileInfo.inputName = testBasePath + "identity.xsl";
+        testFileInfo.xmlName = testBasePath + "identity.xml";
+        testFileInfo.goldName = goldBasePath + "identity.out";
+
+        embeddedFileInfo.xmlName = testBasePath + "embeddedIdentity.xml";
+        embeddedFileInfo.goldName = goldBasePath + "embeddedIdentity.out";
 
         // Cache the system property
         cachedSysProp = System.getProperty(defaultPropName);
@@ -260,7 +264,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logThrowable(reporter.ERRORMSG, t, "factory.newInstance() of Xalan impl threw:");
         }
 
-        reporter.checkAmbiguous("@todo code coverage for findFactory() method");
+        reporter.logStatusMsg("@todo code coverage for findFactory() method");
 
         reporter.testCaseClose();
         return true;
@@ -282,14 +286,22 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logStatusMsg("System property " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
-            reporter.checkAmbiguous("@todo code coverage for newTransformer(Source) method");
-            reporter.checkAmbiguous("@todo code coverage for newTransformer() method");
+            Transformer identityTransformer = factory.newTransformer();
+            reporter.check((identityTransformer != null), true, "newTransformer() APICoverage");
+
+            if (factory.getFeature(StreamSource.FEATURE))
+            {
+                Transformer transformer = factory.newTransformer(new StreamSource(testFileInfo.inputName));
+                reporter.check((transformer != null), true, "newTransformer(Source) APICoverage");
+            }
+            else
+                reporter.logErrorMsg("NOTE: getFeature(StreamSource.FEATURE) false, can't test newTransformer(Source)");
         }
         catch (Throwable t)
         {
-            reporter.logThrowable(reporter.ERRORMSG, t, "newTransformer() tests threw:");
+            reporter.checkFail("newTransformer() tests threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "newTransformer() tests threw");
         }
-
 
         reporter.testCaseClose();
         return true;
@@ -311,11 +323,18 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logStatusMsg("System property " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
-            reporter.checkAmbiguous("@todo code coverage for newTemplates(Source) method");
+            if (factory.getFeature(StreamSource.FEATURE))
+            {
+                Templates templates = factory.newTemplates(new StreamSource(testFileInfo.inputName));
+                reporter.check((templates != null), true, "newTemplates(Source) APICoverage");
+            }
+            else
+                reporter.logErrorMsg("NOTE: getFeature(StreamSource.FEATURE) false, can't test newTemplates(Source)");
         }
         catch (Throwable t)
         {
-            reporter.logThrowable(reporter.ERRORMSG, t, "newTemplates() tests threw:");
+            reporter.checkFail("newTemplates() tests threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "newTemplates() tests threw");
         }
 
         reporter.testCaseClose();
@@ -338,7 +357,26 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.logStatusMsg("System property " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
-            reporter.checkAmbiguous("@todo code coverage for getAssociatedStylesheet(...) method");
+            String media= null;     // currently ignored
+            String title = null;    // currently ignored
+            String charset = null;  // currently ignored
+
+            // May throw IOException
+            FileOutputStream resultStream = new FileOutputStream(outNames.nextName());
+
+            // Get the xml-stylesheet and process it
+            Source stylesheet = factory.getAssociatedStylesheet(new StreamSource(embeddedFileInfo.xmlName), 
+                                                                media, title, charset);
+            Transformer transformer = factory.newTransformer(stylesheet);
+            reporter.logCriticalMsg("SPR SCUU4RXTSQ occours in below line, even though check reports pass (missing linefeed)");
+            transformer.transform(new StreamSource(embeddedFileInfo.xmlName), new StreamResult(resultStream));
+            resultStream.close();   // just in case
+            int result = fileChecker.check(reporter, 
+                                           new File(outNames.currentName()), 
+                                           new File(embeddedFileInfo.goldName), 
+                                          "transform of getAssociatedStylesheet into " + outNames.currentName());
+            if (result == Logger.FAIL_RESULT)
+                reporter.logInfoMsg("transform of getAssociatedStylesheet... failure reason:" + fileChecker.getExtendedInfo());
         }
         catch (Throwable t)
         {
@@ -385,7 +423,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.checkErr("Coverage of get/setURIResolver threw: " + t.toString());
             reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setURIResolver threw:");
         }
-        reporter.checkAmbiguous("@todo feature testing for URIResolver");
+        reporter.logStatusMsg("@todo feature testing for URIResolver");
 
         try
         {
@@ -420,7 +458,7 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
             reporter.checkErr("Coverage of get/setErrorListener threw: " + t.toString());
             reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setErrorListener threw:");
         }
-        reporter.checkAmbiguous("@todo feature testing for ErrorListener");
+        reporter.logStatusMsg("@todo feature testing for ErrorListener");
 
         reporter.testCaseClose();
         return true;
@@ -435,7 +473,6 @@ public class TransformerFactoryAPITest extends XSLProcessorTestBase
     {
         return ("Common [optional] options supported by TransformerFactoryAPITest:\n"
                 + "(Note: assumes inputDir=.\\tests\\api)\n"
-                + "REPLACE_any_new_test_arguments\n"
                 + super.usage());   // Grab our parent classes usage as well
     }
 
