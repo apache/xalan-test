@@ -343,9 +343,10 @@ public class ExamplesTest extends XSLProcessorTestBase
         transformer.transform( new StreamSource(filenameToURL(sourceID)),
                                new StreamResult(outNames.nextName()));
         reporter.logTraceMsg("new StreamResult(" + outNames.currentName());
-        System.out.println("fooFile.goldName: "+fooFile.goldName);
+        String goldname = goldNames.nextName();
+        System.out.println("fooFile.goldName: "+goldname);
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(goldNames.nextName()),                
+                          new File(goldname),                
                           // new File(fooFile.goldName),
                           "exampleSimple1 fileChecker of:" + outNames.currentName());
     } 
@@ -552,7 +553,8 @@ public class ExamplesTest extends XSLProcessorTestBase
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
                                   (OutputProperties.getDefaultMethodProperties("xml"));
-          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+          FileOutputStream fos = new FileOutputStream(outNames.nextName());
+          serializer.setOutputStream(fos);
           reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
           
           Result result = new SAXResult(serializer.asContentHandler());
@@ -564,17 +566,17 @@ public class ExamplesTest extends XSLProcessorTestBase
 
           // Use JAXP1.1 ( if possible )
           try {
-	      javax.xml.parsers.SAXParserFactory factory=
-	          javax.xml.parsers.SAXParserFactory.newInstance();
-	      factory.setNamespaceAware( true );
-	      javax.xml.parsers.SAXParser jaxpParser=
-	          factory.newSAXParser();
-	      reader=jaxpParser.getXMLReader();
-	      
+              javax.xml.parsers.SAXParserFactory factory=
+                  javax.xml.parsers.SAXParserFactory.newInstance();
+              factory.setNamespaceAware( true );
+              javax.xml.parsers.SAXParser jaxpParser=
+                  factory.newSAXParser();
+              reader=jaxpParser.getXMLReader();
+              
           } catch( javax.xml.parsers.ParserConfigurationException ex ) {
-	      throw new org.xml.sax.SAXException( ex );
+              throw new org.xml.sax.SAXException( ex );
           } catch( javax.xml.parsers.FactoryConfigurationError ex1 ) {
-	      throw new org.xml.sax.SAXException( ex1.toString() );
+              throw new org.xml.sax.SAXException( ex1.toString() );
           } catch( NoSuchMethodError ex2 ) {
           }
           if( reader==null ) reader = XMLReaderFactory.createXMLReader();
@@ -587,6 +589,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           // Parse the source XML, and send the parse events to the TransformerHandler.
           reporter.logTraceMsg("reader.parse(" + filenameToURL(sourceID));
           reader.parse(filenameToURL(sourceID));
+          fos.close();
 
           reporter.logTraceMsg("Note: See SPR SCUU4RZT78 for discussion as to why this output is different than XMLReader/XMLFilter");
         fileChecker.check(reporter, new File(outNames.currentName()),
@@ -624,13 +627,15 @@ public class ExamplesTest extends XSLProcessorTestBase
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
                                   (OutputProperties.getDefaultMethodProperties("xml"));
-          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+          FileOutputStream fos = new FileOutputStream(outNames.nextName());                        
+          serializer.setOutputStream(fos);
           reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
       
           reader.setContentHandler(serializer.asContentHandler());
 
           reporter.logTraceMsg("reader.parse(new InputSource(" + filenameToURL(sourceID));
           reader.parse(new InputSource(filenameToURL(sourceID)));
+          fos.close();
 
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
@@ -661,17 +666,17 @@ public class ExamplesTest extends XSLProcessorTestBase
     
         // Use JAXP1.1 ( if possible )
         try {
-	    javax.xml.parsers.SAXParserFactory factory=
-	        javax.xml.parsers.SAXParserFactory.newInstance();
-	      factory.setNamespaceAware( true );
-	      javax.xml.parsers.SAXParser jaxpParser=
-	        factory.newSAXParser();
-	    reader=jaxpParser.getXMLReader();
-	
+            javax.xml.parsers.SAXParserFactory factory=
+                javax.xml.parsers.SAXParserFactory.newInstance();
+              factory.setNamespaceAware( true );
+              javax.xml.parsers.SAXParser jaxpParser=
+                factory.newSAXParser();
+            reader=jaxpParser.getXMLReader();
+        
         } catch( javax.xml.parsers.ParserConfigurationException ex ) {
-	    throw new org.xml.sax.SAXException( ex );
+            throw new org.xml.sax.SAXException( ex );
         } catch( javax.xml.parsers.FactoryConfigurationError ex1 ) {
-	    throw new org.xml.sax.SAXException( ex1.toString() );
+            throw new org.xml.sax.SAXException( ex1.toString() );
         } catch( NoSuchMethodError ex2 ) {
         }
         if( reader==null ) reader = XMLReaderFactory.createXMLReader();
@@ -679,7 +684,8 @@ public class ExamplesTest extends XSLProcessorTestBase
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
                                   (OutputProperties.getDefaultMethodProperties("xml"));
-          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+          FileOutputStream fos = new FileOutputStream(outNames.nextName());
+          serializer.setOutputStream(fos);
           reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
           reader.setContentHandler(serializer.asContentHandler());
 
@@ -708,6 +714,8 @@ public class ExamplesTest extends XSLProcessorTestBase
         // will then call the parse method on the parser.
           reporter.logTraceMsg("filter.parse(new InputSource(" + filenameToURL(sourceID));
         filter.parse(new InputSource(filenameToURL(sourceID)));
+        
+        fos.close();
 
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
@@ -747,17 +755,17 @@ public class ExamplesTest extends XSLProcessorTestBase
 
           // Use JAXP1.1 ( if possible )
           try {
-	      javax.xml.parsers.SAXParserFactory factory=
-	          javax.xml.parsers.SAXParserFactory.newInstance();
-	      factory.setNamespaceAware( true );
-	      javax.xml.parsers.SAXParser jaxpParser=
-	          factory.newSAXParser();
-	      reader=jaxpParser.getXMLReader();
-	      
+              javax.xml.parsers.SAXParserFactory factory=
+                  javax.xml.parsers.SAXParserFactory.newInstance();
+              factory.setNamespaceAware( true );
+              javax.xml.parsers.SAXParser jaxpParser=
+                  factory.newSAXParser();
+              reader=jaxpParser.getXMLReader();
+              
           } catch( javax.xml.parsers.ParserConfigurationException ex ) {
-	      throw new org.xml.sax.SAXException( ex );
+              throw new org.xml.sax.SAXException( ex );
           } catch( javax.xml.parsers.FactoryConfigurationError ex1 ) {
-	      throw new org.xml.sax.SAXException( ex1.toString() );
+              throw new org.xml.sax.SAXException( ex1.toString() );
           } catch( NoSuchMethodError ex2 ) {
           }
           if( reader==null ) reader = XMLReaderFactory.createXMLReader();
@@ -789,7 +797,8 @@ public class ExamplesTest extends XSLProcessorTestBase
           // Set the result handling to be a serialization to the file output stream.
           Serializer serializer = SerializerFactory.getSerializer
                                   (OutputProperties.getDefaultMethodProperties("xml"));
-          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+          FileOutputStream fos = new FileOutputStream(outNames.nextName());
+          serializer.setOutputStream(fos);
           reporter.logTraceMsg("new FileOutputStream(" + outNames.currentName());
           filter3.setContentHandler(serializer.asContentHandler());
 
@@ -801,6 +810,7 @@ public class ExamplesTest extends XSLProcessorTestBase
             // SAX parser, and call parser.parse(new InputSource(fooFile.xmlName)).
           reporter.logTraceMsg("filter3.parse(new InputSource(" + filenameToURL(sourceID));
             filter3.parse(new InputSource(filenameToURL(sourceID)));
+            fos.close();
         fileChecker.check(reporter, new File(outNames.currentName()),
                           new File(goldNames.nextName()),                
                           // new File(NOT_DEFINED),
@@ -1091,17 +1101,17 @@ public class ExamplesTest extends XSLProcessorTestBase
 
           // Use JAXP1.1 ( if possible )
           try {
-	      javax.xml.parsers.SAXParserFactory factory=
-	          javax.xml.parsers.SAXParserFactory.newInstance();
-	      factory.setNamespaceAware( true );
-	      javax.xml.parsers.SAXParser jaxpParser=
-	          factory.newSAXParser();
-	      reader=jaxpParser.getXMLReader();
-	      
+              javax.xml.parsers.SAXParserFactory factory=
+                  javax.xml.parsers.SAXParserFactory.newInstance();
+              factory.setNamespaceAware( true );
+              javax.xml.parsers.SAXParser jaxpParser=
+                  factory.newSAXParser();
+              reader=jaxpParser.getXMLReader();
+              
           } catch( javax.xml.parsers.ParserConfigurationException ex ) {
-	      throw new org.xml.sax.SAXException( ex );
+              throw new org.xml.sax.SAXException( ex );
           } catch( javax.xml.parsers.FactoryConfigurationError ex1 ) {
-	      throw new org.xml.sax.SAXException( ex1.toString() );
+              throw new org.xml.sax.SAXException( ex1.toString() );
           } catch( NoSuchMethodError ex2 ) {
           }
           if( reader==null ) reader= XMLReaderFactory.createXMLReader();
