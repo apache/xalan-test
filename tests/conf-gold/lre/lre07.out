@@ -1,7 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<root xmlns:ped="http://www.test.com">
-<out1/>
-<out2 xmlns="http://www.test.com"/>
-<out3 xmlns="http://www.bdd.com"/>
-</root>
+<out english="to leave"/>
