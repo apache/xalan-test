@@ -99,6 +99,49 @@ public class FileDatalet implements Datalet
 
 
     /** 
+     * Worker method to validate the files/dirs we represent.  
+     * 
+     * By default, ensures that the input already exists in some 
+     * format, and for both the output and gold, attempts to create 
+     * them if they don't already exist.
+     *
+     * @param strict if true, requires that output and gold must 
+     * be created; otherwise they're optional
+     * @return false if input doesn't already exist; true otherwise
+     */
+    public boolean validate(boolean strict)
+    {
+        File f = new File(getInput());
+        if (!f.exists())
+            return false;
+
+        f = new File(getOutput());
+        if (!f.exists())
+        {
+            if (!f.mkdirs())
+            {
+                // Only fail if asked to be strict
+                if (strict)
+                    return false;
+            }
+        }        
+
+        f = new File(getGold());
+        if (!f.exists())
+        {
+            if (!f.mkdirs())
+            {
+                // Only fail if asked to be strict
+                if (strict)
+                    return false;
+            }
+        }        
+        // If we get here, we're happy either way
+        return true;
+    }
+
+
+    /** 
      * Generic placeholder for any additional options.  
      * 
      * This allows FileDatalets to support additional kinds 
