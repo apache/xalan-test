@@ -10,7 +10,6 @@
 
 <xsl:template match="catalog">
   <out>
-    <xsl:apply-templates select="id"/>
     <xsl:apply-templates select="document(pointer/urlref/@urlstr)/market.participant/business.identity.group/business.name"/>
     <xsl:apply-templates select="document('..\mdocs\compu.xml')/market.participant/address.set/*"/>
   </out>
