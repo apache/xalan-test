@@ -56,7 +56,8 @@ rem This label provides a place for the argument list loop to break out
 rem and for NT handling to skip to.
 
 rem default ANT_HOME
-if "%ANT_HOME%"=="" set ANT_HOME=java
+if "%ANT_HOME%"=="" set _ANT_HOME=java
+if not "%ANT_HOME%"=="" set _ANT_HOME=%ANT_HOME%
 goto checkJava
 
 :checkJava
@@ -70,7 +71,7 @@ if not "%PARSER_JAR%" == "" set _PARSER_JAR=%PARSER_JAR%
 rem If JARDIR is blank, then only add Ant and a PARSER_JAR to the 
 rem    classpath before running Ant - then within the Ant file, it 
 rem    will add other .jars from default locations
-if "%JARDIR%" == "" set _ANT_CP=%CLASSPATH%;%ANT_HOME%\bin\ant.jar;%_PARSER_JAR%
+if "%JARDIR%" == "" set _ANT_CP=%CLASSPATH%;%_ANT_HOME%\bin\ant.jar;%_PARSER_JAR%
 
 rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files 
 rem    in the classpath first from that one dir
@@ -91,14 +92,15 @@ echo.
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 
 :runAnt
-%_JAVACMD% -classpath %_ANT_CP% -Dant.home="%ANT_HOME%" %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+%_JAVACMD% -classpath %_ANT_CP% -Dant.home="%_ANT_HOME%" %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 goto end
 
 :runAntWithJikes
-%_JAVACMD% -classpath %_ANT_CP% -Dant.home="%ANT_HOME%" -Djikes.class.path=%JIKESPATH% %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+%_JAVACMD% -classpath %_ANT_CP% -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 
 :end
 set _ANT_CP=
+set _ANT_HOME=
 set _JAVACMD=
 set _PARSER_JAR=
 set ANT_CMD_LINE_ARGS=
