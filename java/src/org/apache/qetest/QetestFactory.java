@@ -57,6 +57,8 @@
 
 package org.apache.qetest;
 
+import java.util.Properties;
+
 /**
  * Factory constructor for various qetest-related objects.  
  *
@@ -135,6 +137,99 @@ public abstract class QetestFactory
             return service;
         }
     }
+
+
+    /**
+     * Get a new Reporter with some defaults.
+     * 
+     * Will attempt to initialize the appropriate Reporter
+     * depending on the options passed in; if all else fails, will 
+     * return at least a ConsoleLogger.  
+     *
+     * @param options to create Reporter from
+     * @return appropriate Reporter instance, or a default one.
+     */
+    public static Reporter newReporter(Properties options)
+    {
+        Reporter reporter = null;
+        if (null == options)
+        {
+            // Return a default Reporter
+            reporter = new Reporter(null);
+            reporter.addDefaultLogger();  // add default logger automatically
+            return reporter;
+        }
+
+        // Setup appropriate defaults for the Reporter
+        // Ensure we have an XMLFileLogger if we have a logName
+        String logF = options.getProperty(Logger.OPT_LOGFILE);
+
+        if ((logF != null) && (!logF.equals("")))
+        {
+
+            // We should ensure there's an XMLFileReporter
+            String r = options.getProperty(Reporter.OPT_LOGGERS);
+
+            if (r == null)
+            {
+                // Create the property if needed...
+                options.put(Reporter.OPT_LOGGERS,
+                              "org.apache.qetest.XMLFileLogger");
+            }
+            else if (r.indexOf("XMLFileLogger") <= 0)
+            {
+                // ...otherwise append to existing list
+                options.put(Reporter.OPT_LOGGERS,
+                              r + Reporter.LOGGER_SEPARATOR
+                              + "org.apache.qetest.XMLFileLogger");
+            }
+        }
+
+        // Ensure we have a ConsoleLogger unless asked not to
+        // @todo improve and document this feature
+        String noDefault = options.getProperty("noDefaultReporter");
+
+        if (noDefault == null)
+        {
+
+            // We should ensure there's an XMLFileReporter
+            String r = options.getProperty(Reporter.OPT_LOGGERS);
+
+            if (r == null)
+            {
+                options.put(Reporter.OPT_LOGGERS,
+                              "org.apache.qetest.ConsoleLogger");
+            }
+            else if (r.indexOf("ConsoleLogger") <= 0)
+            {
+                options.put(Reporter.OPT_LOGGERS,
+                              r + Reporter.LOGGER_SEPARATOR
+                              + "org.apache.qetest.ConsoleLogger");
+            }
+        }
+
+        // Pass our options directly to the reporter
+        //  so it can use the same values in initialization
+        // A Reporter will auto-initialize from the values
+        //  in the properties block
+        reporter = new Reporter(options);
+        return reporter;
+    }
+
+
+    /**
+     * Get a new Logger with some defaults.
+     * 
+     * Currently a redirect to call (Logger)newReporter(options).  
+     *
+     * @param options to create Logger from
+     * @return appropriate Logger instance, or a default one.
+     */
+    public static Logger newLogger(Properties options)
+    {
+        return (Logger)newReporter(options);
+    }
+
 
     /** Prevent instantiation - private constructor.  */
     private QetestFactory() { /* no-op */ }
