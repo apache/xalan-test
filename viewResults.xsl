@@ -320,33 +320,58 @@
 <xsl:template name="restable">
   <xsl:param name="linkname" select="none"/>
   <TABLE FRAME="box" BORDER="1" CELLPADDING="2" WIDTH="80%">
-  <TR><TD>
-  <xsl:element name="a">
-    <xsl:attribute name="name"><xsl:value-of select="$file-results-marker"/><xsl:value-of select="$linkname"/></xsl:attribute>
-    <B><xsl:text>Overall Result: </xsl:text></B>
-  </xsl:element>
-  <xsl:value-of select="fileresult/@result"/></TD><TD><B><xsl:text>Test Cases</xsl:text></B></TD><TD><B><xsl:text>Test Points</xsl:text></B><xsl:text> "checks"</xsl:text></TD></TR>
+  <TR>
+    <TD>
+      <xsl:element name="a">
+        <xsl:attribute name="name"><xsl:value-of select="$file-results-marker"/><xsl:value-of select="$linkname"/></xsl:attribute>
+        <B><xsl:text>Overall Result: </xsl:text></B>
+      </xsl:element>
+      <xsl:value-of select="fileresult/@result"/>
+    </TD>
+    <TD>
+      <B><xsl:text>Test Cases</xsl:text></B>
+    </TD>
+    <TD>
+      <B><xsl:text>Test Points</xsl:text></B><xsl:text> (from script)</xsl:text>
+    </TD>
+    <TD>
+      <B><xsl:text>Test Points</xsl:text></B><xsl:text> (from count)</xsl:text>
+    </TD>
+  </TR>
 
-  <xsl:if test="./statistic[@desc='passCount[CASES]'] or statistic[@desc='passCount[CHECKS]']">
-    <TR><TD><xsl:text>Pass</xsl:text></TD><TD><xsl:value-of select="./statistic[@desc='passCount[CASES]']/longval"/></TD>
-      <TD><xsl:value-of select="statistic[@desc='passCount[CHECKS]']/longval"/></TD></TR>
-  </xsl:if>
-  <xsl:if test="./statistic[@desc='failCount[CASES]'] or statistic[@desc='failCount[CHECKS]']">
-  <TR><TD><B><xsl:text>Fail</xsl:text></B></TD><TD><xsl:value-of select="./statistic[@desc='failCount[CASES]']/longval"/></TD>
-      <TD><xsl:value-of select="statistic[@desc='failCount[CHECKS]']/longval"/></TD></TR>
-  </xsl:if>
-  <xsl:if test="./statistic[@desc='errrCount[CASES]'] or statistic[@desc='errrCount[CHECKS]']">
-  <TR><TD><I><xsl:text>Error</xsl:text></I></TD><TD><xsl:value-of select="./statistic[@desc='errrCount[CASES]']/longval"/></TD>
-      <TD><xsl:value-of select="statistic[@desc='errrCount[CHECKS]']/longval"/></TD></TR>
-  </xsl:if>
-  <xsl:if test="./statistic[@desc='ambgCount[CASES]'] or statistic[@desc='ambgCount[CHECKS]']">
-  <TR><TD><I><xsl:text>Ambiguous</xsl:text></I></TD><TD><xsl:value-of select="./statistic[@desc='ambgCount[CASES]']/longval"/></TD>
-      <TD><xsl:value-of select="statistic[@desc='ambgCount[CHECKS]']/longval"/></TD></TR>
-  </xsl:if>
-  <xsl:if test="./statistic[@desc='incpCount[CASES]'] or statistic[@desc='incpCount[CHECKS]']">
-  <TR><TD><I><xsl:text>Incomplete</xsl:text></I></TD><TD><xsl:value-of select="./statistic[@desc='incpCount[CASES]']/longval"/></TD>
-      <TD><xsl:value-of select="statistic[@desc='incpCount[CHECKS]']/longval"/></TD></TR>
-  </xsl:if>
+  <TR>
+    <TD><xsl:text>Pass</xsl:text></TD>
+    <TD><xsl:value-of select="./statistic[@desc='passCount[CASES]']/longval"/></TD>
+    <TD><xsl:value-of select="statistic[@desc='passCount[CHECKS]']/longval"/></TD>
+    <!-- Note this is horribly inefficent, but it gets the job done.
+         I'd welcome any optimizations for this stylesheet!
+    -->
+    <TD><xsl:value-of select="count(//checkresult[@result=$PASS])"/></TD>
+  </TR>
+  <TR>
+    <TD><B><xsl:text>Fail</xsl:text></B></TD>
+    <TD><xsl:value-of select="./statistic[@desc='failCount[CASES]']/longval"/></TD>
+    <TD><xsl:value-of select="statistic[@desc='failCount[CHECKS]']/longval"/></TD>
+    <TD><xsl:value-of select="count(//checkresult[@result=$FAIL])"/></TD>
+  </TR>
+  <TR>
+    <TD><I><xsl:text>Error</xsl:text></I></TD>
+    <TD><xsl:value-of select="./statistic[@desc='errrCount[CASES]']/longval"/></TD>
+    <TD><xsl:value-of select="statistic[@desc='errrCount[CHECKS]']/longval"/></TD>
+    <TD><xsl:value-of select="count(//checkresult[@result=$ERRR])"/></TD>
+  </TR>
+  <TR>
+    <TD><I><xsl:text>Ambiguous</xsl:text></I></TD>
+    <TD><xsl:value-of select="./statistic[@desc='ambgCount[CASES]']/longval"/></TD>
+    <TD><xsl:value-of select="statistic[@desc='ambgCount[CHECKS]']/longval"/></TD>
+    <TD><xsl:value-of select="count(//checkresult[@result=$AMBG])"/></TD>
+  </TR>
+  <TR>
+    <TD><I><xsl:text>Incomplete</xsl:text></I></TD>
+    <TD><xsl:value-of select="./statistic[@desc='incpCount[CASES]']/longval"/></TD>
+    <TD><xsl:value-of select="statistic[@desc='incpCount[CHECKS]']/longval"/></TD>
+    <TD><xsl:value-of select="count(//checkresult[@result=$INCP])"/></TD>
+  </TR>
   </TABLE><BR/>
 </xsl:template>
 
