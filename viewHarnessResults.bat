@@ -11,7 +11,7 @@ call viewResults.bat %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto done
 
 :calldefaults
-call viewResults.bat results-api\Harness.xml results-api\Harness.html
+call viewResults.bat results-api\Harness.xml results-api\Harness.html -param summaryfile results-api\HarnessSummary.xml
 
 :done
 set VSXSL=

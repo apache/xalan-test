@@ -38,7 +38,6 @@
   <BODY>
     <H1><xsl:text>Multiple Harness Test Results from: </xsl:text><xsl:value-of select="@desc"/></H1>
     <a name="top"><xsl:text>Includes individual resultfile(s):</xsl:text></a>
-    <BR />
     <UL>
       <xsl:for-each select="testcase/resultsfile">
         <LI>
@@ -57,14 +56,19 @@
               <I><xsl:value-of select="$testResult"/></I>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$testResult"/>
+              <FONT color="green"><xsl:value-of select="$testResult"/></FONT>
             </xsl:otherwise>
           </xsl:choose>
         </LI>
       </xsl:for-each>
     </UL>
-    <P><xsl:text>Total harness time (milliseconds): </xsl:text><xsl:value-of select="(statistic[starts-with(@desc,$TEST_STOP)]/longval) - (statistic[starts-with(@desc,$TEST_START)]/longval)"/></P>
-    <a name="harness-properties"><xsl:text>Harness-level System Properties:</xsl:text></a>
+    <P>
+      <xsl:text>Total harness time: </xsl:text>
+      <xsl:call-template name="total-time">
+        <!-- Should use params to make this generic later on -->
+      </xsl:call-template>
+    </P>
+    <H3><a name="harness-properties"><xsl:text>Harness-level System Properties:</xsl:text></a></H3>
     <xsl:apply-templates select="hashtable"></xsl:apply-templates>
     <H3><xsl:text>Individual resultfile(s) follow:</xsl:text></H3>
     <!-- Before processing any files, open up a summary file to 
@@ -88,6 +92,11 @@
   </HTML>
 </xsl:template>
 
+<xsl:template name="total-time">
+  <xsl:variable name="totalsec" select="((statistic[starts-with(@desc,$TEST_STOP)]/longval) - (statistic[starts-with(@desc,$TEST_START)]/longval)) div 1000"/>
+  <xsl:value-of select="floor($totalsec div 3600)"/> hr <xsl:value-of select="floor(($totalsec mod 3600) div 60)"/> min <xsl:value-of select="floor(($totalsec mod 3600) mod 60)"/> sec<xsl:text>.</xsl:text>
+</xsl:template>
+
 <!-- Select the document of each fileRef, also put in an anchor
      It's much easier to put the anchor in here, since we're assured 
      that the href from above and the anchor here will match. -->
@@ -101,8 +110,16 @@
   <xsl:apply-templates select="document(.)"></xsl:apply-templates>
 </xsl:template>
 
-<!-- Just call the included stylesheet to output each individual file -->
+<!-- Just call the included stylesheet to output each individual file 
+     Note that these stylesheets grew (accreted) over time, and should 
+     really be redesigned to make it simpler to plug in different 
+     kinds of templates for various reporting types, like performance 
+     charts and what-not.  Yet another place where the first time you 
+     implement some xsl it's hard, and then you have the 'ah-ha!' moment 
+     about the xsl way to do something.
+-->
 <xsl:template match="resultsfile">
+    <!-- Should use params to make this generic later on -->
     <xsl:call-template name="mainResultsFile"></xsl:call-template>
 </xsl:template>
 
