@@ -3,6 +3,7 @@
                 xmlns:lxslt="http://xml.apache.org/xslt"
                 xmlns:counter="MyCounter"
                 extension-element-prefixes="counter"
+                exclude-result-prefixes="lxslt"
                 version="1.0">
 
 

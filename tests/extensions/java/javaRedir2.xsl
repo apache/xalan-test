@@ -2,7 +2,8 @@
     version="1.0"
     xmlns:lxslt="http://xml.apache.org/xslt"
     xmlns:redirect="org.apache.xalan.lib.Redirect"
-    extension-element-prefixes="redirect">
+    extension-element-prefixes="redirect"
+    exclude-result-prefixes="lxslt">
 
 
 <!-- Testing redirect:write append="" attribute -->

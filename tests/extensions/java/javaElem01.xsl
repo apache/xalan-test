@@ -3,7 +3,8 @@
     version="1.0"
     xmlns:lxslt="http://xml.apache.org/xslt"
     xmlns:javaElem="javaElem01"
-    extension-element-prefixes="javaElem">
+    extension-element-prefixes="javaElem"
+    exclude-result-prefixes="lxslt">
 
   <lxslt:component prefix="javaElem" 
         elements="putString putBoolean putDouble putNode" functions="getCounter">

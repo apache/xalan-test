@@ -3,6 +3,7 @@
                 xmlns:lxslt="http://xml.apache.org/xslt"
                 xmlns:bug3722="javaBugzilla3722-namespace"
                 extension-element-prefixes="bug3722"
+                exclude-result-prefixes="lxslt"
                 version="1.0">
 
   <lxslt:component prefix="bug3722"
