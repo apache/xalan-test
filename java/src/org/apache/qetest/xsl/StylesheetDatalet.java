@@ -65,6 +65,7 @@ package org.apache.qetest.xsl;
 import org.apache.qetest.Datalet;
 
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
@@ -99,6 +100,21 @@ public class StylesheetDatalet implements Datalet
      */
     public boolean useURL = true;
 
+    /** 
+     * Generic placeholder for any additional options.  
+     * I'm still undecided if I like this idea or not.  
+     * This allows StylesheetDatalets to support additional kinds 
+     * of tests, like performance tests, without having to change 
+     * this data model.  These options can serve as a catch-all 
+     * for any new properties or options or what-not that new 
+     * tests need, without having to change how the most basic 
+     * member variables here work.
+     * Note that while this needs to be a Properties object to 
+     * take advantage of the parent/default behavior in 
+     * getProperty(), this doesn't necessarily mean they can only 
+     * store Strings.
+     */
+    public Properties options = new Properties();
 
     /** Description of what this Datalet tests.  */
     protected String description = "StylesheetDatalet: String inputName, String xmlName, String outputName, String goldName, String flavor";
@@ -151,6 +167,8 @@ public class StylesheetDatalet implements Datalet
     /**
      * Load fields of this Datalet from a Hashtable.  
      * Caller must provide data for all of our fields.
+     * //@todo design decision: only have load(Hashtable)
+     * or load(Properties), not both.
      * 
      * @param Hashtable to load
      */
@@ -166,6 +184,28 @@ public class StylesheetDatalet implements Datalet
         flavor = (String)h.get("flavor");
     }
 
+
+    /**
+     * Load fields of this Datalet from a Properties.  
+     * Caller must provide data for all of our fields.
+     * //@todo design decision: only have load(Hashtable)
+     * or load(Properties), not both.
+     * 
+     * @param Hashtable to load
+     */
+    public void load(Properties p)
+    {
+        if (null == p)
+            return; //@todo should this have a return val or exception?
+
+        inputName = (String)p.getProperty("inputName");
+        xmlName = (String)p.getProperty("xmlName");
+        outputName = (String)p.getProperty("outputName");
+        goldName = (String)p.getProperty("goldName");
+        flavor = (String)p.getProperty("flavor");
+        // Also set our internal options to default to this Properties
+        options = new Properties(p);
+    }
 
     /**
      * Load fields of this Datalet from an array.  
