@@ -1020,13 +1020,13 @@
         description="Compile Xsltc*Wrapper xslwrappers only">
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}xslwrapper/Xsltc*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
+               includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java,${test.root}xslwrapper/Xsltc*Wrapper.java"
                debug="${debug}">
             <classpath refid="xsltc.compile.class.path" />
         </javac>               
     </target>
 
-    <target name="compile.xsltc" depends="compile.xsltc.xslwrappers"
+    <target name="compile.xsltc" depends="compile.trax"
         description="Compile xsltc native API tests only">
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
@@ -1058,7 +1058,7 @@
             <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
         </xalantest>
         <antcall target="scan">
-            <param name="scan.outputDir" value="${conf.outputDir}"/>
+            <param name="scan.outputDir" value="${conf.xsltc.outputDir}"/>
         </antcall>
     </target>
 
