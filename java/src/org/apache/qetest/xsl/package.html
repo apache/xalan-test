@@ -1,0 +1,48 @@
+<html>
+  <title>XSL-TEST general XSLT package.</title>
+  <body>
+    <p>This package contains XSLT testing base classes and utilities, and a generic test driver.</p>
+    <dl>
+      <dt><b>Author: </b></dt><dd><a href="mailto:shane_curcuru@lotus.com">Shane_Curcuru@lotus.com</a></dd>
+      <dt><b>Program(s) Under Test: </b></dt>
+      <dd><a href="http://xml.apache.org/xalan-j" target="_top">Xalan-J 2.x XSLT Processor</a></dd>
+      <dd><a href="http://xml.apache.org/xalan" target="_top">Xalan-J 1.x XSLT Processor</a></dd>
+      <dd><a href="http://xml.apache.org/xalan-c" target="_top">Xalan-C 1.x XSLT Processor</a></dd>
+    </dl>
+    <p>This package includes base classes and utilities, as well as several 
+    generic test drivers that use {@link org.apache.qetest.xslwrapper.ProcessorWrapper ProcessorWrappers} 
+    to process stylesheets.  Classes in this package must not depend directly 
+    on any Xalan interfaces, only on the ProcessorWrapper interface.<p>
+    <ul>Current utilities include:
+    <li>Logging* - implementations of XSLT-related listeners 
+    and the like that log to our Reporter.</li>
+    <li>XHTFileCheckService, XHTComparator - checks equivalence of 
+    two File objects by parsing either as XML, HTML, or text.  Note 
+    the HTML parsing is unimplemented - we need a good HTML->DOM 
+    parser we can use in Apache - any suggestions?</li>
+    <li>XSLTestfileInfo - simple extension of TestfileInfo to 
+    add xmlName member.</li>
+    <li>XSLDirectoryIterator - simple implementation that processes 
+    xsl/xml file pairs from a fileList or over a directory tree, 
+    automatically comparing the result files with a known good 
+    or 'gold' reference tree of outputs.</li>
+    <li>XSLProcessorTestBase - adds useful XSLT processing 
+    utilities, etc. from FileTestBase: including flags like 
+    -preprocess, -flavor, -category, etc.  Most xsl and trax 
+    package Test scripts derive from this class.</li>
+    </ul>
+    <ul>Current tests include:
+    <li>ConformanceTest - generic test driver, including some 
+    FilenameFilters.  This essentially uses the XSLDirectoryIterator 
+    for everything.</li>
+    <li>PerformanceTest - test driver that iterates repeatedly and 
+    reports memory and timing info.</li>
+    <li>CConformanceTest - generic test driver that constructs a 
+    command line and then shells out to execute TestXSLT.exe, which 
+    is from the Xalan-C build.  This allows basic comparisons of 
+    results from the Java versions with the C++ versions.</li>
+    </ul>
+  </body>
+</html>
+
+
