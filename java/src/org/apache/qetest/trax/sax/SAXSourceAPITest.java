@@ -67,6 +67,7 @@ import org.apache.qetest.*;
 import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
@@ -219,6 +220,16 @@ public class SAXSourceAPITest extends XSLProcessorTestBase
             reporter.check(saxSrcWithID.getSystemId(), NONSENSE_SYSTEMID, "SAXSource(new InputSource(sysId)) has SystemId: " + saxSrcWithID.getSystemId());
 
             // ctor(XMLReader, InputSource) 
+            reporter.logTraceMsg("API coverage of ctor(XMLReader, InputSource)...");
+            reporter.logTraceMsg("JAXP way:reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader()");
+            XMLReader reader2 = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+            SAXSource saxSrcReaderID2 = new SAXSource(reader2, srcWithID);
+            reporter.checkObject(saxSrcReaderID2.getInputSource(), srcWithID, "SAXSource(reader, new InputSource(sysId)) has InputSource: " + saxSrcReaderID2.getInputSource());
+            reporter.checkObject(saxSrcReaderID2.getXMLReader(), reader2, "SAXSource(reader, new InputSource(sysId)) has XMLReader: " + saxSrcReaderID2.getXMLReader());
+            reporter.check(saxSrcReaderID2.getSystemId(), NONSENSE_SYSTEMID, "SAXSource(reader, new InputSource(sysId)) has SystemId: " + saxSrcReaderID2.getSystemId());
+
+            // ctor(XMLReader, InputSource) 
+            reporter.logTraceMsg("SAX way:reader = XMLReaderFactory.createXMLReader()");
             XMLReader reader = XMLReaderFactory.createXMLReader();
             SAXSource saxSrcReaderID = new SAXSource(reader, srcWithID);
             reporter.checkObject(saxSrcReaderID.getInputSource(), srcWithID, "SAXSource(reader, new InputSource(sysId)) has InputSource: " + saxSrcReaderID.getInputSource());
