@@ -6,7 +6,7 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.5 -->
   <!-- Creator: David Marston -->
-  <!-- Purpose: Test for xsl:copy-of with nodeset. Shows handling of namespaces. -->
+  <!-- Purpose: Test for xsl:copy with nodeset. Shows handling of namespaces. -->
 
 <xsl:template match="/">
   <out>
