@@ -267,17 +267,15 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
             DOMSource blankXSLDOM = new DOMSource();
             reporter.logTraceMsg("About to newTemplates(blankXSLDOM)");
             Templates blankTemplates = factory.newTemplates(blankXSLDOM); // SPR SCUU4R5JYZ throws npe; 0b29CVS now returns null
-            if (blankTemplates != null) // Use if so we can pass id to checkPass/Fail calls
-                reporter.checkPass("factory.newTemplates(blankXSLDOM) is non-null", "SCUU4R5JYZ");
-            else
-                reporter.checkFail("factory.newTemplates(blankXSLDOM) is non-null", "SCUU4R5JYZ");
-
-            reporter.checkObject(blankXSLDOM.getNode(), null, "blankXSLDOM is still empty");
+            // Note: functionality (and hopefully Javadoc too) have 
+            //  been updated to make it illegal to use a DOMSource 
+            //  with a null node as the XSL document -sc 18-Dec-00
+            reporter.checkFail("blankXSLDOM should throw exception per Resolved bug", "SCUU4R5JYZ");
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with blankXSLDOM(1)", "SCUU4R5JYZ");
-            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with blankXSLDOM(1)");
+            reporter.checkPass("blankXSLDOM should throw exception per Resolved bug", "SCUU4R5JYZ");
+            reporter.logThrowable(reporter.ERRORMSG, t, "blankXSLDOM(1) should throw exception");
         }
         try
         {
@@ -285,13 +283,12 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
             DOMSource blankXSLDOM = new DOMSource();
             reporter.logTraceMsg("About to newTransformer(blankXSLDOM)");
             Transformer blankTransformer = factory.newTransformer(blankXSLDOM); // SPR SCUU4R5JYZ throws npe
-            reporter.check((blankTransformer != null), true, "factory.newTransformer(blankXSLDOM) is non-null");
-            reporter.checkObject(blankXSLDOM.getNode(), null, "blankXSLDOM is still empty");
+            reporter.checkFail("blankXSLDOM should throw exception per Resolved bug", "SCUU4R5JYZ");
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with blankXSLDOM(2)", "SCUU4R5JYZ");
-            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with blankXSLDOM(2)");
+            reporter.checkPass("blankXSLDOM should throw exception per Resolved bug", "SCUU4R5JYZ");
+            reporter.logThrowable(reporter.ERRORMSG, t, "blankXSLDOM(2) should throw exception");
         }
 
         try
@@ -314,21 +311,21 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
             reporter.logTraceMsg("@todo validate the dom in memory as well");
 
             // A blank DOM as source doc of the transform - should 
-            //  auto-create a source Document
+            //  throw exception (new functionality Dec-00)
             DOMSource blankSource = new DOMSource();
             Node emptyNode = docBuilder.newDocument();
             DOMResult emptyNodeDOM = new DOMResult(emptyNode);
             reporter.logTraceMsg("About to transform(blankSource, emptyNodeDOM)");
             transformerXSL.transform(blankSource, emptyNodeDOM); // SPR SCUU4R5KLL throws TransformerException
-            Node tmpNode = blankSource.getNode();
-            reporter.check((tmpNode != null), true, "transform(blankSource, emptyNodeDOM) has non-null node");
-            serializeDOMAndCheck(gotNode, testFileInfo.goldName, "transform(blankSource, emptyNodeDOM) HACK: needs new gold file");
-            reporter.checkAmbiguous("validate contents of emptyNodeDOM");            
+            // Note: functionality (and hopefully Javadoc too) have 
+            //  been updated to make it illegal to use a DOMSource 
+            //  with a null node as the input document -sc 18-Dec-00
+            reporter.checkFail("transform(blankDOM, result) should throw exception", "SCUU4R5KLL");
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem with transform(doms 1)", "SCUU4R5KLL");
-            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform(doms 1)");
+            reporter.checkPass("transform(blankDOM, result) should throw exception", "SCUU4R5KLL");
+            reporter.logThrowable(reporter.ERRORMSG, t, "transform(blankDOM, result) should throw exception");
         }
         try
         {
