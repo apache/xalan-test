@@ -10,7 +10,8 @@
 #---- Choose tests: which tests should we run
 # Semicolon delimited list of tests, either FQCNs or just 
 #   package.ClassName assuming org.apache.qetest. will be prepended
-tests=trax.TemplatesAPITest;trax.TransformerAPITest;trax.TransformerFactoryAPITest;trax.stream.StreamResultAPITest;trax.stream.StreamSourceAPITest;trax.dom.DOMResultAPITest;trax.dom.DOMSourceAPITest;trax.sax.SAXSourceAPITest;trax.sax.SAXTransformerFactoryAPITest;trax.sax.TemplatesHandlerAPITest;trax.sax.TransformerHandlerAPITest;trax.SystemIdTest;trax.SystemIdImpInclTest;trax.EmbeddedStylesheetTest;trax.OutputPropertiesTest;trax.Minitest;trax.ErrorListenerAPITest;trax.ExamplesTest;trax.URIResolverTest;xalanj2.SerializedStylesheetTest;xalanj2.TraceListenerTest
+tests=trax.TemplatesAPITest;trax.TransformerAPITest;trax.TransformerFactoryAPITest;trax.stream.StreamResultAPITest;trax.stream.StreamSourceAPITest;trax.dom.DOMResultAPITest;trax.dom.DOMSourceAPITest;trax.sax.SAXSourceAPITest;trax.sax.SAXTransformerFactoryAPITest;trax.sax.TemplatesHandlerAPITest;trax.sax.TransformerHandlerAPITest;trax.SystemIdTest;trax.SystemIdImpInclTest;trax.EmbeddedStylesheetTest;trax.OutputPropertiesTest;trax.Minitest;trax.ErrorListenerAPITest;xalanj2.SerializedStylesheetTest;xalanj2.TraceListenerTest
+# outtakes 01-Jul-01 trax.ExamplesTest;trax.URIResolverTest;
 
 # Note: list of tests must be carefully managed to ensure 
 # 'build smoketest' will normally pass on current good builds 
