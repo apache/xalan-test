@@ -953,11 +953,10 @@ public class XMLFileLogger implements Logger
     /**
      * Lifted from org.apache.xml.serialize.transition.XMLSerializer
      *
-     * NEEDSDOC @param ch
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param ch character to get entity ref for
+     * @return String of entity name
      */
-    protected String getEntityRef(char ch)
+    public static String getEntityRef(char ch)
     {
 
         // Encode special XML characters into the equivalent character references.
@@ -987,16 +986,15 @@ public class XMLFileLogger implements Logger
      * not printable will be escaped using character references.
      * Lifted from org.apache.xml.serialize.transition.BaseMarkupSerializer
      */
-    private int _lastPrintable = 0x7E;
+    public static int _lastPrintable = 0x7E;
 
     /**
      * Lifted from org.apache.xml.serialize.transition.BaseMarkupSerializer
      *
-     * NEEDSDOC @param ch
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param ch character to escape
+     * @return String that is escaped
      */
-    protected String printEscaped(char ch)
+    public static String printEscaped(char ch)
     {
 
         String charRef;
@@ -1045,7 +1043,7 @@ public class XMLFileLogger implements Logger
      * @param source The string to escape
      * @return String after escaping - needed for our application
      */
-    protected String escapeString(String source)  // protected void printEscaped( String source )
+    public static String escapeString(String source)
     {
         // Check for null; just return null (callers shouldn't care)
         if (source == null)
