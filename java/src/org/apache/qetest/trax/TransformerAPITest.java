@@ -130,6 +130,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
     /** Just goldName for outputFormatTest with UTF-8 */
     protected String outputFormatTestUTF8 = null;
 
+    /** TransformerAPIHTMLFormat.xsl.xsl used for set/getOutputFormat related tests  */
+    protected XSLTestfileInfo htmlFormatTest = new XSLTestfileInfo();
+
     /** Known outputFormat values from TransformerAPIOutputFormat.xsl  */
     public static final String METHOD_VALUE = "xml";
     public static final String VERSION_VALUE ="123.45";
@@ -212,6 +215,10 @@ public class TransformerAPITest extends XSLProcessorTestBase
         outputFormatTest.inputName = filenameToURL(testBasePath + "TransformerAPIOutputFormat.xsl");
         outputFormatTest.goldName = goldBasePath + "TransformerAPIOutputFormatUTF16.out";
         outputFormatTestUTF8 = goldBasePath + "TransformerAPIOutputFormatUTF8.out";
+
+        htmlFormatTest.xmlName = filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xml");
+        htmlFormatTest.inputName = filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xsl");
+        htmlFormatTest.goldName = goldBasePath + "TransformerAPIHTMLFormat.out";
 
         // Cache trax system property
         saveXSLTProp = System.getProperty(TRAX_PROCESSOR_XSLT);
@@ -496,16 +503,30 @@ public class TransformerAPITest extends XSLProcessorTestBase
      */
     public boolean testCase2()
     {
+        //@todo I can't decide how to split tests up between 
+        //  testCase2/testCase3 - they really should be reorganized
         reporter.testCaseInit("API coverage test of Transformer.set/getOutputProperty()");
         TransformerFactory factory = null;
         Templates outputTemplates = null;
         Transformer outputTransformer = null;
-        Transformer identityTransformer = null;
+        Templates htmlTemplates = null;
+        Transformer htmlTransformer = null;
+        Templates identityTemplates = null;
+        Transformer identityTransformer = null; // an .xsl file defining an identity transform
+        Transformer defaultTransformer = null; // the default 'identity' transform
         try
         {
             factory = TransformerFactory.newInstance();
-            identityTransformer = factory.newTransformer();
             outputTemplates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
+            outputTransformer = outputTemplates.newTransformer();
+
+            htmlTemplates = factory.newTemplates(new StreamSource(htmlFormatTest.inputName));
+            htmlTransformer = htmlTemplates.newTransformer();
+
+            identityTemplates = factory.newTemplates(new StreamSource(simpleTest.inputName));
+            identityTransformer = identityTemplates.newTransformer();
+
+            defaultTransformer = factory.newTransformer();
         }
         catch (Throwable t)
         {
@@ -518,21 +539,93 @@ public class TransformerAPITest extends XSLProcessorTestBase
         try
         {
             // See what the default 'identity' transform has by default
-            Properties identityProps = identityTransformer.getOutputProperties(); // SPR SCUU4RXQYH throws npe
+            Properties defaultProps = defaultTransformer.getOutputProperties(); // SPR SCUU4RXQYH throws npe
+            reporter.logHashtable(reporter.STATUSMSG, defaultProps, 
+                                  "default defaultTransformer.getOutputProperties()");
+
+            // Check that the local stylesheet.getProperty has default set, cf. getOutputProperties javadoc
+            reporter.check(("xml".equals(defaultProps.getProperty(OutputKeys.METHOD))), true, "defaultTransformer.op.getProperty(" 
+                           + OutputKeys.METHOD + ") is default value, act: " + defaultProps.getProperty(OutputKeys.METHOD));
+            // Check that the local stylesheet.get has nothing set, cf. getOutputProperties javadoc
+            reporter.check((null == defaultProps.get(OutputKeys.METHOD)), true, "defaultTransformer.op.get(" 
+                           + OutputKeys.METHOD + ") is null value, act: " + defaultProps.get(OutputKeys.METHOD));
+
+            // Can you set properties on this transformer?
+            defaultTransformer.setOutputProperty(OutputKeys.METHOD, "text");
+            reporter.logTraceMsg("Just defaultTransformer setOutputProperty(method,text)");
+            String tmp = defaultTransformer.getOutputProperty(OutputKeys.METHOD); // SPR SCUU4R3JPH - throws npe
+            reporter.check(tmp, "text", "defaultTransformer set/getOutputProperty, is ?" + tmp + "?");
+        } 
+        catch (Exception e)
+        {
+            reporter.checkFail("Problem with default output property", "SCUU4RXQYH");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with default output property");
+        }
+
+        try
+        {
+            // See what the our .xsl file 'identity' transform has
+            Properties identityProps = identityTransformer.getOutputProperties();
             reporter.logHashtable(reporter.STATUSMSG, identityProps, 
                                   "default identityTransformer.getOutputProperties()");
 
+            // Check that the local stylesheet.getProperty has default set, cf. getOutputProperties javadoc
+            reporter.check(("xml".equals(identityProps.getProperty(OutputKeys.METHOD))), true, "identityTransformer.op.getProperty(" 
+                           + OutputKeys.METHOD + ") is default value, act: " + identityProps.getProperty(OutputKeys.METHOD));
+            // Check that the local stylesheet.get has nothing set, cf. getOutputProperties javadoc
+            reporter.check((null == identityProps.get(OutputKeys.METHOD)), true, "identityTransformer.op.get(" 
+                           + OutputKeys.METHOD + ") is null value, act: " + identityProps.get(OutputKeys.METHOD));
+
+            // Check that the local stylesheet.getProperty has default set, cf. getOutputProperties javadoc
+            reporter.check(("no".equals(identityProps.getProperty(OutputKeys.INDENT))), true, "identityTransformer.op.getProperty(" 
+                           + OutputKeys.INDENT + ") is default value, act: " + identityProps.getProperty(OutputKeys.INDENT));
+            // Check that the local stylesheet.get has nothing set, cf. getOutputProperties javadoc
+            reporter.check((null == (identityProps.get(OutputKeys.INDENT))), true, "identityTransformer.op.get(" 
+                           + OutputKeys.INDENT + ") is default value, act: " + identityProps.get(OutputKeys.INDENT));
+
             // Can you set properties on this transformer?
-            identityTransformer.setOutputProperty(OutputKeys.METHOD, "text");
+            defaultTransformer.setOutputProperty(OutputKeys.METHOD, "text");
             reporter.logTraceMsg("Just identityTransformer setOutputProperty(method,text)");
-            String tmp = identityTransformer.getOutputProperty(OutputKeys.METHOD); // SPR SCUU4R3JPH - throws npe
+            String tmp = defaultTransformer.getOutputProperty(OutputKeys.METHOD); // SPR SCUU4R3JPH - throws npe
             reporter.check(tmp, "text", "identityTransformer set/getOutputProperty, is ?" + tmp + "?");
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with identity output property", "SCUU4RXQYH");
-            reporter.logThrowable(reporter.ERRORMSG, e,
-                                  "Problem with identity output property");
+            reporter.checkFail("Problem with identity output property");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with identity output property");
+        }
+
+        try
+        {
+            // See what the our html-format output has
+            Properties htmlProps = htmlTransformer.getOutputProperties();
+            reporter.logHashtable(reporter.STATUSMSG, htmlProps, 
+                                  "default htmlTransformer.getOutputProperties()");
+
+            // Check that the local stylesheet.getProperty has stylesheet val set, cf. getOutputProperties javadoc
+            reporter.check(("html".equals(htmlProps.getProperty(OutputKeys.METHOD))), true, "htmlTransformer.op.getProperty(" 
+                           + OutputKeys.METHOD + ") is stylesheet value, act: " + htmlProps.getProperty(OutputKeys.METHOD));
+            // Check that the local stylesheet.get has stylesheet val set, cf. getOutputProperties javadoc
+            reporter.check(("html".equals(htmlProps.get(OutputKeys.METHOD))), true, "htmlTransformer.op.get(" 
+                           + OutputKeys.METHOD + ") is stylesheet value, act: " + htmlProps.get(OutputKeys.METHOD));
+
+            // Check that the local stylesheet.getProperty has default set, cf. getOutputProperties javadoc
+            reporter.check(("yes".equals(htmlProps.getProperty(OutputKeys.INDENT))), true, "htmlTransformer.op.getProperty(" 
+                           + OutputKeys.INDENT + ") is default value, act: " + htmlProps.getProperty(OutputKeys.INDENT));
+            // Check that the local stylesheet.get has nothing set, cf. getOutputProperties javadoc
+            reporter.check((null == (htmlProps.get(OutputKeys.INDENT))), true, "htmlTransformer.op.get(" 
+                           + OutputKeys.INDENT + ") is default value, act: " + htmlProps.get(OutputKeys.INDENT));
+
+            // Can you set properties on this transformer?
+            defaultTransformer.setOutputProperty(OutputKeys.METHOD, "text");
+            reporter.logTraceMsg("Just htmlTransformer setOutputProperty(method,text)");
+            String tmp = defaultTransformer.getOutputProperty(OutputKeys.METHOD); // SPR SCUU4R3JPH - throws npe
+            reporter.check(tmp, "text", "htmlTransformer set/getOutputProperty, is ?" + tmp + "?");
+        } 
+        catch (Exception e)
+        {
+            reporter.checkFail("Problem with html output property");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with html output property");
         }
 
         try
@@ -700,7 +793,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
         try
         {
             Transformer negTransformer = outputTemplates.newTransformer();
-
+            //@todo, or put in a separate testcase
         } 
         catch (Exception e)
         {
@@ -786,24 +879,128 @@ public class TransformerAPITest extends XSLProcessorTestBase
             return true;
         }
 
+        GetOutputPropertyTestlet testlet = new GetOutputPropertyTestlet();
+        reporter.logTraceMsg("Using GetOutputPropertyTestlet for negative tests");
+        testlet.setLogger(reporter);
+
         // Negative tests of getOutputProperty()
-        String testDesc = "getOutputProperty of bogus-name";
+        GetOutputPropertyDatalet datalet = new GetOutputPropertyDatalet();
+        reporter.logTraceMsg("Using GetOutputPropertyDatalet for negative tests");
+
         try
         {
-            Transformer t = factory.newTransformer();
-            String val = t.getOutputProperty("bogus-name");
-            reporter.checkFail(testDesc);
-        }
-        catch (IllegalArgumentException iae)
-        {
-            reporter.checkPass(testDesc + ", threw: " + iae.toString());
-        }
-        catch (Throwable t)
-        {
-            reporter.checkFail(testDesc + ", threw: " + t.toString());
-        }
+            datalet.transformer = identityTransformer;
+            datalet.propName = "bogus-name";
+            datalet.expectedValue = null;
+            datalet.expectedException = "java.lang.IllegalArgumentException";
+            datalet.setDescription("bogus-name identityTransformer throws IllegalArgumentException");
+            testlet.execute(datalet);
+            
+            datalet.transformer = identityTransformer;
+            datalet.propName = "bogus-{name}";
+            datalet.expectedValue = null;
+            datalet.expectedException = "java.lang.IllegalArgumentException";
+            datalet.setDescription("bogus-{name} throws IllegalArgumentException");
+            testlet.execute(datalet);
 
+            datalet.transformer = identityTransformer;
+            datalet.propName = "{bogus-name";
+            datalet.expectedValue = null;
+            datalet.expectedException = "java.lang.IllegalArgumentException";
+            datalet.setDescription("{bogus-name throws IllegalArgumentException (bracket not closed)");
+            testlet.execute(datalet);
 
+            datalet.transformer = identityTransformer;
+            datalet.propName = "{some-namespace}bogus-name";
+            datalet.expectedValue = datalet.NULL_VALUE_EXPECTED;
+            datalet.expectedException = null;
+            datalet.setDescription("{some-namespace}bogus-name returns null");
+            testlet.execute(datalet);
+
+            datalet.transformer = identityTransformer;
+            datalet.propName = "{just-some-namespace}";
+            datalet.expectedValue = datalet.NULL_VALUE_EXPECTED;
+            datalet.expectedException = null;
+            datalet.setDescription("{just-some-namespace}bogus-name returns null");
+            testlet.execute(datalet);
+
+            datalet.transformer = identityTransformer;
+            datalet.propName = "{}no-namespace-at-all";
+            datalet.expectedValue = datalet.NULL_VALUE_EXPECTED;
+            datalet.expectedException = null;
+            datalet.setDescription("{}no-namespace-at-all returns null (is this correct?)");
+            testlet.execute(datalet);
+
+            datalet.transformer = identityTransformer;
+            datalet.propName = OutputKeys.METHOD;
+            datalet.expectedValue = "xml";
+            datalet.expectedException = null;
+            datalet.setDescription(OutputKeys.METHOD + " returns xml on identity transformer (is this really correct?)");
+            testlet.execute(datalet);
+            
+        }
+        catch (Throwable t2)
+        {
+            reporter.checkErr("Problem with negative identityTransformer getOutputProperty: " + t2.toString());
+            reporter.logThrowable(reporter.STATUSMSG, t2, "Problem with negative identityTransformer getOutputProperty");
+        }
+        try
+        {
+            datalet.transformer = outputTemplates.newTransformer();
+            datalet.propName = "bogus-name";
+            datalet.expectedValue = null;
+            datalet.expectedException = "java.lang.IllegalArgumentException";
+            datalet.setDescription("bogus-name regular transformer throws IllegalArgumentException");
+            testlet.execute(datalet);
+            
+            datalet.transformer = outputTemplates.newTransformer();
+            datalet.propName = "bogus-{name}";
+            datalet.expectedValue = null;
+            datalet.expectedException = "java.lang.IllegalArgumentException";
+            datalet.setDescription("bogus-{name} throws IllegalArgumentException");
+            testlet.execute(datalet);
+
+            datalet.transformer = outputTemplates.newTransformer();
+            datalet.propName = "{bogus-name";
+            datalet.expectedValue = null;
+            datalet.expectedException = "java.lang.IllegalArgumentException";
+            datalet.setDescription("{bogus-name throws IllegalArgumentException (bracket not closed)");
+            testlet.execute(datalet);
+
+            datalet.transformer = outputTemplates.newTransformer();
+            datalet.propName = "{some-namespace}bogus-name";
+            datalet.expectedValue = datalet.NULL_VALUE_EXPECTED;
+            datalet.expectedException = null;
+            datalet.setDescription("{some-namespace}bogus-name returns null");
+            testlet.execute(datalet);
+
+            datalet.transformer = outputTemplates.newTransformer();
+            datalet.propName = "{just-some-namespace}";
+            datalet.expectedValue = datalet.NULL_VALUE_EXPECTED;
+            datalet.expectedException = null;
+            datalet.setDescription("{just-some-namespace}bogus-name returns null");
+            testlet.execute(datalet);
+
+            datalet.transformer = outputTemplates.newTransformer();
+            datalet.propName = "{}no-namespace-at-all";
+            datalet.expectedValue = datalet.NULL_VALUE_EXPECTED;
+            datalet.expectedException = null;
+            datalet.setDescription("{}no-namespace-at-all returns null (is this correct?)");
+            testlet.execute(datalet);
+
+            datalet.transformer = outputTemplates.newTransformer();
+            datalet.propName = OutputKeys.METHOD;
+            datalet.expectedValue = METHOD_VALUE;
+            datalet.expectedException = null;
+            datalet.setDescription(OutputKeys.METHOD + " returns " + METHOD_VALUE + " on transformer");
+            testlet.execute(datalet);
+            
+        }
+        catch (Throwable t3)
+        {
+            reporter.checkErr("Problem with negative transformer getOutputProperty: " + t3.toString());
+            reporter.logThrowable(reporter.STATUSMSG, t3, "Problem with negative transformer getOutputProperty");
+        }
 
         reporter.testCaseClose();
         return true;
@@ -946,13 +1143,19 @@ public class TransformerAPITest extends XSLProcessorTestBase
         }
     }
 
+    /** 
+     * Datalet for output property testing.   
+     * Fields: transformer, propName, (expectedValue|expectedException)
+     */
     public class GetOutputPropertyDatalet implements Datalet
     {
+        public GetOutputPropertyDatalet() {} // no-op
         public GetOutputPropertyDatalet(String[] args)
         {
             load(args);
         }
         public final String IDENTITY = "identity";
+        public final String NULL_VALUE_EXPECTED = "NULL_VALUE_EXPECTED";
         protected String description = "no data";
         public String getDescription() { return description; }
         public void setDescription(String d) { description = d; }
@@ -991,7 +1194,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             expectedException = (String)h.get("expectedException");
         }
         
-    } // end class GetOutputPropertyTestlet
+    } // end class GetOutputPropertyDatalet
 
     /** 
      * Calls getOutputProperty() on the Transformer supplied, and 
@@ -1023,25 +1226,51 @@ public class TransformerAPITest extends XSLProcessorTestBase
             }
             try
             {
+                // Perform the test
                 String val = datalet.transformer.getOutputProperty(datalet.propName);
-                if (null != datalet.expectedValue)
+                // Validate non-throwing of expected exceptions
+                if (null != datalet.expectedException)
                 {
-                    if (datalet.expectedValue.equals(val))
+                    logger.checkFail(datalet.getDescription() + ", did not throw:" + datalet.expectedException
+                                     + ", act:" + val);
+                    return;
+                }
+
+                // Validate any return data
+                if (null != val)
+                {
+                    // Check for positive values that exist
+                    if ((null != datalet.expectedValue) 
+                        && datalet.expectedValue.equals(val))
                         logger.checkPass(datalet.getDescription());
                     else
-                        logger.checkFail(datalet.getDescription());
+                        logger.checkFail(datalet.getDescription() + " act:" + val 
+                                         + ", exp:" + datalet.expectedValue);
                 }
-                else if (null != datalet.expectedException)
-                   logger.checkFail(datalet.getDescription());
+                else if (datalet.NULL_VALUE_EXPECTED == datalet.expectedValue)
+                {
+                    // If expectedValue is the special 'null' string, 
+                    //  and we're not expecting an exception, then 
+                    //  we pass here
+                   logger.checkPass(datalet.getDescription());
+                }
+                else
+                {
+                    // Otherwise, we fail
+                    logger.checkFail(datalet.getDescription() + " act:" + val 
+                                     + ", exp:" + datalet.expectedValue);
+                }
             }
             catch (Throwable t)
             {
+                // Validate any Exceptions thrown
                 if (null != datalet.expectedException)
                 {
                     if (datalet.expectedException.equals(t.getClass().getName()))
                         logger.checkPass(datalet.getDescription());
                     else
-                        logger.checkFail(datalet.getDescription());
+                        logger.checkFail(datalet.getDescription() + ", threw:" + t.toString()
+                                         + ", exp:" + datalet.expectedException);
                 }
                 else
                     logger.checkFail(datalet.getDescription() + ", threw: " + t.toString());
