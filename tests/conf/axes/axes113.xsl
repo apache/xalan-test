@@ -8,7 +8,6 @@
   <!-- Purpose: Comprehensive test of all axes -->
   <!-- Author: Dave Haffner -->
 
-
 <xsl:strip-space elements="*"/>
 
 <xsl:template match="//a[@id='36']">
@@ -16,7 +15,6 @@
    <xsl:text>matched on node </xsl:text>
    <xsl:value-of select="./@id"/>
    <xsl:text>: </xsl:text>
-
 
    <xsl:call-template name="displayNodes">
       <xsl:with-param name="nodeList" select="parent::*" />
@@ -68,10 +66,15 @@
       <xsl:with-param name="axisName" select="'ancestor-or-self::*'" />
    </xsl:call-template>
 
-   <xsl:call-template name="displayAttributeNodes">
-      <xsl:with-param name="nodeList" select="attribute::*" />
-      <xsl:with-param name="axisName" select="'attribute::*'" />
-   </xsl:call-template>
+  <!-- Special handling for attribute axis. -->
+  <xsl:text>&#10;     Axis: attribute::* (sorted):  </xsl:text>
+  <xsl:for-each select="attribute::*" >
+    <xsl:sort select="name()"/>
+    <xsl:value-of select="name()"/>
+    <xsl:text>: </xsl:text>
+    <xsl:value-of select="."/>
+    <xsl:text>, </xsl:text>
+  </xsl:for-each>
 </out>
 </xsl:template>
 
@@ -82,19 +85,6 @@
      <xsl:text>:  </xsl:text>
         <xsl:for-each select="$nodeList" >
             <xsl:value-of select="@id"/>
-            <xsl:text>,</xsl:text>
-        </xsl:for-each>
-</xsl:template>
-
-<xsl:template name="displayAttributeNodes">
-   <xsl:param name="nodeList" select="/.."/>
-   <xsl:param name="axisName" select="''" />
-     Axis: <xsl:value-of select="$axisName"/>
-     <xsl:text>:  </xsl:text>
-        <xsl:for-each select="$nodeList" >
-            <xsl:value-of select="name()"/>
-            <xsl:text> : </xsl:text>
-            <xsl:value-of select="."/>
             <xsl:text>,</xsl:text>
         </xsl:for-each>
 </xsl:template>

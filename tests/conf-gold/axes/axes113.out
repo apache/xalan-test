@@ -10,4 +10,4 @@
      Axis: descendant-or-self::*:  36,42,51,43,52,44,53,45,54,55,
      Axis: ancestor::*:  11,22,
      Axis: ancestor-or-self::*:  11,22,36,
-     Axis: attribute::*:  id : 36,a1 : 1,a2 : 2,</out>
+     Axis: attribute::* (sorted):  a1: 1, a2: 2, id: 36, </out>
