@@ -578,6 +578,11 @@
             <param name="conf.outputDir" value="${alltest.resultDir}/stream"/>
             <param name="conf.logFile" value="${alltest.resultDir}/stream/results.xml"/>
         </antcall>
+        <antcall target="conferr">
+            <param name="conferr.flavor" value="trax.systemId"/>
+            <param name="conferr.outputDir" value="${alltest.resultDir}/conferr"/>
+            <param name="conferr.logFile" value="${alltest.resultDir}/conferr/results.xml"/>
+        </antcall>
         <!-- Run various other sets of conf-like tests -->
         <antcall target="perf">
             <param name="perf.outputDir" value="${alltest.resultDir}/perf"/>
