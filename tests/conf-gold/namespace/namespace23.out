@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bogus:stylesheet version="1.0" xmlns:ped="www.ped.com" xmlns:lotus="http://www.lotus.com" xmlns:bogus="http://www.w3.org/1999/XSL/Transform">
+<bogus:stylesheet xmlns:ped="www.ped.com" xmlns:lotus="http://www.lotus.com" xmlns:bogus="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <bogus:template match="/">
 <out>
 		Yeee ha
