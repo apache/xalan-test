@@ -119,13 +119,14 @@
   <!-- Anchor element for each test -->
   <xsl:element name="a">
     <xsl:attribute name="name"><xsl:value-of select="$statusfilename"/></xsl:attribute>
+    <hr/>
   </xsl:element>
 
   <!-- Link to the full xml source of each test -->
-  <font size="-1"><xsl:value-of select="$testresults/testfile/@filename"/>
+  <font size="-1"><xsl:text> Original results.xml:</xsl:text>
     <xsl:element name="a">
       <xsl:attribute name="href"><xsl:value-of select="$testresultsfilename"/></xsl:attribute>
-      <xsl:text> source results xml</xsl:text>
+      <xsl:value-of select="$testresults/testfile/@filename"/>
     </xsl:element>
   </font>
 

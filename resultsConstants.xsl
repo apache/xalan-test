@@ -3,6 +3,8 @@
     <!-- Misc Constants used within results viewing stylesheets -->
     <xsl:variable name="hash-marker">#hash</xsl:variable>
     <xsl:variable name="file-results-marker">#fr</xsl:variable>
+    <xsl:variable name="testcase-marker">#tc</xsl:variable>
+    <xsl:variable name="checkresult-marker">#cr</xsl:variable>
 
     <!-- Constants file for XML results files - copied from Java sources -->
 
