@@ -112,7 +112,7 @@ public class PerfTestlet extends StylesheetTestlet
             throws Exception
     {
         // Setup: Save options from the datalet in convenience variables
-        int iterations = 10;
+        int iterations = 5;
         boolean runtimeGC = true;
         long[] times = null;
 
