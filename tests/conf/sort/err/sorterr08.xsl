@@ -8,7 +8,7 @@
   <!-- Section: 10 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Undefined value for data-type attribute on sort, but it's qualified. -->
-  <!-- ExpectedException: -->
+  <!-- ExpectedException: No known sort routine for baz1:badtype -->
 
 <xsl:template match="doc">
   <out>
