@@ -1,0 +1,92 @@
+<html>
+  <title>Xalan testing support files</title>
+  <body>
+    <p>This directory is a repository for test files and test automation for Xalan.</p>  
+    <dl>
+      <dt><b>Program(s) Under Test: </b></dt>
+      <dd><a href="http://xml.apache.org/xalan-j" target="_top">Xalan-J 2.x XSLT Processor</a></dd>
+      <dd><a href="http://xml.apache.org/xalan" target="_top">Xalan-J 1.x XSLT Processor</a></dd>
+      <dd><a href="http://xml.apache.org/xalan-c" target="_top">Xalan-C 1.x XSLT Processor</a></dd>
+      <dt><b>Credits for the tests:</b></dt>
+      <dd><a href="mailto:shane_curcuru@lotus.com">Shane Curcuru</a></dd>
+      <dd><a href="mailto:paul_dick@lotus.com">Paul Dick</a></dd>
+      <dd><a href="mailto:David_Marston@lotus.com">David Marston</a></dd>
+      <dd><a href="mailto:garyp@firstech.com">Gary L Peskin</a></dd>
+      <dd>Many other <a href="http://xml.apache.org/mail.html">xalan-dev</a> subscribers</dd>
+      <dd>Many other helpers who we still need to credit! Sorry!</dd>
+    </dl>
+<p>These tests are provided for Xalan contributors to evaluate the impact of code changes. 
+Run the tests on the unchanged code, make the change and rebuild, then run the tests again 
+and compare the results. Results should also be compared to the files in the "-gold" 
+directory trees.</p>
+
+<dl>
+  <dt><b>Brief overview of directory structure:</b></dt>
+  <dt>xml-xalan/test/.</dt><dd>Top level dir for all Xalan versions/products tests</dd>
+  <dt>..test/java</dt><dd>Top level for Java test automation</dd>
+  <dt>....java/bin</dt><dd>Java test automation dependencies (includes 
+  <a href="http://jakarta.apache.org/ant/index.html">Ant 1.2</a>)</dd>
+  <dt>....java/src</dt><dd>Java test automation source tree (primary packages: 
+  <a href="java/src/org/apache/qetest/package.html">org.apache.qetest</a>, 
+  <a href="java/src/org/apache/qetest/xsl/package.html">org.apache.qetest.xsl</a>, 
+  <a href="java/src/org/apache/qetest/trax/package.html">org.apache.qetest.trax</a>, 
+  <a href="java/src/org/apache/qetest/xalanj1/package.html">org.apache.qetest.xalanj1</a>, 
+  )</dd>
+  <dt>..test/tests</dt><dd>Top level for XSLT stylesheet trees</dd>
+  <dt>....tests/contrib</dt><dd>Directory tree of user-contributed stylesheets</dd>
+  <dt>....tests/contrib-gold</dt><dd>Directory tree of user-contributed stylesheets gold 
+  output reference files (this tree should mirror the structure of contrib)</dd>
+  <dt>....tests/apitest</dt><dd>Directory tree for stylesheets used in Java API tests</dd>
+  <dt>....tests/apitest-gold</dt><dd>Matching Directory tree of gold files for Java API tests</dd>
+  <dt>....tests/extension</dt><dd>Directory tree for stylesheets used in Xalan-specific extension tests</dd>
+  <dt>....tests/extension/xalanj1</dt><dd>Xalan-J 1.x version-specific extension tests</dd>
+  <dt>....tests/extension/xalanj2</dt><dd>Xalan-J 2.x version-specific extension tests</dd>
+  <dt>....tests/extension-gold</dt><dd>Matching Directory tree of gold files for Xalan-specific extension tests</dd>
+  <dt>....tests/...</dt><dd>More stylesheet trees to be added!</dd>
+  <dt>....tests/...-gold</dt><dd></dd>
+</dl>
+<p>Some tests are ones that Xalan has not passed to date, but we know the 
+correct ("gold") result by analysis or by trying the test on other processors. At Lotus/IBM, 
+we have some additional test cases that we can't give away, so a patch may pass all these 
+tests and fail others, but those cases should be rare.</p>
+
+<p>Test cases in the "conf" group will ultimately be submitted to OASIS as part of 
+their vendor-independent project on XSLT/XPath Conformance Testing. For more 
+information about this project, visit 
+<a href="http://www.oasis-open.org/committees/xslt/index.html">http://www.oasis-open.org/committees/xslt/index.html</a></p>
+
+<p>The project will combine test cases from different sources and provide a way to 
+customize the set of tests according to design decisions made for each processor 
+under test. We expect that when the OASIS test system is delivered, it will supplant 
+most or all of the "conf" group provided here. Conformance tests are designed as 
+streamlined "atomic" (or at least "molecular") tests, so there are several hundred of them.</p>
+
+<p>You are invited to submit additional test cases by checking them into the "contrib" 
+area or mailing them to <a href="mailto:David_Marston@lotus.com">David_Marston@lotus.com</a>. If you want to help with testing Xalan and wish to be 
+assigned to write some cases, send email to David Marston stating your interest. 
+Contributed tests may be sent along to the OASIS conformance project if they test 
+conformance. Guidelines for comments in tests are still evolving as part of the 
+OASIS project, so it may be necessary to add more comments or other annotation 
+after the test is submitted.</p>
+<hr>
+<p>Quick-doc: to build/run automation:</p>
+<p>Build (DOS format, UNIX is similar): <br>
+<code>set JARDIR=c:\all-jars-here</code> (put xalan.jar, xerces.jar, etc. there)<br>
+<code>cd xml-xalan\test\java</code><br>
+either: <code>build.bat package.trax</code> (packages build\testxsl.jar for Xalan-J 2.x build testing with TRAX interface)<br>
+or: <code>build.bat package.xalan1</code> (packages build\testxsl.jar for Xalan-J 1.x build testing)<br>
+</p>
+<p>Run (DOS format, UNIX is similar): <br>
+<code>set JARDIR=c:\all-jars-here</code> (put xalan.jar, xerces.jar, <b>and</b> testxsl.jar etc. there)<br>
+
+<code>cd xml-xalan\test</code><br>
+Any of:<br>
+<code>runtest.bat TestClassName [options]</code> (see batch file for comments)<br>
+<code>traxapitest.bat TestClassName [options]</code> (runs TRAX interface tests with Xalan-J 2.x)<br>
+<code>xalanj1apitest.bat TestClassName [options]</code> (runs Xalan-J 1.x API tests)<br>
+<code>contribtest.bat [options]</code> (runs ConformanceTest driver over contrib test tree)<br>
+</p>
+  </body>
+</html>
+
+
