@@ -22,7 +22,7 @@
 <elem1/>
 <BTM:BreakingTheMold xmlns:BTM="www.btm.com"/>
 </Ancestor-or-Self>
-<Attribute attr3="O" attr2="P" attr1="Q"/>
+<Attribute attr1="Q" attr2="P" attr3="O"/>
 <Child>
 <elem1/>
 <elem1/>
@@ -47,7 +47,7 @@
 <Following-Sibling/>
 <Namespace xmlns:test="http://www.extension03.test" xmlns:BTM="www.btm.com"/>
 <Parent0/>
-<Parent1/>
+<Parent1>elem2</Parent1>
 <Preceding>test:elem3</Preceding>
 <Preceding-Sibling>1</Preceding-Sibling>
 <Self>BTM:BreakingTheMold</Self>
