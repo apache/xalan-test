@@ -5,15 +5,15 @@
   <!-- Purpose: Basic import and include tests for StreamSource APIs. -->
 
 <xsl:template match="list">
-  <simple-include>
-    <xsl:copy-of select="." />
-  </simple-include>
+  <include-list>
+    <xsl:apply-imports/>
+  </include-list>
 </xsl:template>
 
-<xsl:template match="item[@version='1']">
-  <simple-include>
+<xsl:template match="item[@match-by='include']">
+  <matched-by-include>
     <xsl:value-of select="." />
-  </simple-include>
+  </matched-by-include>
 </xsl:template>
 
 </xsl:stylesheet>

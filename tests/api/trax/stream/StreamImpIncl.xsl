@@ -14,9 +14,15 @@
 </xsl:template>
 
 <xsl:template match="list" priority="-1">
- <out-list>
+ <main-list>
   <xsl:apply-templates/>
- </out-list>
+ </main-list>
+</xsl:template>
+
+<xsl:template match="item[not(@match-by)]">
+  <matched-by-main>
+    <xsl:value-of select="." />
+  </matched-by-main>
 </xsl:template>
 
 </xsl:stylesheet>
