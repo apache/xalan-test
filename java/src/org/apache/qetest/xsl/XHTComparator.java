@@ -55,11 +55,6 @@
  * <http://www.apache.org/>.
  */
 
-/*
- *
- * XHTComparator.java
- *
- */
 package org.apache.qetest.xsl;
 
 import org.apache.qetest.Logger;  // Only for PASS_RESULT, etc.
@@ -84,14 +79,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Text;
 
-// Xerces imports - use JAXP interface instead
 // Needed JAXP classes
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 // SAX2 imports
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Uses an XML/HTML/Text diff comparator to check or diff two files.
@@ -116,16 +113,13 @@ import org.xml.sax.InputSource;
 public class XHTComparator
 {
 
-    /** Default value for maximum output length of diff'd values.  */
-    static final int MAX_VALUE_DISPLAY_LEN = 511;  // arbitrary length, for convenience
-
     /** 
      * Maximum output length we may log for differing values.  
      * When two nodes have mismatched values, we output the first 
      * two values that were mismatched.  In some cases, this may be 
      * extremely long, so limit how much we output for convenience.
      */
-    private int maxDisplayLen = MAX_VALUE_DISPLAY_LEN;
+    private int maxDisplayLen = 511;  // arbitrary length, for convenience
 
     /**
      * Accessor method for maxDisplayLen.
@@ -244,12 +238,12 @@ public class XHTComparator
      * both non-null, and both in the same basic position in the tree.
      * //@todo verify caller really performs for the contract -sc
      *
-     * NEEDSDOC @param gold
-     * NEEDSDOC @param test
-     * NEEDSDOC @param reporter
-     * NEEDSDOC @param warning
+     * @param gold gold or expected node
+     * @param test actual node
+     * @param reporter PrintWriter to dump status info to
+     * @param warning[] if any whitespace diffs found
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return true if pass, false if any problems encountered
      */
     boolean diff(Node gold, Node test, PrintWriter reporter,
                  boolean[] warning)
@@ -469,7 +463,7 @@ public class XHTComparator
      *
      *
      * NEEDSDOC @param n
-     * NEEDSDOC @param reporter
+     * @param reporter PrintWriter to dump status info to
      * NEEDSDOC @param warning
      * NEEDSDOC @param next
      * NEEDSDOC @param which
@@ -507,7 +501,7 @@ public class XHTComparator
      *
      * NEEDSDOC @param gold
      * NEEDSDOC @param test
-     * NEEDSDOC @param reporter
+     * @param reporter PrintWriter to dump status info to
      * NEEDSDOC @param warning
      * NEEDSDOC @param next
      *
@@ -637,48 +631,57 @@ public class XHTComparator
         return s;
     }  // end of nodeTypeString()
 
-    /**
-     * Parameter: force use of URI's for Xerces 1.1.2 or leave filenames alone?
-     */
-    protected boolean useURI = true;
 
     /**
-     * NEEDSDOC Method parse 
+     * Simple worker method to parse filename to a Document.  
      *
+     * Attempts XML parse, then HTML parse (when parser available), 
+     * then just parses as text and sticks into a text node.
      *
-     * NEEDSDOC @param filename
-     * NEEDSDOC @param reporter
-     * NEEDSDOC @param which
+     * @param filename to parse as a local path
+     * @param reporter PrintWriter to dump status info to
+     * @param which either TEST or GOLD file being parsed
+     * @param attributes name=value pairs to set on the 
+     * DocumentBuilderFactory that we use to parse
      *
-     * NEEDSDOC (parse) @return
+     * @return Document object with contents of the file; 
+     * otherwise throws an unchecked RuntimeException if there 
+     * is any fatal problem
      */
     Document parse(String filename, PrintWriter reporter, String which, Properties attributes)
     {
         // Force filerefs to be URI's if needed: note this is independent of any other files
-        String docURI = filename;
-        if (useURI)
-        {
-            // Use static worker method to get the correct format
-            docURI = QetestUtils.filenameToURL(filename);
-        }
-
-        // Use JAXP instead of Xerces-specific calls
+        String docURI = QetestUtils.filenameToURL(filename);
+        
         DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
         // Always set namespaces on
         dfactory.setNamespaceAware(true);
         // Set other attributes here as needed
         applyAttributes(dfactory, attributes);
         
+        // Local class: cheap non-printing ErrorHandler
+        // This is used to suppress validation warnings
+        ErrorHandler nullHandler = new ErrorHandler() {
+            public void warning(SAXParseException e) throws SAXException {}
+            public void error(SAXParseException e) throws SAXException {}
+            public void fatalError(SAXParseException e) throws SAXException 
+            {
+                throw e;
+            }
+        };
+
         String parseType = which + PARSE_TYPE + "[xml];";
         Document doc = null;
         try
         {
+            // First, attempt to parse as XML (preferred)...
             DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+            docBuilder.setErrorHandler(nullHandler);
             doc = docBuilder.parse(new InputSource(docURI));
         }
         catch (Throwable se)
         {
-            // We couldn't parse as XML, attempt parse as HTML
+            // ... if we couldn't parse as XML, attempt parse as HTML...
             reporter.println(WARNING + se.toString());
             parseType = which + PARSE_TYPE + "[html];";
 
@@ -686,13 +689,13 @@ public class XHTComparator
             {
                 // @todo need to find an HTML to DOM parser we can use!!!
                 // doc = someHTMLParser.parse(new InputSource(filename));
-                throw new RuntimeException("We need an HTML to DOM parser!");
+                throw new RuntimeException("XHTComparator no HTML parser!");
             }
             catch (Exception e)
             {
+                // ... if we can't parse as HTML, then just parse the text
                 try
                 {
-                    // We couldn't parse as HTML, just compare as strings
                     reporter.println(WARNING + e.toString());
                     parseType = which + PARSE_TYPE + "[text];";
 
