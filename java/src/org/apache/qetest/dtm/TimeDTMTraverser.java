@@ -93,10 +93,10 @@ public static void main(String argv[])
   	System.out.println("\n#### Timing Traversal of DEEP documents. ####");
 
 	StringBuffer buf = new StringBuffer();
-
+											
 	// Preload once to prime the JVM.
 	DTM dtm = QeDtmUtils.createDTM(0, QeDtmUtils.deepFile, buf);
-
+										  
 	// Time the creation of the dtm
 	buf.setLength(0);
 	dtm = QeDtmUtils.createDTM(0, QeDtmUtils.deepFile, buf);  
@@ -118,7 +118,7 @@ public static void main(String argv[])
 	String ANodeName = dtm.getNodeName(ANode);
 	
 	int[] rtData = {0,0,0};		// returns Traversal time, last node, number of nodes traversed 
-
+										   
 	// Get a traverser for Descendant:: axis.
 	System.out.println("\n* DESCENDANT from "+"<"+DNodeName+">");
 	QeDtmUtils.timeAxisTraverser(dtm, Axis.DESCENDANT, DNode, rtData);
@@ -128,11 +128,11 @@ public static void main(String argv[])
 	System.out.println("\n* DESCENDANT-OR-SELF from "+"<"+DNodeName+">");
 	QeDtmUtils.timeAxisTraverser(dtm, Axis.DESCENDANTORSELF, DNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
-	
+										   
 	// Use last node from Child traverse as Context node for subsequent traversals
 	int lastNode = rtData[1];
 	String lastNodeName = dtm.getNodeName(lastNode);
-
+										   
 	// Get a traverser for Ancestor:: axis.
 	System.out.println("\n* ANCESTOR from "+"<"+lastNodeName+">");	
 	QeDtmUtils.timeAxisTraverser(dtm, Axis.ANCESTOR, lastNode, rtData);
@@ -144,62 +144,62 @@ public static void main(String argv[])
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	System.out.println("\n#### Timing Traversal of FLAT documents. ####");
-
+						  
 	buf.setLength(0);
-	DTM dtm2 = QeDtmUtils.createDTM(0, QeDtmUtils.flatFile, buf);
-	buf.setLength(0);
-	dtm2 = QeDtmUtils.createDTM(0, QeDtmUtils.flatFile, buf);
+	DTM dtm2 = QeDtmUtils.createDTM(0, QeDtmUtils.flatFile, buf);  
 	buf.setLength(0);
 	dtm2 = QeDtmUtils.createDTM(0, QeDtmUtils.flatFile, buf);
 	buf.setLength(0);
 	dtm2 = QeDtmUtils.createDTM(0, QeDtmUtils.flatFile, buf);
 	buf.setLength(0);
 	dtm2 = QeDtmUtils.createDTM(0, QeDtmUtils.flatFile, buf);
-																	
+	buf.setLength(0);
+	dtm2 = QeDtmUtils.createDTM(0, QeDtmUtils.flatFile, buf);
+																  	
 	// Get various nodes to use as context nodes.
-	dtmRoot = dtm2.getDocument();				// #document
-	dtmRootName = dtm2.getNodeName(dtmRoot);	// Used for output
-	DNode = dtm2.getFirstChild(dtmRoot);		// <Doc>
+	dtmRoot = dtm2.getDocument();					// #document
+	dtmRootName = dtm2.getNodeName(dtmRoot);		// Used for output
+	DNode = dtm2.getFirstChild(dtmRoot);			// <Doc>
 	DNodeName = dtm2.getNodeName(DNode);
 	int fiNode = dtm2.getFirstChild(DNode);			// first <item>
 	String fiNodeName = dtm2.getNodeName(fiNode);
-
+			   
 	// Get a traverser for Child:: axis.
-	System.out.println("\n* CHILD from "+"<"+DNodeName+">");
+	System.out.println("\n* CHILD from "+"<"+DNodeName+"> " + DNode);
 	QeDtmUtils.timeAxisTraverser(dtm2, Axis.CHILD, DNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	// Get a traverser for Following:: axis.
-	System.out.println("\n* FOLLOWING from "+"<"+fiNodeName+">");
+	System.out.println("\n* FOLLOWING from "+"<"+fiNodeName+"> " + fiNode);
 	QeDtmUtils.timeAxisTraverser(dtm2, Axis.FOLLOWING, fiNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
-
+							  
 	// Get a traverser for Following-sibling:: axis.
-	System.out.println("\n* FOLLOWINGSIBLING from "+"<"+fiNodeName+">");
-	QeDtmUtils.timeAxisTraverser(dtm2, Axis.FOLLOWING, fiNode, rtData);
+	System.out.println("\n* FOLLOWINGSIBLING from "+"<"+fiNodeName+"> " +fiNode);
+	QeDtmUtils.timeAxisTraverser(dtm2, Axis.FOLLOWINGSIBLING, fiNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
-
+				 							 
 	// Get a traverser for Descendant:: axis.
-	System.out.println("\n* DESCENDANT from "+"<"+DNodeName+">");
+	System.out.println("\n* DESCENDANT from "+"<"+DNodeName+"> " + DNode);
 	QeDtmUtils.timeAxisTraverser(dtm2, Axis.DESCENDANT, DNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	// Use last node from Descendant traverse as Context node for subsequent traversals
 	lastNode = rtData[1];
 	lastNodeName = dtm2.getNodeName(lastNode);
-
+											 
 	// Get a traverser for Ancestor:: axis.
-	System.out.println("\n* ANCESTOR from "+"<"+lastNodeName+">");	
+	System.out.println("\n* ANCESTOR from "+"<"+lastNodeName+"> " + lastNode);	
 	QeDtmUtils.timeAxisTraverser(dtm2, Axis.ANCESTOR, lastNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
 
 	// Get a traverser for Preceding:: axis.
-	System.out.println("\n* PRECEDING from "+"<"+lastNodeName+">");			   
+	System.out.println("\n* PRECEDING from "+"<"+lastNodeName+"> " + lastNode);			   
 	QeDtmUtils.timeAxisTraverser(dtm2, Axis.PRECEDING, lastNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
-
+											   
 	// Get a traverser for Preceding:: axis.
-	System.out.println("\n* PRECEDING-SIBLING from "+"<"+lastNodeName+">");			   
+	System.out.println("\n* PRECEDING-SIBLING from "+"<"+lastNodeName+"> " + lastNode);			   
 	QeDtmUtils.timeAxisTraverser(dtm2, Axis.PRECEDINGSIBLING, lastNode, rtData);
 	System.out.println("Time="+rtData[0] + " : " + "LastNode="+rtData[1]+" nodes="+rtData[2]);
   
