@@ -93,7 +93,7 @@ import java.util.Properties;
  * @author Krishna.Meduri@eng.sun.com
  * @version $Id$
  */
-public class OutputPropertiesTest extends XSLProcessorTestBase
+public class OutputPropertiesTest extends FileBasedTest
 {
 
     /** Used for generating names of actual output files.   */

@@ -86,7 +86,7 @@ import java.util.Properties;
  * @author shane_curcuru@us.ibm.com
  * @version $Id$
  */
-public class PrefixResolverAPITest extends XSLProcessorTestBase
+public class PrefixResolverAPITest extends FileBasedTest
 {
     /** Just initialize test name, comment, numTestCases. */
     public PrefixResolverAPITest()

@@ -72,7 +72,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 
-public class TimeDTMIterDeep extends XSLProcessorTestBase
+public class TimeDTMIterDeep extends FileBasedTest
 {
     /**
      * Provides nextName(), currentName() functionality for tests 

@@ -110,7 +110,7 @@ import java.util.Vector;
  * @author shane_curcuru@us.ibm.com
  * @version $Id$
  */
-public class Minitest extends XSLProcessorTestBase
+public class Minitest extends FileBasedTest
 {
 
     /**

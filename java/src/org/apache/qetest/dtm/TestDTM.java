@@ -88,7 +88,7 @@ import org.apache.xpath.objects.XMLStringFactoryImpl;
  * %REVIEW% Extend to test DOM2DTM, incremental, DOM view of the DTM, 
  * whitespace-filtered, indexed/nonindexed, ...
  * */
-public class TestDTM extends XSLProcessorTestBase
+public class TestDTM extends FileBasedTest
 {
 /**
 * This test creates a DTM and tests basic functionality of the DTM API

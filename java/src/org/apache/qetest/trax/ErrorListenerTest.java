@@ -101,7 +101,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class ErrorListenerTest extends XSLProcessorTestBase
+public class ErrorListenerTest extends FileBasedTest
 {
 
     /** Provide sequential output names automatically.   */

@@ -96,7 +96,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class SAXSourceAPITest extends XSLProcessorTestBase
+public class SAXSourceAPITest extends FileBasedTest
 {
 
     /**

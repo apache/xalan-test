@@ -123,7 +123,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class SmoketestOuttakes extends XSLProcessorTestBase
+public class SmoketestOuttakes extends FileBasedTest
 {
 
     /** Provides nextName(), currentName() functionality.  */

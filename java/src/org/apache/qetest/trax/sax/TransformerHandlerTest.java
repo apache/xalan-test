@@ -95,7 +95,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class TransformerHandlerTest extends XSLProcessorTestBase
+public class TransformerHandlerTest extends FileBasedTest
 {
 
     /** Provides nextName(), currentName() functionality for output files.  */

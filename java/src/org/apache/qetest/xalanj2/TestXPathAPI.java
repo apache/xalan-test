@@ -108,7 +108,7 @@ import javax.xml.transform.stream.StreamResult;
  * @author myriam_midy@lotus.com
  * @author shane_curcuru@lotus.com
  */
-public class TestXPathAPI extends XSLProcessorTestBase
+public class TestXPathAPI extends FileBasedTest
 {
   /** Array of sample XPaths to test.  */
   protected String[] xpath;

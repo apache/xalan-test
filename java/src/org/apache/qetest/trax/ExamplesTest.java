@@ -136,7 +136,7 @@ import java.util.Properties;
  * @author scott_boag@lotus.com
  * @version $Id$
  */
-public class ExamplesTest extends XSLProcessorTestBase
+public class ExamplesTest extends FileBasedTest
 {
 
     /**

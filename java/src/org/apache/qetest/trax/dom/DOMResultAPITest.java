@@ -90,7 +90,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class DOMResultAPITest extends XSLProcessorTestBase
+public class DOMResultAPITest extends FileBasedTest
 {
 
     /**

@@ -71,7 +71,7 @@ import java.util.Properties;
  * @author shane_curcuru@us.ibm.com
  * @version $Id$
  */
-public class SystemIDResolverAPITest extends XSLProcessorTestBase
+public class SystemIDResolverAPITest extends FileBasedTest
 {
     /** Just initialize test name, comment, numTestCases. */
     public SystemIDResolverAPITest()

@@ -112,7 +112,7 @@ import java.lang.reflect.Method;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class TransformStateAPITest extends XSLProcessorTestBase
+public class TransformStateAPITest extends FileBasedTest
         implements ContentHandler, TransformerClient
 
 {

@@ -93,7 +93,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class ProgrammaticDOMTest extends XSLProcessorTestBase
+public class ProgrammaticDOMTest extends FileBasedTest
 {
 
     /** Provides nextName(), currentName() functionality.  */

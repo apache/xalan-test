@@ -85,7 +85,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class SerializedStylesheetTest extends XSLProcessorTestBase
+public class SerializedStylesheetTest extends FileBasedTest
 {
 
     /** Provides nextName(), currentName() functionality.  */

@@ -97,7 +97,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class OutputSettingsTest extends XSLProcessorTestBase
+public class OutputSettingsTest extends FileBasedTest
 {
 
     /** Used for generating names of actual output files.   */

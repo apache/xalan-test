@@ -96,7 +96,7 @@ import java.util.Properties;
  * @author REPLACE_authorname
  * @version $Id$
  */
-public class REPLACE_template_for_new_tests extends XSLProcessorTestBase
+public class REPLACE_template_for_new_tests extends FileBasedTest
 {
 
     /**

@@ -85,7 +85,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class ErrorListenerAPITest extends XSLProcessorTestBase
+public class ErrorListenerAPITest extends FileBasedTest
 {
     /** FQCN for Xalan-J 2.x impl.  */
     public static final String XALAN_ERRORLISTENER_IMPL = "org.apache.xml.utils.DefaultErrorHandler";

@@ -99,7 +99,7 @@ import java.util.Vector;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class DTMDumpTest extends XSLProcessorTestBase
+public class DTMDumpTest extends FileBasedTest
 {
 
     /** Provides nextName(), currentName() functionality.   */

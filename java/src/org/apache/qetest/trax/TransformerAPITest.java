@@ -95,7 +95,7 @@ import java.util.Hashtable;
  * coverage of Transformer API's in those usage cases.
  * @author shane_curcuru@lotus.com
  */
-public class TransformerAPITest extends XSLProcessorTestBase
+public class TransformerAPITest extends FileBasedTest
 {
 
     /** Cheap-o filename for various output files.  */

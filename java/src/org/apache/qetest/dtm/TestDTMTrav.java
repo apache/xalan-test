@@ -90,7 +90,7 @@ import org.apache.xpath.objects.XMLStringFactoryImpl;
 * @author Paul Dick
 * @version $Id$
 */
-public class TestDTMTrav extends XSLProcessorTestBase
+public class TestDTMTrav extends FileBasedTest
 {
     /**
      * Provides nextName(), currentName() functionality for tests 

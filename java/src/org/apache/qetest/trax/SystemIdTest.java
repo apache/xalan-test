@@ -126,7 +126,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class SystemIdTest extends XSLProcessorTestBase
+public class SystemIdTest extends FileBasedTest
 {
 
     /**

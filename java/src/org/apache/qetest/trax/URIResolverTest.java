@@ -92,7 +92,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class URIResolverTest extends XSLProcessorTestBase
+public class URIResolverTest extends FileBasedTest
 {
 
     /** Provide sequential output names automatically.   */

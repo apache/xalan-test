@@ -87,7 +87,7 @@ import java.util.Vector;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class StylesheetTestletDriver extends XSLProcessorTestBase
+public class StylesheetTestletDriver extends FileBasedTest
 {
 
     //-----------------------------------------------------

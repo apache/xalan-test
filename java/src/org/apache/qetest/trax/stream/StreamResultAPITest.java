@@ -98,7 +98,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class StreamResultAPITest extends XSLProcessorTestBase
+public class StreamResultAPITest extends FileBasedTest
 {
 
     /**

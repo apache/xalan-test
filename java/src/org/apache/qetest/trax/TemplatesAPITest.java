@@ -102,7 +102,7 @@ import java.util.Properties;
  * Basic API coverage test for the Templates class of TRAX.
  * @author shane_curcuru@lotus.com
  */
-public class TemplatesAPITest extends XSLProcessorTestBase
+public class TemplatesAPITest extends FileBasedTest
 {
 
     /**

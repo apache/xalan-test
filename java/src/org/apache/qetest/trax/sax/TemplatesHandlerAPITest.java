@@ -96,7 +96,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class TemplatesHandlerAPITest extends XSLProcessorTestBase
+public class TemplatesHandlerAPITest extends FileBasedTest
 {
 
     /**

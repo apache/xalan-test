@@ -90,7 +90,7 @@ import java.util.Vector;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class FactoryFeatureTest extends XSLProcessorTestBase
+public class FactoryFeatureTest extends FileBasedTest
 {
 
     /** Provides nextName(), currentName() functionality.   */

@@ -89,7 +89,7 @@ import java.util.Vector;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class TransformStateTest extends XSLProcessorTestBase
+public class TransformStateTest extends FileBasedTest
 {
 
     /** Subdirectory under test\tests\api for our xsl/xml files.  */

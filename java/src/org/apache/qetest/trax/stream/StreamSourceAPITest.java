@@ -94,7 +94,7 @@ import java.util.Properties;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class StreamSourceAPITest extends XSLProcessorTestBase
+public class StreamSourceAPITest extends FileBasedTest
 {
 
     /**
