@@ -9,7 +9,7 @@
   <!-- Purpose: Test placement of attribute-set inside a template, which is illegal. -->
   <!-- ExpectedException: xsl:attribute-set is not allowed inside a template! -->
   <!-- ExpectedException: XSLT: (StylesheetHandler) xsl:attribute-set is not allowed inside a template! -->
-
+  <!-- ExpectedException: xsl:attribute-set is not allowed in this position in the stylesheet! -->
 <xsl:template match="/">
   <out>
     <xsl:attribute-set name="set2">

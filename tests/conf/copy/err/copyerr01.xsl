@@ -10,6 +10,7 @@
   <!-- Purpose: Test for xsl:copy-of without select. -->                
   <!-- Creator: David Marston -->
   <!-- ExpectedException: xsl:copy-of requires a select attribute -->
+  <!-- ExpectedException: xsl:copy-of requires attribute: select -->
 
 <xsl:template match="/">
   <root>

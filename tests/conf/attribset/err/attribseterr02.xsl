@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Set up circular references of attribute-sets using each other -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: xsl:attribute-set 'set1' used itself, which will cause an infinite loop. -->
-  <!-- ExpectedException: xsl:attribute-set 'set1' used itself, which will cause an infinite loop. -->
+  <!-- ExpectedException: xsl:attribute-set set1 used itself, which will cause an infinite loop. -->
 
 <xsl:template match="/">
     <out>

@@ -9,6 +9,7 @@
   <!-- Purpose: Put xsl:choose at top level, which is illegal. -->
   <!-- ExpectedException: (StylesheetHandler) xsl:choose not allowed inside a stylesheet! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:choose not allowed inside a stylesheet! -->
+  <!-- ExpectedException: xsl:when is not allowed in this position in the stylesheet! -->
 
 <xsl:choose>
   <xsl:when test="doc">Found a doc</xsl:when>

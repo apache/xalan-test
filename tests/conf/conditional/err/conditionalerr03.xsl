@@ -9,6 +9,7 @@
   <!-- Purpose: Test of xsl:choose containing sub-element that is not a when or otherwise. -->
   <!-- ExpectedException: ElemTemplateElement error: Can not add #text to xsl:choose -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: ElemTemplateElement error: Can not add #text to xsl:choose -->
+  <!-- ExpectedException: xsl:text is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

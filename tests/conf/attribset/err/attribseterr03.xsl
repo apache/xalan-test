@@ -9,7 +9,7 @@
   	   is an error.  The attributes can be ignored.-->
   <!-- ExpectedException: Can not add xsl:attribute to xsl:attribute -->
   <!-- ExpectedException: ElemTemplateElement error: Can not add xsl:attribute to xsl:attribute -->
-
+  <!-- ExpectedException: xsl:attribute is not allowed in this position in the stylesheet! -->
 <xsl:template match="/">
   <out>
     <xsl:element name="Element1">

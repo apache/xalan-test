@@ -10,6 +10,7 @@
        can be ignored. -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: ElemTemplateElement error: Can not add foo to xsl:attribute -->
   <!-- ExpectedException: ElemTemplateElement error: Can not add foo to xsl:attribute -->
+  <!-- ExpectedException: foo is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="/">
    <Out>

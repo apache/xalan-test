@@ -9,6 +9,7 @@
   <!-- Purpose: Try to use when outside of choose. -->
   <!-- ExpectedException: (StylesheetHandler) xsl:when not parented by xsl:choose! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:when not parented by xsl:choose! -->
+  <!-- ExpectedException: xsl:when is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="/doc">
   <out>

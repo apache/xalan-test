@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test xsl:if that lacks the required "test" attribute. -->
   <!-- ExpectedException: xsl:if must have a test attribute -->
-
+  <!-- ExpectedException: xsl:if requires attribute: test -->
 <xsl:template match="/">
   <out>
     <xsl:if>

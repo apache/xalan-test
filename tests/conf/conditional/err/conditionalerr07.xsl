@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test attempt to put attribute on xsl:otherwise. -->
   <!-- ExpectedException: xsl:otherwise has an illegal attribute: test -->
+  <!-- ExpectedException: "test" attribute is not allowed on the xsl:otherwise element! -->
 
 <xsl:template match="doc">
   <out>

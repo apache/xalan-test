@@ -7,6 +7,7 @@
   <!-- Section: 2.3 LRE as Stylesheet -->
   <!-- Purpose: See what happens when version number is missing from xsl namespace (above). -->
   <!-- ExpectedException: stylesheet must have a "version" attribute -->
+  <!-- ExpectedException: xsl:stylesheet requires attribute: version -->
 
 <xsl:template match="/">
 <html>

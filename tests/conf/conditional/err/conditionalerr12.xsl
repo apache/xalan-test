@@ -9,6 +9,7 @@
   <!-- Purpose: Try to use otherwise outside of choose. -->
   <!-- ExpectedException: (StylesheetHandler) xsl:otherwise not parented by xsl:choose! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:otherwise not parented by xsl:choose! -->
+  <!-- ExpectedException: xsl:otherwise is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="/doc">
   <out>

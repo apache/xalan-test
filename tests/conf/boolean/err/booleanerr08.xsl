@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of false() with an argument. -->
   <!-- ExpectedException: expected zero arguments -->
+  <!-- ExpectedException: FuncFalse only allows 0 arguments -->
 
 <xsl:template match="/">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Give lang() function too few arguments -->
   <!-- ExpectedException: expected one argument -->
+  <!-- ExpectedException: FuncLang only allows 1 arguments -->
 
 <xsl:template match="/">
   <out><xsl:apply-templates select="doc/p"/></out>

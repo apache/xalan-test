@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of invalid function that resembles "true" in and. -->
   <!-- ExpectedException: XSL Warning: Could not find function: troo -->
+  <!-- ExpectedException: Could not find function: troo -->
 
 <xsl:template match="/">
   <out>

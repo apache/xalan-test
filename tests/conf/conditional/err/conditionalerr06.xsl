@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test bad attribute on xsl:when (only "test" allowed). -->
   <!-- ExpectedException: xsl:when has an illegal attribute: name -->
+  <!-- ExpectedException: "name" attribute is not allowed on the xsl:when element! -->
 
 <xsl:template match="doc">
   <out>

@@ -7,7 +7,7 @@
   <!-- Section: 3.4 -->
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of invalid function that resembles "not". -->
-  <!-- ExpectedException: XSL Warning: Could not find function: nt -->
+  <!-- ExpectedException: Could not find function: nt -->
 
 <xsl:template match="/">
   <out>

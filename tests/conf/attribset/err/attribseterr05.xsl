@@ -8,7 +8,7 @@
   <!-- Purpose: Put illegal instructions in xsl:attribute-set. -->
   <!-- ExpectedException: ElemTemplateElement error: Can not add xsl:apply-templates to xsl:attribute-set -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: ElemTemplateElement error: Can not add xsl:apply-templates to xsl:attribute-set -->
-
+  <!-- ExpectedException: xsl:apply-templates is not allowed in this position in the stylesheet! -->
 <xsl:template match="/">
   <out>
     <xsl:element name="test" use-attribute-sets="set1"/>

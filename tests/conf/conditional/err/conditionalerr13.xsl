@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test xsl:when lacking the "test" attribute. -->
   <!-- ExpectedException: xsl:when must have a 'test' attribute -->
+  <!-- ExpectedException: xsl:when requires attribute: test -->
 
 <xsl:template match="doc">
   <out>

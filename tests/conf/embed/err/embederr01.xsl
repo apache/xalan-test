@@ -11,6 +11,7 @@
   	   containing xsl:key statement -->
   <!-- ExpectedException: (StylesheetHandler) xsl:key is not allowed inside a template! -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: (StylesheetHandler) xsl:key is not allowed inside a template! -->
+  <!-- ExpectedException: xsl:key is not allowed in this position in the stylesheet! -->
 
   <xsl:key name="test" match="para" use="@id"/>
 

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of not() with too many arguments. -->
   <!-- ExpectedException: expected one argument -->
+  <!-- ExpectedException: FuncNot only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

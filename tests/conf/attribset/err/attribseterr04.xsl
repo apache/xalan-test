@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Omit name attribute in xsl:attribute-set. -->
   <!-- ExpectedException: xsl:attribute-set must have a name attribute. -->
-
+  <!-- ExpectedException: xsl:attribute-set requires attribute: name -->
 <xsl:template match="/">
   <out>
     <xsl:element name="test" use-attribute-sets="set1"/>

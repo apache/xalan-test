@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of boolean() with too many arguments. -->
   <!-- ExpectedException: expected one argument -->
+  <!-- ExpectedException: FuncBoolean only allows 1 arguments -->
 
 <xsl:template match="/">
   <out>

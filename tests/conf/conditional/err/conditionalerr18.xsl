@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test xsl:when that has bad content in "test" attribute. -->
   <!-- ExpectedException: Invalid token -->
+  <!-- ExpectedException: Could not find function: &#58490;&#57332; -->
 
 <xsl:template match="doc">
   <out>

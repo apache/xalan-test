@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of true() with an argument. -->
   <!-- ExpectedException: expected zero arguments -->
+  <!-- ExpectedException: FuncTrue only allows 0 arguments -->
 
 <xsl:template match="/">
   <out>

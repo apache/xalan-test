@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test attempt to put attribute on xsl:choose. -->
   <!-- ExpectedException: xsl:choose has an illegal attribute: name -->
+  <!-- ExpectedException: "name" attribute is not allowed on the xsl:choose element! -->
 
 <xsl:template match="doc">
   <out>
