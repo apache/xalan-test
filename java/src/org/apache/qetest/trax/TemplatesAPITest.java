@@ -283,6 +283,20 @@ public class TemplatesAPITest extends XSLProcessorTestBase
                            + simpleTest.inputName);
             reporter.logHashtable(reporter.STATUSMSG, outputFormat,
                                   "getOutputProperties for " + simpleTest.inputName);
+
+            // Check that the local stylesheet.getProperty has default set, cf. getOutputProperties javadoc
+            reporter.check(("xml".equals(outputFormat.getProperty(OutputKeys.METHOD))), true, simpleTest.inputName + ".op.getProperty(" 
+                           + OutputKeys.METHOD + ") is default value, act: " + outputFormat.getProperty(OutputKeys.METHOD));
+            // Check that the local stylesheet.get has nothing set, cf. getOutputProperties javadoc
+            reporter.check((null == outputFormat.get(OutputKeys.METHOD)), true, simpleTest.inputName + ".op.get(" 
+                           + OutputKeys.METHOD + ") is null value, act: " + outputFormat.get(OutputKeys.METHOD));
+
+            // Check that the local stylesheet.getProperty has default set, cf. getOutputProperties javadoc
+            reporter.check(("no".equals(outputFormat.getProperty(OutputKeys.INDENT))), true, simpleTest.inputName + ".op.getProperty(" 
+                           + OutputKeys.INDENT + ") is default value, act: " + outputFormat.getProperty(OutputKeys.INDENT));
+            // Check that the local stylesheet.get has nothing set, cf. getOutputProperties javadoc
+            reporter.check((null == (outputFormat.get(OutputKeys.INDENT))), true, simpleTest.inputName + ".op.get(" 
+                           + OutputKeys.INDENT + ") is null value, act: " + outputFormat.get(OutputKeys.INDENT));
         }
         catch (Exception e)
         {
