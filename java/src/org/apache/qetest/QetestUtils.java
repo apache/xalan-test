@@ -319,16 +319,26 @@ public abstract class QetestUtils
      * <li>org.apache.qetest.xsl</li>
      * <li>org.apache.qetest.xalanj2</li>
      * <li>org.apache.qetest.trax</li>
+     * <li>org.apache.qetest.trax.dom</li>
+     * <li>org.apache.qetest.trax.sax</li>
+     * <li>org.apache.qetest.trax.stream</li>
      * <li>org.apache.qetest.xalanj1</li>
      * <li>org.apache.qetest</li>
      * <li>org.apache.qetest.qetesttest</li>
      * </ul>
+     * Note the normal naming convention for automated tests 
+     * is either *Test.java or *Testlet.java; although this is 
+     * not required, it will make it easier to write simple 
+     * test discovery mechanisims.
      */
     public static final String[] defaultPackages = 
     {
         "org.apache.qetest.xsl", 
         "org.apache.qetest.xalanj2", 
         "org.apache.qetest.trax", 
+        "org.apache.qetest.trax.dom", 
+        "org.apache.qetest.trax.sax", 
+        "org.apache.qetest.trax.stream", 
         "org.apache.qetest.xalanj1", 
         "org.apache.qetest",
         "org.apache.qetest.qetesttest" 
