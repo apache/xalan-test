@@ -1,9 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<out>
-  
-<ext>http://somebody.elses.extension</ext>
-<java>http://xml.apache.org/xslt/java</java>
-<ped>http://tester.com</ped>
-<bdd>http://buster.com</bdd>
-<jad>http://administrator.com</jad>
-</out>
+
+  <NSlist ext="http://somebody.elses.extension" java="http://xml.apache.org/xslt/java" ped="http://tester.com" bdd="http://buster.com" jad="http://administrator.com"/>

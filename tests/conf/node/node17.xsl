@@ -8,17 +8,12 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test that 'namespace::node()' selects all namespaces. -->
 
-<xsl:template match="/">
-  <out>
-    <xsl:apply-templates/>
-  </out>
-</xsl:template>
-
 <xsl:template match="doc">
-  <xsl:for-each select="namespace::node()">
-    <xsl:text>&#010;</xsl:text>
-    <xsl:element name="{name(.)}"><xsl:value-of select="."/></xsl:element>
-  </xsl:for-each>
+  <xsl:element name="NSlist">
+    <xsl:for-each select="namespace::node()">
+      <xsl:attribute name="{name(.)}"><xsl:value-of select="."/></xsl:attribute>
+    </xsl:for-each>
+  </xsl:element>
 </xsl:template>
 
 </xsl:stylesheet>
