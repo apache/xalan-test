@@ -14,11 +14,11 @@
 
 <xsl:param name="w3">http://www.w3.org/</xsl:param>
 <!--
-+++++++++++++++++++++++++
+++++++++++++++++++++++++
 
 Inclusions
 
-+++++++++++++++++++++++++
+++++++++++++++++++++++++
 -->
 
 <xsl:template match="spec" mode="css">
