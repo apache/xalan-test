@@ -65,11 +65,11 @@ package org.apache.qetest;
 /**
  * Simple utility class to manage tests with multiple output names.
  * <p>Starts with a base name and extension, and returns
- * nextName()s like:<br>
- * baseName_1.ext<br>
- * baseName_2.ext<br>
- * baseName_3.ext<br>
- * ...<br>
+ * nextName()s like:<pre>
+ * baseName_<i>1</i>.ext
+ * baseName_<i>2</i>.ext
+ * baseName_<i>3</i>.ext
+ * ...<pre>
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
  */
@@ -99,7 +99,7 @@ public class OutputNameManager
     /**
      * Construct with just a basename.  
      *
-     * NEEDSDOC @param base
+     * @param base basename of file; defaults counter, extension
      */
     public OutputNameManager(String base)
     {
@@ -109,8 +109,8 @@ public class OutputNameManager
     /**
      * Construct with a basename and extension.  
      *
-     * NEEDSDOC @param base
-     * NEEDSDOC @param ext
+     * @param base basename of file; defaults counter
+     * @param ext extension to use instead of .out
      */
     public OutputNameManager(String base, String ext)
     {
@@ -121,9 +121,9 @@ public class OutputNameManager
     /**
      * Construct with a basename, extension, and set the counter.  
      *
-     * NEEDSDOC @param base
-     * NEEDSDOC @param ext
-     * NEEDSDOC @param ctr
+     * @param base basename of file; defaults counter
+     * @param ext extension to use instead of .out
+     * @param ctr number to start output counting from
      */
     public OutputNameManager(String base, String ext, int ctr)
     {
@@ -146,12 +146,12 @@ public class OutputNameManager
     /**
      * Increment counter and get next name.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return the next name in the series
      */
     public String nextName()
     {
 
-        setCounter(counter++);  // Updates names
+        setCounter(counter + 1);  // Updates names
 
         return currentName();
     }
@@ -159,7 +159,7 @@ public class OutputNameManager
     /**
      * Just get the current name.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return our current output name
      */
     public String currentName()
     {
@@ -169,7 +169,7 @@ public class OutputNameManager
     /**
      * Get the previous name, even past a reset().  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return last name we calculated
      */
     public String previousName()
     {
@@ -179,7 +179,7 @@ public class OutputNameManager
     /**
      * Get the current counter number.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return counter
      */
     public int currentCounter()
     {
@@ -189,11 +189,10 @@ public class OutputNameManager
     /**
      * Set the current counter number, including names.  
      *
-     * NEEDSDOC @param ctr
+     * @param ctr new counter number to set
      */
     public void setCounter(int ctr)
     {
-
         counter = ctr;
         previousName = currentName;
         currentName = baseName + SEPARATOR + counter + extension;
