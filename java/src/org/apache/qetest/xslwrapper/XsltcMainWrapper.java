@@ -154,6 +154,8 @@ public class XsltcMainWrapper extends TransformWrapperHelper
      * @param xmlName local path\filename of XML file to transform
      * @param xslName local path\filename of XSL stylesheet to use
      * @param resultName local path\filename to put result in
+     * TWA - temp hack; use results dir to get path for to use for a dir to put
+     * the translets
      *
      * @return array of longs denoting timing of only these parts of 
      * our operation: IDX_OVERALL, IDX_XSLBUILD, IDX_TRANSFORM
@@ -174,10 +176,27 @@ public class XsltcMainWrapper extends TransformWrapperHelper
         // java com.sun.xslt.runtime.DefaultRun play.xml play1 >stdout
 
         // Timed: compile stylesheet class from XSL file
-        String[] args1 = new String[3];
-        args1[0] = "-s"; // Don't allow System.exit
+
+/* TWA - commented out the -u option 
+Problem when local path/file is being used, somewhere a file://// prefix is 
+being appended to the filename and xsltc can't find the file even with the -u
+So as a temp fix - strip off the protocol prefix and pass the local path/file
         args1[1] = "-u"; // Using URIs
-        args1[2] = xslName;
+*/
+/* TWA - temporay hack to construct and pass a directory for translets */
+        int tidx = resultName.indexOf("tests/");
+        String tdir = resultName.substring(0, tidx+6);
+        String transletsdirName = tdir + "translets";
+        String[] args1 = new String[4];
+        args1[0] = "-s";
+        args1[1] = "-d";
+        args1[2] = transletsdirName;
+        args1[3] = xslName;
+        int idx = xslName.indexOf("file:////");
+        if (idx != -1){
+               xslName = new String(xslName.substring(8));
+               args1[3] = xslName;
+        }
         startTime = System.currentTimeMillis();
         /// Transformer transformer = factory.newTransformer(new StreamSource(xslName));
         XSLTC.main(args1);
@@ -185,6 +204,7 @@ public class XsltcMainWrapper extends TransformWrapperHelper
 
         // Verify output file was created
         // WARNING: assumption of / here, which means we assume URI not local path - needs revisiting
+        //TWA - / may mean local file on Unix platform
         int nameStart = xslName.lastIndexOf('/') + 1;
         String baseName = xslName.substring(nameStart);
         int extStart = baseName.lastIndexOf('.');
@@ -195,12 +215,23 @@ public class XsltcMainWrapper extends TransformWrapperHelper
         // applyParameters(transformer);
 
         // Timed: read/build xml, transform, and write results
-        String[] args2 = new String[4];
+
+/* TWA - We shouldn't use the -u option unless we are really using URLs.
+With or without the -u option, the files aree getting a file://// prefix 
+which caused them to be not found
+*/
+
+//        args2[1] = "-u"; // Using URIs
+
+        String[] args2 = new String[3];
         args2[0] = "-s"; // Don't allow System.exit
-        args2[1] = "-u"; // Using URIs
-        args2[2] = xmlName;
-        args2[3] = baseName;    // Just basename of the .class file, without the .class
-                                // Note that . must be on CLASSPATH to work!
+        args2[1] = xmlName;
+        int idx2 = xmlName.indexOf("file:////");
+        if (idx2 != -1){
+               args2[1] = new String(xmlName.substring(8));
+        }
+        args2[2] = baseName;// Just basename of the .class file, without the .class
+                            // Note that . must be on CLASSPATH to work!
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream newSystemOut = new PrintStream(baos);
         PrintStream saveSystemOut = System.out;
@@ -225,8 +256,10 @@ public class XsltcMainWrapper extends TransformWrapperHelper
 
         File compiledXslClass = new File(baseName + ".class");
         //@todo WARNING! We REALLY need to clean up the name*.class files when we're done!!! -sc
-        if (compiledXslClass.exists())
-            compiledXslClass.delete();
+        // TWA - we should probably use the -d option to put them in a desired directory first
+        // I commented out the delete, to see if the translets were getting compiled
+//        if (compiledXslClass.exists())
+//             compiledXslClass.delete();
 
         long[] times = getTimeArray();
         times[IDX_OVERALL] = xslBuild + transform;
