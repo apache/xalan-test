@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- FileName: copy01 -->
+  <!-- FileName: copy31 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.5 -->
-  <!-- Creator: Paul Dick -->
-  <!-- Purpose: Test for simple identity transformation with template match -->
+  <!-- Creator: David Marston -->
+  <!-- Purpose: Test for xsl:copy-of with nodeset. Shows handling of namespaces. -->
 
 <xsl:template match="/">
   <out>
@@ -14,9 +14,9 @@
   </out>
 </xsl:template>
 
-<xsl:template match="@*|comment()|processing-instruction()|text()|*">
+<xsl:template match='node()|@*'>
   <xsl:copy>
-    <xsl:apply-templates select="@*|comment()|processing-instruction()|text()|*"/>
+    <xsl:apply-templates select='node()|@*'/>
   </xsl:copy>
 </xsl:template>
 
