@@ -61,6 +61,8 @@ import org.apache.xalan.xslt.Process;
 
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Implementation of TransformWrapper that calls Xalan's default 
@@ -69,18 +71,24 @@ import java.util.Properties;
  * This is similar to the common usage:
  * java org.apache.xalan.xslt.Process -in foo.xml -xsl foo.xsl ...
  *
- * //@todo support other command line options
+ * See OPT_PREFIX for how to pass miscellaneous cmdline args.
+ *
  * //@todo support precompiled/serialized stylesheets
  *
- * @author Shane Curcuru
+ * @author Shane_Curcuru@us.ibm.com
  * @version $Id$
  */
 public class XalanProcessWrapper extends TransformWrapperHelper
 {
 
     /**
-     * Array of additional or optional args for Process.main() calls.
-     * //@todo not yet supported; futureuse for -validate, -edump, etc.
+     * Marker for cmdline items to add to optionArgs.  
+     */
+    public static final String OPT_PREFIX = TransformWrapper.SET_PROCESSOR_ATTRIBUTES + "cmdline";
+
+
+    /**
+     * Array of additional or optional args for Process.main() calls.  
      */
     protected String[] optionArgs = new String[0];
 
@@ -136,6 +144,36 @@ public class XalanProcessWrapper extends TransformWrapperHelper
     public Object newProcessor(Hashtable options) throws Exception
     {
         newProcessorOpts = options;
+        
+        // semi-HACK: set any additional cmdline options from user
+        String extraOpts = null;
+        try
+        {
+            // Attempt to use as a Properties block..
+            extraOpts = ((Properties)options).getProperty(OPT_PREFIX);
+            // But, if null, then try getting as hash anyway
+            if (null == extraOpts)
+            {
+                extraOpts = (String)options.get(OPT_PREFIX);
+            }
+        }
+        catch (ClassCastException cce)
+        {
+            // .. but fallback to get as Hashtable instead
+            extraOpts = (String)options.get(OPT_PREFIX);
+        }
+
+        if ((null != extraOpts) && (extraOpts.length() > 0))
+        {
+            Vector v = new Vector();
+            StringTokenizer st = new StringTokenizer(extraOpts, " ");
+            while (st.hasMoreTokens())
+            {
+                v.addElement(st.nextToken());
+            }
+            optionArgs = new String[v.size()];
+            v.copyInto(optionArgs);
+        }
         //@todo do we need to do any other cleanup?
         reset(false);
         return null;
