@@ -55,7 +55,7 @@
  * <http://www.apache.org/>.
  */
 
-package org.apache.qetest;
+package org.apache.qetest.xsl;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.FileNotFoundException;
