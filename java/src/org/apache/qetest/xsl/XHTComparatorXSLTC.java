@@ -272,7 +272,7 @@ public class XHTComparatorXSLTC extends XHTComparator
 	    }
 
 	    // Remove NS declarations from test attribute list
-	    nsDeclarations.clear();
+	    nsDeclarations.removeAllElements(); // Use JDK 1.1.x methods
 	    length = testAttrs.getLength();
 	    for (int i = 0; i < length; i++) {
 		final String name = testAttrs.item(i).getNodeName();
