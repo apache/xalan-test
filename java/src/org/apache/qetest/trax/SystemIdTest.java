@@ -268,18 +268,34 @@ public class SystemIdTest extends XSLProcessorTestBase
 
         String xslTestIds[][] = 
         {
+            // { systemId to test,
+            //   description of the test,
+            //   expected XSL behavior or exception, 
+            //   expected XSL inner exception, 
+            //   expected XML behavior or exception, 
+            //   expected XML inner exception
+            // }
+
             // Test variations on the inputDir specified by the 
             //  user, to be able to do some adhoc testing
             { "file:///" + inputDirPath, 
             "file:///, user-specified inputDir, /blah1[1a]",
             EXPECTED_RESULT_UNKNOWN,
+            null,
+            EXPECTED_RESULT_UNKNOWN,
             null },
+
             { "file://localhost/" + inputDirPath, 
             "file://localhost/, user-specified inputDir, /blah[1b]",
             EXPECTED_RESULT_UNKNOWN,
+            null,
+            EXPECTED_RESULT_UNKNOWN,
             null },
+
             { inputDirPath, 
             "Just user-specified inputDir, /blah (works normally, if relative)[1c]",
+            EXPECTED_RESULT_UNKNOWN,
+            null,
             EXPECTED_RESULT_UNKNOWN,
             null },
 
@@ -288,13 +304,21 @@ public class SystemIdTest extends XSLProcessorTestBase
             { "file:///" + userDirPath, 
             "file:///, System(user.dir), /blah (works normally)[2a]",
             userDirExpected,
+            null,
+            userDirExpected,
             null },
+
             { "file://localhost/" + userDirPath, 
             "file://localhost/, System(user.dir), /blah (works normally)[2b]",
             userDirExpected,
+            null,
+            userDirExpected,
             null },
+
             { userDirPath, 
             "Just System(user.dir), /blah[2c]",
+            EXPECTED_RESULT_UNKNOWN,
+            null,
             EXPECTED_RESULT_UNKNOWN,
             null },
 
@@ -303,6 +327,8 @@ public class SystemIdTest extends XSLProcessorTestBase
                          + "/tests/./api/" + TRAX_SUBDIR + "/" + knownGoodBaseName, 
             "file:///, System(user.dir), /./blah (???)[2d]",
             userDirExpected,
+            null,
+            userDirExpected,
             null },
 
             // Absolute path with up/down steps
@@ -310,15 +336,22 @@ public class SystemIdTest extends XSLProcessorTestBase
                          + "/tests/../tests/api/" + TRAX_SUBDIR + "/" + knownGoodBaseName, 
             "file:///, System(user.dir), /updir/../downdir/blah (???)[2e]",
             userDirExpected,
+            null,
+            userDirExpected,
             null },
 
             // Just relative paths, should work if user.dir correct
             { "file:tests/api/" + TRAX_SUBDIR + "/" + knownGoodBaseName, 
             "Just file:/blah relative path[3a]",
             userDirExpected,
+            null,
+            userDirExpected,
             null },
+
             { "tests/api/" + TRAX_SUBDIR + "/" + knownGoodBaseName, 
             "Just /blah relative path[3b]",
+            userDirExpected,
+            null,
             userDirExpected,
             null },
 
@@ -327,10 +360,15 @@ public class SystemIdTest extends XSLProcessorTestBase
             { "file://" + userDirPath, 
             "file://, System(user.dir), /blah (causes hostname error)[4a]",
             "javax.xml.transform.TransformerConfigurationException", 
+            "java.net.UnknownHostException",
+            "javax.xml.transform.TransformerException", 
             "java.net.UnknownHostException" },
+
             { "file://" + inputDirPath, 
             "file://, user-specified inputDir, /blah (causes hostname error)[4b]",
             "javax.xml.transform.TransformerConfigurationException", 
+            "java.net.UnknownHostException",
+            "javax.xml.transform.TransformerException", 
             "java.net.UnknownHostException" },
 
             // file://host.does.not.exist/blah should fail, here we 
@@ -338,20 +376,30 @@ public class SystemIdTest extends XSLProcessorTestBase
             { "file://this.host.does.not.exist/" + userDirPath, 
             "file://this.host.does.not.exist/userDir/blah (causes hostname error)[4c]",
             "javax.xml.transform.TransformerConfigurationException: this.host.does.not.exist", 
-            "java.net.UnknownHostException: this.host.does.not.exist" },
+            "java.net.UnknownHostException: this.host.does.not.exist",
+            "javax.xml.transform.TransformerException: this.host.does.not.exist", 
+            "java.net.UnknownHostException" },
+
             { "file://this.host.does.not.exist/" + inputDirPath, 
             "file://this.host.does.not.exist/inputDir/blah (causes hostname error)[4d]",
             "javax.xml.transform.TransformerConfigurationException: this.host.does.not.exist", 
-            "java.net.UnknownHostException: this.host.does.not.exist" },
+            "java.net.UnknownHostException: this.host.does.not.exist",
+            "javax.xml.transform.TransformerException: this.host.does.not.exist", 
+            "java.net.UnknownHostException" },
             
 
             // Too few leading slashes for the file: spec, probably error
             { "file:/" + userDirPath, 
             "file:/, System(user.dir), /blah (probable error)[5a]",
             EXPECTED_RESULT_UNKNOWN,
+            null,
+            EXPECTED_RESULT_UNKNOWN,
             null },
+
             { "file:/" + inputDirPath, 
             "file:/, user-specified inputDir, /blah (probable error)[5b]",
+            EXPECTED_RESULT_UNKNOWN,
+            null,
             EXPECTED_RESULT_UNKNOWN,
             null },
 
@@ -359,9 +407,14 @@ public class SystemIdTest extends XSLProcessorTestBase
             { "file:" + userDirPath, 
             "file:, System(user.dir), /blah (probable error)[6a]",
             EXPECTED_RESULT_UNKNOWN,
+            null,
+            EXPECTED_RESULT_UNKNOWN,
             null },
+
             { "file:" + inputDirPath, 
             "file:, user-specified inputDir, /blah (probable error)[6b]",
+            EXPECTED_RESULT_UNKNOWN,
+            null,
             EXPECTED_RESULT_UNKNOWN,
             null },
             
@@ -369,13 +422,17 @@ public class SystemIdTest extends XSLProcessorTestBase
             // Using backslashes in the path portion is explicitly
             //  forbidden in the RFC, should give error            
             { "file:///" + userDirPath.replace('/', '\\'),
-            "file:///, System(user.dir) \blah, (causes error)[7a]",
+            "file:///, System(user.dir) \\blah, (backslashes are illegal)[7a]",
+            EXPECTED_RESULT_UNKNOWN,
+            null,
             EXPECTED_RESULT_UNKNOWN,
             null },
             { "file:///" + inputDirPath.replace('/', '\\'),
-            "file:///, user-specified inputDir \blah (causes error)[7b]",
+            "file:///, user-specified inputDir \\blah (backslashes are illegal)[7b]",
             EXPECTED_RESULT_UNKNOWN,
-            null },
+            null,
+            EXPECTED_RESULT_UNKNOWN,
+            null }
         };
 
         for (int i = 0; i < xslTestIds.length; i++)
@@ -392,7 +449,7 @@ public class SystemIdTest extends XSLProcessorTestBase
             // Loop and attempt to do a transform of an xml 
             //  document with each, using known-good stylesheet
             testTransformWithSystemId(xslTestIds[i][0] + ".xml", xslTestIds[i][1], 
-                                      xslTestIds[i][2], xslTestIds[i][3]);
+                                      xslTestIds[i][4], xslTestIds[i][5]);
         }
 
         reporter.testCaseClose();
