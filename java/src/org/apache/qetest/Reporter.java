@@ -1114,6 +1114,54 @@ public class Reporter implements Logger
     //-----------------------------------------------------
     // There is no public void checkIncp(String comment) method
 
+    /* EXPERIMENTAL: have duplicate set of check*() methods 
+       that all output some form of ID as well as comment. 
+       Leave the non-ID taking forms for both simplicity to the 
+       end user who doesn't care about IDs as well as for 
+       backwards compatibility.
+    */
+
+    /**
+     * Writes out a Pass record with comment.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the pass record.
+     */
+    public void checkPass(String comment)
+    {
+        checkPass(comment, null);
+    }
+
+    /**
+     * Writes out an ambiguous record with comment.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment to log with the ambg record.
+     */
+    public void checkAmbiguous(String comment)
+    {
+        checkAmbiguous(comment, null);
+    }
+
+    /**
+     * Writes out a Fail record with comment.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the fail record.
+     */
+    public void checkFail(String comment)
+    {
+        checkFail(comment, null);
+    }
+    
+
+    /**
+     * Writes out an Error record with comment.
+     * @author Shane_Curcuru@lotus.com
+     * @param comment comment to log with the error record.
+     */
+    public void checkErr(String comment)
+    {
+        checkErr(comment, null);
+    }
+
     /**
      * Writes out a Pass record with comment.
      * A Pass signifies that an individual test point has completed and has
@@ -1126,8 +1174,9 @@ public class Reporter implements Logger
      * that if a test never calls check*(), it will have an incomplete result.</p>
      * @author Shane_Curcuru@lotus.com
      * @param comment to log with the pass record.
+     * @param ID token to log with the pass record.
      */
-    public void checkPass(String comment)
+    public void checkPass(String comment, String id)
     {
 
         // Increment our results counters 
@@ -1138,7 +1187,7 @@ public class Reporter implements Logger
         {
             for (int i = 0; i < numLoggers; i++)
             {
-                loggers[i].checkPass(comment);
+                loggers[i].checkPass(comment, id);
             }
         }
 
@@ -1157,8 +1206,9 @@ public class Reporter implements Logger
      * 'gold' result to compare it to.</p>
      * @author Shane_Curcuru@lotus.com
      * @param comment to log with the ambg record.
+     * @param ID token to log with the pass record.
      */
-    public void checkAmbiguous(String comment)
+    public void checkAmbiguous(String comment, String id)
     {
 
         // Increment our results counters 
@@ -1166,7 +1216,7 @@ public class Reporter implements Logger
 
         for (int i = 0; i < numLoggers; i++)
         {
-            loggers[i].checkAmbiguous(comment);
+            loggers[i].checkAmbiguous(comment, id);
         }
 
         caseResult = java.lang.Math.max(AMBG_RESULT, caseResult);
@@ -1183,8 +1233,9 @@ public class Reporter implements Logger
      * been verified to have behaved <B>in</B>correctly.</p>
      * @author Shane_Curcuru@lotus.com
      * @param comment to log with the fail record.
+     * @param ID token to log with the pass record.
      */
-    public void checkFail(String comment)
+    public void checkFail(String comment, String id)
     {
 
         // Increment our results counters 
@@ -1192,7 +1243,7 @@ public class Reporter implements Logger
 
         for (int i = 0; i < numLoggers; i++)
         {
-            loggers[i].checkFail(comment);
+            loggers[i].checkFail(comment, id);
         }
 
         caseResult = java.lang.Math.max(FAIL_RESULT, caseResult);
@@ -1209,8 +1260,9 @@ public class Reporter implements Logger
      * debug to see what really happened.</p>
      * @author Shane_Curcuru@lotus.com
      * @param comment to log with the error record.
+     * @param ID token to log with the pass record.
      */
-    public void checkErr(String comment)
+    public void checkErr(String comment, String id)
     {
 
         // Increment our results counters 
@@ -1218,7 +1270,7 @@ public class Reporter implements Logger
 
         for (int i = 0; i < numLoggers; i++)
         {
-            loggers[i].checkErr(comment);
+            loggers[i].checkErr(comment, id);
         }
 
         caseResult = java.lang.Math.max(ERRR_RESULT, caseResult);
@@ -1381,6 +1433,15 @@ public class Reporter implements Logger
     }
 
     /**
+     * Accessor for current test case's description, read-only.
+     * @return current test case result.
+     */
+    public String getCurrentCaseComment()
+    {
+        return caseComment;
+    }
+
+    /**
      * Accessor for overall test file result, read-only.
      * @return test file's overall result.
      */
@@ -1392,8 +1453,8 @@ public class Reporter implements Logger
     /**
      * Utility method to log out overall result counters.  
      *
-     * NEEDSDOC @param count
-     * NEEDSDOC @param desc
+     * @param count number of this kind of result
+     * @param desc description of this kind of result
      */
     protected void logResultsCounter(int count, String desc)
     {
@@ -1897,15 +1958,15 @@ public class Reporter implements Logger
      * @author Shane_Curcuru@lotus.com
      * @param CheckService implementation to use
      *
-     * NEEDSDOC @param service
+     * @param service a non-null CheckService implementation for 
+     * this type of actual and expected object
      * @param actual Object returned from your test code.
      * @param expected Object that test should return to pass.
      * @param comment to log out with result.
+     * @return status true if PASS_RESULT, false otherwise
      * @see #checkPass
      * @see #checkFail
      * @see #check
-     *
-     * NEEDSDOC ($objectName$) @return
      */
     public boolean check(CheckService service, Object actual,
                          Object expected, String comment)
@@ -1919,6 +1980,27 @@ public class Reporter implements Logger
         }
 
         if (service.check(this, actual, expected, comment) == PASS_RESULT)
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * Uses an external CheckService to Compares actual and expected,
+     * and logs the result, pass/fail.
+     */
+    public boolean check(CheckService service, Object actual,
+                         Object expected, String comment, String id)
+    {
+
+        if (service == null)
+        {
+            checkErr("CheckService null for: " + comment);
+
+            return false;
+        }
+
+        if (service.check(this, actual, expected, comment, id) == PASS_RESULT)
             return true;
         else
             return false;
