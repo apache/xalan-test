@@ -130,12 +130,13 @@ public class PerfTestlet extends StylesheetTestlet
         // Setup: store various XalanC-like timing data in convenience variables
 		long warmup = 0L;			// First transform. Used to load classes.
         long singletransform = 0L;  // Very first Preload end-to-end transform
-        long etoe = 0L;     // First end-to-end transform during iterations
-        long avgetoe = 0L;  // Average of end-to-end transforms during iterations
-        long parsexsl = 0L;     // First stylesheet preprocess during iterations
-        long avgparsexsl = 0L;  // Average of stylesheet preprocess during iterations
-        long unparsedxml = 0L;   // First stylesheet process during iterations
-        long avgunparsedxml = 0L;// Average of stylesheet process during iterations
+        long etoe = 0L;     		// First end-to-end transform during iterations
+        long avgetoe = 0L;  		// Average of end-to-end transforms during iterations
+        long parsexsl = 0L;     	// First stylesheet preprocess during iterations
+        long avgparsexsl = 0L;  	// Average of stylesheet preprocess during iterations
+        long unparsedxml = 0L;   	// First stylesheet process during iterations
+        long transxml = 0L;			// Transform w/Stylesheet - NO OUTPUT
+		long transxmloutput = 0L; 	// Transform w/Stylesheet - OUTPUT
 
         //logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
         //              + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
@@ -175,10 +176,16 @@ public class PerfTestlet extends StylesheetTestlet
             avgparsexsl += times[TransformWrapper.IDX_OVERALL];
             logMemory(runtimeGC, false);
 
-            // Measure(avgunparsedxml): average process
+            // Measure(avgunparsedxml): getTransformer + xmlRead + transform 
             times = transformWrapper.transformWithStylesheet(datalet.xmlName, datalet.outputName);
-            avgunparsedxml += times[TransformWrapper.IDX_OVERALL];
+            transxml += times[TransformWrapper.IDX_TRANSFORM];
             logMemory(runtimeGC, false);
+
+            // Measure(avgunparsedxml): getTransformer + xmlRead + transform + resultWrite
+            times = transformWrapper.transformWithStylesheet(datalet.xmlName, datalet.outputName);
+            transxmloutput += times[TransformWrapper.IDX_OVERALL];
+            logMemory(runtimeGC, false);
+
         }
 
         // Measure(etoe): once: first full process
@@ -226,7 +233,7 @@ public class PerfTestlet extends StylesheetTestlet
         attrs.put("parsexsl", new Long(parsexsl)); // First stylesheet preprocess during iterations
         attrs.put("avgparsexsl", new Long(avgparsexsl / iterations)); // Average of stylesheet preprocess during iterations
         attrs.put("unparsedxml", new Long(unparsedxml)); // First stylesheet process during iterations
-        attrs.put("avgunparsedxml", new Long(avgunparsedxml / iterations)); // Average of stylesheet process during iterations
+        attrs.put("transxml", new Long(transxml / iterations)); // Average of stylesheet process during iterations
 
 		// Additional metrics for data throughput
 		File fIn = new File(datalet.inputName);
@@ -242,14 +249,33 @@ public class PerfTestlet extends StylesheetTestlet
 		attrs.put("BytesOut", new Long(btOut));
 		fOutStrm.close();
 
-		// Calculate thruput as Kb/sec. This is based on DataPower code.
-		double thruPut = (double)(1000 * (btIn + btOut)) / (double)(1024 * 2 * avgunparsedxml);
+		// I've added additional measurments.  DP calculated KBs as ((Ki+Ko)/2)/sec.
+		// I now calculate it with the following (Ki+K0)/sec
 
+		// Calculate TRANSFORM thruput (Kb/sec). Based on DataPower; does NOT file I/O
+		double KBtdp = (double)(1000 * (btIn + btOut)) / (double)(1024 * 2 * transxml);
 		DecimalFormat fmt = new DecimalFormat("####.##");
-		StringBuffer x = new StringBuffer( fmt.format(thruPut));
-		attrs.put("KBs", x); 
+		StringBuffer x = new StringBuffer( fmt.format(KBtdp));
+		attrs.put("KBtdp", x); 
 
-        //logger.logElement(Logger.STATUSMSG, "perf", attrs, "PItr;");
+		// Calculate OVERALL thruput (Kb/sec). Based on DataPower; does include file I/O
+		double KBtsdp = (double)(1000 * (btIn + btOut)) / (double)(1024 * 2 * transxmloutput);
+		//DecimalFormat fmt = new DecimalFormat("####.##");
+		x = new StringBuffer(fmt.format(KBtsdp));
+		attrs.put("KBtsdp", x); 
+
+		// Calculate TRANSFORM thruput (Kb/sec). Based on ped; does NOT file I/O
+		double KBtPD = (double)(1000 * (btIn + btOut)) / (double)(1024 * transxml);
+		//DecimalFormat fmt = new DecimalFormat("####.##");
+		x = new StringBuffer(fmt.format(KBtPD));
+		attrs.put("KBtPD", x); 
+
+		// Calculate OVERALL thruput (Kb/sec). Based on ped; does include file I/O
+		double KBtsPD = (double)(1000 * (btIn + btOut)) / (double)(1024 * transxmloutput);
+		//DecimalFormat fmt = new DecimalFormat("####.##");
+		x = new StringBuffer(fmt.format(KBtsPD));
+		attrs.put("KBtsPD", x); 
+
 		logger.logElement(Logger.STATUSMSG, "perf", attrs, fIn.getName());
     }
 
