@@ -101,6 +101,14 @@ import java.lang.reflect.Method;
 
 /**
  * API coverage testing of TransformState interface.
+ * Currently this focuses on dumping debug information about 
+ * a TransformState while transforming several different 
+ * stylesheets; manual validation of the output results 
+ * to see what was traced) is expected.
+ * Future work will add basic validation of 
+ * various ExpectedTransformState objects, which will be 
+ * keyed off of the ContentHandler event and the line/column 
+ * information of the pertinent element or template. 
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
@@ -108,18 +116,13 @@ public class TransformStateAPITest extends XSLProcessorTestBase
         implements ContentHandler, TransformerClient
 
 {
-    /**
-     * Provides nextName(), currentName() functionality for tests 
-     * that may produce any number of output files.
-     */
+    /** Provides nextName(), currentName() functionality.  */
     protected OutputNameManager outNames;
 
-    /** 
-     * Identity transform - simple test.  
-     */
+    /** Identity transform - simple test.  */
     protected XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
 
-    /**  Another simple test.  */
+    /**  RootTemplate: simple stylesheet with xsl:template select="/".  */
     protected XSLTestfileInfo testFileInfo2 = new XSLTestfileInfo();
 
     /**  Another simple test for manual debugging.  */
@@ -271,7 +274,7 @@ public class TransformStateAPITest extends XSLProcessorTestBase
             reporter.logInfoMsg("---- doTransform:" + options); // options otherwise currently unused
             reporter.logTraceMsg("---- About to newTransformer " + inputURL);
             Transformer transformer = factory.newTransformer(new StreamSource(inputURL));
-            reporter.logTraceMsg("---- About to transform " + xmlURL + " into: SAXResult(this)");
+            reporter.logTraceMsg("---- About to transform " + xmlURL + " into: SAXResult(this-no disk output)");
             transformer.transform(new StreamSource(xmlURL),
                                   new SAXResult(this)); // use us to handle result
             reporter.logInfoMsg("---- Afterwards, this.transformState=" + transformState);
@@ -309,19 +312,22 @@ public class TransformStateAPITest extends XSLProcessorTestBase
         return lastItem;
     }
 
-    /** Cheap-o static counter to detect multithreading.  */
-    static int validateTransformStateCtr = 0;
-
-    /** Worker routine to validate a TransformState based on an event/value.  */
-    protected synchronized void validateTransformState(TransformState ts, String event, String value)
+    /** 
+     * Worker routine to validate a TransformState based on an event/value.  
+     * Note: this may not be threadsafe!
+     * //@todo actually add validation code - just logs out now
+     * @param ts TransformState to validate, if null, just logs it
+     * @param event our String constant of START_ELEMENT, etc.
+     * @param value any String value of the current event 
+     */
+    protected void validateTransformState(TransformState ts, String event, String value)
     {
-        validateTransformStateCtr++;
         if(null == transformState)
         {
-            reporter.logTraceMsg("validateTransformState" + validateTransformStateCtr + "(" + event + ")=" + value);
+            reporter.logTraceMsg("validateTransformState(ts-NULL!, " + event + ")=" + value);
             return;
         }
-        reporter.logTraceMsg("validateTransformState" + validateTransformStateCtr + "(" + event + ")=" + value);
+        reporter.logTraceMsg("validateTransformState(" + event + ")=" + value);
         logTransformStateDump(reporter, traceLoggingLevel, ts, event);
         //@todo: implement validation service for this stuff
         //  focus on what tooling/debugging clients will want to see
@@ -363,7 +369,6 @@ public class TransformStateAPITest extends XSLProcessorTestBase
     protected void logTransformStateDump(Reporter reporter, int traceLoggingLevel, 
             TransformState ts, String event)
     {
-        reporter.logTraceMsg("//@todo HACK debug logTransformStateDump " + event);
         String elemName = "transformStateDump";
         Hashtable attrs = new Hashtable();
         attrs.put("event", event);
