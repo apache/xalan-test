@@ -17,6 +17,7 @@
 <xsl:template match="*">
   <xsl:element name="{name(.)}">
      <xsl:for-each select="namespace::*">
+		<xsl:sort select="name(.)"/>
         <xsl:element name="{name(.)}"><xsl:value-of select="."/></xsl:element>
      </xsl:for-each>
   </xsl:element>
