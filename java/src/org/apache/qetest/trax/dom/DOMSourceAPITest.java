@@ -117,7 +117,7 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public DOMSourceAPITest()
     {
-        numTestCases = 2;  // REPLACE_num
+        numTestCases = 3;  // REPLACE_num
         testName = "DOMSourceAPITest";
         testComment = "API Coverage test for the DOMSource class of TRAX";
     }
