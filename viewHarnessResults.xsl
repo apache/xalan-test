@@ -32,6 +32,20 @@
             <xsl:attribute name="href">#<xsl:value-of select="@fileRef"/></xsl:attribute>
             <xsl:value-of select="@fileRef"/>
           </xsl:element>
+          <xsl:text>  test result: </xsl:text>
+          <xsl:variable name="testResult" select="document(@fileRef)/resultsfile/testfile/fileresult/@result"/>
+          <xsl:choose>
+            <xsl:when test="$testResult=$FAIL">
+              <!-- can't reference $errfailcolor since it's not in scope here -->
+              <FONT color="red"><xsl:value-of select="$testResult"/></FONT>
+            </xsl:when>
+            <xsl:when test="$testResult != $PASS">
+              <I><xsl:value-of select="$testResult"/></I>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$testResult"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </LI>
       </xsl:for-each>
     </UL>
