@@ -92,6 +92,8 @@ dependencies - users must manually 'build jar' first.
 
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
+    <property name="xalan.unbundled.jar" 
+            value="${xalan.build.dir}/xalan-unbundled.jar"/>
     <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
     <property name="xml-apis.jar" value="${xalan.bin.dir}/xml-apis.jar"/>
@@ -196,6 +198,17 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${parserjar}" />
     </path>
 
+    <!-- Gump build xml-xalan2-smoketest should use xalan.unbundled.jar -->
+    <path id="boot.class.path.gump">
+        <pathelement location="${xalan.unbundled.jar}" />
+        <pathelement location="${xsltc.jar}" />  <!-- add this so we can test the
+                                                      separate jar distribution -->  
+        <pathelement location="${ser.jar}" />                                                       
+        <pathelement location="${java.class.path}" />
+        <pathelement location="${xml-apis.jar}" />
+        <pathelement location="${parserjar}" />
+    </path>
+    
     <!-- Classpath used when running perf or performance tests -->
     <path id="perf.class.path">
         <path refid="conf.class.path" />
@@ -251,16 +264,48 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="run.xalantest" depends="run.xalantest.default,run.xalantest.transfact"/>
 
-    <target name="run.xalantest.default" unless="sysprop.transfact" >
+    <target name="run.xalantest.default" unless="sysprop.transfact" >       
+        <antcall target="run.xalantest.default.gump"/>
+        <antcall target="run.xalantest.default.normal"/>
+    </target>
+ 
+    <target name="run.xalantest.default.gump" if="gump" >
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="${xalantest.classpathref}"
+            bootclasspathref="boot.class.path.gump"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" />
+    </target>
+
+    <target name="run.xalantest.default.normal" unless="gump" >
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="${xalantest.classpathref}"
             bootclasspathref="boot.class.path"
             fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+            failonerror="${fail-on-error}" />    
     </target>
 
     <target name="run.xalantest.transfact" if="sysprop.transfact" >
+        <antcall target="run.xalantest.transfact.gump"/>
+        <antcall target="run.xalantest.transfact.normal"/>
+    </target>
+
+    <target name="run.xalantest.transfact.gump" if="gump">
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="${xalantest.classpathref}"
+            bootclasspathref="boot.class.path.gump"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" >
+            <!-- Explicitly set TransformerFactory property to use -->
+            <sysproperty key="javax.xml.transform.TransformerFactory"
+                         value="${sysprop.transfact}" />
+        </xalantest>
+    </target>
+
+    <target name="run.xalantest.transfact.normal" unless="gump">
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="${xalantest.classpathref}"
@@ -270,10 +315,27 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use -->
             <sysproperty key="javax.xml.transform.TransformerFactory"
                          value="${sysprop.transfact}" />
+        </xalantest>    
+    </target>
+    
+    <target name="run.xalan-extension-test" >
+        <antcall target="run.xalan-extension-test.gump"/>
+        <antcall target="run.xalan-extension-test.normal"/>
+    </target>
+
+    <target name="run.xalan-extension-test.gump" if="gump">
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="${xalantest.classpathref}"
+            bootclasspathref="boot.class.path.gump"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" >
+            <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
+                         value="${sysprop.BSFManager}" />
         </xalantest>
     </target>
 
-    <target name="run.xalan-extension-test" >
+    <target name="run.xalan-extension-test.normal" unless="gump">
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="${xalantest.classpathref}"
@@ -282,7 +344,7 @@ dependencies - users must manually 'build jar' first.
             failonerror="${fail-on-error}" >
             <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
                          value="${sysprop.BSFManager}" />
-        </xalantest>
+        </xalantest>    
     </target>
 
     <!-- ================================================================== -->
@@ -591,7 +653,10 @@ dependencies - users must manually 'build jar' first.
 
     <target name="minitest.gump" 
             description="Compile and Run the Xalan-J 2.x Minitest"
-            depends="jar,minitest">
+            depends="jar">
+       <antcall target="minitest">
+         <param name="gump" value="boot.class.path.gump"/>
+       </antcall>            
     </target>
     <target name="minitest-execute">
         <echo message="About to execute the Minitest..." />
@@ -634,14 +699,30 @@ dependencies - users must manually 'build jar' first.
         -->
     </target>
     <target name="smoketest.gump" 
-            description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies"
-            depends="jar,minitest-execute,extensions.classes,smoketest-execute,smoketest-results-dist,dist-nodeps,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
+            description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies">
+       <antcall target="minitest.gump">
+         <param name="gump" value="boot.class.path.gump"/>
+       </antcall>    
+       <antcall target="extensions.classes"/>      
+       <antcall target="smoketest-execute.gump">
+         <param name="gump" value="boot.class.path.gump"/>
+       </antcall>  
+       
         <!-- This compiles the minimum to run the smoketests, runs them, 
              and creates distros just of the results and existing tree, 
              without actually running the docs - this is to ensure that 
              doc build errors in the tests won't affect GUMP runs.
         -->
     </target>
+    
+    <!-- This target smoketest-execute.gump is a subtarget which is called
+         from smoketest.gump. 
+    -->
+    <target name="smoketest-execute.gump" 
+            description="Run the Xalan-J 2.x Smoketest for Gump build "
+            depends="smoketest-execute,smoketest-results-dist,dist-nodeps,
+            smoketest-notpass,smoketest-pass">
+    </target>    
 
     <target name="smoketest-execute">
         <echo message="About to execute Conformance tests..." />
