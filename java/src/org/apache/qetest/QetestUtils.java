@@ -62,7 +62,11 @@ import java.io.IOException;
 
 /**
  * Static utility class for both general-purpose testing methods 
- * and a few XML-specific methods.
+ * and a few XML-specific methods.  
+ * Also provides a simplistic Test/Testlet launching helper 
+ * functionality.  Simply execute this class from the command 
+ * line with a full or partial classname (in the org.apache.qetest 
+ * area, obviously) and we'll load and execute that class instead.
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
@@ -239,4 +243,95 @@ public abstract class QetestUtils
         else
             return formatter.format(new java.util.Date());
     }
+
+
+    /**
+     * Main method to run from the command line - this acts 
+     * as a cheap launching mechanisim for Xalan tests.  
+     * 
+     * Simply finds the class specified in the first argument, 
+     * instantiates one, and passes it any remaining command 
+     * line arguments we were given.  
+     * The primary motivation here is to provide a simpler 
+     * command line for inexperienced  users.  You can either 
+     * pass the FQCN, or just the classname and it will still 
+     * get run.  Note the one danger is the order of package 
+     * lookups and the potential for the wrong class to run 
+     * when we have identically named classes in different 
+     * packages - but this will usually work!
+     * 
+     * @param args command line argument array
+     */
+    public static void main(String[] args)
+    {
+        if (args.length < 1)
+        {
+            System.err.println("QetestUtils.main() ERROR in usage: must have at least one arg: classname [options]");
+            return;
+        }
+
+        // Get the class specified by the first arg...
+        Class clazz = QetestUtils.testClassForName(
+                args[0], defaultPackages, null); // null = no default class
+        if (null == clazz)
+        {
+            System.err.println("QetestUtils.main() ERROR: Could not find class:" + args[0]);
+            return;
+        }
+
+        try
+        {
+            // ...find the main() method...
+            Class[] parameterTypes = new Class[1];
+            parameterTypes[0] = java.lang.String[].class;
+            java.lang.reflect.Method main = clazz.getMethod("main", parameterTypes);
+            
+            // ...copy over our remaining cmdline args...
+            final String[] appArgs = new String[(args.length) == 1 ? 0 : args.length - 1];
+            if (args.length > 1)
+            {
+                System.arraycopy(args, 1, 
+                                 appArgs, 0, 
+                                 args.length - 1);
+            }
+
+            // ...and execute the method!
+            Object[] mainArgs = new Object[1];
+            mainArgs[0] = appArgs;
+            main.invoke(null, mainArgs);
+        }
+        catch (Throwable t)
+        {
+            System.err.println("QetestUtils.main() ERROR: running " + args[0] 
+                    + ".main() threw: " + t.toString());
+            t.printStackTrace();
+        }        
+    }
+
+
+    /** 
+     * Default list of packages for xml-xalan tests.  
+     * Technically this is Xalan-specific and should really be 
+     * in some other directory, but I'm being lazy tonight.
+     * This looks for Xalan-related tests in the following 
+     * packages in <b>this order</b>:
+     * <ul>
+     * <li>org.apache.qetest.xsl</li>
+     * <li>org.apache.qetest.xalanj2</li>
+     * <li>org.apache.qetest.trax</li>
+     * <li>org.apache.qetest.xalanj1</li>
+     * <li>org.apache.qetest</li>
+     * <li>org.apache.qetest.qetesttest</li>
+     * </ul>
+     */
+    public static final String[] defaultPackages = 
+    {
+        "org.apache.qetest.xsl", 
+        "org.apache.qetest.xalanj2", 
+        "org.apache.qetest.trax", 
+        "org.apache.qetest.xalanj1", 
+        "org.apache.qetest",
+        "org.apache.qetest.qetesttest" 
+    };
+
 }
