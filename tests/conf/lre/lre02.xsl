@@ -16,7 +16,7 @@
        that were present on the element node in the stylesheet tree with the exception 
        of any namespace node whose string-value is the XSLT namespace URI, a namespace 
        URI declared as an extension namespace, or a namespace URI designated as an 
-       excluded namespace. -->
+       excluded namespace. (Can't exclude namespaces that are used, however.) -->
 
 <xsl:template match="doc">
   <out english="to leave"/>
