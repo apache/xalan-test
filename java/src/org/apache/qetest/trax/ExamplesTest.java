@@ -278,7 +278,10 @@ public class ExamplesTest extends XSLProcessorTestBase
         exampleUseTemplatesObj(fooFile.xmlName, bazFile.xmlName, fooFile.inputName);
 
         reporter.logStatusMsg("exampleContentHandlerToContentHandler(" + tmpFooNames + ")");
-        exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName);
+        reporter.logErrorMsg("exampleContentHandlerToContentHandler(" + tmpFooNames + ") NOTE: See SmoketestOuttakes instead!");
+        String unused = goldNames.nextName(); // must increment out, gold names to simulate actual test
+        unused = outNames.nextName(); // must increment out, gold names to simulate actual test
+//        exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName);
 
         reporter.logStatusMsg("exampleXMLReader(" + tmpFooNames + ")");
         exampleXMLReader(fooFile.xmlName, fooFile.inputName);
@@ -306,7 +309,10 @@ public class ExamplesTest extends XSLProcessorTestBase
         exampleUseAssociated(fooFile.xmlName);
 
         reporter.logStatusMsg("exampleContentHandler2DOM(" + tmpFooNames + ")");
-        exampleContentHandler2DOM(fooFile.xmlName, fooFile.inputName);
+        reporter.logErrorMsg("exampleContentHandler2DOM(" + tmpFooNames + ") NOTE: See SmoketestOuttakes instead!");
+        unused = goldNames.nextName(); // must increment out, gold names to simulate actual test
+        unused = outNames.nextName(); // must increment out, gold names to simulate actual test
+        //exampleContentHandler2DOM(fooFile.xmlName, fooFile.inputName);
 
         reporter.logStatusMsg("exampleAsSerializer(" + tmpFooNames + ")");
         exampleAsSerializer(fooFile.xmlName, fooFile.inputName);
