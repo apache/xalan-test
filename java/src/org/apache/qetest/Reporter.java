@@ -62,6 +62,8 @@
  */
 package org.apache.qetest;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -69,6 +71,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -178,13 +181,10 @@ public class Reporter implements Logger
      * Call once to initialize this Logger/Reporter from Properties.
      * <p>Simple hook to allow Logger/Reporters with special output
      * items to initialize themselves.</p>
+     *
      * @author Shane_Curcuru@lotus.com
-     * @param Properties block to initialize from.
+     * @param p Properties block to initialize from.
      * @param status, true if OK, false if an error occoured.
-     *
-     * NEEDSDOC @param p
-     *
-     * NEEDSDOC ($objectName$) @return
      */
     public boolean initialize(Properties p)
     {
@@ -252,9 +252,9 @@ public class Reporter implements Logger
 
     /**
      * Is this Logger/Reporter still running OK?
+     * Should be deprecated and removed: not used. -sc 21-Mar-01
      * @author Shane_Curcuru@lotus.com
      * @return status - true if an error has occoured, false if it's OK
-     * @todo should we check our contained Loggers for their status?
      */
     public boolean checkError()
     {
@@ -329,7 +329,7 @@ public class Reporter implements Logger
     /**
      * Accessor method for closeOnFileClose.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return our value for closeOnFileClose
      */
     public boolean getCloseOnFileClose()
     {
@@ -339,7 +339,7 @@ public class Reporter implements Logger
     /**
      * Accessor method for closeOnFileClose.  
      *
-     * NEEDSDOC @param b
+     * @param b value to set for closeOnFileClose
      */
     public void setCloseOnFileClose(boolean b)
     {
@@ -401,40 +401,6 @@ public class Reporter implements Logger
     /** NEEDSDOC Field errrCount          */
     protected int[] errrCount = new int[MAX_COUNTERS];
     
-    /**
-     * Tell if the overall test result is pass or fail.
-     * 
-     * @return true if there are no failures or errors.
-     */
-    public boolean didPass()
-    {
-      /*
-      System.out.println("incpCount[FILES]: "+incpCount[FILES]);
-      System.out.println("incpCount[CASES]: "+incpCount[CASES]);
-      System.out.println("incpCount[CHECKS]: "+incpCount[CHECKS]);
-
-      System.out.println("passCount[FILES]: "+passCount[FILES]);
-      System.out.println("passCount[CASES]: "+passCount[CASES]);
-      System.out.println("passCount[CHECKS]: "+passCount[CHECKS]);
-
-      System.out.println("ambgCount[FILES]: "+ambgCount[FILES]);
-      System.out.println("ambgCount[CASES]: "+ambgCount[CASES]);
-      System.out.println("ambgCount[CHECKS]: "+ambgCount[CHECKS]);
-
-      System.out.println("failCount[FILES]: "+failCount[FILES]);
-      System.out.println("failCount[CASES]: "+failCount[CASES]);
-      System.out.println("failCount[CHECKS]: "+failCount[CHECKS]);
-
-      System.out.println("errrCount[FILES]: "+errrCount[FILES]);
-      System.out.println("errrCount[CASES]: "+errrCount[CASES]);
-      System.out.println("errrCount[CHECKS]: "+errrCount[CHECKS]);
-      */
-
-      if(failCount[CHECKS] > 0 || errrCount[CHECKS] > 0)
-        return false;
-      else
-        return true;
-    }
 
     //-----------------------------------------------------
     //-------- Composite Pattern Variables And Methods --------
@@ -1094,6 +1060,10 @@ public class Reporter implements Logger
           return;
         
         // Don't log anyway if level is 10 or less.
+        //@todo revisit this decision: I don't like having special
+        //  rules like this to exclude output.  On the other hand, 
+        //  if the user set loggingLevel this low, they really don't 
+        //  want much output coming out, and hashtables are big
         if (loggingLevel <= 10)
             return;
 
@@ -1549,6 +1519,155 @@ public class Reporter implements Logger
         // logResultsCounter(errrCount[FILES], "errrCount[FILES]");
         logResultsCounter(errrCount[CASES], "errrCount[CASES]");
         logResultsCounter(errrCount[CHECKS], "errrCount[CHECKS]");
+    }
+
+    /** 
+     * Utility method to store overall result counters. 
+     *
+     * @return a Hashtable of various results items suitable for
+     * passing to logElement as attrs
+     */
+    protected Hashtable createResultsStatusHash()
+    {
+        Hashtable resHash = new Hashtable();
+        if (incpCount[CASES] > 0)
+            resHash.put(INCP + "-cases", new Integer(incpCount[CASES]));
+        if (incpCount[CHECKS] > 0)
+            resHash.put(INCP + "-checks", new Integer(incpCount[CHECKS]));
+
+        if (passCount[CASES] > 0)
+            resHash.put(PASS + "-cases", new Integer(passCount[CASES]));
+        if (passCount[CHECKS] > 0)
+            resHash.put(PASS + "-checks", new Integer(passCount[CHECKS]));
+
+        if (ambgCount[CASES] > 0)
+            resHash.put(AMBG + "-cases", new Integer(ambgCount[CASES]));
+        if (ambgCount[CHECKS] > 0)
+            resHash.put(AMBG + "-checks", new Integer(ambgCount[CHECKS]));
+
+        if (failCount[CASES] > 0)
+            resHash.put(FAIL + "-cases", new Integer(failCount[CASES]));
+        if (failCount[CHECKS] > 0)
+            resHash.put(FAIL + "-checks", new Integer(failCount[CHECKS]));
+
+        if (errrCount[CASES] > 0)
+            resHash.put(ERRR + "-cases", new Integer(errrCount[CASES]));
+        if (errrCount[CHECKS] > 0)
+            resHash.put(ERRR + "-checks", new Integer(errrCount[CHECKS]));
+        return resHash;
+    }
+
+    /** 
+     * Utility method to write out overall result counters. 
+     * 
+     * This writes out both a testsummary element as well as 
+     * writing a separate marker file for the test's currently 
+     * rolled-up test results.
+     *
+     * Note if writeFile is true, we do a bunch of additional 
+     * processing, including deleting any potential marker 
+     * files, along with creating a new marker file.  
+     * 
+     * Marker files look like: [testStat][testName].log, where 
+     * testStat is the actual current status, like 
+     * Pass/Fail/Ambg/Errr/Incp, and testName comes from the 
+     * currently executing test.
+     * Design comments welcome on this feature.  
+     *
+     * @param writeFile if we should also write out a separate 
+     * Passname/Failname marker file as well
+     */
+    public void writeResultsStatus(boolean writeFile)
+    {
+        Hashtable resultsHash = createResultsStatusHash();
+        resultsHash.put("desc", testComment);
+        resultsHash.put("testName", testName);
+
+        String elementName = "teststatus";
+        String overallResult = resultToString(getCurrentFileResult());
+        // Ask each of our loggers to report this
+        for (int i = 0; i < numLoggers; i++)
+        {
+            loggers[i].logElement(CRITICALMSG, elementName, resultsHash, overallResult);
+        }
+
+        // Only continue if user asked us to
+        if (!writeFile)
+            return;
+
+        // Now write an actual file out as a marker for enclosing 
+        //  harnesses and build environments
+
+        // Calculate the name relative to any logfile we have
+        String logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, "ResultsSummary.xml"))).getParent();
+        File summaryFile = new File("ResultsSummary.xml");    //@todo have better default
+        File[] summaryFiles = 
+        {
+            // Note array is ordered; should be re-designed so this doesn't matter
+            // Coordinate PASS name with results.marker in build.xml
+            // File name rationale: put Pass/Fail/etc first, so they 
+            //  all show up together in dir listing; include 
+            //  testName so you know where it came from; make it 
+            //  .xml since it is an XML file
+            new File(logFileBase, INCP + "-" + testName + ".xml"),
+            new File(logFileBase, PASS + "-" + testName + ".xml"),
+            new File(logFileBase, AMBG + "-" + testName + ".xml"),
+            new File(logFileBase, FAIL + "-" + testName + ".xml"),
+            new File(logFileBase, ERRR + "-" + testName + ".xml")
+        };
+        // Clean up any pre-existing files that might be confused 
+        //  as markers from this testrun
+        for (int i = 0; i < summaryFiles.length; i++)
+        {
+            if (summaryFiles[i].exists())
+                summaryFiles[i].delete();
+        }
+
+        switch (getCurrentFileResult())
+        {
+            case INCP_RESULT:
+                summaryFile = summaryFiles[0];
+                break;
+            case PASS_RESULT:
+                summaryFile = summaryFiles[1];
+                break;
+            case AMBG_RESULT:
+                summaryFile = summaryFiles[2];
+                break;
+            case FAIL_RESULT:
+                summaryFile = summaryFiles[3];
+                break;
+            case ERRR_RESULT:
+                summaryFile = summaryFiles[4];
+                break;
+            default:
+                // Use error case, this should never happen
+                summaryFile = summaryFiles[4];
+                break;
+        }
+        // Now actually write out the summary file
+        try
+        {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(summaryFile));
+            // Fake the output of Logger.logElement mostly; except 
+            //  we add an XML header so this is a legal XML doc
+            printWriter.println("<?xml version=\"1.0\"?>"); 
+            printWriter.println("<" + elementName); 
+            for (Enumeration enum = resultsHash.keys();
+                    enum.hasMoreElements(); /* no increment portion */ )
+            {
+                Object key = enum.nextElement();
+                printWriter.println(key + "=\"" + resultsHash.get(key) + "\"");
+            }
+            printWriter.println(">"); 
+            printWriter.println(overallResult); 
+            printWriter.println("</" + elementName + ">"); 
+            printWriter.close();
+        }
+        catch(Exception e)
+        {
+            logErrorMsg("writeResultsStatus: Can't write: " + summaryFile);
+        }
     }
 
     //-----------------------------------------------------
