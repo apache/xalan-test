@@ -77,6 +77,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -111,6 +113,7 @@ import java.util.Vector;
  * @author <a href="mailto:shane_curcuru@lotus.com">Shane Curcuru</a>
  * @author Stefano Mazzocchi <a href="mailto:stefano@apache.org">stefano@apache.org</a>
  * @author <a href="mailto:stefan.bodewig@epost.de">Stefan Bodewig</a>
+ * @version $Id$
  */
 public class XSLTestAntTask extends Task
 {
@@ -134,10 +137,55 @@ public class XSLTestAntTask extends Task
      */
     protected boolean failOnError = false;
 
+    /** Normal constants for testType: API tests.  */
+    public static final String TESTTYPE_API = "api.";
+
+    /** Normal constants for testType: API tests.  */
+    public static final String TESTTYPE_CONF = "conf.";
+
+    /** Normal constants for testType: API tests.  */
+    public static final String TESTTYPE_PERF = "perf.";
+
+    /** Normal constants for testType: API tests.  */
+    public static final String TESTTYPE_CONTRIB = "contrib.";
+
+    /** 
+     * Type of test we're executing.
+     * Used by passThruProps to determine which kind of prefixed 
+     * properties from the Ant file to pass thru to the test.
+     * Normally one of api|conf|perf|contrib, etc.
+     */
+    protected String testType = TESTTYPE_API;
+
+    /** 
+     * Name of the class to execute as the test.  
+     */
+    protected String testClass = null;
+
+    /** 
+     * Cheap-o way to pass properties to the underlying test.  
+     * This task simply writes out needed properties to this file, 
+     * then tells the test to -load them when executing.
+     */
+    protected String passThruProps = "XSLTestAntTask.properties";
 
     //-----------------------------------------------------
     //-------- Implementations for test-related parameters --------
     //-----------------------------------------------------
+
+    /**
+     * Test parameter: Set the type of this test.
+     *
+     * @param ll loggingLevel passed to test for all
+     * non-console output; 0=very little output, 99=lots
+     * @see org.apache.qetest.Reporter#setLoggingLevel(int)
+     */
+    public void setTestType(String type)
+    {
+        log("setTestType(" + type + ")", Project.MSG_VERBOSE);
+        testType = type;
+    }
+
 
     /**
      * Test parameter: Name of test class to execute.
@@ -148,41 +196,37 @@ public class XSLTestAntTask extends Task
      * to actually get the FQCN of the class to run; this allows
      * users to just specify the name of the class itself
      * (e.g. SystemIdTest) and have it work properly.
-     * We search the following default packages in order if needed:
-     * <ul>
-     * <li>org.apache.qetest.xsl</li>
-     * <li>org.apache.qetest.trax</li>
-     * <li>org.apache.qetest.xalanj2</li>
-     * <li>org.apache.qetest.xalanj1</li>
-     * <li>org.apache.qetest</li>
-     * </ul>
+     * We search a number of default packages in order if needed: 
+     * as seen in QetestUtils.testClassForName().
+     * Note! Due to Ant's interesting handling of classpaths, we 
+     * cannot actually resolve the testname here - we simply store 
+     * the string, and then let QetestUtils resolve it later 
+     * when we're actually executing.  That's because any classpaths 
+     * that were set in the build.xml file aren't valid here, when 
+     * the task is setting properties - they're only valid when the 
+     * task actually executes later on.
      *
      * @param testClassname FQCN or just bare classname
      * of test to run
      */
     public void setTest(String testClassname)
     {
+        log("setTest(" + testClassname + ")", Project.MSG_VERBOSE);
+        testClass = testClassname;
 
-        String[] testPackages = { "org.apache.qetest.xsl",
-                                  "org.apache.qetest.trax",
-                                  "org.apache.qetest.xalanj2",
-                                  "org.apache.qetest.xalanj1",
-                                  "org.apache.qetest" };
-
-        //@todo update to not be so roundabout
-        Class clazz =
-            QetestUtils.testClassForName(testClassname, testPackages,
-                                         "org.apache.qetest.xsl.Minitest");
-
-
-        // Note the wisdom of defaulting to the Minitest 
-        //  is not obvious even to me; but it's something
-        commandLineJava.setClassname(clazz.getName());
+        // Force the actual class being executed to be a 'launcher' class
+        commandLineJava.setClassname("org.apache.qetest.QetestUtils");
+        // Note this needs to be the first argument in the line,
+        //  thus this should be the first property set
+        //@todo fix this so users can actually use other properties 
+        //  first without the ordering problem
+        commandLineJava.createArgument().setLine(testClass);
     }
 
 
     /**
      * Test parameter: Set the loggingLevel used in this test.
+     * //@todo deprecate: should use passThruProps instead
      *
      * @param ll loggingLevel passed to test for all
      * non-console output; 0=very little output, 99=lots
@@ -202,6 +246,7 @@ public class XSLTestAntTask extends Task
 
     /**
      * Test parameter: Set the consoleLoggingLevel used in this test.
+     * //@todo deprecate: should use passThruProps instead
      *
      * @param ll loggingLevel used just for console output; here,
      * the default log going to Ant's console
@@ -216,6 +261,7 @@ public class XSLTestAntTask extends Task
 
     /**
      * Test parameter: inputDir, root of input files tree (required).
+     * //@todo deprecate: should use passThruProps instead
      *
      * //@todo this should have a default, since without a valid
      * value most tests will just return an error
@@ -234,6 +280,7 @@ public class XSLTestAntTask extends Task
 
     /**
      * Test parameter: outputDir, dir to put outputs in.
+     * //@todo deprecate: should use passThruProps instead
      * @param d where the test will put it's output files
      * @see org.apache.qetest.FileBasedTest#OPT_OUTPUTDIR
      */
@@ -248,6 +295,7 @@ public class XSLTestAntTask extends Task
 
     /**
      * Test parameter: goldDir, root of gold files tree.
+     * //@todo deprecate: should use passThruProps instead
      * @param d Path to look for gold files in: should be the
      * root of the applicable tests/api-gold, tests/conf-gold, etc. tree
      * @see org.apache.qetest.FileBasedTest#OPT_GOLDDIR
@@ -263,6 +311,7 @@ public class XSLTestAntTask extends Task
 
     /**
      * Test parameter: logFile, where to put XMLFileLogger output.
+     * //@todo deprecate: should use passThruProps instead
      * @param f File(name) to send our 'official' results to via
      * an {@link org.apache.qetest.XMLFileLogger XMLFileLogger}
      */
@@ -270,6 +319,65 @@ public class XSLTestAntTask extends Task
     {
         commandLineJava.createArgument().setValue("-" + Logger.OPT_LOGFILE);
         commandLineJava.createArgument().setFile(f);  // Check if this is what the test is expecting
+    }
+
+    
+    /** 
+     * Default prefix of Ant properties to passThru to the test.  
+     * Note that testType is also a dynamic prefix that's also used.
+     */
+    public static final String ANT_PASSTHRU_PREFIX = "qetest.";
+    
+    
+    /**
+     * Worker method to write out properties file for test.  
+     * Simply translates any properties in your Ant build file that 
+     * begin with the prefix, and puts them in a Properties block.
+     * This block is then written out to disk, so that the test can 
+     * later read them in via -load.
+     * //@todo NEEDS IMPROVEMENT: make more robust; check for write 
+     * access to local dir; support dir-switching attribute 
+     * when forking from Ant task; etc.
+     * @param altPrefix alternate prefix of Ant properties to also 
+     * pass thru in addition to ANT_PASSTHRU_PREFIX
+     */
+    protected void writePassThruProps(String altPrefix)
+    {
+        Hashtable antProps = this.getProject().getProperties();
+
+        Properties passThru = new Properties();
+        for (Enumeration enum = antProps.keys();
+                enum.hasMoreElements(); 
+                /* no increment portion */ )
+        {
+            String key = enum.nextElement().toString();
+            if (key.startsWith(ANT_PASSTHRU_PREFIX))
+            {
+                // Move any of these properties into the test; 
+                //  rip off the prefix first
+                passThru.put(key.substring(ANT_PASSTHRU_PREFIX.length()), antProps.get(key));
+            }
+            else if (key.startsWith(altPrefix))
+            {
+                // Also move alternate prefixed properties too
+                passThru.put(key.substring(altPrefix.length()), antProps.get(key));
+            }
+        }
+        try
+        {
+            log("Attempting to write out properties to " + passThruProps, Project.MSG_VERBOSE);
+            // If we can write the props out to disk...
+            passThru.save(new FileOutputStream(passThruProps), 
+                    "XSLTestAntTask.writePassThruProps() for use by test " + testClass);
+            
+            // ... then also force -load of this file into test's command line
+            commandLineJava.createArgument().setLine("-load " + passThruProps);
+        }
+        catch (IOException ioe)
+        {
+            throw new BuildException("writePassThruProps could not write to " + passThruProps + ", threw: "
+                                     + ioe.toString(), location);
+        }
     }
 
 
@@ -289,20 +397,27 @@ public class XSLTestAntTask extends Task
      */
     public void execute() throws BuildException
     {
+        // Log out our version info: useful for debugging, since 
+        //  the wrong version of this class can easily get loaded
+        log("XSLTestAntTask: $Id$", Project.MSG_VERBOSE);
 
+        // Call worker method to create and write prop file
+        // This passes thru both default 'qetest.' properties as 
+        //  well as properties associated with testType
+        writePassThruProps(testType);
+        
         int err = -1;
-
 
         if ((err = executeJava()) != 0)
         {
             if (failOnError)
             {
-                throw new BuildException("QetestAntTask execution returned: "
+                throw new BuildException("XSLTestAntTask execution returned: "
                                          + err, location);
             }
             else
             {
-                log("QetestAntTask Result: " + err, Project.MSG_ERR);
+                log("XSLTestAntTask Result: " + err, Project.MSG_ERR);
             }
         }
     }
