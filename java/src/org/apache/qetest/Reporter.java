@@ -2116,7 +2116,7 @@ public class Reporter implements Logger
         {
 
             // .compareTo returns 0 if the strings match lexicographically
-            if (actual.compareTo(expected) == 0)
+            if ((expected != null) && (actual.compareTo(expected) == 0))
             {
                 checkPass(comment);
 
