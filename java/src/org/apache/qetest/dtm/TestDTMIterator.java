@@ -163,7 +163,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		{ printNode(dtm, iter, itNode, " ");
+		{ printNode(dtm, itNode, " ");
 		  lastNode = itNode;
 		}
 	  
@@ -177,7 +177,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 
 	  // Get iterator for SELF:: Axis
 	  iter = dtm.getAxisIterator(Axis.SELF);
@@ -187,7 +187,8 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
+
 /**** Not Implemented
 	  // Get iterator for NAMESPACEDECLS:: Axis
 	  iter = dtm.getAxisIterator(Axis.NAMESPACEDECLS);
@@ -197,8 +198,9 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 ****/
+
 	  // Get iterator for NAMESPACE:: Axis
 	  iter = dtm.getAxisIterator(Axis.NAMESPACE);
 	  iter.setStartNode(lastNode);
@@ -207,7 +209,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 
 	  // Get iterator for PRECEDING:: Axis
 	  iter = dtm.getAxisIterator(Axis.PRECEDING);
@@ -217,7 +219,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 
 	  // Get iterator for PRECEDINGSIBLING:: Axis
 	  iter = dtm.getAxisIterator(Axis.PRECEDINGSIBLING);
@@ -227,7 +229,8 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
+
 /**** ArrayIndexOutOfBoundsException
 	  // Get iterator for ATTRIBUTE:: Axis
 	  iter = dtm.getAxisIterator(Axis.ATTRIBUTE);
@@ -237,8 +240,9 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 ****/
+
 	  // Get iterator for FOLLOWING:: Axis
 	  iter = dtm.getAxisIterator(Axis.FOLLOWING);
 	  iter.setStartNode(ANode);
@@ -247,7 +251,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 
 	  // Get iterator for FOLLOWINGSIBLING:: Axis
 	  iter = dtm.getAxisIterator(Axis.FOLLOWINGSIBLING);
@@ -257,7 +261,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 
 	  // Get a iterator for  DESCENDANT:: axis.
 	  iter = dtm.getAxisIterator(Axis.DESCENDANT);
@@ -268,7 +272,7 @@ static final String[] TYPENAME=
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
 		  {
-		  	printNode(dtm, iter, itNode, " ");
+		  	printNode(dtm, itNode, " ");
 			lastNode = itNode;
 		  }
 
@@ -281,7 +285,7 @@ static final String[] TYPENAME=
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
 		{
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 		  lastNode = itNode;
 		}
 
@@ -298,7 +302,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 
 	  // Get iterator for ANCESTORORSELF:: Axis
 	  iter = dtm.getAxisIterator(Axis.ANCESTORORSELF);
@@ -308,7 +312,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 
 /**** Absolute axis (ALL, DESCENDANTSFROMROOT, or DESCENDANTSORSELFFROMROOT) not implemented.  
 	  // Get itertor for ALL:: Axis
@@ -320,7 +324,7 @@ static final String[] TYPENAME=
 	  // Iterate the axis and print out node info.
       for (int itNode = iter.next(); DTM.NULL != itNode;
               itNode = iter.next())
-		  printNode(dtm, iter, itNode, " ");
+		  printNode(dtm, itNode, " ");
 ****/
     }
     catch(Exception e)
@@ -329,7 +333,7 @@ static final String[] TYPENAME=
       }
   }
   
-  static void printNode(DTM dtm, DTMAxisIterator iter, int nodeHandle, String indent)
+static void printNode(DTM dtm, int nodeHandle, String indent)
   {
     // Briefly display this node
     // Don't bother displaying namespaces or attrs; we do that at the
@@ -339,7 +343,7 @@ static final String[] TYPENAME=
     // Formatting hack -- suppress quotes when value is null, to distinguish
     // it from "null".
     String value=dtm.getNodeValue(nodeHandle);
-    String vq=(value==null) ? "" : "\"";
+    String vq = (value==null) ? "" : "\"";
 
     // Skip outputing of text nodes. In most cases they clutter the output, 
 	// besides I'm only interested in the elemental structure of the dtm. 
@@ -354,4 +358,5 @@ static final String[] TYPENAME=
 		       ); 
 	}
   }
+
 }
