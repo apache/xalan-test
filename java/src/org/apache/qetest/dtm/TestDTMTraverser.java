@@ -343,7 +343,7 @@ static final String[] TYPENAME=
 		printNode(dtm, atNode, " ");
 
 	  // Get a traverser for DESCENDANTSORSELFFROMROOT:: axis.
-	  System.out.println("\n#### DESCENDANTSFROMROOT(absolute) from "+"<"+dtmRootName+">");
+	  System.out.println("\n#### DESCENDANTSORSELFFROMROOT(absolute) from "+"<"+dtmRootName+">");
       at = dtm.getAxisTraverser(Axis.DESCENDANTSORSELFFROMROOT);
 
 	  // Traverse the axis and print out node info.
