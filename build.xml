@@ -386,7 +386,7 @@
             <param name="testClass" value="org.apache.qetest.xsl.XSLTestHarness"/>
             <param name="testType" value="smoketest.api."/>
         </antcall>
-        <available file="${smoketest.conf.passFile}" property="smoketest-conf-passed" />
+        <available file="${smoketest.api.passFile}" property="smoketest-api-passed" />
     </target>
     <target name="smoketest-conf-notpass" unless="smoketest-conf-passed">
         <echo message=" [minitest] ERROR! The Smoketest-conf failed!" />
