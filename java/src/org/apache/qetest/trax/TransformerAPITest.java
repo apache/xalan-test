@@ -55,11 +55,6 @@
  * <http://www.apache.org/>.
  */
 
-/*
- *
- * TransformerAPITest.java
- *
- */
 package org.apache.qetest.trax;
 
 import org.apache.qetest.*;
@@ -67,7 +62,6 @@ import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
 import javax.xml.transform.*;
-import javax.xml.transform.OutputKeys;  // Don't know why this needs explicit importing?!?!
 import javax.xml.transform.stream.*;    // We assume Features.STREAM for some tests
 
 // javax JAXP classes for parser pluggability
@@ -79,9 +73,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.Parser;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-import org.xml.sax.XMLReader;
 
 // Needed DOM classes
 import org.w3c.dom.Node;
@@ -145,8 +136,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
     public static final String MEDIA_TYPE_VALUE = "text/test/xml";
     public static final String OMIT_XML_DECLARATION_VALUE = "yes";
 
-    /** System property name javax.xml.transform.TransformerFactory.  */
-    public static final String TRAX_PROCESSOR_XSLT = "javax.xml.transform.TransformerFactory";
+    /** Cheap-o filename set(s) for multiple transform tests. */
+    protected XSLTestfileInfo multiTest = new XSLTestfileInfo();
+    protected XSLTestfileInfo multi2Test = new XSLTestfileInfo();
 
     /** Subdir name under test\tests\api for files.  */
     public static final String TRAX_SUBDIR = "trax";
@@ -155,7 +147,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
     public TransformerAPITest()
     {
 
-        numTestCases = 5;  // REPLACE_num
+        numTestCases = 6;  // REPLACE_num
         testName = "TransformerAPITest";
         testComment = "Basic API coverage test for the Transformer class";
     }
@@ -203,9 +195,12 @@ public class TransformerAPITest extends XSLProcessorTestBase
         htmlFormatTest.inputName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIHTMLFormat.xsl");
         htmlFormatTest.goldName = goldBasePath + "TransformerAPIHTMLFormat.out";
 
-        reporter.logInfoMsg(TRAX_PROCESSOR_XSLT + " property is: "
-                            + System.getProperty(TRAX_PROCESSOR_XSLT));
+        multiTest.xmlName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIVar.xml");
+        multiTest.inputName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIVar.xsl");
+        multiTest.goldName = goldBasePath + "TransformerAPIVar.out";
 
+        multi2Test.xmlName = QetestUtils.filenameToURL(testBasePath + "TransformerAPIVar2.xml");
+        multi2Test.goldName = goldBasePath + "TransformerAPIVar2.out";
         try
         {
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -229,7 +224,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
 
     /**
      * TRAX Transformer: cover basic get/setParameter(s) APIs.
-     * See {@link ParamTest ParamTest to be written} for more 
+     * See {@link ParameterTest ParameterTest} for more 
      * functional test coverage on setting different kinds 
      * and types of parameters, etc.
      * 
@@ -263,9 +258,6 @@ public class TransformerAPITest extends XSLProcessorTestBase
         try
         {
             // See what the default 'identity' transform has by default
-            // @todo should add checks for the type of object returned; 
-            //  a bug around 10-Nov-00 always returned a type of 
-            //  XObject instead of the type you set
             Object tmp = identityTransformer.getParameter("This-param-does-not-exist");
             reporter.checkObject(tmp, null, "This-param-does-not-exist is null by default identityTransformer");
             // Can you set properties on this transformer?
@@ -277,13 +269,14 @@ public class TransformerAPITest extends XSLProcessorTestBase
             }
             else
             {
-                reporter.checkString((String)tmp, "bar", "identityTransformer set/getParameter");
+                reporter.checkString((String)tmp, "bar", "identityTransformer set/getParameter value: " + tmp);
+                reporter.check((tmp instanceof String), true, "identityTransformer set/getParameter datatype");
             }
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with identity parameters");
-            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with identity parameters");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem(1) with identity parameters");
+            reporter.checkFail("Problem(1) with identity parameters");
         }
 
         try
@@ -325,8 +318,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem set/getParameter testing");
-            reporter.logThrowable(reporter.ERRORMSG, e, "Problem set/getParameter testing");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem(2) set/getParameter testing");
+            reporter.checkFail("Problem(2) set/getParameter testing");
         }
 
         try
@@ -393,14 +386,11 @@ public class TransformerAPITest extends XSLProcessorTestBase
                     reporter.checkFail(PARAM3S + " is now ?" + tmp + "?, isa " + tmp.getClass().getName());
                 }
             }
-            
-
-            // Verify setting Properties full of params works - feature removed from product 13-Nov-00
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem set/getParameters testing");
-            reporter.logThrowable(reporter.ERRORMSG, e, "Problem set/getParameters testing");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem(3) set/getParameters testing");
+            reporter.checkFail("Problem(3) set/getParameters testing");
         }
 
         try
@@ -434,8 +424,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with parameter transform");
-            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with parameter transform");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem(4) with parameter transform");
+            reporter.checkFail("Problem(4) with parameter transform");
         }
 
         reporter.testCaseClose();
@@ -507,8 +497,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with default output property", "SCUU4RXQYH");
-            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with default output property");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem(1) with default output property");
+            reporter.checkFail("Problem(1) with default output property", "SCUU4RXQYH");
         }
 
         try
@@ -540,8 +530,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with identity output property");
-            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with identity output property");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem(2) with identity output property");
+            reporter.checkFail("Problem(2) with identity output property");
         }
 
         try
@@ -573,8 +563,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with html output property");
-            reporter.logThrowable(reporter.ERRORMSG, e, "Problem with html output property");
+            reporter.logThrowable(reporter.ERRORMSG, e, "Problem(3) with html output property");
+            reporter.checkFail("Problem(3) with html output property");
         }
 
         try
@@ -630,8 +620,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
             }
             catch (Exception e)
             {
-                reporter.checkFail("Problem with set/get output properties(1)", "SCUU4RXQYH");
-                reporter.logThrowable(reporter.ERRORMSG, e, "Problem with set/get output properties(1)");
+                reporter.logThrowable(reporter.ERRORMSG, e, "Problem(a1) with set/get output properties");
+                reporter.checkFail("Problem(a1) with set/get output properties", "SCUU4RXQYH");
             }
 
             /*
@@ -693,8 +683,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
             }
             catch (Exception e)
             {
-                reporter.checkFail("Problem with set/get output properties(2)", "SCUU4RXR6E");
-                reporter.logThrowable(reporter.ERRORMSG, e, "Problem with set/get output properties(2)");
+                reporter.logThrowable(reporter.ERRORMSG, e, "Problem(a2) with set/get output properties");
+                reporter.checkFail("Problem(a2) with set/get output properties", "SCUU4RXR6E");
             }
             try
             {   // Inner try-catch
@@ -714,7 +704,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             catch (Exception e)
             {
                 reporter.logThrowable(reporter.ERRORMSG, e,
-                                      "Problem with set/get output property(3)");
+                                      "Problem(a3) with set/get output property");
             }
 
             // OutputKeys.METHOD = xml|html|text|qname-but-not-ncname
@@ -729,27 +719,17 @@ public class TransformerAPITest extends XSLProcessorTestBase
             // OutputKeys.MEDIA_TYPE = qnames
             // OutputKeys.CDATA_SECTION_ELEMENTS = qnames
 
-            reporter.logStatusMsg("@todo Cover setOutputProperties(Properties oformat)");
+            reporter.logTraceMsg("//@todo Cover setOutputProperties(Properties oformat)");
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with set/get output properties(0)");
             reporter.logThrowable(reporter.ERRORMSG, e,
-                                  "Problem with set/get output properties(0)");
+                                  "Problem(4) with set/get output properties");
+            reporter.checkFail("Problem(4) with set/get output properties");
         }
 
-        // Negative testing: various illegal arguments, etc.
-        try
-        {
-            Transformer negTransformer = outputTemplates.newTransformer();
-            //@todo, or put in a separate testcase
-        } 
-        catch (Exception e)
-        {
-            reporter.checkFail("Problem with negative setOutputProperty/ies tests");
-            reporter.logThrowable(reporter.ERRORMSG, e,
-                                  "Problem with negative setOutputProperty/ies tests");
-        }
+        reporter.logTraceMsg("//@todo: Negative testing: various illegal arguments, etc. - in separate testcase");
+
         reporter.testCaseClose();
         return true;
     }
@@ -791,12 +771,12 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with identity OutputProperties", "SCUU4RXQYH");
             reporter.logThrowable(reporter.ERRORMSG, e,
                                   "Problem with identity OutputProperties");
+            reporter.checkFail("Problem with identity OutputProperties", "SCUU4RXQYH");
         }
 
-        reporter.logTraceMsg("More work to be done here!");
+        reporter.logTraceMsg("//@todo: coverage of non-identity transformers and set/get of props");
         reporter.testCaseClose();
         return true;
     } // end testCase3
@@ -892,10 +872,10 @@ public class TransformerAPITest extends XSLProcessorTestBase
             testlet.execute(datalet);
             
         }
-        catch (Throwable t2)
+        catch (Throwable t)
         {
-            reporter.checkErr("Problem with negative identityTransformer getOutputProperty: " + t2.toString());
-            reporter.logThrowable(reporter.STATUSMSG, t2, "Problem with negative identityTransformer getOutputProperty");
+            reporter.logThrowable(reporter.STATUSMSG, t, "Problem(1) with negative identityTransformer getOutputProperty");
+            reporter.checkErr("Problem(1) with negative identityTransformer getOutputProperty: " + t.toString());
         }
         try
         {
@@ -953,10 +933,10 @@ public class TransformerAPITest extends XSLProcessorTestBase
             testlet.execute(datalet);
             
         }
-        catch (Throwable t3)
+        catch (Throwable t)
         {
-            reporter.checkErr("Problem with negative transformer getOutputProperty: " + t3.toString());
-            reporter.logThrowable(reporter.STATUSMSG, t3, "Problem with negative transformer getOutputProperty");
+            reporter.logThrowable(reporter.STATUSMSG, t, "Problem(2) with negative transformer getOutputProperty");
+            reporter.checkErr("Problem(2) with negative transformer getOutputProperty: " + t.toString());
         }
 
         reporter.testCaseClose();
@@ -965,20 +945,118 @@ public class TransformerAPITest extends XSLProcessorTestBase
 
 
     /**
-     * TRAX Transformer: cover transform() API and basic 
-     * functionality; plus set/getURIResolver() API; 
-     * plus set/getErrorListener() API; .
-     *
-     * Note: These are simply coverage tests for the 
-     * transform() API - for more general testing, 
-     * see TraxWrapper.java and use ConformanceTest or 
-     * another suitable test driver.
+     * TRAX Transformer: cover transform() API and multiple 
+     * Transformations from single transformer.  
      * 
-     * @todo should the Features.SAX and Features.DOM tests be in 
-     * this file, or should they be in sax/dom subdirectory tests?
+     * Note: obviously as the most important API, transform() is 
+     * also covered in many other API tests as well as in various 
+     * Stylesheet*Testlet tests.
+     * 
      * @return false if we should abort the test
      */
     public boolean testCase5()
+    {
+        reporter.testCaseInit(
+            "TRAX Transformer: cover multiple calls to transform()");
+        TransformerFactory factory = null;
+        Templates templates = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+        }
+        catch (Throwable t)
+        {
+            reporter.logThrowable(reporter.STATUSMSG, t, "Can't continue testcase, factory.newInstance threw:");
+            reporter.checkErr("Can't continue testcase, factory.newInstance threw: " + t.toString());
+            return true;
+        }
+
+        try
+        {
+            Transformer transformer = factory.newTransformer(new StreamSource(simpleTest.inputName));
+            // Re-use the transformer multiple times on identity
+            transformer.transform(new StreamSource(simpleTest.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(simpleTest.goldName), 
+                "transform(#1) identity into: " + outNames.currentName());
+
+            transformer.transform(new StreamSource(simpleTest.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(simpleTest.goldName), 
+                "transform(#2) identity into: " + outNames.currentName());
+
+            transformer.transform(new StreamSource(simpleTest.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(simpleTest.goldName), 
+                "transform(#3) identity into: " + outNames.currentName());
+            
+            transformer = factory.newTransformer(new StreamSource(multiTest.inputName));
+            // Re-use the transformer multiple times on file with variable
+            transformer.transform(new StreamSource(multiTest.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(multiTest.goldName), 
+                "transform(#1-a) var test into: " + outNames.currentName());
+
+            transformer.transform(new StreamSource(multiTest.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(multiTest.goldName), 
+                "transform(#2-a) var test into: " + outNames.currentName());
+
+            transformer.transform(new StreamSource(multiTest.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(multiTest.goldName), 
+                "transform(#3-a) var test into: " + outNames.currentName());
+
+            // Now re-use with different xml doc
+            transformer.transform(new StreamSource(multi2Test.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(multi2Test.goldName), 
+                "transform(#4-b) var test into: " + outNames.currentName());
+
+            // Now re-use with original xml doc
+            transformer.transform(new StreamSource(multiTest.xmlName), 
+                                  new StreamResult(outNames.nextName()));
+            fileChecker.check(reporter, 
+                new File(outNames.currentName()), 
+                new File(multiTest.goldName), 
+                "transform(#5-a) var test into: " + outNames.currentName());
+        }
+        catch (Throwable t)
+        {
+            reporter.logThrowable(reporter.WARNINGMSG, t, "Multiple transform() calls threw");
+            reporter.checkErr("Multiple transform() calls threw: " + t.toString());
+        }
+        reporter.testCaseClose();
+        return true;
+    }
+
+    /**
+     * TRAX Transformer: cover set/getURIResolver() API; 
+     * plus set/getErrorListener() API.
+     *
+     * Note: These are simply coverage tests for these api's, 
+     * for feature testing see links below 
+     * 
+     * @see ErrorListenerTest
+     * @see ErrorListenerAPITest
+     * @see URIResolverTest
+     * @return false if we should abort the test
+     */
+    public boolean testCase6()
     {
         reporter.testCaseInit(
             "TRAX Transformer: cover transform() and set/getURIResolver API and functionality");
@@ -1031,7 +1109,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             reporter.checkErr("Coverage of get/setErrorListener threw: " + t.toString());
             reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setErrorListener threw:");
         }
-        reporter.logStatusMsg("@todo feature testing for ErrorListener");
+        reporter.logStatusMsg("@todo feature testing for ErrorListener; see ErrorListenerTest, ErrorListenerAPITest");
 
         try
         {
@@ -1050,30 +1128,23 @@ public class TransformerAPITest extends XSLProcessorTestBase
                             new StreamResult(fos)))
             {
                 fos.close(); // must close ostreams we own
-                if (Logger.PASS_RESULT
-                    != fileChecker.check(reporter, 
-                                  new File(outNames.currentName()), 
-                                  new File(simpleTest.goldName), 
-                                  "transform(Stream, Stream) into: " + outNames.currentName())
-                   )
-                    reporter.logInfoMsg("transform(Stream, Stream) failure reason:" + fileChecker.getExtendedInfo());
+                fileChecker.check(reporter, 
+                        new File(outNames.currentName()), 
+                        new File(simpleTest.goldName), 
+                        "transform(Stream, Stream) into: " + outNames.currentName());
             }
             reporter.logTraceMsg("myURIres.getQuickCounters = " + myURIResolver.getQuickCounters());
 
-            reporter.logStatusMsg("@todo basic URIResolver functionality test (i.e. does it get used in a transform)");
+            reporter.logStatusMsg("@todo feature testing for URIResolver; see URIResolverTest");
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
-            reporter.checkFail("TestCase threw: " + e.toString());
-            reporter.logThrowable(reporter.ERRORMSG, e, "TestCase threw:");
+            reporter.logThrowable(reporter.ERRORMSG, t, "TestCase threw:");
+            reporter.checkFail("TestCase threw: " + t.toString());
         }
-
-        // Features.SAX && Features.DOM tests should be in trax\SAX and trax\DOM subdirs
-
         reporter.testCaseClose();
-
         return true;
-    } // end testCase5
+    }
 
 
     /**
