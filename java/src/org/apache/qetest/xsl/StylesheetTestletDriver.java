@@ -83,6 +83,14 @@ import java.util.Vector;
 
 /**
  * Test driver for XSLT stylesheet Testlets.
+ * 
+ * This is a generic driver for XSLT-oriented Testlets, and 
+ * supports iterating over either a user-supplied, specific list 
+ * of files to test or over a directory tree of test files.
+ * Note there are a number of design decisions made that are 
+ * just slightly specific to stylesheet testing, although this 
+ * would be a good model for a completely generic TestletDriver.
+ *
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
@@ -144,6 +152,9 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
     protected String fileFilter = null;
 
 
+    /** Unique runId for each specific invocation of this test driver.  */
+    protected String runId = null;
+
     /** Convenience constant: .xml extension for input data file.  */
     public static final String XML_EXTENSION = ".xml";
 
@@ -177,6 +188,13 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
         dirFilter = testProps.getProperty(OPT_DIRFILTER);
         fileFilter = testProps.getProperty(OPT_FILEFILTER);
         fileList = testProps.getProperty(OPT_FILELIST);
+
+        // Grab a unique runid for logging out with our tests 
+        //  Used in results reporting stylesheets to differentiate 
+        //  between different test runs
+        runId = QetestUtils.createRunId(testProps.getProperty("runId"));
+        testProps.put("runId", runId);  // put back in the properties 
+                                        // for later use
         return true;
     }
 
@@ -185,24 +203,30 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      * Run through the directory given to us and run tests found
      * in subdirs; or run through our fileList.
      *
+     * This method logs some basic runtime data (like the actual 
+     * testlet and ProcessorWrapper implementations used) and 
+     * then decides to either run a user-specified fileList or to 
+     * use our dirFilter to iterate over the inputDir.
+     *
      * @param p Properties block of options to use - unused
      * @return true if OK, false if we should abort
      */
     public boolean runTestCases(Properties p)
     {
-        // Grab the (potential) fileList from our properties
-        //  block, in case it hasn't been read yet
-        //@todo better specify how this is set!
-        if (null == fileList)
-        {
-            fileList = testProps.getProperty(OPT_FILELIST);
-        }
+
 
         // First log out any other runtime information, like the 
         //  actual flavor of ProcessorWrapper, etc.
         try
         {
             Hashtable runtimeProps = new Hashtable(4);
+            // Note that each of these calls actually force the 
+            //  creation of an actual object of each type: this is 
+            //  required since we may default the types or our call 
+            //  to QetestUtils.testClassForName() may return a 
+            //  different classname than the user actually specified
+            // Care should be taken that the construction of objects 
+            //  here does not affect our testing later on
             runtimeProps.put("actual.ProcessorWrapper",
                              ProcessorWrapper.getWrapper(flavor).getDescription());
             runtimeProps.put("actual.testlet", getTestlet());
@@ -253,6 +277,8 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      * <li>tests/whitespace - test all whitespace*.xsl files</li>
      * <li>etc.</li>
      * </ul>
+     * Parameters: none, uses our internal members inputDir, 
+     * outputDir, testlet, etc.
      */
     public void processInputDir()
     {
@@ -329,6 +355,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
 
             // 'Transform' the list of individual test files into a 
             //  list of Datalets with all fields filled in
+            //@todo should getFilesFromDir and buildDatalets be combined?
             Vector datalets = buildDatalets(files, subTestDir, subOutDir, subGoldDir);
 
             if ((null == datalets) || (0 == datalets.size()))
@@ -340,6 +367,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
                 continue;
             }
 
+            // Now process the list of files found in this dir
             processFileList(datalets, "Conformance test of: " + subdirs[i]);
         } // end of for...
     }
@@ -351,9 +379,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      * the corresponding directories exist.
      * Each fileList is turned into a testcase.
      *
-     * @param testlet StylesheetTestlet or subclass to use to test 
-     * with the corresponding Datalets
-     * @param vector of StylesheetDatalet objects to pass in
+     * @param vector of Datalet objects to pass in
      * @param desc String to use as testCase description
      */
     public void processFileList(Vector datalets, String desc)
@@ -469,6 +495,12 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      * Transform a vector of individual test names into a Vector 
      * of filled-in datalets to be tested
      *
+     * This basically just calculates local path\filenames across 
+     * the three presumably-parallel directory trees of testLocation 
+     * (inputDir), outLocation (outputDir) and goldLocation 
+     * (goldDir).  It then stuffs each of these values plus some 
+     * generic info like our testProps into each datalet it creates.
+     * 
      * @param files Vector of local path\filenames to be tested
      * @param testLocation File denoting directory where all 
      * .xml/.xsl tests are found
@@ -508,7 +540,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
             catch (ClassCastException cce)
             {
                 // Just skip this entry
-                //@todo log an error
+                reporter.logWarningMsg("Bad file element found, skipping: " + cce.toString());
                 continue;
             }
             // Check if it's a normal .xsl file, or a .xml file
@@ -560,7 +592,11 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      * details on how the file lines are parsed!</li>
      * </ul>
      * <p>Most items are optional, but not having them may result 
-     * in validation oddities</p>
+     * in validation oddities.  Future work would be to coordinate 
+     * this with various Datalet's implementations of .load() so 
+     * that Datalets can do better defaulting of non-provided 
+     * items; or maybe so that a user can specific a default 'mask' 
+     * of values to use for unspecified items.</p>
      *
      * @param fileName String; name of the file
      * @param desc description; caller's copy changed
@@ -736,6 +772,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      * Note that Xalan-J 2.x packages are listed before Xalan-J 1.x 
      * packages, and there is an inherent danger in the ordering 
      * when two classes have the same name.
+     * This is used in QetestUtils.testClassForName()
      */
     protected String[] testPackages = 
     {
@@ -746,15 +783,17 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
         "org.apache.qetest"
     };
 
-    /** Default FilenameFilter for directories.   */
+    /** Default FilenameFilter FQCN for directories.   */
     protected String defaultDirFilter = "org.apache.qetest.xsl.ConformanceDirRules";
 
-    /** Default FilenameFilter for files.   */
+    /** Default FilenameFilter FQCN for files.   */
     protected String defaultFileFilter = "org.apache.qetest.xsl.ConformanceFileRules";
 
-    /** Default Testlet for executing stylesheet tests.   */
+    /** Default Testlet FQCN for executing stylesheet tests.   */
     protected String defaultTestlet = "org.apache.qetest.xsl.StylesheetTestlet";
 
+    /** Cached Testlet Class; used for life of this test.   */
+    protected Class cachedTestletClazz = null;
 
     /**
      * Convenience method to get a Testlet to use.  
@@ -765,14 +804,17 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      */
     public Testlet getTestlet()
     {
-        // Find a Testlet class to use
-        Class clazz = QetestUtils.testClassForName(testlet, 
-                                                   testPackages,
-                                                   defaultTestlet);
+        // Find a Testlet class to use if we haven't already
+        if (null == cachedTestletClazz)
+        {
+            cachedTestletClazz = QetestUtils.testClassForName(testlet, 
+                                                              testPackages,
+                                                              defaultTestlet);
+        }
         try
         {
             // Create it and set our reporter into it
-            Testlet t = (Testlet)clazz.newInstance();
+            Testlet t = (Testlet)cachedTestletClazz.newInstance();
             t.setLogger((Logger)reporter);
             return (Testlet)t;
         }
