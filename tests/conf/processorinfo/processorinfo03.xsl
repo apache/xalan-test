@@ -9,7 +9,9 @@
 
 <xsl:template match="doc">
   <out>
-    <xsl:value-of select="system-property('xsl:vendor-url')"/>
+	<xsl:if test="contains(system-property('xsl:vendor-url'), 'http://xml.apache.org/xalan-')">
+		<xsl:value-of select="'Xalan_URL_found'"/>
+	</xsl:if>
   </out>
 </xsl:template>
  
