@@ -105,11 +105,11 @@
                destdir="${build.dir}" 
                includes="TraxWrapper.java"
                debug="${debug}" />
-<!-- comment out until javax.xml.transform interfaces stabilize
+        <!-- Exclude files that haven't caught up to new TRAX api changes -sc -->
         <javac srcdir="${test.dir}/trax" 
                destdir="${build.dir}" 
+               excludes="TemplatesAPITest.java,ProcessorAPITest.java,ResultAPITest.java,TestThreads.java"
                debug="${debug}" />
-comment out until javax.xml.transform interfaces stabilize -->
     </target>
     <target name="package.trax" depends="compile.trax">
         <jar jarfile="${build.dir}/${testxsl.jar}" 
