@@ -27,7 +27,8 @@
     <!-- Initialize: define various properties about locations, jars, etc.  -->
     <!-- ================================================================== -->
     <!-- First, read in the user's own default properties, if they exist -->
-    <property file="my.test.properties" />
+    <property name="local.properties" value="my.test.properties"/>
+    <property file="${local.properties}" />
     <!-- Then, read in the default checked-in properties -->
     <property file="test.properties" />
 
