@@ -53,6 +53,7 @@
     <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
     <property name="xalan.generator.styletargz" value="${xalan.xdocs}/xml-site-style.tar.gz"/>
     <property name="xdocs.generator.styletar" value="${xdocs.dir}/xml-site-style.tar"/>
+    <property name="compat.jar.name" value="../../java/build/xalanj1compat.jar" />
 
     <!-- Flags used when executing tests; provided as properties 
          here so that they may be overriden either by calling ant 
@@ -75,6 +76,14 @@
     -->
     <property name="prepend.class.path" value="" />
     <path id="compiletest.class.path">
+        <pathelement path="${prepend.class.path}" />
+        <pathelement path="${java.class.path}" />
+    </path>
+    <!-- Used when compiling Xalan-J 1.x tests explicitly against
+         Xalan-J 2.x with it's compat.jar 
+    -->
+    <path id="compattest.class.path">
+        <pathelement path="${compat.jar.name}" />
         <pathelement path="${prepend.class.path}" />
         <pathelement path="${java.class.path}" />
     </path>
@@ -172,6 +181,30 @@
     <!-- See comments for target minitest.xalan2 -->
     <target name="minitest.xalan1" depends="minitest-xalan1,minitest-report,minitest-not-pass,minitest-pass" 
             description="Run the Minitest for Xalan-J 1.x">
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- For Xalan-J 2.x compatibilty testing, use these targets -->
+    <!-- This compiles the Xalan-J 1.x tests against Xalan-J 2.x 
+         using compat.jar that provides backwards compatibility. -->
+    <!-- =================================================================== -->
+    <target name="compile.compat1" depends="compile.xsl">
+        <javac srcdir="${test.dir}/xslwrapper" 
+               destdir="${build.dir}" 
+               includes="XalanWrapper.java"
+               debug="${debug}" 
+               classpathref="compattest.class.path" />
+        <javac srcdir="${test.dir}/xalanj1" 
+               destdir="${build.dir}" 
+               debug="${debug}" 
+               classpathref="compattest.class.path" />
+        <!-- Note this may not support being called externally yet -->
+    </target>
+    <target name="package.compat1" depends="compile.compat1"
+            description="Build testxsl.jar for testing Xalan-J 2.x/1.x compatibility" >
+        <jar jarfile="${build.dir}/${testxsl.jar.name}" 
+             basedir="${build.dir}" 
+             includes="**/*.class,**/*.properties" />
     </target>
 
     <!-- =================================================================== -->
