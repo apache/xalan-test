@@ -127,16 +127,21 @@ public class XHTFileCheckService implements CheckService
         sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 
+        if (((null == actual) || (null == reference )))
+        {
+            pw.println("XHTFileCheckService actual or reference was null!");
+            pw.flush();
+            logFileCheckElem(logger, "null", "null", msg, id, sw.toString());
+            logger.checkErr(msg, id);
+            return logger.ERRR_RESULT;
+        }
         if (!((actual instanceof File) & (reference instanceof File)))
         {
-
             // Must have File objects to continue
-            logger.checkErr("XHTFileCheckService only takes files, with: "
-                              + msg, id);
-            pw.println("XHTFileCheckService only takes files, with: " + msg);
-            pw.println("   actual: " + actual);
-            pw.println("reference: " + reference);
+            pw.println("XHTFileCheckService only takes File objects!");
             pw.flush();
+            logFileCheckElem(logger, actual.toString(), reference.toString(), msg, id, sw.toString());
+            logger.checkErr(msg, id);
             return logger.ERRR_RESULT;
         }
 
@@ -146,10 +151,9 @@ public class XHTFileCheckService implements CheckService
         // Fail if Actual file doesn't exist or is 0 len
         if ((!actualFile.exists()) || (actualFile.length() == 0))
         {
-            String errMsg = "actual(" + actualFile.toString() + ") did not exist or was 0 len";
-            logger.logMsg(Logger.WARNINGMSG, errMsg);
-            pw.println(errMsg);
+            pw.println("actual(" + actualFile.toString() + ") did not exist or was 0 len");
             pw.flush();
+            logFileCheckElem(logger, actualFile.toString(), referenceFile.toString(), msg, id, sw.toString());
             logger.checkFail(msg, id);
             return logger.FAIL_RESULT;
         }
@@ -157,10 +161,9 @@ public class XHTFileCheckService implements CheckService
         // Ambiguous if gold file doesn't exist or is 0 len
         if ((!referenceFile.exists()) || (referenceFile.length() == 0))
         {
-            String errMsg = "reference(" + referenceFile.toString() + ") did not exist or was 0 len";
-            logger.logMsg(Logger.WARNINGMSG, errMsg);
-            pw.println(errMsg);
+            pw.println("reference(" + referenceFile.toString() + ") did not exist or was 0 len");
             pw.flush();
+            logFileCheckElem(logger, actualFile.toString(), referenceFile.toString(), msg, id, sw.toString());
             logger.checkAmbiguous(msg, id);
             return Logger.AMBG_RESULT;
         }
@@ -171,44 +174,31 @@ public class XHTFileCheckService implements CheckService
 
         try
         {
-
             // Note calling order (gold, act) is different than checkFiles()
             isEqual = comparator.compare(referenceFile.getCanonicalPath(),
                                          actualFile.getCanonicalPath(), pw,
                                          warning);
-
             // Side effect: fills in pw/sw with info about the comparison
         }
         catch (Throwable t)
         {
-            // Add any exception info to pw/sw
-            logger.logThrowable(Logger.ERRORMSG, t, "XHTFileCheckService threw");
+            // Add any exception info to pw/sw; this will automatically 
+            //  get logged out later on via logFileCheckElem
             pw.println("XHTFileCheckService threw: " + t.toString());
             t.printStackTrace(pw);
             isEqual = false;
         }
 
+        // If not equal at all, fail
         if (!isEqual)
         {
             pw.println("XHTFileCheckService files were not equal");
             pw.flush();
-            // We fail, obviously!  Bunch up info for logging 
-            //  a special element about fail
-            Hashtable attrs = new Hashtable();
-            attrs.put("actual", actualFile.toString());
-            attrs.put("reference", referenceFile.toString());
-            attrs.put("reportedBy", "XHTFileCheckService");
-            String elementBody = msg + "(" + id + ") \n" + sw.toString();
-            // HACK: escapeString(elementBody) so that it's legal XML
-            //  for cases where we have XML output.  This isn't 
-            //  necessarily a 'hack', I'm just not sure what the 
-            //  cleanest place to put this is (here or some sort 
-            //  of intelligent logic in XMLFileLogger)
-            elementBody = XMLFileLogger.escapeString(elementBody);
-            logger.logElement(Logger.STATUSMSG, "fileCheck", attrs, elementBody);
+            logFileCheckElem(logger, actualFile.toString(), referenceFile.toString(), msg, id, sw.toString());
             logger.checkFail(msg, id);
             return Logger.FAIL_RESULT;
         }
+        // If whitespace-only diffs, then pass/fail based on allowWhitespaceDiff
         else if (warning[0])
         {
             pw.println("XHTFileCheckService whitespace diff warning!");
@@ -221,19 +211,63 @@ public class XHTFileCheckService implements CheckService
             }
             else
             {
-                logger.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, failing!");
+                logFileCheckElem(logger, actualFile.toString(), referenceFile.toString(), msg, id, 
+                        "XHTFileCheckService whitespace diff warning, failing!\n" + sw.toString());
                 logger.checkFail(msg, id);
                 return Logger.FAIL_RESULT;
             }
         }
+        // Otherwise we were completely equal, so pass
         else
         {
-            logger.checkPass(msg, id);
             pw.println("XHTFileCheckService files were equal");
             pw.flush();
-
+            // For pass case, we *dont* call logFileCheckElem
+            logger.checkPass(msg, id);
             return Logger.PASS_RESULT;
         }
+    }
+
+    /**
+     * Logs a custom element about the current check() call.  
+     * <pre>
+     * <fileCheck level="40"
+     * reference="tests\conf-gold\match\match16.out"
+     * reportedBy="XHTFileCheckService"
+     * actual="results-alltest\dom\match\match16.out"
+     * >
+     * StylesheetTestlet match16.xsl(null) 
+     * XHTFileCheckService threw: java.io.IOException: The process cannot access the file because it is being used by another process
+     * java.io.IOException: The process cannot access the file because it is being used by another process
+     * 	at java.io.Win32FileSystem.canonicalize(Native Method)
+     *     etc...
+     * XHTFileCheckService files were not equal
+     * 
+     * </fileCheck>
+     * </pre>     
+     * @param logger to dump any output messages to
+     * @param name of actual (current) File to check
+     * @param name of reference (gold, or expected) File to check against
+     * @param msg comment to log out with this test point
+     * @param id to log out with this test point
+     * @param additional log info from PrintWriter/StringWriter
+     */
+    protected void logFileCheckElem(Logger logger, 
+            String actualFile, String referenceFile,
+            String msg, String id, String logs)
+    {
+        Hashtable attrs = new Hashtable();
+        attrs.put("actual", actualFile);
+        attrs.put("reference", referenceFile);
+        attrs.put("reportedBy", "XHTFileCheckService");
+        String elementBody = msg + "(" + id + ") \n" + logs;
+        // HACK: escapeString(elementBody) so that it's legal XML
+        //  for cases where we have XML output.  This isn't 
+        //  necessarily a 'hack', I'm just not sure what the 
+        //  cleanest place to put this is (here or some sort 
+        //  of intelligent logic in XMLFileLogger)
+        elementBody = XMLFileLogger.escapeString(elementBody);
+        logger.logElement(Logger.STATUSMSG, "fileCheck", attrs, elementBody);
     }
 
     /**
