@@ -57,7 +57,7 @@
 
 package org.apache.qetest;
 
-import org.apache.qetest.xsl.XSLProcessorTestBase;
+///import org.apache.qetest.xsl.XSLProcessorTestBase;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -88,7 +88,7 @@ import java.util.Vector;
  * @author shane_curcuru@us.ibm.com
  * @version $Id$
  */
-public class FileTestletDriver extends XSLProcessorTestBase
+public class FileTestletDriver extends FileBasedTest /// extends XSLProcessorTestBase
 {
 
     //-----------------------------------------------------
@@ -174,7 +174,6 @@ public class FileTestletDriver extends XSLProcessorTestBase
         testlet = testProps.getProperty(OPT_TESTLET, testlet);
         dirFilter = testProps.getProperty(OPT_DIRFILTER, dirFilter);
         fileFilter = testProps.getProperty(OPT_FILEFILTER, fileFilter);
-        flavor = testProps.getProperty(OPT_FLAVOR, flavor);
 
         // Grab a unique runid for logging out with our tests 
         //  Used in results reporting stylesheets to differentiate 
@@ -201,7 +200,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
     public boolean runTestCases(Properties p)
     {
         // First log out any other runtime information, like the 
-        //  actual flavor of ProcessorWrapper, etc.
+        //  actual current testlet and filters
         try
         {
             // Note that each of these calls actually force the 
@@ -681,7 +680,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
         try
         {
             // Create it, optionally with a category
-            String category = testProps.getProperty("category");
+            String category = testProps.getProperty(OPT_CATEGORY);
             if ((null != category) && (category.length() > 1))  // Arbitrary check for non-null, non-blank string
             {
                 Class[] parameterTypes = 
@@ -726,7 +725,7 @@ public class FileTestletDriver extends XSLProcessorTestBase
         try
         {
             // Create it, optionally with excludes
-            String excludes = testProps.getProperty("excludes");
+            String excludes = testProps.getProperty(OPT_EXCLUDES);
             if ((null != excludes) && (excludes.length() > 1))  // Arbitrary check for non-null, non-blank string
             {
                 Class[] parameterTypes = 
@@ -773,15 +772,15 @@ public class FileTestletDriver extends XSLProcessorTestBase
      */
     public String usage()
     {
-        return ("Common [optional] options supported by FileTestletDriver:\n"
+        return ("Additional options supported by FileTestletDriver:\n"
                 + "    -" + OPT_FILELIST
-                + "  <name of listfile of tests to run>\n"
+                + "   <name of listfile of tests to run>\n"
                 + "    -" + OPT_DIRFILTER
                 + "  <classname of FilenameFilter for dirs>\n"
                 + "    -" + OPT_FILEFILTER
-                + "  <classname of FilenameFilter for files>\n"
+                + " <classname of FilenameFilter for files>\n"
                 + "    -" + OPT_TESTLET
-                + "  <classname of Testlet to execute tests with>\n"
+                + "    <classname of Testlet to execute tests with>\n"
                 + super.usage());   // Grab our parent classes usage as well
     }
 

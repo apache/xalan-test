@@ -66,6 +66,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -84,9 +85,12 @@ import java.util.Vector;
  * <li>outputDir (string representing dir where output, working, temp files go)</li>
  * <li>goldDir  (string representing dir where known good reference files are)</li>
  * <li>debug (generic boolean flag for debugging)</li>
- * <li>loggers (FQCN;of;Loggers to add to our Reporter)</li>
- * <li>loggingLevel (passed to Reporters)</li>
- * <li>logFile (string filename for any file-based Reporter)</li>
+ * <li>(stored in testProps) loggers (FQCN;of;Loggers to add to our Reporter)</li>
+ * <li>(stored in testProps) loggingLevel (passed to Reporters)</li>
+ * <li>(stored in testProps) logFile (string filename for any file-based Reporter)</li>
+ * <li>fileChecker</li>
+ * <li>(stored in testProps) excludes</li>
+ * <li>(stored in testProps) category</li>
  * </ul>
  * @author Shane_Curcuru@lotus.com
  * @version 3.0
@@ -100,27 +104,35 @@ public class FileBasedTest extends TestImpl
      * <p>Should be overridden by subclasses, although they are free
      * to call super.usage() to get the common options string.</p>
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return String denoting usage of this class
      */
     public String usage()
     {
 
         return ("Common options supported by FileBasedTest:\n" + "    -"
                 + OPT_LOAD
-                + " <loadPropFile>  (read in a .properties file,\n"
-                + "                           that can set any/all of the other opts)\n"
-                + "    -" + OPT_INPUTDIR + "     <path to input files>\n"
+                + " <file.props>  (read in a .properties file,\n"
+                + "                         that can set any/all of the other opts)\n"
+                + "    -" + OPT_INPUTDIR 
+                + "    <path to input files>\n"
                 + "    -" + OPT_OUTPUTDIR
-                + "    <path to output area - where all output is sent>\n"
+                + "   <path to output area - where all output is sent>\n"
                 + "    -" + OPT_GOLDDIR
-                + "      <path to gold reference output>\n" + "    -"
-                + Logger.OPT_LOGFILE
-                + "      <resultsFileName> (sends test results to file)\n"
+                + "     <path to gold reference output>\n"
+                + "    -" + OPT_CATEGORY
+                + "    <names;of;categories of tests to run>\n"
+                + "    -" + OPT_EXCLUDES
+                + "    <list;of;specific file.ext tests to skip>\n" 
+                + "    -" + OPT_FILECHECKER
+                + " <FQCN of a non-standard FileCheckService>\n"
                 + "    -" + Reporter.OPT_LOGGERS
-                + "      <FQCN;of;Loggers to use >\n" + "    -"
-                + Reporter.OPT_LOGGINGLEVEL + " <int level>\n" + "    -"
-                + Reporter.OPT_DEBUG
-                + "        (prints extra debugging info)\n");
+                + "     <FQCN;of;Loggers to use>\n"
+                + "    -" + Logger.OPT_LOGFILE
+                + "     <resultsFileName> (sends test results to XML file)\n"
+                + "    -" + Reporter.OPT_LOGGINGLEVEL 
+                + " <int> (level of msgs to log out; 0=few, 99=lots)\n" 
+                + "    -" + Reporter.OPT_DEBUG
+                + " (prints extra debugging info)\n");
     }
 
     //-----------------------------------------------------
@@ -135,9 +147,6 @@ public class FileBasedTest extends TestImpl
      */
     public static final String OPT_LOAD = "load";
 
-    /** NEEDSDOC Field load          */
-    protected String load = null;
-
     /**
      * Parameter: Where are test input files?
      * <p>Default: .\inputs.
@@ -145,7 +154,7 @@ public class FileBasedTest extends TestImpl
      */
     public static final String OPT_INPUTDIR = "inputDir";
 
-    /** NEEDSDOC Field inputDir          */
+    /** Field inputDir:holds String denoting local path for inputs.  */
     protected String inputDir = "." + File.separator + "inputs";
 
     /**
@@ -155,7 +164,7 @@ public class FileBasedTest extends TestImpl
      */
     public static final String OPT_OUTPUTDIR = "outputDir";
 
-    /** NEEDSDOC Field outputDir          */
+    /** Field outputDir:holds String denoting local path for outputs.  */
     protected String outputDir = "." + File.separator + "outputs";
 
     /**
@@ -165,8 +174,39 @@ public class FileBasedTest extends TestImpl
      */
     public static final String OPT_GOLDDIR = "goldDir";
 
-    /** NEEDSDOC Field goldDir          */
+    /** Field goldDir:holds String denoting local path for golds.  */
     protected String goldDir = "." + File.separator + "golds";
+
+    /**
+     * Parameter: Only run a single subcategory of the tests.
+     * <p>Default: blank, runs all tests - supply the directory name
+     * of a subcategory to run just that set.  Set into testProps 
+     * and used from there.</p>
+     */
+    public static final String OPT_CATEGORY = "category";
+
+    /**
+     * Parameter: Should we exclude any specific test files?
+     * <p>Default: null (no excludes; otherwise specify 
+     * semicolon delimited list of bare filenames something like 
+     * 'axes01.xsl;bool99.xsl').  Set into testProps and used 
+     * from there</p>
+     */
+    public static final String OPT_EXCLUDES = "excludes";
+
+    /**
+     * Parameter: Which CheckService should we use for XML output Files?
+     * <p>Default: org.apache.qetest.XHTFileCheckService.</p>
+     */
+    public static final String OPT_FILECHECKER = "fileChecker";
+
+    /**
+     * Parameter-Default value: org.apache.qetest.XHTFileCheckService.  
+     */
+    public static final String OPT_FILECHECKER_DEFAULT = "org.apache.qetest.xsl.XHTFileCheckService";
+
+    /** FileChecker instance for use by subclasses; created in preTestFileInit()  */
+    protected CheckService fileChecker = null;
 
     /**
      * Parameter: if Reporters should log performance data, true/false.
@@ -203,7 +243,7 @@ public class FileBasedTest extends TestImpl
     /**
      * Accessor method for our Properties block, for use by harnesses.
      *
-     * NEEDSDOC @param p
+     * @param p if (p != null) testProps = (Properties) p.clone(); 
      */
     public void setProperties(Properties p)
     {
@@ -218,7 +258,7 @@ public class FileBasedTest extends TestImpl
     /**
      * Accessor method for our Properties block, for use by harnesses.
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return our Properties block itself
      */
     public Properties getProperties()
     {
@@ -249,9 +289,9 @@ public class FileBasedTest extends TestImpl
      * @author Shane_Curcuru@lotus.com
      * @see TestImpl#testFileInit(java.util.Properties)
      *
-     * NEEDSDOC @param p
+     * @param p Properties to initialize from 
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return false if we should abort; true otherwise
      */
     public boolean preTestFileInit(Properties p)
     {
@@ -260,9 +300,29 @@ public class FileBasedTest extends TestImpl
         //  so it can use the same values in initialization
         // A Reporter will auto-initialize from the values
         //  in the properties block
-        setReporter(new Reporter(p));
-        reporter.addDefaultLogger();  // add default logger if needed
+        setReporter(QetestFactory.newReporter(p));
         reporter.testFileInit(testName, testComment);
+
+        // Create a file-based CheckService for later use
+        if (null == fileChecker)
+        {
+            String tmpName = testProps.getProperty(OPT_FILECHECKER);
+            if ((null != tmpName) && (tmpName.length() > 0))
+            {
+                // Use the user's specified class; if not available 
+                //  will return null which gets covered below
+                fileChecker = QetestFactory.newCheckService(reporter, tmpName);
+            }
+            
+            if (null == fileChecker)
+            {
+                // If that didn't work, then ask for default one that does files
+                fileChecker = QetestFactory.newCheckService(reporter, QetestFactory.TYPE_FILES);
+            }
+            // If we're creating a new one, also applyAttributes
+            // (Assume that if we already had one, it already had this done)
+            fileChecker.applyAttributes(p);
+        }
 
         return true;
     }
@@ -276,21 +336,30 @@ public class FileBasedTest extends TestImpl
      * @author Shane_Curcuru@lotus.com
      * @see TestImpl#testFileInit(java.util.Properties)
      *
-     * NEEDSDOC @param p
+     * @param p Properties to initialize from 
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return false if we should abort; true otherwise
      */
     public boolean doTestFileInit(Properties p)
     {
-
-        // @todo implement in your subclass
-        reporter.logTraceMsg(
-            "FileBasedTest.doTestFileInit() default implementation - please override");
-
+        /* no-op; feel free to override */
         return true;
     }
 
-    // Use default implementation of postTestFileInit()
+    /**
+     * Override mostly blank routine to dump environment info.
+     * <p>Log out information about our environment in a structured 
+     * way: mainly by calling logTestProps() here.</p>
+     * 
+     * @param p Properties to initialize from 
+     *
+     * @return false if we should abort; true otherwise
+     */
+    public boolean postTestFileInit(Properties p)
+    {
+        logTestProps();
+        return true;
+    }
 
     /**
      * Run all of our testcases.
@@ -299,9 +368,9 @@ public class FileBasedTest extends TestImpl
      * you must set numTestCases properly!</p>
      * @author Shane Curcuru
      *
-     * NEEDSDOC @param p
+     * @param p Properties to initialize from 
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return false if we should abort; true otherwise
      */
     public boolean runTestCases(Properties p)
     {
@@ -317,20 +386,42 @@ public class FileBasedTest extends TestImpl
      * @author Shane Curcuru
      * <p>Tests should override if they need to do any cleanup.</p>
      *
-     * NEEDSDOC @param p
+     * @param p Properties to initialize from 
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return false if we should abort; true otherwise
      */
     public boolean doTestFileClose(Properties p)
     {
-
-        reporter.logTraceMsg(
-            "FileBasedTest.doTestFileClose() default implementation - please override");
-
+        /* no-op; feel free to override */
         return true;
     }
 
-    // Use default implementations of pre/postTestFileClose()
+    // Use default implementations of preTestFileClose()
+
+    /**
+     * Mark the test complete - called once after running testcases.
+     * <p>Currently logs a summary of our test status and then tells 
+     * our reporter to log the testFileClose. This will calculate 
+     * final results, and complete logging for any structured 
+     * output logs (like XML files).</p>
+     *<p>We also call reporter.writeResultsStatus(true) to 
+     * write out a pass/fail marker file.  (This last part is 
+     * actually optional, but it's useful and quick, so I'll 
+     * do it by default for now.)</p>
+     *
+     * @param p Unused; passed through to super
+     *
+     * @return true if OK, false otherwise
+     */
+    protected boolean postTestFileClose(Properties p)
+    {
+        // Log out a special summary status, with marker file
+        reporter.writeResultsStatus(true);
+
+        // Ask our superclass to handle this as well
+        return super.postTestFileClose(p);
+    }
+
     //-----------------------------------------------------
     //-------- Initialize our common input params --------
     //-----------------------------------------------------
@@ -347,36 +438,60 @@ public class FileBasedTest extends TestImpl
      */
     public boolean initializeFromProperties(Properties props)
     {
+        // Copy over all properties into our local block
+        //  this is a little unusual, but it does allow users 
+        //  to set any new sort of properties via the properties 
+        //  file, and we'll pick it up - that way this class doesn't
+        //  have to get updated when we have new properties
+        // Note that this may result in duplicates since we
+        //  re-set many of the things from bleow
+        for (Enumeration enum = props.propertyNames();
+                enum.hasMoreElements(); /* no increment portion */ )
+        {
+            Object key = enum.nextElement();
+
+            testProps.put(key, props.get(key));
+        }
+
 
         // Parse out any values that match our internal convenience variables
         // default all values to our current values
         // String values are simply getProperty()'d
         inputDir = props.getProperty(OPT_INPUTDIR, inputDir);
-
         if (inputDir != null)
             testProps.put(OPT_INPUTDIR, inputDir);
 
         outputDir = props.getProperty(OPT_OUTPUTDIR, outputDir);
-
         if (outputDir != null)
             testProps.put(OPT_OUTPUTDIR, outputDir);
 
         goldDir = props.getProperty(OPT_GOLDDIR, goldDir);
-
         if (goldDir != null)
             testProps.put(OPT_GOLDDIR, goldDir);
+
+        // The actual fileChecker object is created in preTestFileInit()
 
         // Use a temp string for those properties we only set 
         //  in our testProps, but don't bother to save ourselves
         String temp = null;
 
-        temp = props.getProperty(Reporter.OPT_LOGGERS);
+        temp = props.getProperty(OPT_FILECHECKER);
+        if (temp != null)
+            testProps.put(OPT_FILECHECKER, temp);
 
+        temp = props.getProperty(OPT_CATEGORY);
+        if (temp != null)
+            testProps.put(OPT_CATEGORY, temp);
+
+        temp = props.getProperty(OPT_EXCLUDES);
+        if (temp != null)
+            testProps.put(OPT_EXCLUDES, temp);
+
+        temp = props.getProperty(Reporter.OPT_LOGGERS);
         if (temp != null)
             testProps.put(Reporter.OPT_LOGGERS, temp);
 
         temp = props.getProperty(Logger.OPT_LOGFILE);
-
         if (temp != null)
             testProps.put(Logger.OPT_LOGFILE, temp);
 
@@ -424,7 +539,7 @@ public class FileBasedTest extends TestImpl
      * @author Shane Curcuru
      * @param String[] array of arguments
      *
-     * NEEDSDOC @param args
+     * @param args array of command line arguments
      * @param flag: are we being called from a subclass?
      * @return status - true if OK, false if error.
      */
@@ -459,23 +574,24 @@ public class FileBasedTest extends TestImpl
                         return false;
                     }
 
-                    load = args[k];
+                    String loadPropsName = args[k];
 
                     try
                     {
 
                         // Load named file into our properties block
-                        FileInputStream fIS = new FileInputStream(load);
+                        FileInputStream fIS = new FileInputStream(loadPropsName);
                         Properties p = new Properties();
 
                         p.load(fIS);
+                        p.put(OPT_LOAD, loadPropsName); // Pass along with properties
 
                         propsOK &= initializeFromProperties(p);
                     }
                     catch (Exception e)
                     {
                         System.err.println(
-                            "ERROR: loading properties file failed: " + load);
+                            "ERROR: loading properties file failed: " + loadPropsName);
                         e.printStackTrace();
 
                         return false;
@@ -543,6 +659,36 @@ public class FileBasedTest extends TestImpl
                 continue;
             }
 
+            if (args[i].equalsIgnoreCase(optPrefix + OPT_CATEGORY))
+            {
+                if (++i >= nArgs)
+                {
+                    System.err.println("ERROR: must supply arg for: "
+                                       + optPrefix + OPT_CATEGORY);
+
+                    return false;
+                }
+
+                testProps.put(OPT_CATEGORY, args[i]);
+
+                continue;
+            }
+
+            if (args[i].equalsIgnoreCase(optPrefix + OPT_EXCLUDES))
+            {
+                if (++i >= nArgs)
+                {
+                    System.err.println("ERROR: must supply arg for: "
+                                       + optPrefix + OPT_EXCLUDES);
+
+                    return false;
+                }
+
+                testProps.put(OPT_EXCLUDES, args[i]);
+
+                continue;
+            }
+
             if (args[i].equalsIgnoreCase(optPrefix + Reporter.OPT_LOGGERS))
             {
                 if (++i >= nArgs)
@@ -569,6 +715,21 @@ public class FileBasedTest extends TestImpl
                 }
 
                 testProps.put(Logger.OPT_LOGFILE, args[i]);
+
+                continue;
+            }
+
+            if (args[i].equalsIgnoreCase(optPrefix + OPT_FILECHECKER))
+            {
+                if (++i >= nArgs)
+                {
+                    System.out.println("ERROR: must supply arg for: "
+                                       + optPrefix + OPT_FILECHECKER);
+
+                    return false;
+                }
+
+                testProps.put(OPT_FILECHECKER, args[i]);
 
                 continue;
             }
@@ -657,54 +818,15 @@ public class FileBasedTest extends TestImpl
     //-----------------------------------------------------
 
     /**
-     * Create a TestfileInfo object from our paths.
-     * From a single base filename, fill in fully qualified paths for
-     * the inputName, outputName, goldName from our inputDir,
-     * outputDir, goldDir.
-     * Note: uses semicolon ':' as separator!
-     * @author Shane Curcuru
-     * @param basename of file
-     * @return TestfileInfo with *Name fields set
+     * Log out any System or common version info.
+     * <p>Logs System.getProperties(), and our the testProps block, etc..</p>
      */
-    public TestfileInfo createTestfileInfo(String basename)
+    public void logTestProps()
     {
-
-        TestfileInfo t = new TestfileInfo();
-
-        try
-        {
-            t.inputName = (new File(inputDir)).getCanonicalPath()
-                          + File.separatorChar + basename;
-        }
-        catch (IOException ioe)
-        {
-            t.inputName = (new File(inputDir)).getAbsolutePath()
-                          + File.separatorChar + basename;
-        }
-
-        try
-        {
-            t.outputName = (new File(outputDir)).getCanonicalPath()
-                           + File.separatorChar + basename;
-        }
-        catch (IOException ioe)
-        {
-            t.outputName = (new File(outputDir)).getAbsolutePath()
-                           + File.separatorChar + basename;
-        }
-
-        try
-        {
-            t.goldName = (new File(goldDir)).getCanonicalPath()
-                         + File.separatorChar + basename;
-        }
-        catch (IOException ioe)
-        {
-            t.goldName = (new File(goldDir)).getAbsolutePath()
-                         + File.separatorChar + basename;
-        }
-
-        return t;
+        reporter.logHashtable(reporter.CRITICALMSG, System.getProperties(),
+                              "System.getProperties");
+        reporter.logHashtable(reporter.CRITICALMSG, testProps, "testProps");
+        reporter.logHashtable(reporter.CRITICALMSG, QetestUtils.getEnvironmentHash(), "getEnvironmentHash");
     }
 
 
@@ -743,7 +865,7 @@ public class FileBasedTest extends TestImpl
         for (int i = 0; i < args.length; i++)
         {
             buf.append(args[i]);
-            buf.append(", "); // Ignore messiness of extra trailing ,
+            buf.append(" ");
         }
         testProps.put(MAIN_CMDLINE, buf.toString());
 
