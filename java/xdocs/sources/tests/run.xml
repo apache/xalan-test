@@ -21,6 +21,8 @@
     for their inputs, so you can run them without any setup at all. 
     However we have provided a couple of more 
     convenient ways to run the most common tests:</p>
+    <note>If you need to debug into the tests themselves, 
+    you may want to use the <link idref="faq" anchor="debug">debug*.bat files</link></note>
     <p>Of course, first <link idref="getstarted" anchor="how-to-build">Build a fresh copy of testxsl.jar.</link>
     </p>
     <p>cd xml-xalan\test<br/></p>
@@ -65,13 +67,22 @@
         more output shown in the results (higher numbers up to 99 show more details, 
         lower numbers, down to 0, show fewer details).
       </p>  
+      <p>Future work includes greatly updated results analysis stylesheets. 
+      See FailScanner.xsl and PerfScanner.xsl for ideas.  An important design 
+      principle in the tests is that at runtime the tests merely output 
+      whatever data they can as results are generated; afterwards, we then 
+      post-process the results into whatever presentation format is needed, 
+      including perhaps re-calculating overall results (example: if we have 
+      a list of known fails correlated to Bugzilla numbers, then a stylesheet 
+      could filter out these fails and report them as known bugs instead.
+      </p>
     </s2>
     <anchor name="test-options"/>
     <s2 title="Common Test Options">
       <note>Section needs updating to reflect the fact that while the options the 
       tests see remain as below, the user must now prefix all optionNames with 
       'qetest.' or 'conf.', etc. when passing the options on the command line or 
-      via my.test.properties or test.properties Aug-01 -sc</note>
+      via my.test.properties or test.properties -sc</note>
       <p>Most tests can either accept options from a properties file, via:<br/>
       <code>&nbsp;&nbsp;TestName -load file.properties</code><br/><br/>
       or simply from the command line (which overrides the properties file) like:<br/>
@@ -118,10 +129,14 @@
           <item>(read in a .properties file, that can set any/all of the other opts)  
           This option is automatically used by the Ant build.xml file, so you normally 
           would not specify it yourself.</item>
-        <label>-debug</label>
-          <item>prints extra test debugging info</item>
       </gloss> 	
       <p>Note that most options work equivalently with either Xalan-J or Xalan-C tests.</p>
+      <p>When running tests using Ant, the &lt;xalantest&gt; task actually 
+      marshalls various Ant variables and uses the precompiled org.apache.qetest.xsl.XSLTestAntTask 
+      to actually execute the test (either in the same JVM or forked depending on 
+      ${fork-tests}.  It simply strips the appropriate set of prefixes 
+      off of required Ant variables and dumps them into an XSLTestAntTask.properties 
+      file on disk, which it tells the test executing to -load.</p>
     </s2>
     
     <anchor name="how-to-run-c"/>

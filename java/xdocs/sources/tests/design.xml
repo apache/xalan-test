@@ -219,6 +219,21 @@
       <code>cd xml-xalan\test</code><br/>
       <code>build contrib -Dqetest.category=foo</code><br/>
     </p>
+    <p>Tests using Xalan Extensions may be found under test/tests/extensions and are separated 
+    into directories by language:<br/>
+    <gloss>
+      <label>test/tests/extensions/library</label>
+        <item>Stylesheets for extensions implemented natively in Xalan; these only 
+        have .xsl and .xml files for the test</item>
+      <label>test/tests/extensions/java</label>
+        <item>Stylesheets for extensions implemented in Java; these are run by 
+        a .java file that uses an ExtensionTestlet to run</item>
+      <label>test/tests/extensions/javascript</label>
+        <item>Stylesheets for extensions implemented in Javascript; these include 
+        only a .xsl and .xml file but require 
+        <jump href="http://xml.apache.org/xalan-j/extensions.html#supported-lang">bsf.jar and js.jar</jump> in the classpath</item>
+    </gloss>
+    </p>
 
   </s2>
 
@@ -241,9 +256,9 @@
     <ul>
     <li><jump href="http://www.soft.com/Institute/HotList/index.html">Software Research Institute HotList</jump>
     This is a pretty good laundry list of top-level links for software testing</li>
-    <li><jump href=""></jump>In progress</li>
-    <li><jump href=""></jump></li>
-    <li><jump href=""></jump></li>
+    <li><jump href="http://www.swquality.com/users/pustaver/index.shtml">SWQuality site; plenty of links</jump></li>
+    <li><jump href="http://www.stickyminds.com/">StickyMinds</jump></li>
+    <li><jump href="http://www.sqe.com/press/index.asp">SQE</jump></li>
     </ul>
   </s2>
 </s1>

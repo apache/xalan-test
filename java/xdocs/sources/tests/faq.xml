@@ -50,6 +50,19 @@
     </ul>
   </s2>
 
+  <anchor name="xsltc"/>
+  <s2 title="Run XSLTC-related tests">
+    <p>Note that currently some of the XSLTC-specific tests are 
+    built with separate targets; in the future as the XSLTC engine 
+    is more completely integrated into the Xalan core, we hope to 
+    merge the tests as well.</p>
+    <p>Note that many of the tests that use TrAX/JAXP should work 
+    equally well with XSLTC since they have their own version of 
+    a TransformerFactory; remember to set the appropriate system 
+    property or classpath appropriately.  The various org.apache.qetest.trax 
+    API tests should also work normally with XSLTC.</p>
+  </s2>
+
   <anchor name="xsltmark"/>
   <s2 title="Run XSLTMARK perf tests">
     <p>Xalan has it's own more detailed automation harness for running 
