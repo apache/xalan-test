@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Document xmlns:x="www.x.com" a1="hello" a2="goodbye">
+<!-- Default test document -->
+<?api a1="yes" a2="no"?>
+<A><B><C><D><E><F/></E></D></C></B></A>
+<Aa/><Ab/><Ac><Ac1/></Ac>
+<Ad xmlns:xx="www.xx.com" xmlns:y="www.y.com" xmlns:z="www.z.com">
+<Ad1/></Ad>
+</Document>
