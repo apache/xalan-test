@@ -70,7 +70,7 @@ public class ConformanceErrFileRules implements FilenameFilter
     /**
      * Initialize with a case-insensitive name of parent directory.  
      *
-     * NEEDSDOC @param p
+     * @param p case-insensitive name of parent directory
      */
     public ConformanceErrFileRules(String p)
     {
@@ -78,7 +78,7 @@ public class ConformanceErrFileRules implements FilenameFilter
             parentName = p;
     }
 
-    /** Case-insensitive name of parent directory; used in {@link accept(java.io.File, java.lang.String)}. */
+    /** Case-insensitive name of parent directory; used in {@link #accept(java.io.File, java.lang.String)}. */
     protected String parentName = "";
 
     /**

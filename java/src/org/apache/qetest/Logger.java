@@ -177,7 +177,8 @@ public interface Logger
      * <p>Loggers merely use these constants in their output formats.
      * Reporters will only call contained Loggers to report messages
      * at the current logging level and higher.
-     * For example, if you <code>setLoggingLevel(ERRORMSG)</code> then INFOMSGs
+     * For example, if you <code>setLoggingLevel(ERRORMSG)</code>
+     * (currently found in the {@link Reporter Reporter} subclass) then INFOMSGs
      * will not be reported, presumably speeding execution time and saving
      * output log space.  These levels are also coded into most Logger output,
      * allowing for easy reporting of various levels of results.</p>
@@ -525,9 +526,10 @@ public interface Logger
     /**
      * Logs out Throwable.toString() and a stack trace of the 
      * Throwable with the specified severity.
-     * <p>Works in conjuntion with {@link #setLoggingLevel(int)}; 
+     * <p>Works in conjunction with {@link Reporter#setLoggingLevel(int) setLoggingLevel}; 
      * only outputs messages that are more severe than the current 
-     * logging level.</p>
+     * logging level.  Different Logger or Reporter implementations 
+     * may implement loggingLevels in different ways currently.</p>
      * <p>This uses logArbitrary to log out your msg - message, 
      * a newline, throwable.toString(), a newline,
      * and then throwable.printStackTrace().</p>
