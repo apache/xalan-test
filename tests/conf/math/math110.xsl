@@ -16,21 +16,21 @@
       <xsl:text>|</xsl:text>
       <xsl:value-of select="number(7 div 4)"/>
       <xsl:text>|</xsl:text>
-      <xsl:value-of select="(1.75 = (7 div 4))"/>
+      <xsl:value-of select="(number(1.75) = (7 div 4))"/>
       <xsl:text>|&#10;</xsl:text>
-      <xsl:value-of select="number(0.0175 * 100)"/>
+      <xsl:value-of select="number(0.109375 * 16)"/>
       <xsl:text>|</xsl:text>
-      <xsl:value-of select="(1.75 = (0.0175 * 100))"/>
+      <xsl:value-of select="(number(1.75) = (0.109375 * 16))"/>
       <xsl:text>|&#10;</xsl:text>
       <xsl:value-of select="number(k)"/>
       <xsl:text>|</xsl:text>
       <xsl:value-of select="number(4 div 10000)"/>
       <xsl:text>|</xsl:text>
-      <xsl:value-of select="(k = (4 div 10000))"/>
+      <xsl:value-of select="(number(k) = (4 div 10000))"/>
       <xsl:text>|&#10;</xsl:text>
       <xsl:value-of select="number(0.0001 * 4)"/>
       <xsl:text>|</xsl:text>
-      <xsl:value-of select="(k = (0.0001 * 4))"/>
+      <xsl:value-of select="(number(k) = (0.0001 * 4))"/>
       <xsl:text>|&#10;</xsl:text>
   </out>
 </xsl:template>
