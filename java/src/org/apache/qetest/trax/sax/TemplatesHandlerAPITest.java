@@ -75,6 +75,7 @@ import javax.xml.transform.stream.*;
 // Needed SAX, DOM, JAXP classes
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
@@ -358,18 +359,21 @@ public class TemplatesHandlerAPITest extends XSLProcessorTestBase
             reporter.checkFail("No exception when expected: parsing stylesheet with bad systemId");
 
         }
-        catch (SAXParseException spe)
-        {
-            // We're expecting this exception: validate it's text
-            // Note: 'impincl/SimpleImport.xsl' comes from the stylesheet itself
-            reporter.check(spe.getMessage(), "File \"" + NONSENSE_SYSTEMID + "impincl/SimpleImport.xsl\" not found.", 
-                           "Expected SAXParseException has proper message for bad systemId");
-            reporter.logThrowable(reporter.STATUSMSG, spe,"Expected SAXParseException");
-        }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem TemplatesHandler(3)");
-            reporter.logThrowable(reporter.ERRORMSG, t,"Problem TemplatesHandler(3)");
+            String msg = t.toString();
+            if (msg != null)
+            {
+                // Note: 'impincl/SimpleImport.xsl' comes from the stylesheet itself,
+                //  so to reduce dependencies, only validate that portion of the msg
+                reporter.check((msg.indexOf("impincl/SimpleImport.xsl") > 0), true, 
+                               "Expected Exception has proper message for bad systemId");
+            }
+            else
+            {
+                reporter.checkFail("Expected Exception has proper message for bad systemId");
+            }
+            reporter.logThrowable(reporter.STATUSMSG, t,"(potentially) Expected Exception");
         }
         finally
         {
