@@ -373,11 +373,14 @@ public class XSLTestAntTask extends Task
                 passThru.put(key.substring(altPrefix.length()), antProps.get(key));
             }
         }
+        // Make sure to write to the basedir of the project!
+        File baseDir = this.getProject().getBaseDir();
+        String propFileName = baseDir.getPath() + File.separator + passThruProps;
+        log("writePassThruProps attempting to write to " + propFileName, Project.MSG_VERBOSE);
         try
         {
-            log("writePassThruProps attempting to write to " + passThruProps, Project.MSG_VERBOSE);
             // If we can write the props out to disk...
-            passThru.save(new FileOutputStream(passThruProps), 
+            passThru.save(new FileOutputStream(propFileName), 
                     "XSLTestAntTask.writePassThruProps() generated for use by test " + testClass);
             
             // ... then also force -load of this file into test's command line
@@ -385,7 +388,7 @@ public class XSLTestAntTask extends Task
         }
         catch (IOException ioe)
         {
-            throw new BuildException("writePassThruProps could not write to " + passThruProps + ", threw: "
+            throw new BuildException("writePassThruProps could not write to " + propFileName + ", threw: "
                                      + ioe.toString(), location);
         }
     }
