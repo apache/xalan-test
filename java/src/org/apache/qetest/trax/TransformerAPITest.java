@@ -92,6 +92,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Hashtable;
 
 //-------------------------------------------------------------------------
 
@@ -168,7 +169,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
     public TransformerAPITest()
     {
 
-        numTestCases = 3;  // REPLACE_num
+        numTestCases = 5;  // REPLACE_num
         testName = "TransformerAPITest";
         testComment = "Basic API coverage test for the Transformer class";
     }
@@ -276,7 +277,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
      * functional test coverage on setting different kinds 
      * and types of parameters, etc.
      * 
-     * NEEDSDOC ($objectName$) @return
+     * @return false if we should abort the test
      */
     public boolean testCase1()
     {
@@ -487,18 +488,15 @@ public class TransformerAPITest extends XSLProcessorTestBase
 
 
     /**
-     * TRAX Transformer: cover basic get/setOutputFormat APIs.
-     * See {@link OutputFormatTest} for more coverage on setting 
+     * API coverage test of Transformer.set/getOutputProperty()
+     * See {@link OutputPropertiesTest} for more coverage on setting 
      * different kinds of outputs, etc.
      * 
-     * NEEDSDOC ($objectName$) @return
+     * @return false if we should abort the test
      */
     public boolean testCase2()
     {
-
-        reporter.testCaseInit(
-            "TRAX Transformer: cover basic get/setOutputFormat APIs");
-
+        reporter.testCaseInit("API coverage test of Transformer.set/getOutputProperty()");
         TransformerFactory factory = null;
         Templates outputTemplates = null;
         Transformer outputTransformer = null;
@@ -511,9 +509,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
         }
         catch (Throwable t)
         {
-            reporter.checkFail("Problem creating Templates; cannot continue testcase");
+            reporter.checkFail("Problem creating Templates; cannot continue");
             reporter.logThrowable(reporter.ERRORMSG, t, 
-                                  "Problem creating Templates; cannot continue testcase");
+                                  "Problem creating Templates; cannot continue");
             return true;
         }
 
@@ -532,9 +530,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
         } 
         catch (Exception e)
         {
-            reporter.checkFail("Problem with identity output properties", "SCUU4RXQYH");
+            reporter.checkFail("Problem with identity output property", "SCUU4RXQYH");
             reporter.logThrowable(reporter.ERRORMSG, e,
-                                  "Problem with identity output properties");
+                                  "Problem with identity output property");
         }
 
         try
@@ -698,10 +696,119 @@ public class TransformerAPITest extends XSLProcessorTestBase
                                   "Problem with set/get output properties(0)");
         }
 
-        reporter.testCaseClose();
+        // Negative testing: various illegal arguments, etc.
+        try
+        {
+            Transformer negTransformer = outputTemplates.newTransformer();
 
+        } 
+        catch (Exception e)
+        {
+            reporter.checkFail("Problem with negative setOutputProperty/ies tests");
+            reporter.logThrowable(reporter.ERRORMSG, e,
+                                  "Problem with negative setOutputProperty/ies tests");
+        }
+        reporter.testCaseClose();
         return true;
     }
+
+    /**
+     * API coverage test of Transformer.set/getOutputProperties()
+     * See {@link OutputPropertiesTest} for more coverage on setting 
+     * different kinds of outputs, etc.
+     * 
+     * @return false if we should abort the test
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("API coverage test of Transformer.set/getOutputProperties()");
+        TransformerFactory factory = null;
+        Templates outputTemplates = null;
+        Transformer outputTransformer = null;
+        Transformer identityTransformer = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            identityTransformer = factory.newTransformer();
+            outputTemplates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem creating Templates; cannot continue");
+            reporter.logThrowable(reporter.ERRORMSG, t, 
+                                  "Problem creating Templates; cannot continue");
+            return true;
+        }
+        try
+        {
+            // See what the default 'identity' transform has by default
+            Properties identityProps = identityTransformer.getOutputProperties(); // SPR SCUU4RXQYH throws npe
+            reporter.check((null != identityProps), true, "identityTransformer.getOutputProperties() is non-null");
+            reporter.logHashtable(reporter.STATUSMSG, identityProps, 
+                                  "default identityTransformer.getOutputProperties()");
+        } 
+        catch (Exception e)
+        {
+            reporter.checkFail("Problem with identity OutputProperties", "SCUU4RXQYH");
+            reporter.logThrowable(reporter.ERRORMSG, e,
+                                  "Problem with identity OutputProperties");
+        }
+
+        reporter.logTraceMsg("More work to be done here!");
+        reporter.testCaseClose();
+        return true;
+    } // end testCase3
+
+
+    /**
+     * Negative tests of Transformer.set/getOutputProperty/ies()
+     * 
+     * @return false if we should abort the test
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Negative tests of Transformer.set/getOutputProperty/ies()");
+        TransformerFactory factory = null;
+        Templates outputTemplates = null;
+        Transformer outputTransformer = null;
+        Transformer identityTransformer = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            identityTransformer = factory.newTransformer();
+            outputTemplates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem creating Templates; cannot continue");
+            reporter.logThrowable(reporter.ERRORMSG, t, 
+                                  "Problem creating Templates; cannot continue");
+            return true;
+        }
+
+        // Negative tests of getOutputProperty()
+        String testDesc = "getOutputProperty of bogus-name";
+        try
+        {
+            Transformer t = factory.newTransformer();
+            String val = t.getOutputProperty("bogus-name");
+            reporter.checkFail(testDesc);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            reporter.checkPass(testDesc + ", threw: " + iae.toString());
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail(testDesc + ", threw: " + t.toString());
+        }
+
+
+
+        reporter.testCaseClose();
+        return true;
+    } // end testCase4
+
 
     /**
      * TRAX Transformer: cover transform() API and basic 
@@ -715,9 +822,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
      * 
      * @todo should the Features.SAX and Features.DOM tests be in 
      * this file, or should they be in sax/dom subdirectory tests?
-     * NEEDSDOC ($objectName$) @return
+     * @return false if we should abort the test
      */
-    public boolean testCase3()
+    public boolean testCase5()
     {
         reporter.testCaseInit(
             "TRAX Transformer: cover transform() and set/getURIResolver API and functionality");
@@ -812,7 +919,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
         reporter.testCaseClose();
 
         return true;
-    }
+    } // end testCase5
 
 
     /**
@@ -839,11 +946,112 @@ public class TransformerAPITest extends XSLProcessorTestBase
         }
     }
 
+    public class GetOutputPropertyDatalet implements Datalet
+    {
+        public GetOutputPropertyDatalet(String[] args)
+        {
+            load(args);
+        }
+        public final String IDENTITY = "identity";
+        protected String description = "no data";
+        public String getDescription() { return description; }
+        public void setDescription(String d) { description = d; }
+        public Transformer transformer = null;
+        public String propName = null;
+        public String expectedValue = null;
+        public String expectedException = null;
+        public void load(String[] args)
+        {
+            try
+            {
+                if (IDENTITY.equals(args[0]))
+                    transformer = (TransformerFactory.newInstance()).newTransformer();
+                else
+                    transformer = (TransformerFactory.newInstance()).newTransformer(new StreamSource(args[0]));
+                propName = args[1];
+                String tmp = args[2];
+                // Semi-hack: if it looks like the FQCN of a 
+                //  Throwable derivative, then use one 
+                //  of those; otherwise, assume it's the expected 
+                //  value to get back from getOutputProperty
+                if ((tmp.indexOf("Exception") >= 0) || (tmp.indexOf("Error") >= 0))
+                    expectedException = tmp;
+                else
+                    expectedValue = tmp;
+            }
+            catch (Throwable t)
+            { /* no-op, let it fail elsewhere */
+            }
+        }
+        public void load(Hashtable h)
+        {
+            transformer = (Transformer)h.get("transformer");
+            propName = (String)h.get("propName");
+            expectedValue  = (String)h.get("expectedValue ");
+            expectedException = (String)h.get("expectedException");
+        }
+        
+    } // end class GetOutputPropertyTestlet
+
+    /** 
+     * Calls getOutputProperty() on the Transformer supplied, and 
+     * then either validates the returned String, or the classname 
+     * of any exception thrown.
+     *
+     * This is almost more complex to implement as a Testlet than
+     * is really worth it, but I wanted to experiment with using one.
+     */
+    public class GetOutputPropertyTestlet extends TestletImpl
+    {
+        { thisClassName = "org.apache.qetest.xsl.GetOutputPropertyTestlet"; }
+        public String getDescription() { return "gets OutputProperty and validates"; }
+        public Datalet getDefaultDatalet()
+        {
+            return new GetOutputPropertyDatalet(new String[] { "identity", "method", "xml" });
+        }
+        public void execute(Datalet d)
+        {
+            GetOutputPropertyDatalet datalet = null;
+            try
+            {
+                datalet = (GetOutputPropertyDatalet)d;
+            }
+            catch (ClassCastException e)
+            {
+                logger.checkErr("Datalet provided is not a GetOutputPropertyDatalet; cannot continue");
+                return;
+            }
+            try
+            {
+                String val = datalet.transformer.getOutputProperty(datalet.propName);
+                if (null != datalet.expectedValue)
+                {
+                    if (datalet.expectedValue.equals(val))
+                        logger.checkPass(datalet.getDescription());
+                    else
+                        logger.checkFail(datalet.getDescription());
+                }
+                else if (null != datalet.expectedException)
+                   logger.checkFail(datalet.getDescription());
+            }
+            catch (Throwable t)
+            {
+                if (null != datalet.expectedException)
+                {
+                    if (datalet.expectedException.equals(t.getClass().getName()))
+                        logger.checkPass(datalet.getDescription());
+                    else
+                        logger.checkFail(datalet.getDescription());
+                }
+                else
+                    logger.checkFail(datalet.getDescription() + ", threw: " + t.toString());
+            }
+        }
+    } // end class GetOutputPropertyTestlet
 
     /**
      * Convenience method to print out usage information - update if needed.  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @return usage string
      */
     public String usage()
     {
@@ -859,9 +1067,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
      */
     public static void main(String[] args)
     {
-
         TransformerAPITest app = new TransformerAPITest();
-
         app.doMain(args);
     }
 }
