@@ -98,15 +98,17 @@ public class ErrorListenerTest extends XSLProcessorTestBase
     /** Provide sequential output names automatically.   */
     protected OutputNameManager outNames;
 
-    /** FilenameFilter that lists appropriate tests in api/err directory to use.   */
-    protected FilenameFilter errorFileFilter = null;
-
     /** 
      * A simple stylesheet with errors for testing in various flavors.  
      * Must be coordinated with templatesExpectedType/Value,
      * transformExpectedType/Value.
      */
     protected XSLTestfileInfo testFileInfo = new XSLTestfileInfo();
+
+    /** 
+     * A simple stylesheet without errors in it.  
+     */
+    protected XSLTestfileInfo goodFileInfo = new XSLTestfileInfo();
 
     /** Expected type of error during stylesheet build.  */
     protected int templatesExpectedType = 0;
@@ -129,7 +131,7 @@ public class ErrorListenerTest extends XSLProcessorTestBase
     /** Just initialize test name, comment, numTestCases. */
     public ErrorListenerTest()
     {
-        numTestCases = 3;  // REPLACE_num
+        numTestCases = 4;  // REPLACE_num
         testName = "ErrorListenerTest";
         testComment = "Verify that ErrorListeners are called properly from Transformers.";
     }
@@ -151,8 +153,6 @@ public class ErrorListenerTest extends XSLProcessorTestBase
         outNames = new OutputNameManager(outputDir + File.separator + ERR_SUBDIR
                                          + File.separator + testName, ".out");
 
-        errorFileFilter = new ConformanceErrFileRules(API_PARENTDIR);
-
         String testBasePath = inputDir 
                               + File.separator 
                               + ERR_SUBDIR
@@ -161,6 +161,13 @@ public class ErrorListenerTest extends XSLProcessorTestBase
                               + File.separator 
                               + ERR_SUBDIR
                               + File.separator;
+
+        goodFileInfo.inputName = inputDir + File.separator 
+                              + "trax" + File.separator + "identity.xsl";
+        goodFileInfo.xmlName  = inputDir + File.separator 
+                              + "trax" + File.separator + "identity.xml";
+        goodFileInfo.goldName  = goldDir + File.separator 
+                              + "trax" + File.separator + "identity.out";
 
         testFileInfo.inputName = testBasePath + "ErrorListenerTest.xsl";
         testFileInfo.xmlName = testBasePath + "ErrorListenerTest.xml";
@@ -427,6 +434,71 @@ public class ErrorListenerTest extends XSLProcessorTestBase
         reporter.testCaseClose();
         return true;
     }
+
+
+    /**
+     * Miscellaneous other ErrorListener tests.
+     * Includes Bugzilla1266.
+     * Primarily using StreamSources.
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Miscellaneous other ErrorListener tests");
+        LoggingErrorListener loggingErrorListener = new LoggingErrorListener(reporter);
+        loggingErrorListener.setThrowWhen(LoggingErrorListener.THROW_NEVER);
+        reporter.logTraceMsg("loggingErrorListener originally setup:" + loggingErrorListener.getQuickCounters());
+
+        TransformerFactory factory = null;
+        Templates templates = null;
+        Transformer transformer = null;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+            reporter.logInfoMsg("About to factory.newTemplates(" + QetestUtils.filenameToURL(goodFileInfo.inputName) + ")");
+            templates = factory.newTemplates(new StreamSource(QetestUtils.filenameToURL(goodFileInfo.inputName)));
+            transformer = templates.newTransformer();
+
+            // Set the errorListener and validate it
+            transformer.setErrorListener(loggingErrorListener);
+            reporter.check((transformer.getErrorListener() == loggingErrorListener),
+                           true, "set/getErrorListener on transformer");
+
+            reporter.logStatusMsg("Reproduce Bugzilla1266 - warning due to bad output props not propagated");
+            reporter.logStatusMsg("transformer.setOutputProperty(encoding, illegal-encoding-value)");
+            transformer.setOutputProperty("encoding", "illegal-encoding-value");
+
+            reporter.logTraceMsg("about to transform(...)");
+            transformer.transform(new StreamSource(QetestUtils.filenameToURL(goodFileInfo.xmlName)), 
+                                  new StreamResult(outNames.nextName()));
+            reporter.logTraceMsg("after transform(...)");
+            reporter.logStatusMsg("loggingErrorListener after transform:" + loggingErrorListener.getQuickCounters());
+
+            // Validate that one warning (about illegal-encoding-value) should have been reported
+            int[] errCtr = loggingErrorListener.getCounters();
+            reporter.check((errCtr[LoggingErrorListener.TYPE_WARNING] > 0), true, "At least one Warning listned to for illegal-encoding-value");
+            
+            // Validate the actual output file as well: in this case, 
+            //  the stylesheet should still work
+            if (Logger.PASS_RESULT
+                != fileChecker.check(reporter, 
+                    new File(outNames.currentName()), 
+                    new File(goodFileInfo.goldName), 
+                    "transform of good xsl w/bad output props into: " + outNames.currentName())
+               )
+                reporter.logInfoMsg("transform of error xsl failure reason:" + fileChecker.getExtendedInfo());
+            
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("errorListener4 unexpectedly threw: " + t.toString());
+            reporter.logThrowable(Logger.ERRORMSG, t, "errorListener4 unexpectedly threw");
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
 
     /**
      * Convenience method to print out usage information - update if needed.  
