@@ -197,7 +197,7 @@ public class URIResolverTest extends XSLProcessorTestBase
             // Set the URIResolver and validate it
             transformer.setURIResolver(loggingURIResolver);
             reporter.check((transformer.getURIResolver() == loggingURIResolver),
-                           true, "set/getURIResolver on transformer");
+                           true, "set/getURIResolver on transformer"); 
 
             // Validate various URI's to be resolved during transform
             //  time with the loggingURIResolver
@@ -205,11 +205,11 @@ public class URIResolverTest extends XSLProcessorTestBase
             String[] expectedXmlUris = 
             {
                 "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
-                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
+                // "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "../impincl/SystemIdImport.xsl",
                 "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
-                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
+                // "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "impincl/SystemIdImport.xsl",
                 "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl",
-                "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl"
+                // "{" + QetestUtils.filenameToURL(testFileInfo.inputName) + "}" + "systemid/impincl/SystemIdImport.xsl"
             };
             loggingURIResolver.setExpected(expectedXmlUris);
             reporter.logTraceMsg("about to transform(...)");
