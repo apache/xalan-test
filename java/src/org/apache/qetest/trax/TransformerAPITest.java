@@ -90,6 +90,7 @@ import org.w3c.dom.Document;
 // java classes
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Enumeration;
 import java.util.Properties;
 
 //-------------------------------------------------------------------------
@@ -125,11 +126,17 @@ public class TransformerAPITest extends XSLProcessorTestBase
     /** TransformerAPIOutputFormat.xsl used for set/getOutputFormat related tests  */
     protected XSLTestfileInfo outputFormatTest = new XSLTestfileInfo();
 
-    /** Known outputFormat property name from outputFormatTest  */
-    public static final String OUTPUT_FORMAT_NAME = "cdata-section-elements";
-
-    /** Known outputFormat property value from outputFormatTest  */
-    public static final String OUTPUT_FORMAT_VALUE = "cdataHere";
+    /** Known outputFormat values from TransformerAPIOutputFormat.xsl  */
+    public static final String METHOD_VALUE = "xml";
+    public static final String VERSION_VALUE ="123.45";
+    public static final String ENCODING_VALUE ="UTF-16";
+    public static final String STANDALONE_VALUE = "yes";
+    public static final String DOCTYPE_PUBLIC_VALUE = "this-is-doctype-public";
+    public static final String DOCTYPE_SYSTEM_VALUE = "this-is-doctype-system";
+    public static final String CDATA_SECTION_ELEMENTS_VALUE = "cdataHere";
+    public static final String INDENT_VALUE  =  "yes";
+    public static final String MEDIA_TYPE_VALUE = "text/test/xml";
+    public static final String OMIT_XML_DECLARATION_VALUE = "yes";
 
     /** Cache the relevant system property. */
     protected String saveXSLTProp = null;
@@ -223,16 +230,15 @@ public class TransformerAPITest extends XSLProcessorTestBase
             TransformerFactory tf = TransformerFactory.newInstance();
             if (!tf.getFeature(Features.STREAM))
             {   // The rest of this test relies on Streams only
-                reporter.logWarningMsg("Features.STREAM not supported! Some tests may be invalid!");
+                reporter.logErrorMsg("Features.STREAM not supported! Some tests may be invalid!");
             }
         }
         catch (Exception e)
         {
             reporter.checkFail(
-                "Problem creating Templates; cannot continue testcase");
+                "Problem creating factory; Some tests may be invalid!");
             reporter.logThrowable(reporter.ERRORMSG, e,
-                                  "Problem creating Templates");
-            return true;
+                                  "Problem creating factory; Some tests may be invalid!");
         }
 
         return true;
@@ -295,6 +301,9 @@ public class TransformerAPITest extends XSLProcessorTestBase
         try
         {
             // See what the default 'identity' transform has by default
+            // @todo should add checks for the type of object returned; 
+            //  a bug around 10-Nov-00 always returned a type of 
+            //  XObject instead of the type you set
             Object tmp = identityTransformer.getParameter("This-param-does-not-exist");
             reporter.checkObject(tmp, null, "This-param-does-not-exist is null by default identityTransformer");
             // Can you set properties on this transformer?
@@ -332,18 +341,24 @@ public class TransformerAPITest extends XSLProcessorTestBase
                 reporter.checkFail(PARAM1S + " is " + tmp + " by default");
             }
 
-            // Verify simple set/get of a single parameter
+            // Verify simple set/get of a single parameter - String
             transformer.setParameter(PARAM1S, "new value1s");
             reporter.logTraceMsg("Just reset " + PARAM1S + " to new value1s");
-            tmp = transformer.getParameter(PARAM1S);    // SPR SCUU4QWTVZ - returns an XString
+            tmp = transformer.getParameter(PARAM1S);    // SPR SCUU4QWTVZ - returns an XString - fixed
             if (tmp == null)
             {
                 reporter.checkFail(PARAM1S + " is still set to null!");
             }
             else
-            {
-                reporter.logTraceMsg(PARAM1S + " is now ?" + tmp + "?, isa " + tmp.getClass().getName());
-                reporter.checkString((String)tmp, "new value1s", PARAM1S + " is now set to ?" + tmp + "?");
+            {   // Validate SPR SCUU4QWTVZ - should return the same type you set
+                if (tmp instanceof String)
+                {
+                    reporter.checkString((String)tmp, "new value1s", PARAM1S + " is now set to ?" + tmp + "?");
+                }
+                else
+                {
+                    reporter.checkFail(PARAM1S + " is now ?" + tmp + "?, isa " + tmp.getClass().getName());
+                }
             }
         } 
         catch (Exception e)
@@ -355,22 +370,68 @@ public class TransformerAPITest extends XSLProcessorTestBase
         try
         {
             transformer = templates.newTransformer();
-            // Verify simple set/get of a single parameter
-            transformer.setParameter(PARAM1S, new Integer(1234));
-            reporter.logTraceMsg("Just set " + PARAM1S + " to Integer(1234)");
-            Object tmp = transformer.getParameter(PARAM1S);    // SPR SCUU4QWTVZ - returns an XObject
-            // @todo need to type-check maybe?
-            reporter.logTraceMsg(PARAM1S + " is now ?" + tmp + "?, isa " + tmp.getClass().getName());
-            reporter.checkObject(tmp, new Integer(1234), PARAM1S + " is now set to ?" + tmp + "?");
+            // Verify simple set/get of a single parameter - Integer
+            transformer.setParameter(PARAM3S, new Integer(1234));
+            reporter.logTraceMsg("Just set " + PARAM3S + " to Integer(1234)");
+            Object tmp = transformer.getParameter(PARAM3S);    // SPR SCUU4QWTVZ - returns an XObject - fixed
+            if (tmp == null)
+            {
+                reporter.checkFail(PARAM3S + " is still set to null!");
+            }
+            else
+            {   // Validate SPR SCUU4QWTVZ - should return the same type you set
+                if (tmp instanceof Integer)
+                {
+                    reporter.checkObject(tmp, new Integer(1234), PARAM3S + " is now set to ?" + tmp + "?");
+                }
+                else
+                {
+                    reporter.checkFail(PARAM3S + " is now ?" + tmp + "?, isa " + tmp.getClass().getName());
+                }
+            }
 
+            // Verify simple re-set/get of a single parameter - new Integer
+            transformer.setParameter(PARAM3S, new Integer(99));   // SPR SCUU4R3JGY - can't re-set
+            reporter.logTraceMsg("Just reset " + PARAM3S + " to new Integer(99)");
+            tmp = null;
+            tmp = transformer.getParameter(PARAM3S);
+            if (tmp == null)
+            {
+                reporter.checkFail(PARAM3S + " is still set to null!");
+            }
+            else
+            {   // Validate SPR SCUU4QWTVZ - should return the same type you set
+                if (tmp instanceof Integer)
+                {
+                    reporter.checkObject(tmp, new Integer(99), PARAM3S + " is now set to ?" + tmp + "?");
+                }
+                else
+                {
+                    reporter.checkFail(PARAM3S + " is now ?" + tmp + "?, isa " + tmp.getClass().getName());
+                }
+            }
+
+            // Verify simple re-set/get of a single parameter - now a new String
             transformer.setParameter(PARAM3S, "new value3s");
             reporter.logTraceMsg("Just reset " + PARAM3S + " to new value3s");
+            tmp = null;
             tmp = transformer.getParameter(PARAM3S);
-            reporter.checkString((String)tmp, "new value3s", PARAM3S + " is now set to ?" + tmp + "?");
-
-            Properties setParams = new Properties();
-            setParams.put(PARAM1S, "another value1s");
-            setParams.put(PARAM2S, "yet another value2s");
+            if (tmp == null)
+            {
+                reporter.checkFail(PARAM3S + " is still set to null!");
+            }
+            else
+            {   // Validate SPR SCUU4QWTVZ - should return the same type you set
+                if (tmp instanceof String)
+                {
+                    reporter.checkString((String)tmp, "new value3s", PARAM3S + " is now set to ?" + tmp + "?");
+                }
+                else
+                {
+                    reporter.checkFail(PARAM3S + " is now ?" + tmp + "?, isa " + tmp.getClass().getName());
+                }
+            }
+            
 
             // Verify setting Properties full of params works - feature removed from product 13-Nov-00
         } 
@@ -396,7 +457,12 @@ public class TransformerAPITest extends XSLProcessorTestBase
                                   new File(paramTest.goldName), 
                                   "transform with param1s,param1n into: " + outNames.currentName());
             }
-            reporter.checkAmbiguous("@todo verify if params are still set after transform");
+            String gotParam = (String)transformer.getParameter(PARAM1S);
+            reporter.check(gotParam, "test-param-1s", 
+                           PARAM1S + " is still set after transform to ?" + gotParam + "?");
+            gotParam = (String)transformer.getParameter(PARAM1N);
+            reporter.check(gotParam, "test-param-1n", 
+                           PARAM1N + " is still set after transform to ?" + gotParam + "?");
         } 
         catch (Exception e)
         {
@@ -405,7 +471,6 @@ public class TransformerAPITest extends XSLProcessorTestBase
         }
 
         reporter.testCaseClose();
-
         return true;
     }
 
@@ -424,19 +489,19 @@ public class TransformerAPITest extends XSLProcessorTestBase
             "TRAX Transformer: cover basic get/setOutputFormat APIs");
 
         TransformerFactory factory = null;
-        Templates templates = null;
-        Transformer transformer = null;
+        Templates outputTemplates = null;
+        Transformer outputTransformer = null;
         Transformer identityTransformer = null;
         try
         {
             factory = TransformerFactory.newInstance();
             identityTransformer = factory.newTransformer();
-            templates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
+            outputTemplates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
             reporter.checkFail("Problem creating Templates; cannot continue testcase");
-            reporter.logThrowable(reporter.ERRORMSG, e, 
+            reporter.logThrowable(reporter.ERRORMSG, t, 
                                   "Problem creating Templates; cannot continue testcase");
             return true;
         }
@@ -449,9 +514,10 @@ public class TransformerAPITest extends XSLProcessorTestBase
                                   "default identityTransformer.getOutputProperties()");
 
             // Can you set properties on this transformer?
-            identityTransformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, "cdata-sections");
-            String tmp = identityTransformer.getOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS);
-            reporter.check(tmp, "cdata-sections", "identityTransformer set/getOutputProperty");
+            identityTransformer.setOutputProperty(OutputKeys.METHOD, "text");
+            reporter.logTraceMsg("Just identityTransformer setOutputProperty(method,text)");
+            String tmp = identityTransformer.getOutputProperty(OutputKeys.METHOD); // SPR SCUU4R3JPH - throws npe
+            reporter.check(tmp, "text", "identityTransformer set/getOutputProperty, is ?" + tmp + "?");
         } 
         catch (Exception e)
         {
@@ -462,35 +528,98 @@ public class TransformerAPITest extends XSLProcessorTestBase
 
         try
         {
-            // See what our templates parent has
-            Properties tmpltProps = templates.getOutputProperties();
+            // See what our outputTemplates parent has
+            Properties tmpltProps = outputTemplates.getOutputProperties();
             reporter.logHashtable(reporter.STATUSMSG, tmpltProps, 
-                                  "default templates.getOutputProperties()");
+                                  "default outputTemplates.getOutputProperties()");
 
             // See what we have by default, from our testfile
-            transformer = templates.newTransformer();
-            Properties outProps = transformer.getOutputProperties();
+            outputTransformer = outputTemplates.newTransformer();
+            Properties outProps = outputTransformer.getOutputProperties();
             reporter.logHashtable(reporter.STATUSMSG, outProps, 
-                                  "default transformer.getOutputProperties()");
+                                  "default outputTransformer.getOutputProperties()");
+
+            // Validate the two have the same properties (which they 
+            //  should, since we just got the templates now)
+            for (Enumeration enum = tmpltProps.propertyNames();
+                    enum.hasMoreElements(); /* no increment portion */ )
+            {
+                String key = (String)enum.nextElement();
+                String value = tmpltProps.getProperty(key);
+                reporter.check(value, outProps.getProperty(key), 
+                               "Template, transformer identical outProp: " + key);
+            }
             
-            reporter.checkAmbiguous("@todo validate transformer, templates have same default output formats");
+            // Validate known output properties from our testfile
+            // @todo validate these are all correct, and can be detected here
+            String knownOutputProps[][] =
+            {
+                { OutputKeys.METHOD, METHOD_VALUE },
+                { OutputKeys.VERSION, VERSION_VALUE },
+                { OutputKeys.ENCODING, ENCODING_VALUE },
+                { OutputKeys.STANDALONE, STANDALONE_VALUE },
+                { OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC_VALUE }, // SPR SCUU4R3JRR - not returned
+                { OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM_VALUE }, // SPR SCUU4R3JRR - not returned
+                { OutputKeys.CDATA_SECTION_ELEMENTS, CDATA_SECTION_ELEMENTS_VALUE }, // SPR SCUU4R3JRR - not returned
+                { OutputKeys.INDENT, INDENT_VALUE },
+                { OutputKeys.MEDIA_TYPE, MEDIA_TYPE_VALUE },
+                { OutputKeys.OMIT_XML_DECLARATION, OMIT_XML_DECLARATION_VALUE }
+            };
 
-            // @todo validate some known output property from our testfile
-            String tmp = transformer.getOutputProperty(OUTPUT_FORMAT_NAME);
-            reporter.check(tmp, OUTPUT_FORMAT_VALUE, "transformer get known OutputProperty value ?" + tmp + "?");
+            for (int i = 0; i < knownOutputProps.length; i++)
+            {
+                String item = outProps.getProperty(knownOutputProps[i][0]);
+                reporter.check(item, knownOutputProps[i][1], 
+                               "Known prop(1) " + knownOutputProps[i][0] 
+                               + " is: ?" + item + "?");
+            }
 
-            // Simple set/getOutputProperty
-            tmp = transformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION);
-            reporter.logTraceMsg(OutputKeys.OMIT_XML_DECLARATION + " is currently: " + tmp);
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            tmp = transformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION);
-            reporter.check(tmp, "yes", "transformer set/getOutputProperty value to ?" + tmp + "?");
+            // Try doing a transform, to get some output
+            if (doTransform(outputTransformer, 
+                            new StreamSource(outputFormatTest.xmlName), 
+                            new StreamResult(new FileOutputStream(outNames.nextName()))))
+            {
+                // @todo should update goldFile!
+                fileChecker.check(reporter, 
+                                  new File(outNames.currentName()), 
+                                  new File(outputFormatTest.goldName), 
+                                  "transform(1) outputParams into: " + outNames.currentName());
+            }
 
-            // setOutputProperties(Properties oformat)
-            // Properties getOutputProperties()
-            // setOutputProperty(String name, String value) throws TransformerException
-            // String getOutputProperty(String name) throws TransformerException;
-            // Only with StreamResult, obviously
+            try
+            {   // Inner try-catch
+                // Simple set/getOutputProperty
+                String tmp = outputTransformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION); // SPR SCUU4R3JZ7 - throws npe
+                reporter.logTraceMsg(OutputKeys.OMIT_XML_DECLARATION + " is currently: " + tmp);
+                outputTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                tmp = outputTransformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION);
+                reporter.check(tmp, "no", "outputTransformer set/getOutputProperty value to ?" + tmp + "?");
+            }
+            catch (Exception e)
+            {
+                reporter.logThrowable(reporter.ERRORMSG, e,
+                                      "Problem with set/get output properties(1)");
+            }
+            try
+            {   // Inner try-catch
+                // Try getting the whole properties block, so we can see what it thinks it has
+                Properties newOutProps = outputTransformer.getOutputProperties();
+                reporter.logHashtable(reporter.STATUSMSG, newOutProps, 
+                                      "after transform getOutputProperties()");
+
+                // Simple set/getOutputProperty
+                String tmp = outputTransformer.getOutputProperty(OutputKeys.ENCODING);
+                reporter.logTraceMsg(OutputKeys.ENCODING + " is currently: " + tmp);
+                outputTransformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                tmp = outputTransformer.getOutputProperty(OutputKeys.ENCODING);
+                reporter.check(tmp, "UTF-8", "outputTransformer set/getOutputProperty value to ?" + tmp + "?");
+            }
+            catch (Exception e)
+            {
+                reporter.logThrowable(reporter.ERRORMSG, e,
+                                      "Problem with set/get output properties(2)");
+            }
+
             // OutputKeys.METHOD = xml|html|text|qname-but-not-ncname
             // OutputKeys.VERSION = number
             // OutputKeys.ENCODING = string
@@ -503,13 +632,13 @@ public class TransformerAPITest extends XSLProcessorTestBase
             // OutputKeys.MEDIA_TYPE = qnames
             // OutputKeys.CDATA_SECTION_ELEMENTS = qnames
 
-            reporter.checkAmbiguous("@todo Cover set/getOutputProperty/ies()");
+            reporter.checkAmbiguous("@todo Cover setOutputProperties(Properties oformat)");
         } 
         catch (Exception e)
         {
             reporter.checkFail("Problem with set/get output properties");
             reporter.logThrowable(reporter.ERRORMSG, e,
-                                  "Problem with set/get output properties");
+                                  "Problem with set/get output properties(0)");
         }
 
         reporter.testCaseClose();
@@ -519,7 +648,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
 
     /**
      * TRAX Transformer: cover transform() API and basic 
-     * functionality; plus set/getURIResolver() API.
+     * functionality; plus set/getURIResolver() API; 
+     * plus set/getErrorListener() API; .
      *
      * Note: These are simply coverage tests for the 
      * transform() API - for more general testing, 
@@ -535,18 +665,64 @@ public class TransformerAPITest extends XSLProcessorTestBase
         reporter.testCaseInit(
             "TRAX Transformer: cover transform() and set/getURIResolver API and functionality");
         TransformerFactory factory = null;
+        Templates templates = null;
         try
         {
-            // Grab a stylesheet to use 
             factory = TransformerFactory.newInstance();
-            Templates templates = factory.newTemplates(new StreamSource(simpleTest.inputName));
+            // Grab a stylesheet to use for this testcase
+            factory = TransformerFactory.newInstance();
+            templates = factory.newTemplates(new StreamSource(simpleTest.inputName));
+        }
+        catch (Throwable t)
+        {
+            reporter.checkErr("Can't continue testcase, factory.newInstance threw: " + t.toString());
+            reporter.logThrowable(reporter.STATUSMSG, t, "Can't continue testcase, factory.newInstance threw:");
+            return true;
+        }
 
+        try
+        {
+            Transformer transformer = templates.newTransformer();
+            ErrorListener errListener = transformer.getErrorListener(); // SPR SCUU4R3K6G - is null
+            if (errListener == null)
+            {
+                reporter.checkFail("getErrorListener() non-null by default");
+            }
+            else
+            {
+                reporter.checkPass("getErrorListener() non-null by default, is: " + errListener);
+            }
+            
+            LoggingErrorListener loggingErrListener = new LoggingErrorListener(reporter);
+            transformer.setErrorListener(loggingErrListener);
+            reporter.checkObject(transformer.getErrorListener(), loggingErrListener, "set/getErrorListener API coverage(1)");
+            try
+            {
+                transformer.setErrorListener(null);                
+                reporter.checkFail("setErrorListener(null) worked, should have thrown exception");
+            }
+            catch (IllegalArgumentException iae)
+            {
+                reporter.checkPass("setErrorListener(null) properly threw: " + iae.toString());
+            }
+            // Verify the previous ErrorListener is still set
+            reporter.checkObject(transformer.getErrorListener(), loggingErrListener, "set/getErrorListener API coverage(2)");
+        }
+        catch (Throwable t)
+        {
+            reporter.checkErr("Coverage of get/setErrorListener threw: " + t.toString());
+            reporter.logThrowable(reporter.STATUSMSG, t, "Coverage of get/setErrorListener threw:");
+        }
+        reporter.checkAmbiguous("@todo feature testing for ErrorListener");
+
+        try
+        {
             Transformer transformer = templates.newTransformer();
             // URIResolver should be null by default; try to set/get one
             reporter.checkObject(transformer.getURIResolver(), null, "getURIResolver is null by default");
             LoggingURIResolver myURIResolver = new LoggingURIResolver(reporter);
             transformer.setURIResolver(myURIResolver);
-            reporter.checkObject(transformer.getURIResolver(), myURIResolver, "set/getURIResolver test");
+            reporter.checkObject(transformer.getURIResolver(), myURIResolver, "set/getURIResolver API coverage");
             reporter.logTraceMsg("myURIres.getCounterString = " + myURIResolver.getCounterString());
 
             // Assumes we support Streams
@@ -569,51 +745,8 @@ public class TransformerAPITest extends XSLProcessorTestBase
             reporter.logThrowable(reporter.ERRORMSG, e, "TestCase threw:");
         }
 
-        try
-        {
-            if (factory.getFeature(Features.DOM))
-            {
-                // @todo should they be in sax/dom subdirectory tests?
-                reporter.checkAmbiguous("@todo transform(DOM, DOM)");
-                reporter.checkAmbiguous("@todo transform(DOM, Stream)");
-                reporter.checkAmbiguous("@todo transform(Stream, DOM)");
-            }
-            else
-            {
-                reporter.logWarningMsg("Skipping transform(DOM*) tests, "
-                                       + Features.DOM
-                                       + " not supported");
-            }
+        // Features.SAX && Features.DOM tests should be in trax\SAX and trax\DOM subdirs
 
-            if (factory.getFeature(Features.SAX))
-            {
-                // @todo should they be in sax/dom subdirectory tests?
-                reporter.checkAmbiguous("@todo transform(SAX, SAX)");
-                reporter.checkAmbiguous("@todo transform(SAX, Stream)");
-                reporter.checkAmbiguous("@todo transform(Stream, SAX)");
-            }
-            else
-            {
-                reporter.logWarningMsg("Skipping transform(SAX*) tests, "
-                                       + Features.SAX
-                                       + " not supported");
-            }
-            if (factory.getFeature(Features.SAX) && factory.getFeature(Features.DOM))
-            {
-                // @todo should they be in sax/dom subdirectory tests?
-                reporter.checkAmbiguous("@todo transform(SAX, DOM)");
-                reporter.checkAmbiguous("@todo transform(DOM, SAX)");
-            }
-            else
-            {
-                reporter.logWarningMsg("Skipping transform(SAX/DOM) tests, one of them not supported.");
-            }
-        }
-        catch (Exception e)
-        {
-            reporter.checkFail("TestCase threw: " + e.toString());
-            reporter.logThrowable(reporter.ERRORMSG, e, "TestCase threw:");
-        }
         reporter.testCaseClose();
 
         return true;
@@ -635,7 +768,6 @@ public class TransformerAPITest extends XSLProcessorTestBase
         {
             t.transform(s, r);
             return true;
-            
         } 
         catch (TransformerException e)
         {
