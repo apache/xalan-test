@@ -1,7 +1,1 @@
-<doc xmlns:ext="http://somebody.elses.extension">
-  <a test="test"/>
-  <b attr1="a1" attr2="a2" xmlns:java="http://xml.apache.org/xslt/java">
-    <a>
-    </a> 
-  </b>
-</doc>
+test
