@@ -10,8 +10,10 @@
   	   should not be processed.  -->
 
 <xsl:template match="/">
+  <out>
 	<example>&gt;&gt;&gt;SHOULD NOT BE WRAPPED WITH cdata section&lt;&lt;&lt;</example><xsl:text>&#010;</xsl:text>
 	<test>&gt;&gt;&gt;SHOULD BE WRAPPED WITH cdata section&lt;&lt;&lt;</test>
+  </out>
 </xsl:template>
  
 </xsl:stylesheet>

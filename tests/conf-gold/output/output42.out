@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<example><![CDATA[<foo>]]></example>
+<out><example><![CDATA[<foo>]]></example>
 <example><![CDATA[>>>HELLO<<<]]></example>
-<test><![CDATA[>>>HELLO<<<]]></test>
+<test><![CDATA[>>>HELLO<<<]]></test></out>
