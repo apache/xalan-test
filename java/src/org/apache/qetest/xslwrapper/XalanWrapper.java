@@ -142,6 +142,12 @@ public class XalanWrapper extends ProcessorWrapper
     /** FQCN of Xalan-J 2.x's version file, when using the compatibility layer.   */
     public static final String XALAN2_VERSION_CLASS = "org.apache.xalan.processor.XSLProcessorVersion";
 
+    /** Marker string added to getDescription, when using the compatibility layer.   */
+    public static final String XALAN2_MARKER = "-compat1";
+
+    /** FQCN of Xerces-J 1.x's version file, for convenience.   */
+    public static final String XERCES1_VERSION_CLASS = "org.apache.xerces.framework.Version";
+
     /**
      * Get a description of the wrappered processor.
      * @return info-string describing the processor and possibly it's common options
@@ -157,10 +163,26 @@ public class XalanWrapper extends ProcessorWrapper
         else
         {
             StringBuffer buf = new StringBuffer("No Xalan version info found");
-
-            // Compatibility with either 1.x or 2.x compatibility layer
+            String parserVersion = new String("no-parser-info-avail");
             Class clazz = null;
             Field f = null;
+
+            // As a convenience, see if we can find the version 
+            //  of the parser we're using as well
+            try
+            {
+                // Currently, only check for Xerces versions
+                clazz = Class.forName(XERCES1_VERSION_CLASS);
+                // Found 1.x, grab it's version fields
+                f = clazz.getField("fVersion");
+                parserVersion = (String)f.get(null);
+            }
+            catch (Exception e2)
+            {
+                // no-op, leave value as-is
+            }
+
+            // Check for either 1.x or 2.x compatibility layer
             try
             {
                 clazz = Class.forName(XALAN1_VERSION_CLASS);
@@ -176,6 +198,8 @@ public class XalanWrapper extends ProcessorWrapper
                 buf.append(f.get(null));
                 buf.append(";");
                 buf.append(processor.getXMLProcessorLiaison());
+                buf.append(";");
+                buf.append(parserVersion);
             }
             catch (Exception e1)
             {
@@ -187,6 +211,7 @@ public class XalanWrapper extends ProcessorWrapper
                     buf = new StringBuffer();
                     f = clazz.getField("PRODUCT");
                     buf.append(f.get(null));
+                    buf.append(XALAN2_MARKER);  // so user knows we're doing compatibility layer
                     buf.append(";");
                     f = clazz.getField("LANGUAGE");
                     buf.append(f.get(null));
@@ -194,7 +219,9 @@ public class XalanWrapper extends ProcessorWrapper
                     f = clazz.getField("S_VERSION");
                     buf.append(f.get(null));
                     buf.append(";");
-                    //@todo find way to figure out parser info too
+                    // Liaison info not applicable
+                    buf.append(";");
+                    buf.append(parserVersion);
                 }
                 catch (Exception e2)
                 {
