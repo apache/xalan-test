@@ -84,8 +84,9 @@ import org.xml.sax.SAXException;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-// Note that not all imports are listed here
-import org.apache.trax.*;  // TRAX package name will change
+// Import all relevant TRAX packages
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;    // We assume Features.STREAM for some tests
 
 //-------------------------------------------------------------------------
 
@@ -93,6 +94,10 @@ import org.apache.trax.*;  // TRAX package name will change
  * Testing multiple simultaneous processors on different threads with TRAX.
  * <p>No validation of output files is currently done!  You must manually
  * inspect any logfiles.  Most options can be passed in with a Properties file.</p>
+ * <p>Note: Most automated tests extend XSLProcessorTestBase, and 
+ * are named *Test.java.  Since we are semi-manual, we're 
+ * named Test*.java instead.</p>
+ * We assume Features.STREAM.
  * @author shane_curcuru@lotus.com
  */
 public class TestThreads
@@ -108,8 +113,8 @@ public class TestThreads
 
         return ("Usage: TestThreads file.properties :\n"
                 + "    where the properties file can set:,\n"
-                + "    testDir=e:\\builds\\xsl-test\n"
-                + "    outDir=e:\\builds\\xsl-test\\results\n"
+                + "    inputDir=e:\\builds\\xsl-test\n"
+                + "    outputDir=e:\\builds\\xsl-test\\results\n"
                 + "    logFile=e:\\builds\\xsl-test\\results\\TestThreads.xml\n"
                 + "    numRunners=5\n" + "    numRunnerCalls=10\n"
                 + "    setOneFile=bool01\n" + "    setTwoFile=expr01\n"
@@ -126,16 +131,19 @@ public class TestThreads
      */
     protected int numRunners = 10;
 
-    /** NEEDSDOC Field numRunnerCalls          */
+    /**
+     * Number of sets of worker threads to create and loops per runner.
+     * <p>'numRunners=xx', default is 10; 'numRunnerCalls=xx', default is 50.</p>
+     */
     protected int numRunnerCalls = 50;
 
     /**
-     * Root input filenames that certain runners should use, in the testDir.
+     * Root input filenames that certain runners should use, in the inputDir.
      * <p>'setOneFile=File'; 'setTwoFile=File'; 'setThreeFile=File'
      * in .prop file to set; default is TestThreads1, TestThreads2, TestThreads3.</p>
-     * <p>Files are found in 'testDir=c:\bar\baz' from .prop file.</p>
+     * <p>Files are found in 'inputDir=c:\bar\baz' from .prop file.</p>
      */
-    protected String testDir = null;
+    protected String inputDir = null;
 
     /** NEEDSDOC Field setOneFilenameRoot          */
     protected String setOneFilenameRoot = "TestThreads1";
@@ -147,9 +155,9 @@ public class TestThreads
     protected String setThreeFilenameRoot = "TestThreads3";
 
     /**
-     * All output logs and files get put in the outDir.
+     * All output logs and files get put in the outputDir.
      */
-    protected String outDir = null;
+    protected String outputDir = null;
 
     /**
      * Sample PARAM name that certain runners should use.
@@ -171,7 +179,7 @@ public class TestThreads
 
     // Used to pass info to runners; simpler to update than changing ctors
 
-    /** NEEDSDOC Field ID          */
+    /** RunnerID offset in ctor's array initializer.   */
     public static final int ID = 0;
 
     /** NEEDSDOC Field XMLNAME          */
@@ -214,7 +222,7 @@ public class TestThreads
         // Prepare a log file and dump out some basic info
         createLogFile(logFileName);
         println("<?xml version=\"1.0\"?>");
-        println("<resultsfile fileName=\"" + logFileName + "\">");
+        println("<resultsfile logFile=\"" + logFileName + "\">");
         println("<message desc=\"threads=" + (3 * numRunners)
                 + " iterations=" + numRunnerCalls + "\"/>");
         println("<message desc=\"oneF=" + setOneFilenameRoot + " twof="
@@ -230,25 +238,25 @@ public class TestThreads
         try
         {
             String setOneURL =
-                getURLFromString(testDir + setOneFilenameRoot + ".xsl",
+                getURLFromString(inputDir + setOneFilenameRoot + ".xsl",
                                  null).toExternalForm();
             String setTwoURL =
-                getURLFromString(testDir + setTwoFilenameRoot + ".xsl",
+                getURLFromString(inputDir + setTwoFilenameRoot + ".xsl",
                                  null).toExternalForm();
             String setThreeURL =
-                getURLFromString(testDir + setThreeFilenameRoot + ".xsl",
+                getURLFromString(inputDir + setThreeFilenameRoot + ".xsl",
                                  null).toExternalForm();
-            Processor stylesheetProcessor = Processor.newInstance("xslt");
+            TransformerFactory factory = TransformerFactory.newInstance();
 
             errStr = "Processing stylesheet1 threw: ";
             stylesheet1 =
-                stylesheetProcessor.process(new InputSource(setOneURL));
+                factory.newTemplates(new StreamSource(setOneURL));
             errStr = "Processing stylesheet2 threw: ";
             stylesheet2 =
-                stylesheetProcessor.process(new InputSource(setTwoURL));
+                factory.newTemplates(new StreamSource(setTwoURL));
             errStr = "Processing stylesheet3 threw: ";
             stylesheet3 =
-                stylesheetProcessor.process(new InputSource(setThreeURL));
+                factory.newTemplates(new StreamSource(setThreeURL));
         }
         catch (Exception e)
         {
@@ -279,10 +287,10 @@ public class TestThreads
 
                 // First set of runners reports on memory usage periodically
                 rValues[ID] = "one-" + i;
-                rValues[XMLNAME] = "file:" + testDir + setOneFilenameRoot
+                rValues[XMLNAME] = "file:" + inputDir + setOneFilenameRoot
                                    + ".xml";
-                rValues[XSLNAME] = testDir + setOneFilenameRoot + ".xsl";
-                rValues[OUTNAME] = outDir + setOneFilenameRoot + "r" + i;
+                rValues[XSLNAME] = inputDir + setOneFilenameRoot + ".xsl";
+                rValues[OUTNAME] = outputDir + setOneFilenameRoot + "r" + i;
                 rValues[PARAMNAME] = paramName;
                 rValues[PARAMVAL] = paramVal;
                 rValues[OPTIONS] = "memory;param";
@@ -295,10 +303,10 @@ public class TestThreads
 
                 // Second set of runners is polite; uses optional liaison
                 rValues[ID] = "two-" + i;
-                rValues[XMLNAME] = "file:" + testDir + setTwoFilenameRoot
+                rValues[XMLNAME] = "file:" + inputDir + setTwoFilenameRoot
                                    + ".xml";
-                rValues[XSLNAME] = testDir + setTwoFilenameRoot + ".xsl";
-                rValues[OUTNAME] = outDir + setTwoFilenameRoot + "r" + i;
+                rValues[XSLNAME] = inputDir + setTwoFilenameRoot + ".xsl";
+                rValues[OUTNAME] = outputDir + setTwoFilenameRoot + "r" + i;
                 rValues[PARAMNAME] = paramName;
                 rValues[PARAMVAL] = paramVal;
                 rValues[OPTIONS] = "polite;param";
@@ -319,10 +327,10 @@ public class TestThreads
                 // and report memory usage; but not set the param
                 // Note: this causes lots of calls to System.gc
                 rValues[ID] = "thr-" + i;
-                rValues[XMLNAME] = "file:" + testDir + setThreeFilenameRoot
+                rValues[XMLNAME] = "file:" + inputDir + setThreeFilenameRoot
                                    + ".xml";
-                rValues[XSLNAME] = testDir + setThreeFilenameRoot + ".xsl";
-                rValues[OUTNAME] = outDir + setThreeFilenameRoot + "r" + i;
+                rValues[XSLNAME] = inputDir + setThreeFilenameRoot + ".xsl";
+                rValues[OUTNAME] = outputDir + setThreeFilenameRoot + "r" + i;
                 rValues[PARAMNAME] = paramName;
                 rValues[PARAMVAL] = paramVal;
                 rValues[OPTIONS] = "recreate;memory";
@@ -366,9 +374,8 @@ public class TestThreads
     /**
      * Read in properties file and set instance variables.  
      *
-     * NEEDSDOC @param fName
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param fName name of .properties file to read
+     * @return false if error occoured
      */
     protected boolean initPropFile(String fName)
     {
@@ -384,36 +391,36 @@ public class TestThreads
             p.load(fIS);
 
             // Parse out any values that match our internal convenience variables
-            outDir = p.getProperty("outputDir", outDir);
+            outputDir = p.getProperty("outputDir", outputDir);
 
-            // Validate the outDir and use it to reset the logFileName
-            File oDir = new File(outDir);
+            // Validate the outputDir and use it to reset the logFileName
+            File oDir = new File(outputDir);
 
             if (!oDir.exists())
             {
                 if (!oDir.mkdirs())
                 {
 
-                    // Error, we can't create the outDir, default to current dir
-                    println("<message desc=\"outputDir(" + outDir
+                    // Error, we can't create the outputDir, default to current dir
+                    println("<message desc=\"outputDir(" + outputDir
                             + ") does not exist, defaulting to .\"/>");
 
-                    outDir = ".";
+                    outputDir = ".";
                 }
             }
 
-            // Verify testDir as well
-            testDir = p.getProperty("inputDir", testDir);
+            // Verify inputDir as well
+            inputDir = p.getProperty("inputDir", inputDir);
 
-            File tDir = new File(testDir);
+            File tDir = new File(inputDir);
 
             if (!tDir.exists())
             {
                 if (!tDir.mkdirs())
                 {
 
-                    // Error, we can't create the testDir, abort
-                    println("<message desc=\"inputDir(" + testDir
+                    // Error, we can't create the inputDir, abort
+                    println("<message desc=\"inputDir(" + inputDir
                             + ") does not exist, terminating test\"/>");
 
                     return false;
@@ -421,8 +428,8 @@ public class TestThreads
             }
 
             // Add on separators
-            testDir += File.separator;
-            outDir += File.separator;
+            inputDir += File.separator;
+            outputDir += File.separator;
 
             // Each defaults to variable initializers            
             logFileName = p.getProperty("logFile", logFileName);
@@ -561,6 +568,7 @@ public class TestThreads
     /**
      * Take a user string and try and parse XML, and also return the url.
      *
+     * @todo remove this; make URL's in a simpler manner!!!
      * NEEDSDOC @param urlString
      * NEEDSDOC @param base
      *
@@ -1053,13 +1061,13 @@ class TestThreadsRunner implements Runnable
         println("<testrunner desc=\"" + runnerID + ":started\" fileName=\""
                 + xslName + "\">");
 
-        Processor p = null;
+        TransformerFactory factory = null;
 
         try
         {
 
             // Each runner creates it's own processor for use and it's own error log
-            p = Processor.newInstance("xslt");
+            factory = TransformerFactory.newInstance();
 
             // Munge the input filenames to be URLs
             xmlName = TestThreads.getURLFromString(xmlName,
@@ -1096,13 +1104,13 @@ class TestThreadsRunner implements Runnable
                     Transformer transformer1 = xslStylesheet.newTransformer();
                     FileOutputStream resultStream1 =
                         new FileOutputStream(outName + ".out");
-                    Result result1 = new Result(resultStream1);
+                    Result result1 = new StreamResult(resultStream1);
 
                     if (setParam)
-                        transformer1.setParameter(paramName, null, paramVal);
+                        transformer1.setParameter(paramName, paramVal);
 
                     print(".");  // Note presence of this in logs shows which process threw an exception
-                    transformer1.transform(new InputSource(xmlName), result1);
+                    transformer1.transform(new StreamSource(xmlName), result1);
                     resultStream1.close();
 
                     // Temporary vars go out of scope for cleanup here
@@ -1111,17 +1119,17 @@ class TestThreadsRunner implements Runnable
                 // Now process something with a newly-processed stylesheet
                 {
                     Templates templates2 =
-                        p.process(new InputSource(xslName));
+                        factory.newTemplates(new StreamSource(xslName));
                     Transformer transformer2 = templates2.newTransformer();
                     FileOutputStream resultStream2 =
                         new FileOutputStream(outName + "_.out");
-                    Result result2 = new Result(resultStream2);
+                    Result result2 = new StreamResult(resultStream2);
 
                     if (setParam)
-                        transformer2.setParameter(paramName, null, paramVal);
+                        transformer2.setParameter(paramName, paramVal);
 
                     print("*");  // Note presence of this in logs shows which process threw an exception
-                    transformer2.transform(new InputSource(xmlName), result2);
+                    transformer2.transform(new StreamSource(xmlName), result2);
                     resultStream2.close();
                 }
 
@@ -1154,22 +1162,12 @@ class TestThreadsRunner implements Runnable
         }
 
         // Separate messages for each kind of exception
-        catch (TransformException te)
+        catch (TransformerException te)
         {
-            println("\n<transformexception desc=\"" + te.toString() + "\">");
+            println("\n<TransformerException desc=\"" + te.toString() + "\">");
             logStackTrace(te, errWriter);
             logContainedException(te, errWriter);
-            println("</transformexception>");
-            println("</arbitrary>");
-            println("<message desc=\"" + runnerID + ":complete-ERROR:after:"
-                    + i + "\"/>");
-        }
-        catch (SAXException se)
-        {
-            println("\n<saxexception desc=\"" + se.toString() + "\">");
-            logStackTrace(se, errWriter);
-            logContainedException(se, errWriter);
-            println("</saxexception>");
+            println("</TransformerException>");
             println("</arbitrary>");
             println("<message desc=\"" + runnerID + ":complete-ERROR:after:"
                     + i + "\"/>");
@@ -1205,7 +1203,7 @@ class TestThreadsRunner implements Runnable
      * NEEDSDOC @param parent
      * NEEDSDOC @param p
      */
-    private void logContainedException(SAXException parent, PrintWriter p)
+    private void logContainedException(TransformerException parent, PrintWriter p)
     {
 
         Exception containedException = parent.getException();
