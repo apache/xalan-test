@@ -8,7 +8,7 @@
 @echo Notes/prerequisites: 
 @echo   Assumes you're in xml-xalan/test
 @echo   JAVA_OPTS Will be passed to java.exe or jview.exe
-@echo   EXTRA_CP Will be appended to the classpath
+@echo   EXTRA_CP Will be prepended to the classpath (changed Jan-01)
 @echo   END_PKG Will be the subpackage name after org.apache.qetest
 @echo   Special: first arg= -jview: Run Microsoft's jview instead of java
 @echo   Special: first arg= -crimson: Use crimson.jar instead of xerces.jar
@@ -71,8 +71,10 @@ if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;..\java\bin\%PARSER_JAR%;
 @REM If JARDIR set, put those references first then default classpath
 if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
 
-@REM Wrappers use EXTRA_CP to add items to our classpath; if set, append
-if not "%EXTRA_CP%" == "" set TEST_CP=%TEST_CP%;%EXTRA_CP%
+@REM Wrappers use EXTRA_CP to add items to our classpath; if set, prepend
+@REM 19-Jan-01 sc change to prepend to make Xalan-J 2.x compatibility
+@REM  testing easier, since compat.jar gets added at head of classpath
+if not "%EXTRA_CP%" == "" set TEST_CP=%EXTRA_CP%;%TEST_CP%
 
 @REM Wrappers use END_PKG to switch around the end of the 
 @REM    packagename; if not set, default it to most common package
