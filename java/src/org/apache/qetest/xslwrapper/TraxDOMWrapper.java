@@ -70,6 +70,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
@@ -243,7 +244,8 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         xmlSource.setSystemId(QetestUtils.filenameToURL(xmlName));
 
         // Untimed: create DOMResult
-        Document outNode = docBuilder.newDocument();
+        Document outDoc = docBuilder.newDocument();                
+        DocumentFragment outNode = outDoc.createDocumentFragment();
         DOMResult domResult = new DOMResult(outNode);
         
         // Untimed: Set any of our options as Attributes on the transformer
