@@ -121,6 +121,11 @@ public class XHTFileCheckService implements CheckService
      * @return Logger.*_RESULT code denoting status; each method may 
      * define it's own meanings for pass, fail, ambiguous, etc.
      */
+	public  XHTFileCheckService()
+	{
+	  //No-op
+	}
+
     public int check(Logger logger, Object actual, Object reference,
                      String msg, String id)
     {
@@ -292,7 +297,7 @@ public class XHTFileCheckService implements CheckService
         //  cleanest place to put this is (here or some sort 
         //  of intelligent logic in XMLFileLogger)
         elementBody = XMLFileLogger.escapeString(elementBody);
-        logger.logElement(Logger.STATUSMSG, "fileCheck", attrs, elementBody);
+		logger.logElement(Logger.STATUSMSG, "fileCheck", attrs, elementBody);
     }
 
     /**
@@ -481,5 +486,37 @@ public class XHTFileCheckService implements CheckService
             return "XHTFileCheckService-no-info-available";
     }
 
+    /**
+     * Main method to run test from the command line - can be left alone.  
+     * @param args command line argument array
+     */
+    public  static void main(String[] args)
+    {
+		if (args.length < 2)
+		{
+			System.out.println("	Please provide two files to compare");
+		}
+		else
+		{
+			ConsoleLogger log = new ConsoleLogger();
+			XHTFileCheckService app = new XHTFileCheckService();
+			System.out.println("\nThank you for using XHTFileCheckService");
+			System.out.println( app.getDescription() );
+			System.out.println("We hope your results are satisfactory");
+			System.out.println("\n" + args[0] + "  " + args[1]);
+
+			File fAct = new File(args[0]);
+			File fExp = new File(args[1]);
+		
+			try
+			{
+				app.check(log, fAct, fExp, "Check");
+			}
+			catch (Exception e) 
+			{ 
+			   System.out.println ("main() caught unexpected Exception"); 
+			}
+		}
+    }
 }  // end of class XHTFileCheckService
 
