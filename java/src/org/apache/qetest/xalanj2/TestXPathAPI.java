@@ -305,7 +305,7 @@ public class TestXPathAPI extends XSLProcessorTestBase
       for (int i=0;i<numxpath; i++) 
       {
         // Use the simple XPath API to select a nodeIterator.
-        System.out.println("Querying DOM using "+xpath[i]);
+        reporter.logWarningMsg("Querying DOM using "+xpath[i]);
         NodeList nl = XPathAPI.selectNodeList(doc, xpath[i]);
         
         // Serialize the found nodes to System.out.
