@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<out>ELEMENT1A,ELEMENT1B
+elem1,elem2,elem3,elem3,test:elem3,elem3,elem3,elem4,
+elem2a,elem2b,
+Apply-templates match=elem4: Yahoo,
+Sum: 15
+Count: 5
+Number: 2
+Name: docelem
+generate-id: N1efdc1
+Local-name: docelem
+Namespace-uri: ,
+	  ,
+	  : 
+
+xsl:copy-of($rtf): 
+ <docelem xmlns="http://www.hello.com">
+        <elem1>
+            <elem1a>ELEMENT1A</elem1a>
+            <elem1b>,ELEMENT1B</elem1b>
+        </elem1>
+        <elem2>
+            <elem2a>ELEMENT2A</elem2a>
+            <elem2b/>
+        </elem2>
+        <elem3>1</elem3>
+        <elem3>2</elem3>
+        <test:elem3>3</test:elem3>
+        <elem3>4</elem3>
+        <elem3>5</elem3>
+        <elem4>Yahoo</elem4>
+    </docelem>
+
+xsl:copy-of(elem1b): 
+ <elem1b xmlns="http://www.hello.com">,ELEMENT1B</elem1b>
+
+xsl:copy-of(test:elem3): 
+ 
+</out>
