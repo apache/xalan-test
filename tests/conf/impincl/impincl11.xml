@@ -4,6 +4,7 @@
   <author>Joe Jones</author>
   <publisher>Conformance Press</publisher>
   <overview>testing-import</overview>
+  <price>25.85</price>
   <chapters>
     <chapter num="1">know XSL</chapter>
     <chapter num="2">love XSL</chapter>

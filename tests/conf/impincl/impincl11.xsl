@@ -9,10 +9,11 @@
   <!-- Purpose: Nest imports and includes using relative paths. -->
 
 <xsl:import href="fragments/ss2.xsl"/>
+<xsl:import href="fragments/ss6.xsl"/>
 
 <xsl:template match="/">
   <out>
-    <xsl:value-of select="concat($mParam,$nParam,$oParam,$pParam)"/>
+    <xsl:value-of select="concat($mParam,$nParam,$oParam,$pParam, $qParam)"/>
     <xsl:apply-templates/>
   </out>
 </xsl:template>
