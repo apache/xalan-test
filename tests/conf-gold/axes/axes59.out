@@ -5,4 +5,6 @@
 <jad>http://administrator.com</jad>,
 <java>http://xml.apache.org/xslt/java</java>,
 <ped>http://tester.com</ped>,
+<xml>http://www.w3.org/XML/1998/namespace</xml>,
+<xml>http://www.w3.org/XML/1998/namespace</xml>,
 </out>

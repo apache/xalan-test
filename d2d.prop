@@ -7,16 +7,16 @@
 # testDir is where root of test xml/xsl files are
 # inputDir=\\xml-xalan\\test\\tests\\temp
 # inputDir=\\xml-xalan\\test\\tests\\conf
-inputDir=.\\tests\\conf
+inputDir=tests\\conf
 
 # goldDir is where the 'gold' files to check against live
-goldDir=\\user\\dtm\\xml-xalan\\test\\tests\\conf-gold
+goldDir=tests\\conf-gold
 
 # outDir is where we put the actual output files and any logs or error dumps
 outputDir=.\\results-d2d
 
 # All test output will be saved in this file
-logFile=.\\results-d2d\\ConfTest.xml
+logFile=.\\results-d2d\\ConformanceTest.xml
 
 #---- Choose processor: flavors supported: xalan|trax|other...
 # Update for StylesheetTestletDriver/trax.dom 25-Jun-01 -sc 

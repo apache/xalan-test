@@ -1,6 +1,6 @@
 @echo This batch file is deprecated; for an equivalent try:
 @echo build conf
-@goto end
+:@goto end
 
 @echo off
 @goto start
@@ -23,7 +23,11 @@ set END_PKG=
 @REM Call with no args to get default processing; note that if 
 @REM  you've overridden logFile, this may not work
 call viewResults.bat %DASHCRIMSON% results-conf\ConformanceTest.xml results-conf\ConformanceTest.html
-results-conf\ConformanceTest.html
+
+@REM Launch in a new session, so this one can return to command line.
+@REM (Works better with Netscape.)
+start results-conf\ConformanceTest.html
+:end
 
 set DASHCRIMSON=
 :end

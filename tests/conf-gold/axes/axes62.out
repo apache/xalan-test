@@ -2,7 +2,7 @@
 <out xmlns:bdd="http://bdd.lotus.com" xmlns:ped="http://ped.lotus.com">
   
 
-There are 7 Namespace Nodes.
+There are 8 Namespace Nodes.
 <bdd>http://buster.com</bdd>,
 <ext>http://somebody.elses.extension</ext>,
 <jad>http://administrator.com</jad>,
@@ -10,12 +10,14 @@ There are 7 Namespace Nodes.
 <ok1>http://ped.lotus.com</ok1>,
 <ok2>http://bdd.lotus.com</ok2>,
 <ped>http://tester.com</ped>,
+<xml>http://www.w3.org/XML/1998/namespace</xml>,
 
 <ok1>http://ped.lotus.com</ok1>
 <ok2>http://bdd.lotus.com</ok2>
   
 
-There are 0 Namespace Nodes.
+There are 1 Namespace Nodes.
+<xml>http://www.w3.org/XML/1998/namespace</xml>,
 
 
 </out>
