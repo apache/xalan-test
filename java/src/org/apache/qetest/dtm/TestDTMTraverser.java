@@ -158,13 +158,13 @@ static final String[] TYPENAME=
       DTM dtm=manager.getDTM(source, true, stripper, false, true);
 
 	  // Get various nodes to use as context nodes.
-	  int dtmRoot = dtm.getDocument();			// #document
-	  String dtmRootName = dtm.getNodeName(dtmRoot);
-	  int DNode = dtm.getFirstChild(dtmRoot);	// <Document>
+	  int dtmRoot = dtm.getDocument();					// #document
+	  String dtmRootName = dtm.getNodeName(dtmRoot);	// Used for output
+	  int DNode = dtm.getFirstChild(dtmRoot);			// <Document>
 	  String DNodeName = dtm.getNodeName(DNode);
-	  int CNode = dtm.getFirstChild(DNode);		// <Comment>
-	  int PINode = dtm.getNextSibling(CNode);	// <PI>
-	  int ANode = dtm.getNextSibling(PINode);	// <A>
+	  int CNode = dtm.getFirstChild(DNode);				// <Comment>
+	  int PINode = dtm.getNextSibling(CNode);			// <PI>
+	  int ANode = dtm.getNextSibling(PINode);			// <A>
 	  String ANodeName = dtm.getNodeName(ANode);
 	  int lastNode = 0;
 
@@ -265,23 +265,21 @@ static final String[] TYPENAME=
 
 	  // Get a traverser for  DESCENDANT:: axis.
 	  System.out.println("\n#### DESCENDANT from "+"<"+ANodeName+">");
-      DTMAxisTraverser at2 = dtm.getAxisTraverser(Axis.DESCENDANT);
+      at = dtm.getAxisTraverser(Axis.DESCENDANT);
 
 	  // Traverse the axis and print out node info.
-	  for (int atNode = at2.first(ANode); DTM.NULL != atNode;
-              atNode = at2.next(ANode, atNode))
-		{
-			printNode(dtm, atNode, " ");
-			lastNode = atNode;
-		}
+	  for (int atNode = at.first(ANode); DTM.NULL != atNode;
+              atNode = at.next(ANode, atNode))
+		  printNode(dtm, atNode, " ");
+
 
 	  // Get a traverser for  DESCENDANTORSELF:: axis.
 	  System.out.println("\n#### DESCENDANT-OR-SELF from "+"<"+ANodeName+">");
-      at2 = dtm.getAxisTraverser(Axis.DESCENDANTORSELF);
+      at = dtm.getAxisTraverser(Axis.DESCENDANTORSELF);
 
 	  // Traverse the axis and print out node info.
-	  for (int atNode = at2.first(ANode); DTM.NULL != atNode;
-              atNode = at2.next(ANode, atNode))
+	  for (int atNode = at.first(ANode); DTM.NULL != atNode;
+              atNode = at.next(ANode, atNode))
 		{
 			printNode(dtm, atNode, " ");
 			lastNode = atNode;
@@ -290,31 +288,50 @@ static final String[] TYPENAME=
 	  // Get a traverser for ANCESTOR:: axis.
 	  lastNodeName = dtm.getNodeName(lastNode);
 	  System.out.println("\n#### ANCESTOR from "+"<"+lastNodeName+">");
-      DTMAxisTraverser at3 = dtm.getAxisTraverser(Axis.ANCESTOR);
+      at = dtm.getAxisTraverser(Axis.ANCESTOR);
 
 	  // Traverse the axis and print out node info.
-      for (int atNode = at3.first(lastNode); DTM.NULL != atNode;
-              atNode = at3.next(lastNode, atNode))
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
 
-	  // Get a traverser for AncestororSelf:: axis.
+	  // Get a traverser for ANCESTORORSELF:: axis.
 	  System.out.println("\n#### ANCESTOR-OR-SELF from "+"<"+lastNodeName+">");
-      at3 = dtm.getAxisTraverser(Axis.ANCESTORORSELF);
+      at = dtm.getAxisTraverser(Axis.ANCESTORORSELF);
 
 	  // Traverse the axis and print out node info.
-      for (int atNode = at3.first(lastNode); DTM.NULL != atNode;
-              atNode = at3.next(lastNode, atNode))
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
 
 	  // Get a traverser for ALL:: axis.
-	  System.out.println("\n#### ALL(absolute axis) from "+"<"+dtmRootName+">");
-      at3 = dtm.getAxisTraverser(Axis.ALL);
+	  // NOTE: Calling first() is a bit irrelvant here.  It will always default to 
+	  //       the root of the tree, regardless of what we pass to first(). 
+	  System.out.println("\n#### ALL(absolute) from "+"<"+dtmRootName+">");
+      at = dtm.getAxisTraverser(Axis.ALL);
 
 	  // Traverse the axis and print out node info.
-      for (int atNode = at3.first(lastNode); DTM.NULL != atNode;
-              atNode = at3.next(lastNode, atNode))
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
 		printNode(dtm, atNode, " ");
 
+	  // Get a traverser for DESCENDANTSFROMROOT:: axis.
+	  System.out.println("\n#### DESCENDANTSFROMROOT(absolute) from "+"<"+dtmRootName+">");
+      at = dtm.getAxisTraverser(Axis.DESCENDANTSFROMROOT);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
+
+	  // Get a traverser for DESCENDANTSORSELFFROMROOT:: axis.
+	  System.out.println("\n#### DESCENDANTSFROMROOT(absolute) from "+"<"+dtmRootName+">");
+      at = dtm.getAxisTraverser(Axis.DESCENDANTSORSELFFROMROOT);
+
+	  // Traverse the axis and print out node info.
+      for (int atNode = at.first(lastNode); DTM.NULL != atNode;
+              atNode = at.next(lastNode, atNode))
+		printNode(dtm, atNode, " ");
 
     }
     catch(Exception e)
