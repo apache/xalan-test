@@ -957,8 +957,8 @@
             <include name="${tarzip-fwdref}/*.*"/>
             <include name="${tarzip-fwdref}/${testxsl.jar}"/>
             <include name="${tarzip-fwdref}/${test.build.dir}/${test.root}"/>
-            <include name="${tarzip-fwdref}/${test.build.docs}"/>
-            <include name="${tarzip-fwdref}/${test.build.apidocs}"/>
+            <include name="${tarzip-fwdref}/${test.build.docs}/"/>
+            <include name="${tarzip-fwdref}/${test.build.apidocs}/"/>
             <include name="${tarzip-fwdref}/java/xdocs/"/>
             <include name="${tarzip-fwdref}/java/src/"/>
             <include name="${tarzip-fwdref}/bin/"/>
@@ -980,14 +980,33 @@
             <include name="${tarzip-fwdref}/*.*"/>
             <include name="${tarzip-fwdref}/${testxsl.jar}"/>
             <include name="${tarzip-fwdref}/${test.build.dir}/${test.root}"/>
-            <include name="${tarzip-fwdref}/${test.build.docs}"/>
-            <include name="${tarzip-fwdref}/${test.build.apidocs}"/>
+            <include name="${tarzip-fwdref}/${test.build.docs}/"/>
+            <include name="${tarzip-fwdref}/${test.build.apidocs}/"/>
             <include name="${tarzip-fwdref}/java/xdocs/"/>
             <include name="${tarzip-fwdref}/java/src/"/>
             <include name="${tarzip-fwdref}/bin/"/>
           </zipfileset>
         </zip>
           
+        <!-- tar.gz just the documentation for potential posting to the website -->
+        <tar tarfile="${test.build.dir}/xalan-docs-${DSTAMP}.tar">
+          <tarfileset dir="..">
+            <include name="test/${test.build.docs}/"/>
+            <include name="test/${test.build.apidocs}/"/>
+            <include name="test/README.html"/>
+          </tarfileset>
+        </tar>
+        <gzip src="${test.build.dir}/xalan-docs-${DSTAMP}.tar" 
+              zipfile="${test.build.dir}/xalan-docs-${DSTAMP}.tar.gz"/>
+        <delete file="${test.build.dir}/xalan-docs-${DSTAMP}.tar"/>
+        <zip zipfile="${test.build.dir}/xalan-docs-${DSTAMP}.zip" >
+          <zipfileset dir="..">
+            <include name="test/${test.build.docs}/"/>
+            <include name="test/${test.build.apidocs}/"/>
+            <include name="test/README.html"/>
+          </zipfileset>
+        </zip>
+
     </target>
 
     <target name="export" depends="jar"
