@@ -8,6 +8,7 @@
   <!-- Purpose: Attempt text output of characters above 127 when encoding doesn't support them. -->
   <!-- "If the result tree contains a character that cannot be represented in the encoding
        that the XSLT processor is using for output, the XSLT processor should signal an error." -->
+  <!-- ExpectedException: Attempt to output character not represented in specified encoding. -->
   <!-- ExpectedException: Attempt to output character of integral value 264 that is not represented in specified output encoding of US-ASCII. -->
 
 <xsl:output method="text" encoding="US-ASCII"/>
