@@ -35,7 +35,7 @@ if '%1' == '-JVIEW' goto setjv
 @REM -crimson: Use crimson.jar instead of xerces.jar
 @REM    shift to get rid of -crimson arg; just pass rest of args along
 set SAVED_JAVA_OPTS=%JAVA_OPTS%
-if '%1' == '-crimson' set JAVA_OPTS=-Djavax.xml.parsers.DocumentBuilderFactory=org.apache.crimson.jaxp.DocumentBuilderFactoryImpl -Dorg.xml.sax.driver=org.apache.crimson.jaxp.SAXParserFactoryImpl %JAVA_OPTS%
+if '%1' == '-crimson' set JAVA_OPTS=-Dorg.xml.sax.driver=org.apache.crimson.parser.XMLReaderImpl %JAVA_OPTS%
 if '%1' == '-crimson' set PARSER_JAR=crimson.jar
 if '%1' == '-crimson' shift
 
