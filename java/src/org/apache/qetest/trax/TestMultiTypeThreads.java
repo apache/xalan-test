@@ -127,7 +127,7 @@ public class TestMultiTypeThreads
     public static String usage()
     {
 
-        return ("Usage: TestMultiTypeThreads file.properties :\n"
+        return ("Usage: TestMultiTypeThreads [-load] file.properties :\n"
                 + "    where the properties file can set:,\n"
                 + "    inputDir=e:\\builds\\xsl-test\n"
                 + "    outputDir=e:\\builds\\xsl-test\\results\n"
@@ -256,15 +256,10 @@ public class TestMultiTypeThreads
 
         try
         {
-            String setOneURL =
-                getURLFromString(inputDir + setOneFilenameRoot + ".xsl",
-                                 null).toExternalForm();
-            String setTwoURL =
-                getURLFromString(inputDir + setTwoFilenameRoot + ".xsl",
-                                 null).toExternalForm();
-            String setThreeURL =
-                getURLFromString(inputDir + setThreeFilenameRoot + ".xsl",
-                                 null).toExternalForm();
+            String setOneURL = filenameToURI(inputDir + setOneFilenameRoot + ".xsl");
+            String setTwoURL = filenameToURI(inputDir + setTwoFilenameRoot + ".xsl");
+            String setThreeURL = filenameToURI(inputDir + setThreeFilenameRoot + ".xsl");
+
             TransformerFactory factory = TransformerFactory.newInstance();
 
             // Note: for now, just use StreamSources to build all stylesheets
@@ -321,9 +316,8 @@ public class TestMultiTypeThreads
                 }
                 // First set of runners reports on memory usage periodically
                 rValues[ID] = "one-" + i;
-                rValues[XMLNAME] = "file:" + inputDir + setOneFilenameRoot
-                                   + ".xml";
-                rValues[XSLNAME] = inputDir + setOneFilenameRoot + ".xsl";
+                rValues[XMLNAME] = filenameToURI(inputDir + setOneFilenameRoot + ".xml");
+                rValues[XSLNAME] = filenameToURI(inputDir + setOneFilenameRoot + ".xsl");
                 rValues[OUTNAME] = outputDir + setOneFilenameRoot + "r" + i;
                 rValues[PARAMNAME] = paramName;
                 rValues[PARAMVAL] = paramVal;
@@ -338,9 +332,8 @@ public class TestMultiTypeThreads
 
                 // Second set of runners is polite; uses optional liaison
                 rValues[ID] = "two-" + i;
-                rValues[XMLNAME] = "file:" + inputDir + setTwoFilenameRoot
-                                   + ".xml";
-                rValues[XSLNAME] = inputDir + setTwoFilenameRoot + ".xsl";
+                rValues[XMLNAME] = filenameToURI(inputDir + setTwoFilenameRoot + ".xml");
+                rValues[XSLNAME] = filenameToURI(inputDir + setTwoFilenameRoot + ".xsl");
                 rValues[OUTNAME] = outputDir + setTwoFilenameRoot + "r" + i;
                 rValues[PARAMNAME] = paramName;
                 rValues[PARAMVAL] = paramVal;
@@ -363,9 +356,8 @@ public class TestMultiTypeThreads
                 // and report memory usage; but not set the param
                 // Note: this causes lots of calls to System.gc
                 rValues[ID] = "thr-" + i;
-                rValues[XMLNAME] = "file:" + inputDir + setThreeFilenameRoot
-                                   + ".xml";
-                rValues[XSLNAME] = inputDir + setThreeFilenameRoot + ".xsl";
+                rValues[XMLNAME] = filenameToURI(inputDir + setThreeFilenameRoot + ".xml");
+                rValues[XSLNAME] = filenameToURI(inputDir + setThreeFilenameRoot + ".xsl");
                 rValues[OUTNAME] = outputDir + setThreeFilenameRoot + "r" + i;
                 rValues[PARAMNAME] = paramName;
                 rValues[PARAMVAL] = paramVal;
@@ -580,19 +572,28 @@ public class TestMultiTypeThreads
     public static void main(String[] args)
     {
 
-        if (args.length != 1)
+        if (args.length < 1)
         {
-            System.err.println("ERROR! Must have one argument\n" + usage());
+            System.err.println("ERROR! Must have at least one argument\n" + usage());
 
             return;  // Don't System.exit, it's not polite
         }
 
         TestMultiTypeThreads app = new TestMultiTypeThreads();
-
-        if (!app.initPropFile(args[0]))  // Side effect: creates pWriter for logging
+        // semi-HACK: accept and ignore -load as first arg only
+        String propFileName = null;
+        if ("-load".equalsIgnoreCase(args[0]))
+        {
+            propFileName = args[1];
+        }
+        else
+        {
+            propFileName = args[0];
+        }
+        if (!app.initPropFile(propFileName))  // Side effect: creates pWriter for logging
         {
             System.err.println("ERROR! Could not read properties file: "
-                               + args[0]);
+                               + propFileName);
 
             return;
         }
@@ -600,349 +601,23 @@ public class TestMultiTypeThreads
         app.runTest();
     }
 
-    // /////////////////// HACK - added from Xalan1 org.apache.xalan.xslt.Process /////////////////////
-
     /**
-     * Take a user string and try and parse XML, and also return the url.
-     *
-     * @todo remove this; make URL's in a simpler manner!!!
-     * NEEDSDOC @param urlString
-     * NEEDSDOC @param base
-     *
-     * NEEDSDOC ($objectName$) @return
-     * @exception SAXException thrown if we really really can't create the URL
+     * Worker method to translate String to URI.  
+     * Note: Xerces and Crimson appear to handle some URI references 
+     * differently - this method needs further work once we figure out 
+     * exactly what kind of format each parser wants (esp. considering 
+     * relative vs. absolute references).
+     * @param String path\filename of test file
+     * @return URL to pass to SystemId
      */
-    public static URL getURLFromString(String urlString, String base)
-            throws SAXException
+    public static String filenameToURI(String filename)
     {
-
-        String origURLString = urlString;
-        String origBase = base;
-
-        // System.out.println("getURLFromString - urlString: "+urlString+", base: "+base);
-        Object doc;
-        URL url = null;
-        int fileStartType = 0;
-
-        try
-        {
-            if (null != base)
-            {
-                if (base.toLowerCase().startsWith("file:/"))
-                {
-                    fileStartType = 1;
-                }
-                else if (base.toLowerCase().startsWith("file:"))
-                {
-                    fileStartType = 2;
-                }
-            }
-
-            boolean isAbsoluteURL;
-
-            // From http://www.ics.uci.edu/pub/ietf/uri/rfc1630.txt
-            // A partial form can be distinguished from an absolute form in that the
-            // latter must have a colon and that colon must occur before any slash
-            // characters. Systems not requiring partial forms should not use any
-            // unencoded slashes in their naming schemes.  If they do, absolute URIs
-            // will still work, but confusion may result.
-            int indexOfColon = urlString.indexOf(':');
-            int indexOfSlash = urlString.indexOf('/');
-
-            if ((indexOfColon != -1) && (indexOfSlash != -1)
-                    && (indexOfColon < indexOfSlash))
-            {
-
-                // The url (or filename, for that matter) is absolute.
-                isAbsoluteURL = true;
-            }
-            else
-            {
-                isAbsoluteURL = false;
-            }
-
-            if (isAbsoluteURL || (null == base) || (base.length() == 0))
-            {
-                try
-                {
-                    url = new URL(urlString);
-                }
-                catch (MalformedURLException e){}
-            }
-
-            // The Java URL handling doesn't seem to handle relative file names.
-            else if (!((urlString.charAt(0) == '.') || (fileStartType > 0)))
-            {
-                try
-                {
-                    URL baseUrl = new URL(base);
-
-                    url = new URL(baseUrl, urlString);
-                }
-                catch (MalformedURLException e){}
-            }
-
-            if (null == url)
-            {
-
-                // Then we're going to try and make a file URL below, so strip 
-                // off the protocol header.
-                if (urlString.toLowerCase().startsWith("file:/"))
-                {
-                    urlString = urlString.substring(6);
-                }
-                else if (urlString.toLowerCase().startsWith("file:"))
-                {
-                    urlString = urlString.substring(5);
-                }
-            }
-
-            if ((null == url) && ((null == base) || (fileStartType > 0)))
-            {
-                if (1 == fileStartType)
-                {
-                    if (null != base)
-                        base = base.substring(6);
-
-                    fileStartType = 1;
-                }
-                else if (2 == fileStartType)
-                {
-                    if (null != base)
-                        base = base.substring(5);
-
-                    fileStartType = 2;
-                }
-
-                File f = new File(urlString);
-
-                if (!f.isAbsolute() && (null != base))
-                {
-
-                    // String dir = f.isDirectory() ? f.getAbsolutePath() : f.getParent();
-                    // System.out.println("prebuiltUrlString (1): "+base);
-                    StringTokenizer tokenizer = new StringTokenizer(base,
-                                                    "\\/");
-                    String fixedBase = null;
-
-                    while (tokenizer.hasMoreTokens())
-                    {
-                        String token = tokenizer.nextToken();
-
-                        if (null == fixedBase)
-                        {
-
-                            // Thanks to Rick Maddy for the bug fix for UNIX here.
-                            if (base.charAt(0) == '\\'
-                                    || base.charAt(0) == '/')
-                            {
-                                fixedBase = File.separator + token;
-                            }
-                            else
-                            {
-                                fixedBase = token;
-                            }
-                        }
-                        else
-                        {
-                            fixedBase += File.separator + token;
-                        }
-                    }
-
-                    // System.out.println("rebuiltUrlString (1): "+fixedBase);
-                    f = new File(fixedBase);
-
-                    String dir = f.isDirectory()
-                                 ? f.getAbsolutePath() : f.getParent();
-
-                    // System.out.println("dir: "+dir);
-                    // System.out.println("urlString: "+urlString);
-                    // f = new File(dir, urlString);
-                    // System.out.println("f (1): "+f.toString());
-                    // urlString = f.getAbsolutePath();
-                    f = new File(urlString);
-
-                    boolean isAbsolute = f.isAbsolute()
-                                         || (urlString.charAt(0) == '\\')
-                                         || (urlString.charAt(0) == '/');
-
-                    if (!isAbsolute)
-                    {
-
-                        // Getting more and more ugly...
-                        if (dir.charAt(dir.length() - 1)
-                                != File.separator.charAt(0)
-                                && urlString.charAt(0)
-                                   != File.separator.charAt(0))
-                        {
-                            urlString = dir + File.separator + urlString;
-                        }
-                        else
-                        {
-                            urlString = dir + urlString;
-                        }
-
-                        // System.out.println("prebuiltUrlString (2): "+urlString);
-                        tokenizer = new StringTokenizer(urlString, "\\/");
-
-                        String rebuiltUrlString = null;
-
-                        while (tokenizer.hasMoreTokens())
-                        {
-                            String token = tokenizer.nextToken();
-
-                            if (null == rebuiltUrlString)
-                            {
-
-                                // Thanks to Rick Maddy for the bug fix for UNIX here.
-                                if (urlString.charAt(0) == '\\'
-                                        || urlString.charAt(0) == '/')
-                                {
-                                    rebuiltUrlString = File.separator + token;
-                                }
-                                else
-                                {
-                                    rebuiltUrlString = token;
-                                }
-                            }
-                            else
-                            {
-                                rebuiltUrlString += File.separator + token;
-                            }
-                        }
-
-                        // System.out.println("rebuiltUrlString (2): "+rebuiltUrlString);
-                        if (null != rebuiltUrlString)
-                            urlString = rebuiltUrlString;
-                    }
-
-                    // System.out.println("fileStartType: "+fileStartType);
-                    if (1 == fileStartType)
-                    {
-                        if (urlString.charAt(0) == '/')
-                        {
-                            urlString = "file://" + urlString;
-                        }
-                        else
-                        {
-                            urlString = "file:/" + urlString;
-                        }
-                    }
-                    else if (2 == fileStartType)
-                    {
-                        urlString = "file:" + urlString;
-                    }
-
-                    try
-                    {
-
-                        // System.out.println("Final before try: "+urlString);
-                        url = new URL(urlString);
-                    }
-                    catch (MalformedURLException e)
-                    {
-
-                        // System.out.println("Error trying to make URL from "+urlString);
-                    }
-                }
-            }
-
-            if (null == url)
-            {
-
-                // The sun java VM doesn't do this correctly, but I'll 
-                // try it here as a second-to-last resort.
-                if ((null != origBase) && (origBase.length() > 0))
-                {
-                    try
-                    {
-                        URL baseURL = new URL(origBase);
-
-                        // System.out.println("Trying to make URL from "+origBase+" and "+origURLString);
-                        url = new URL(baseURL, origURLString);
-
-                        // System.out.println("Success! New URL is: "+url.toString());
-                    }
-                    catch (MalformedURLException e)
-                    {
-
-                        // System.out.println("Error trying to make URL from "+origBase+" and "+origURLString);
-                    }
-                }
-
-                if (null == url)
-                {
-                    try
-                    {
-                        String lastPart;
-
-                        if (null != origBase)
-                        {
-                            File baseFile = new File(origBase);
-
-                            if (baseFile.isDirectory())
-                            {
-                                lastPart =
-                                    new File(baseFile,
-                                             urlString).getAbsolutePath();
-                            }
-                            else
-                            {
-                                String parentDir = baseFile.getParent();
-
-                                lastPart =
-                                    new File(parentDir,
-                                             urlString).getAbsolutePath();
-                            }
-                        }
-                        else
-                        {
-                            lastPart = new File(urlString).getAbsolutePath();
-                        }
-
-                        // Hack
-                        // if((lastPart.charAt(0) == '/') && (lastPart.charAt(2) == ':'))
-                        //   lastPart = lastPart.substring(1, lastPart.length() - 1);
-                        String fullpath;
-
-                        if (lastPart.charAt(0) == '\\'
-                                || lastPart.charAt(0) == '/')
-                        {
-                            fullpath = "file://" + lastPart;
-                        }
-                        else
-                        {
-                            fullpath = "file:" + lastPart;
-                        }
-
-                        url = new URL(fullpath);
-                    }
-                    catch (MalformedURLException e2)
-                    {
-                        throw new SAXException("Cannot create url for: "
-                                               + urlString, e2);
-
-                        //XSLMessages.createXPATHMessage(XPATHErrorResources.ER_CANNOT_CREATE_URL, new Object[]{urlString}),e2); //"Cannot create url for: " + urlString, e2 );
-                    }
-                }
-            }
-        }
-        catch (SecurityException se)
-        {
-            try
-            {
-                url = new URL("http://xml.apache.org/xslt/"
-                              + java.lang.Math.random());  // dummy
-            }
-            catch (MalformedURLException e2)
-            {
-
-                // I give up
-            }
-        }
-
-        // System.out.println("url: "+url.toString());
-        return url;
+        File f = new File(filename);
+        String tmp = f.getAbsolutePath();
+	    if (File.separatorChar == '\\') {
+	        tmp = tmp.replace('\\', '/');
+	    }
+        return "file:///" + tmp;
     }
 }  // end of class TestMultiTypeThreads
 
@@ -1015,9 +690,9 @@ class TMTThreadsRunner implements Runnable
         this.xslStylesheet = xslStylesheet;
         this.numProcesses = numProcesses;
         this.runnerID = params[TestMultiTypeThreads.ID];
-        this.xmlName = params[TestMultiTypeThreads.XMLNAME];
-        this.xslName = params[TestMultiTypeThreads.XSLNAME];
-        this.outName = params[TestMultiTypeThreads.OUTNAME];
+        this.xmlName = params[TestMultiTypeThreads.XMLNAME]; // must already be legal URI
+        this.xslName = params[TestMultiTypeThreads.XSLNAME]; // must already be legal URI
+        this.outName = params[TestMultiTypeThreads.OUTNAME]; // must be local path/filename
         this.paramName = params[TestMultiTypeThreads.PARAMNAME];
         this.paramVal = params[TestMultiTypeThreads.PARAMVAL];
 
@@ -1030,7 +705,10 @@ class TMTThreadsRunner implements Runnable
         if (params[TestMultiTypeThreads.OPTIONS].indexOf("validate") > 0)
             validate = true;
 
-        if (params[TestMultiTypeThreads.OPTIONS].indexOf("memory") > 0)
+        // Optimization: only report memory if asked to and we're 
+        //  in the first iteration of runners created
+        if ((params[TestMultiTypeThreads.OPTIONS].indexOf("memory") > 0)
+            && (this.runnerID.indexOf("0") >= 0))
             reportMem = true;
 
         if (params[TestMultiTypeThreads.OPTIONS].indexOf("param") > 0)
@@ -1112,12 +790,6 @@ class TMTThreadsRunner implements Runnable
             // Each runner creates it's own processor for use and it's own error log
             factory = TransformerFactory.newInstance();
 
-            // Munge the input filenames to be URLs
-            xmlName = TestMultiTypeThreads.getURLFromString(xmlName,
-                                                   null).toExternalForm();
-            xslName = TestMultiTypeThreads.getURLFromString(xslName,
-                                                   null).toExternalForm();
-
             println("<arbitrary desc=\"" + runnerID + ":processing\">");
         }
         catch (Throwable ex)
@@ -1147,24 +819,22 @@ class TMTThreadsRunner implements Runnable
                     Transformer transformer1 = xslStylesheet.newTransformer();
                     if (transformType == DOMSource.FEATURE)
                     {
-                        doDOMTransform(transformer1, xmlName, outName + ".out", "d");
+                        doDOMTransform(transformer1, xmlName, outName + "d.out", "d");
                     }
                     else if (transformType == SAXSource.FEATURE)
                     {
-                        doSAXTransform(xslName, xmlName, outName + ".out", "x");
+                        doSAXTransform(xslName, xmlName, outName + "x.out", "x");
                     }
                     else if (transformType == StreamSource.FEATURE)
                     {
-                        FileOutputStream resultStream1 =
-                            new FileOutputStream(outName + ".out");
-                        Result result1 = new StreamResult(resultStream1);
+                        // Call String ctor so we don't have to setSystemId
+                        Result result1 = new StreamResult(outName + "t.out");
 
                         if (setParam)
                             transformer1.setParameter(paramName, paramVal);
 
                         print("t");  // Note presence of this in logs shows which process threw an exception
                         transformer1.transform(new StreamSource(xmlName), result1);
-                        resultStream1.close();
                     }
                     else 
                     {
@@ -1181,24 +851,21 @@ class TMTThreadsRunner implements Runnable
                     Transformer transformer2 = templates2.newTransformer();
                     if (transformType == DOMSource.FEATURE)
                     {
-                        doDOMTransform(transformer2, xmlName, outName + "_.out", "D");
+                        doDOMTransform(transformer2, xmlName, outName + "_D.out", "D");
                     }
                     else if (transformType == SAXSource.FEATURE)
                     {
-                        doSAXTransform(xslName, xmlName, outName + "_.out", "X");
+                        doSAXTransform(xslName, xmlName, outName + "_X.out", "X");
                     }
                     else // if (transformType == StreamSource.FEATURE)
                     {
-                        FileOutputStream resultStream2 =
-                            new FileOutputStream(outName + "_.out");
-                        Result result2 = new StreamResult(resultStream2);
+                        Result result2 = new StreamResult(outName + "_T.out");
 
                         if (setParam)
                             transformer2.setParameter(paramName, paramVal);
 
                         print("T");  // Note presence of this in logs shows which process threw an exception
                         transformer2.transform(new StreamSource(xmlName), result2);
-                        resultStream2.close();
                     }
                 }
 
@@ -1269,17 +936,20 @@ class TMTThreadsRunner implements Runnable
     private void doDOMTransform(Transformer t, String xmlName, String outName, String marker)
         throws Exception
     {
+        if (setParam)
+            t.setParameter(paramName, paramVal);
+
         // Parse in the xml data into a DOM
         DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
         Node xmlDoc = docBuilder.parse(new InputSource(xmlName));
+        Source xmlSource = new DOMSource(xmlDoc);
+        xmlSource.setSystemId(xmlName);
 
         // Prepare a result and transform it into a DOM
         org.w3c.dom.Document outNode = docBuilder.newDocument();
-        if (setParam)
-            t.setParameter(paramName, paramVal);
         print(marker);  // Note presence of this in logs shows which process threw an exception
-        t.transform(new DOMSource(xmlDoc), new DOMResult(outNode));
+        t.transform(xmlSource, new DOMResult(outNode));
 
         // Now serialize output to disk with identity transformer
         TransformerFactory factory = TransformerFactory.newInstance();
