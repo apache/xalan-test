@@ -87,6 +87,10 @@
     the test has performed - no need to examine the console, since all the info will 
     be here.  We have a couple of prototype stylesheets to view the results in a 
     semi-pretty HTML style.</p>
+    <p>There is also a tableResults.xsl stylesheet for creating a table of conformance
+      test results. For documentation on how to use the stylesheet, please consult the section
+      <link idref="run" anchor="how-to-view-results">How-to: View Results</link>.
+    </p>
     <ul>
     <li><source>build perf</source><br/>
     (Creates results-perf/results.xml)<br/></li>
