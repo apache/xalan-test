@@ -64,7 +64,7 @@ package org.apache.qetest.xsl;
 
 // Support for test reporting and harness classes
 import org.apache.qetest.*;
-import org.apache.qetest.xslwrapper.ProcessorWrapper;
+import org.apache.qetest.xslwrapper.TransformWrapperFactory;
 
 // java classes
 import java.io.BufferedReader;
@@ -184,10 +184,11 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
     {
         // Copy any of our parameters from testProps to 
         //  our local convenience variables
-        testlet = testProps.getProperty(OPT_TESTLET);
-        dirFilter = testProps.getProperty(OPT_DIRFILTER);
-        fileFilter = testProps.getProperty(OPT_FILEFILTER);
-        fileList = testProps.getProperty(OPT_FILELIST);
+        testlet = testProps.getProperty(OPT_TESTLET, testlet);
+        dirFilter = testProps.getProperty(OPT_DIRFILTER, dirFilter);
+        fileFilter = testProps.getProperty(OPT_FILEFILTER, fileFilter);
+        fileList = testProps.getProperty(OPT_FILELIST, fileList);
+        flavor = testProps.getProperty(OPT_FLAVOR, flavor);
 
         // Grab a unique runid for logging out with our tests 
         //  Used in results reporting stylesheets to differentiate 
@@ -213,13 +214,10 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      */
     public boolean runTestCases(Properties p)
     {
-
-
         // First log out any other runtime information, like the 
         //  actual flavor of ProcessorWrapper, etc.
         try
         {
-            Hashtable runtimeProps = new Hashtable(4);
             // Note that each of these calls actually force the 
             //  creation of an actual object of each type: this is 
             //  required since we may default the types or our call 
@@ -227,8 +225,9 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
             //  different classname than the user actually specified
             // Care should be taken that the construction of objects 
             //  here does not affect our testing later on
-            runtimeProps.put("actual.ProcessorWrapper",
-                             ProcessorWrapper.getWrapper(flavor).getDescription());
+            // Just grab all the info from the TransformWrapper...
+            Properties runtimeProps = TransformWrapperFactory.newWrapper(flavor).getProcessorInfo();
+            // ... and add a few extra things ourselves
             runtimeProps.put("actual.testlet", getTestlet());
             runtimeProps.put("actual.dirFilter", getDirFilter());
             runtimeProps.put("actual.fileFilter", getFileFilter());
@@ -568,12 +567,19 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
             {
                 // Hmmm - I'm not sure what we should do here
                 reporter.logWarningMsg("Unexpected test file found, skipping: " + file);
+                continue;
             }
             d.setDescription(file);
+            d.flavor = flavor;
             // Also copy over our own testProps as it's 
             //  options: this allows for future expansion
             //  of values in the datalet
             d.options = new Properties(testProps);
+            // Optimization: put in a copy of our fileChecker, so 
+            //  that each testlet doesn't have to create it's own
+            //  fileCheckers should not store state, so this 
+            //  shouldn't affect the testing at all
+            d.options.put("fileCheckerImpl", fileChecker);
             v.addElement(d);
         }
         return v;

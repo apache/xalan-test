@@ -67,7 +67,8 @@ import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.TestletImpl;
-import org.apache.qetest.xslwrapper.ProcessorWrapper;
+import org.apache.qetest.xslwrapper.TransformWrapper;
+import org.apache.qetest.xslwrapper.TransformWrapperFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,6 +78,15 @@ import java.util.Hashtable;
 
 /**
  * Testlet for conformance testing of xsl stylesheet files.
+ *
+ * This class provides the testing algorithim used for verifying 
+ * Xalan's conformance to the XSLT spec.  It works in conjunction 
+ * with StylesheetTestletDriver, which supplies the logic for 
+ * choosing the testfiles to iterate over, and with 
+ * TransformWrapper, which provides an XSL  processor- and 
+ * method-independent way to process files (i.e. different 
+ * flavors of TransformWrapper may be different products, as well 
+ * as different processing models, like SAX, DOM or Streams).
  *
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
@@ -114,43 +124,57 @@ public class StylesheetTestlet extends TestletImpl
         }
         catch (ClassCastException e)
         {
-            logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue");
+            logger.checkErr("Datalet provided is not a StylesheetDatalet; cannot continue with " + d);
             return;
         }
-        
+
+        logger.logMsg(Logger.STATUSMSG, "About to test: " 
+                      + (null == datalet.inputName
+                         ? datalet.xmlName
+                         : datalet.inputName));
         //@todo validate our Datalet - ensure it has valid 
         //  and/or existing files available.
 
-        // Cleanup outputName - delete the file on disk
-        //  Ensure other files or previous test runs don't 
-        //  interfere with our results
+        // Cleanup outName only if asked to - delete the file on disk
+        // Optimization: this takes extra time and often is not 
+        //  needed, so only do this if the option is set
+        if ("true".equalsIgnoreCase(datalet.options.getProperty("deleteOutFile")))
+        {
+            try
+            {
+                boolean btmp = (new File(datalet.outputName)).delete();
+                logger.logMsg(Logger.TRACEMSG, "Deleting OutFile of::" + datalet.outputName
+                                     + " status: " + btmp);
+            }
+            catch (SecurityException se)
+            {
+                logger.logMsg(Logger.WARNINGMSG, "Deleting OutFile of::" + datalet.outputName
+                                       + " threw: " + se.toString());
+                // But continue anyways...
+            }
+        }
+
+        // Create a new TransformWrapper of appropriate flavor
+        //  null arg is unused liaison for TransformWrapper
+        //@todo allow user to pass in pre-created 
+        //  TransformWrapper so we don't have lots of objects 
+        //  created and destroyed for every file
+        TransformWrapper transformWrapper = null;
         try
         {
-            File outFile = new File(datalet.outputName);
-            boolean btmp = outFile.delete();
+            transformWrapper = TransformWrapperFactory.newWrapper(datalet.flavor);
+            transformWrapper.newProcessor(null);
         }
-        catch (SecurityException se)
+        catch (Throwable t)
         {
-            logger.logMsg(Logger.WARNINGMSG, "Deleting OutFile of:" + datalet.outputName
-                                   + " threw: " + se.toString());
-            // But continue anyways...
+            logThrowable(t, getDescription() + " newWrapper/newProcessor threw");
+            logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
+            return;
         }
 
         // Test our supplied input file, and compare with gold
         try
         {
-            // Create a new ProcessorWrapper of appropriate flavor
-            //  null arg is unused liaison for ProcessorWrapper
-            //@todo allow user to pass in pre-created 
-            //  ProcessorWrapper so we don't have lots of objects 
-            //  created and destroyed for every file
-            ProcessorWrapper processorWrapper = ProcessorWrapper.getWrapper(datalet.flavor);
-            if (null == processorWrapper.createNewProcessor(null))
-            {
-                logger.checkErr("ERROR: could not create processorWrapper, aborting.");
-                return;
-            }
-
             // Store local copies of XSL, XML references for 
             //  potential change to URLs            
             String inputName = datalet.inputName;
@@ -163,7 +187,7 @@ public class StylesheetTestlet extends TestletImpl
                 xmlName = QetestUtils.filenameToURL(xmlName);
             }
 
-            //@todo do we really want to log all of this out here?
+            //@todo Should we log a custom logElement here instead?
             logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + inputName
                           + " xmlName=" + xmlName + " outputName=" + datalet.outputName
                           + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor);
@@ -171,53 +195,32 @@ public class StylesheetTestlet extends TestletImpl
             // Simply have the wrapper do all the transforming
             //  or processing for us - we handle either normal .xsl 
             //  stylesheet tests or just .xml embedded tests
-            long retVal = ProcessorWrapper.ERROR;
+            long retVal = 0L;
             if (null == datalet.inputName)
             {
                 // presume it's an embedded test
-                retVal = processorWrapper.processEmbeddedToFile(xmlName, datalet.outputName);
+                long [] times = transformWrapper.transformEmbedded(xmlName, datalet.outputName);
+                retVal = times[TransformWrapper.IDX_OVERALL];
             }
             else
             {
                 // presume it's a normal stylesheet test
-                retVal = processorWrapper.processToFile(xmlName, inputName, datalet.outputName);
+                long[] times = transformWrapper.transform(xmlName, inputName, datalet.outputName);
+                retVal = times[TransformWrapper.IDX_OVERALL];
             }
 
-            if (ProcessorWrapper.ERROR == retVal)
-            {
-                //@todo Should validate potential expectedExceptions here
-                logger.checkFail(getDescription() + " " + datalet.getDescription()
-                                 + "unexpected processToFile problem");
-
-                return;
-            }
-            //@todo report out timing data for overall use?
-        }
-        catch (FileNotFoundException fnfe)
-        {
-            logger.checkFail(getDescription() + " " + datalet.getDescription() 
-                             + " threw: " + fnfe.toString());
-            // Don't bother logging the stacktrace here; not worth it
-            return;
-        }
-        catch (Throwable t)
-        {
-            logger.checkFail(getDescription() + " " + datalet.getDescription() 
-                             + " threw: " + t.toString());
-            logThrowable(t, getDescription() + " " + datalet.getDescription());
-            return;
-        }
-
-        // If we get here, attempt to validate the contents of 
-        //  the last outputFile created
-        //@todo allow passing in of preexisting checkService
-        CheckService fileChecker = new XHTFileCheckService();
-        if (Logger.PASS_RESULT
-            != fileChecker.check(logger,
-                                 new File(datalet.outputName), 
-                                 new File(datalet.goldName), 
-                                 getDescription() + " " + datalet.getDescription())
-           )
+            // If we get here, attempt to validate the contents of 
+            //  the last outputFile created
+            CheckService fileChecker = (CheckService)datalet.options.get("fileCheckerImpl");
+            // Supply default value
+            if (null == fileChecker)
+                fileChecker = new XHTFileCheckService();
+            if (Logger.PASS_RESULT
+                != fileChecker.check(logger,
+                                     new File(datalet.outputName), 
+                                     new File(datalet.goldName), 
+                                     getDescription() + " " + datalet.getDescription())
+               )
             {
                 // Log a custom element with all the file refs first
                 // Closely related to viewResults.xsl select='fileref"
@@ -234,6 +237,18 @@ public class StylesheetTestlet extends TestletImpl
                 logger.logArbitrary(Logger.STATUSMSG, (new File(datalet.inputName)).getName() 
                                     + " failure reason: " + fileChecker.getExtendedInfo());
             }
+        }
+        // Note that this class can only validate positive test 
+        //  cases - we don't handle ExpectedExceptions
+        catch (Throwable t)
+        {
+            // Put the logThrowable first, so it appears before 
+            //  the Fail record, and gets color-coded
+            logThrowable(t, getDescription() + " " + datalet.getDescription());
+            logger.checkFail(getDescription() + " " + datalet.getDescription() 
+                             + " threw: " + t.toString());
+            return;
+        }
 	}
 
 
