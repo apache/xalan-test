@@ -17,7 +17,9 @@
 </xsl:template>
 
 <xsl:template match="doc">
-    <xsl:apply-templates select="@*"/>
+    <xsl:apply-templates select="@*">
+        <xsl:sort select="local-name(.)" data-type="text"/>
+    </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="doc/@*">
