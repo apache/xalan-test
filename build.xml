@@ -43,7 +43,7 @@ dependencies - users must manually 'build jar' first.
    -->
     <property environment="ENV" />
 
-    <property name="year" value="2000-2003"/>
+    <property name="year" value="2000-2004"/>
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -217,6 +217,35 @@ dependencies - users must manually 'build jar' first.
     </taskdef>
 
     <!-- ================================================================== -->
+    <!-- Base target for running tests with specified properties.  Actual   -->
+    <!-- work is handled by dependent tasks, at most one of which should be -->
+    <!-- executed.                                                          -->
+    <!-- ================================================================== -->
+    <target name="run.xalantest" depends="run.xalantest.default,run.xalantest.transfact"/>
+
+    <target name="run.xalantest.default" unless="sysprop.transfact" >
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="${xalantest.classpathref}"
+            bootclasspathref="boot.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" />
+    </target>
+
+    <target name="run.xalantest.transfact" if="sysprop.transfact" >
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="${xalantest.classpathref}"
+            bootclasspathref="boot.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}" >
+            <!-- Explicitly set TransformerFactory property to use -->
+            <sysproperty key="javax.xml.transform.TransformerFactory"
+                         value="${sysprop.transfact}" />
+        </xalantest>
+    </target>
+
+    <!-- ================================================================== -->
     <!-- Initialize: setup for compiling, doc building, running tests       -->
     <!-- ================================================================== -->
     <target name="init.test"
@@ -267,12 +296,9 @@ dependencies - users must manually 'build jar' first.
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan conf test: ${testClass}" />
         <property name="testType" value="conf." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="conf.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="conf.class.path" />
+        </antcall>
         <property name="scan.outputDir" value="${conf.outputDir}"/>
         <antcall target="scan"/>
     </target>
@@ -334,12 +360,9 @@ dependencies - users must manually 'build jar' first.
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan conf test: ${testClass}" />
         <property name="testType" value="conferr." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="conf.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="conf.class.path" />
+        </antcall>
         <antcall target="scan">
             <param name="scan.outputDir" value="${conferr.outputDir}"/>
         </antcall>
@@ -354,15 +377,12 @@ dependencies - users must manually 'build jar' first.
         <!-- Set indent-number to 0 to match Xalan's default indentation -->
         <property name="${testType}Processor.setAttribute.indent-number" value="0" />
 
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="conf.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" >
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="conf.class.path" />
             <!-- Explicitly set TransformerFactory property to use xsltc -->
-            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
-        </xalantest>
+            <param name="sysprop.transfact"
+                   value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl" />
+        </antcall>
         <antcall target="scan">
             <param name="scan.outputDir" value="${conferr.xsltc.outputDir}" />
         </antcall>
@@ -376,12 +396,9 @@ dependencies - users must manually 'build jar' first.
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan perf test: ${testClass}" />
         <property name="testType" value="perf." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="perf.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="perf.class.path" />
+        </antcall>
         <antcall target="scan">
             <param name="scan.outputDir" value="${perf.outputDir}"/>
         </antcall>
@@ -395,12 +412,9 @@ dependencies - users must manually 'build jar' first.
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan contrib test: ${testClass}" />
         <property name="testType" value="contrib." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="contrib.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="contrib.class.path" />
+        </antcall>
         <antcall target="scan">
             <param name="scan.outputDir" value="${contrib.outputDir}"/>
         </antcall>
@@ -415,12 +429,9 @@ dependencies - users must manually 'build jar' first.
         <property name="testClass" value="org.apache.qetest.xsl.ThreadedTestletDriver" />
         <echo message="Executing Xalan threads test: ${testClass}" />
         <property name="testType" value="threads." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="api.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="api.class.path" />
+        </antcall>
     </target>
 
 
@@ -432,12 +443,9 @@ dependencies - users must manually 'build jar' first.
         <!-- Note no default is set; also testClass is not prefixed! -->
         <echo message="Executing Xalan api test: ${testClass}" />
         <property name="testType" value="api." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="api.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="api.class.path" />
+        </antcall>
         <antcall target="scan">
             <param name="scan.outputDir" value="${api.outputDir}"/>
         </antcall>
@@ -467,12 +475,9 @@ dependencies - users must manually 'build jar' first.
         <echo message="Executing Xalan Bugzilla Testlets and tests to regress bugs" />
         <property name="testClass" value="org.apache.qetest.xsl.BugzillaTestletDriver" />
         <property name="testType" value="bugzilla." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="bugzilla.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="bugzilla.class.path" />
+        </antcall>
         <echo message="If you got ClassNotFound, did you 'build bugzilla.classes' first?" />
     </target>
 
@@ -487,12 +492,10 @@ dependencies - users must manually 'build jar' first.
         -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <property name="testType" value="extensions." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="extensions.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref"
+                   value="extensions.class.path" />
+        </antcall>
         <property name="scan.outputDir" value="${extensions.outputDir}"/>
         <antcall target="scan"/>            
         <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
@@ -504,12 +507,9 @@ dependencies - users must manually 'build jar' first.
         <echo message="Executing Xalan conf test: ${testClass}" />
         <property name="testType" value="conf." />
         <property name="conf.testlet" value="org.apache.qetest.rwapi.XPathASTTestlet" />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="rwapitest.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="rwapitest.class.path" />
+        </antcall>
         <property name="scan.outputDir" value="${conf.outputDir}"/>
         <antcall target="scan"/>
     </target>
@@ -1409,15 +1409,13 @@ dependencies - users must manually 'build jar' first.
         <property name="testType" value="conf.xsltc." />
 	<!-- Set indent-number to 0 to match Xalan's default indentation -->
 	<property name="${testType}Processor.setAttribute.indent-number" value="0"/>
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="xsltc.runtime.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}">
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref"
+                   value="xsltc.runtime.class.path" />
             <!-- Explicitly set TransformerFactory property to use xsltc -->
-            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
-        </xalantest>
+            <param name="sysprop.transfact"
+                   value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl" />
+        </antcall>
         <property name="scan.outputDir" value="${conf.xsltc.outputDir}"/>
         <antcall target="scan" />
     </target>
@@ -1428,15 +1426,13 @@ dependencies - users must manually 'build jar' first.
         <echo message="Executing Xalan-xsltc perf test: ${testClass}" />
         <!-- Special: allow explicit test.properties overrides for inputDir, etc for xsltc -->
         <property name="testType" value="perf.xsltc." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="xsltc.runtime.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}">
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref"
+                   value="xsltc.runtime.class.path" />
             <!-- Explicitly set TransformerFactory property to use xsltc -->
-            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
-        </xalantest>
+            <param name="sysprop.transfact"
+                   value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl" />
+        </antcall>
         <antcall target="scan">
             <param name="scan.outputDir" value="${perf.xsltc.outputDir}"/>
         </antcall>
@@ -1450,14 +1446,13 @@ dependencies - users must manually 'build jar' first.
         <echo message="Executing Saxon perf test: ${testClass}" />
         <!-- Special: allow explicit test.properties overrides for inputDir, etc for Saxon -->
         <property name="testType" value="perf.saxon." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="saxon.runtime.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}">
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref"
+                   value="saxon.runtime.class.path" />
             <!-- Explicitly set TransformerFactory property to use saxon -->
-            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.saxon.trax.TransformerFactoryImpl"/>
-        </xalantest>
+            <param name="sysprop.transfact"
+                   value="org.saxon.trax.TransformerFactoryImpl" />
+        </antcall>
         <antcall target="scan">
             <param name="scan.outputDir" value="${perf.saxon.outputDir}"/>
         </antcall>
@@ -1471,15 +1466,13 @@ dependencies - users must manually 'build jar' first.
         <!-- Note no default is set; also testClass is not prefixed! -->
         <echo message="Executing Xalan-xsltc api test: ${testClass}" />
         <property name="testType" value="api." />
-        <xalantest test="${testClass}"
-            testType="${testType}"
-            classpathref="xsltc.compile.class.path"
-            bootclasspathref="boot.class.path"
-            fork="${fork-tests}"
-            failonerror="${fail-on-error}">
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref"
+                   value="xsltc.compile.class.path" />
             <!-- Explicitly set TransformerFactory property to use xsltc -->
-            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
-        </xalantest>
+            <param name="sysprop.transfact"
+                   value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl" />
+        </antcall>
     </target>
 
   <!-- =================================================================== -->
