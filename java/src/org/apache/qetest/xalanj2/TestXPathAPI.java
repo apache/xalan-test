@@ -185,7 +185,7 @@ public class TestXPathAPI extends XSLProcessorTestBase
         testFileInfo4.xmlName = testBasePath + "testXPath.xml";
         testFileInfo4.goldName = goldBasePath;
         
-        numxpath = 16;
+        numxpath = 25;
         xpath = new String[numxpath];
         xpath[0] = "/doc/a/@test";
         xpath[1] = "//."; 
@@ -203,6 +203,15 @@ public class TestXPathAPI extends XSLProcessorTestBase
         xpath[13] = "//*[local-name()='a']";
         xpath[14] = "//*[current()]/@*";
         xpath[15] = "//*[last()]";
+        xpath[16] = "doc/*[last()]";
+        xpath[17] = "/doc/a/*[current()]/@*";
+        xpath[18] = "doc/descendant::node()";
+        xpath[19] = "doc/a/@*";
+        xpath[20] = "doc/b/a/ancestor-or-self::*";
+        xpath[21] = "doc/b/a/preceding::*";
+        xpath[22] = "doc/a/following::*";
+        xpath[23] = "/doc/b/preceding-sibling::*";
+        xpath[24] = "/doc/a/following-sibling::*";
 
         return true;
     }
