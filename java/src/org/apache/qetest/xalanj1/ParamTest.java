@@ -75,6 +75,12 @@ import java.util.Properties;
 // Specific imports for testing Xalan
 import org.xml.sax.SAXException;
 
+import org.apache.xalan.xpath.XObject;
+import org.apache.xalan.xpath.XNodeSet;
+import org.apache.xalan.xpath.XBoolean;
+import org.apache.xalan.xpath.XNumber;
+import org.apache.xalan.xpath.XNull;
+import org.apache.xalan.xpath.XString;
 import org.apache.xalan.xslt.XSLTProcessor;
 import org.apache.xalan.xslt.XSLTProcessorFactory;
 import org.apache.xalan.xslt.XSLTInputSource;
@@ -105,8 +111,7 @@ public class ParamTest extends XSLProcessorTestBase
      */
     public ParamTest()
     {
-
-        numTestCases = 2;  // REPLACE_num
+        numTestCases = 3;  // REPLACE_num
         testName = "ParamTest";
         testComment = "Testing Xalan-J 1.x setStylesheetParam with XSL files";
     }
@@ -114,9 +119,8 @@ public class ParamTest extends XSLProcessorTestBase
     /**
      * Initialize this test - Update with your tests's data.  
      *
-     * NEEDSDOC @param p
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param p Properties to initialize from (unused)
+     * @return false if we should abort the test; true otherwise
      */
     public boolean doTestFileInit(Properties p)
     {
@@ -129,7 +133,17 @@ public class ParamTest extends XSLProcessorTestBase
                       + "ParamTest1.xml";
         xslFilename = inputDir + File.separator + "xalanj1" + File.separator
                       + "ParamTest1.xsl";
+        return true;
+    }
 
+    /**
+     * Testing setStylesheetParam.  
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase1()
+    {
+
+        reporter.testCaseInit("Testing setStylesheetParam");
         try
         {
             if ((liaison == null) || ("".equals(liaison)))
@@ -138,31 +152,15 @@ public class ParamTest extends XSLProcessorTestBase
             }
             else
             {
-                processor = XSLTProcessorFactory.getProcessorUsingLiaisonName(
-                    liaison);
+                processor = XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
             }
         }
         catch (Exception e)
         {
-            reporter.checkFail("Could not create processor, threw: "
-                               + e.toString());
+            reporter.checkFail("Could not create processor, threw: " + e.toString());
             reporter.logThrowable(Logger.ERRORMSG, e, "Could not create processor");
-            setAbortTest(true);
-            return false;
+            return true;
         }
-
-        return true;
-    }
-
-    /**
-     * Write some test cases!  
-     *
-     * NEEDSDOC ($objectName$) @return
-     */
-    public boolean testCase1()
-    {
-
-        reporter.testCaseInit("Testing setStylesheetParam");
 
         try
         {
@@ -191,106 +189,106 @@ public class ParamTest extends XSLProcessorTestBase
                 outNames.currentName()
                 + ") ... also with default param value in select expr");
 
-            // Test setting the value and checking it in a select expr
-            reporter.logTraceMsg("Setting t1 param and processing");            
-            processor.setStylesheetParam("t1", "''");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(outNames.currentName(),
-                              "<outt>false,true,false,false,</outt>",
-                              outNames.currentName()
-                              + ") Select expr of a param blank string");
-            processor.setStylesheetParam("t1", "'a'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(outNames.currentName(),
-                              "<outt>false,false,true,false,a</outt>",
-                              outNames.currentName()
-                              + ") Select expr of a param string");
-            processor.setStylesheetParam("t1", "'1'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(outNames.currentName(),
-                              "<outt>false,false,false,true,1</outt>",
-                              outNames.currentName()
-                              + ") Select expr of a param number");
 
-            // Now re-set the value of the element-value params in the xsl file
-            processor.setStylesheetParam("p1", "'foo'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(outNames.currentName(), "foo,foo;",
-                              outNames.currentName()
-                              + ") Stylesheet with literal param value");
+            String paramTests[][] = 
+            {
+                // { paramName to test,
+                //   paramValue to test
+                //   expected output string,
+                //   description of the test
+                // }
+                { 
+                    "t1", 
+                    "'a'",
+                    "<outt>false,false,true,false,a</outt>",
+                    "Select expr of a 'param' string"
+                },
+                // SPR SCUU4T5Q3W in above data: 
+                //  Xalan-J 1.x produces: ...false,a</outt>
+                //  Xalan-J 2.x compat.jar produces: ...false,'a'</outt>
+                {
+                    "t1", 
+                    "'1'",
+                    "<outt>false,false,false,true,1</outt>",
+                    "Select expr of a param number"
+                },
+                { 
+                    "t1", 
+                    "''",
+                    "<outt>false,true,false,false,</outt>",
+                    "Select expr of a param 'blank' string"
+                },
+                { 
+                    "p1", 
+                    "'foo'",
+                    "foo,foo;",
+                    "Stylesheet with literal param value"
+                },
+                { 
+                    "p1", 
+                    "'bar'",
+                    "bar,bar;",
+                    "Stylesheet with replaced/another literal param value"
+                },
+                { 
+                    "p2", 
+                    "'&lt;item&gt;bar&lt;/item&gt;'",
+                    "&amp;lt;item&amp;gt;bar&amp;lt;/item&amp;gt;,&amp;lt;item&amp;gt;bar&amp;lt;/item&amp;gt;;",
+                    "Stylesheet with param value with nodes"
+                },
+                { 
+                    "p3", 
+                    "'foo3'",
+                    "GHI,<B>GHI</B>;",
+                    "Stylesheet with literal param value in a template, is not passed"
+                },
+                { 
+                    "s1", 
+                    "'foos'",
+                    "foos,foos;",
+                    "Stylesheet with literal param select"
+                },
+                { 
+                    "s1", 
+                    "'bars'",
+                    "bars,bars;",
+                    "Stylesheet with replaced/another literal param select"
+                },
+                { 
+                    "s2", 
+                    "'&lt;item/&gt;'",
+                    "&amp;lt;item/&amp;gt;,&amp;lt;item/&amp;gt;;",
+                    "Stylesheet with nodes(?) param select"
+                },
+                { 
+                    "s3", 
+                    "'foos3'",
+                    "s3val,s3val;",
+                    "Stylesheet with literal param select in a template, is not passed"
+                },
+                { 
+                    "t1", 
+                    "",
+                    "<outt>false,true,false,false,</outt>",
+                    "Select expr of a param blank string"
+                },
+                { 
+                    "t1", 
+                    "a",
+                    "<outt>false,false,true,false,a</outt>",
+                    "Select expr of a param string"
+                }
+            }; // end of paramTests array
 
-            // Test resetting the value of a parameter with the same processor instance
-            processor.setStylesheetParam("p1", "'bar'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(
-                outNames.currentName(), "bar,bar;",
-                outNames.currentName()
-                + ") Stylesheet with replaced literal param value");
-
-            // Test putting other nodes in the value
-            processor.setStylesheetParam("p2",
-                                         "'&lt;item&gt;bar&lt;/item&gt;'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(
-                outNames.currentName(),
-                "&amp;lt;item&amp;gt;bar&amp;lt;/item&amp;gt;,&amp;lt;item&amp;gt;bar&amp;lt;/item&amp;gt;;",
-                outNames.currentName()
-                + ") Stylesheet with param value with nodes(?)");
-
-            // Param within a template
-            processor.setStylesheetParam("p3", "'foo3'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(
-                outNames.currentName(), "GHI,<B>GHI</B>;",
-                outNames.currentName()
-                + ") Stylesheet with literal param value in a template, is not passed");
-
-            // Now test the value of the select-value params in the xsl file
-            processor.setStylesheetParam("s1", "'foos'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(outNames.currentName(), "foos,foos;",
-                              outNames.currentName()
-                              + ") Stylesheet with literal param select");
-            processor.setStylesheetParam("s1", "'bars'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(
-                outNames.currentName(), "bars,bars;",
-                outNames.currentName()
-                + ") Stylesheet with replaced literal param select");
-            processor.setStylesheetParam("s2", "'&lt;item/&gt;'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(outNames.currentName(),
-                              "&amp;lt;item/&amp;gt;,&amp;lt;item/&amp;gt;;",
-                              outNames.currentName()
-                              + ") Stylesheet with nodes(?) param select");
-            processor.setStylesheetParam("s3", "'foos3'");
-            processor.process(xmlSource, xslStylesheet,
-                              new XSLTResultTarget(outNames.nextName()));
-            processor.reset();
-            checkFileContains(
-                outNames.currentName(), "s3val,s3val;",
-                outNames.currentName()
-                + ") Stylesheet with literal param select in a template, is not passed");
+            // Just loop through test elements and try each one
+            for (int i = 0; i < paramTests.length; i++)
+            {
+                // Note processor, inputs are just re-used
+                // This method calls check() for us
+                testSetParam(paramTests[i][0], paramTests[i][1],
+                             processor, xmlSource, xslStylesheet, 
+                             paramTests[i][2], paramTests[i][3]);
+            }
         }
         catch (Exception e)
         {
@@ -303,47 +301,53 @@ public class ParamTest extends XSLProcessorTestBase
     }
 
     /**
-     * Write some test cases!  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * Testing setStylesheetParam with XObjects.  
+     * @return false if we should abort the test; true otherwise
      */
     public boolean testCase2()
     {
 
         reporter.testCaseInit("Testing setStylesheetParam with XObjects");
+        try
+        {
+            if ((liaison == null) || ("".equals(liaison)))
+            {
+                processor = XSLTProcessorFactory.getProcessor();
+            }
+            else
+            {
+                processor = XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
+            }
+        }
+        catch (Exception e)
+        {
+            reporter.checkFail("Could not create processor, threw: " + e.toString());
+            reporter.logThrowable(Logger.ERRORMSG, e, "Could not create processor");
+            return true;
+        }
 
         try
         {
-
-            // Note we may be implicitly using the same processor as before!
-            org.apache.xalan.xslt.XSLTInputSource xmlSource =
-                new XSLTInputSource(xmlFilename);
-            org.apache.xalan.xslt.XSLTInputSource xslStylesheet =
-                new XSLTInputSource(xslFilename);
+            XSLTInputSource xmlSource = new XSLTInputSource(xmlFilename);
+            XSLTInputSource xslStylesheet = new XSLTInputSource(xslFilename);
 
             // Create some XObjects to use
-            org.apache.xalan.xpath.XBoolean myBoolean = null;
-            org.apache.xalan.xpath.XNull myNull = null;
-            org.apache.xalan.xpath.XNumber myNumber = null;
-            org.apache.xalan.xpath.XObject myObject = null;
-            org.apache.xalan.xpath.XString myString = null;
-            try
-            {
-                // Note explicit casts are necessary for when running 
-                //  tests against Xalan 2.x's compatibility layer
-                myBoolean = (org.apache.xalan.xpath.XBoolean)processor.createXBoolean(true);
-                myNull = (org.apache.xalan.xpath.XNull)processor.createXNull();
-                myNumber = (org.apache.xalan.xpath.XNumber)processor.createXNumber(1);
-                myObject = (org.apache.xalan.xpath.XObject)processor.createXObject("a");
-                myString = (org.apache.xalan.xpath.XString)processor.createXString("a");
-            }
-            catch (ClassCastException cce)
-            {
-                reporter.logThrowable(Logger.ERRORMSG, cce, "Creating XObjects* threw");
-                //@todo Note rest of testcase is not valid
-            }
+            XBoolean myBoolean = null;
+            XNull myNull = null;
+            XNumber myNumber = null;
+            XObject myObject = null;
+            XString myString = null;
+            myBoolean = processor.createXBoolean(true);
+            myNull = processor.createXNull();
+            myNumber = processor.createXNumber(1);
+            myObject = processor.createXObject("a");
+            myString = processor.createXString("a");
             
             // Test setting the value and checking it in a select expr
+/************************************************ COMPILE PROBLEM
+// Compile problem: this block gives a number of compile errors 
+//  when run against Xalan-J 2.x compat.jar:
+//  Incompatible type for method. Can't convert org.apache.xalan.xpath.XNull to java.lang.String.
             processor.setStylesheetParam("t1", myNull);
             processor.process(xmlSource, xslStylesheet,
                               new XSLTResultTarget(outNames.nextName()));
@@ -352,6 +356,7 @@ public class ParamTest extends XSLProcessorTestBase
                               "<outt>false,false,false,false,</outt>",
                               outNames.currentName()
                               + ") Select expr with XNull");
+
             processor.setStylesheetParam("t1", myBoolean);
             processor.process(xmlSource, xslStylesheet,
                               new XSLTResultTarget(outNames.nextName()));
@@ -360,6 +365,7 @@ public class ParamTest extends XSLProcessorTestBase
                               "<outt>true,false,true,true,true</outt>",
                               outNames.currentName()
                               + ") Select expr with XBoolean");
+
             processor.setStylesheetParam("t1", myString);  // XString = "a"
             processor.process(xmlSource, xslStylesheet,
                               new XSLTResultTarget(outNames.nextName()));
@@ -368,6 +374,7 @@ public class ParamTest extends XSLProcessorTestBase
                               "<outt>false,false,true,false,a</outt>",
                               outNames.currentName()
                               + ") Select expr with XString");
+
             processor.setStylesheetParam("t1", myObject);  // XObject = (string)"a"
             processor.process(xmlSource, xslStylesheet,
                               new XSLTResultTarget(outNames.nextName()));
@@ -376,6 +383,7 @@ public class ParamTest extends XSLProcessorTestBase
                               "<outt>false,false,true,false,a</outt>",
                               outNames.currentName()
                               + ") Select expr with xObject(string)");
+
             processor.setStylesheetParam("t1", myNumber);
             processor.process(xmlSource, xslStylesheet,
                               new XSLTResultTarget(outNames.nextName()));
@@ -384,6 +392,7 @@ public class ParamTest extends XSLProcessorTestBase
                               "<outt>false,false,false,true,1</outt>",
                               outNames.currentName()
                               + ") Select expr with XNumber");
+************************************************ COMPILE PROBLEM */
         }
         catch (Exception e)
         {
@@ -396,16 +405,130 @@ public class ParamTest extends XSLProcessorTestBase
         return true;
     }
 
+
+    /**
+     * Testing multiple setStylesheetParam calls.  
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase3()
+    {
+        reporter.testCaseInit("Testing multiple setStylesheetParam calls");
+        try
+        {
+            if ((liaison == null) || ("".equals(liaison)))
+            {
+                processor = XSLTProcessorFactory.getProcessor();
+            }
+            else
+            {
+                processor = XSLTProcessorFactory.getProcessorUsingLiaisonName(liaison);
+            }
+        }
+        catch (Exception e)
+        {
+            reporter.checkFail("Could not create processor, threw: " + e.toString());
+            reporter.logThrowable(Logger.ERRORMSG, e, "Could not create processor");
+            return true;
+        }
+
+        try
+        {
+            reporter.logInfoMsg("Creating XSLTInputSources " + xslFilename + ", " + xmlFilename);
+            org.apache.xalan.xslt.XSLTInputSource xmlSource =
+                new XSLTInputSource(xmlFilename);
+            org.apache.xalan.xslt.XSLTInputSource xslStylesheet =
+                new XSLTInputSource(xslFilename);
+                
+            // Set one parameter and process the file
+            processor.setStylesheetParam("t1", "'a'");
+            processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
+            processor.reset();
+
+            // Verify our param was set,...
+            checkFileContains(outNames.currentName(), 
+                              "<outt>false,false,true,false,a</outt>",
+                              outNames.currentName() + " Stylesheet one param set(1)");
+
+            // ... and that the other one wasn't
+            checkFileContains(outNames.currentName(),
+                              "<outs>s1val,s1val; s2val,s2val; s3val,s3val; </outs>",
+                              outNames.currentName() + " Stylesheet one param set(2)");
+
+            // Set another parameter and process the file
+            // SPR SCUU4T5QEC 1.x and 2.x compat.jar behave differently:
+            //  1.x reset() appears to reset params
+            //  2.x compat.jar reset() does not appear to reset params
+            processor.setStylesheetParam("s1", "'foos'");
+            processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
+            processor.reset();
+
+            // Verify our previous param is still set...
+            // NOTE: double-check how parameters get reset in 1.x 
+            //  API, and in compatibility layer
+            checkFileContains(outNames.currentName(), 
+                              "<outt>false,false,true,false,a</outt>",
+                              outNames.currentName() + " Stylesheet second param set(1)");
+
+            // ... and that the new one also now is
+            checkFileContains(outNames.currentName(),
+                              "foos,foos;",
+                              outNames.currentName() + " Stylesheet second param set(2)");
+        }
+        catch (Exception e)
+        {
+            reporter.logErrorMsg("Testcase threw: " + e.toString());
+            reporter.logThrowable(Logger.ERRORMSG, e, "Testcase threw");
+        }
+
+        reporter.testCaseClose();
+        return true;
+    }
+
+
+    /**
+     * Test setting a single string-type parameter.  
+     * <P>Calls setStylesheetParam(); process(); then result().
+     * calls checkFileContains() to validate and output results.</P>
+     *
+     * @param paramName simple name of parameter
+     * @param paramVal String value of parameter
+     * @param processor object to use 
+     * @param xmlSource object to use in transform
+     * @param xslStylesheet object to use in transform
+     * @param checkString to look for in output file (logged)
+     * @param comment to log with check() call
+     * @return true if pass, false otherwise
+     */
+    protected boolean testSetParam(String paramName, String paramVal,
+                                   XSLTProcessor processor, 
+                                   XSLTInputSource xmlSource, 
+                                   XSLTInputSource xslStylesheet, 
+                                   String checkString, String comment)
+    {
+        try
+        {
+            processor.setStylesheetParam(paramName, paramVal);
+            processor.process(xmlSource, xslStylesheet,
+                              new XSLTResultTarget(outNames.nextName()));
+            processor.reset();
+        }
+        catch (SAXException se)
+        {
+            reporter.logThrowable(Logger.ERRORMSG, se, "testSetParam unexpectedly threw");
+        }
+        return checkFileContains(outNames.currentName(), checkString,
+                                 comment + " into: " + outNames.currentName());
+    }
+
+
     /**
      * Checks and reports if a file contains a certain string (within one line).
      * <P>We should really validate the entire output file, but this will do for now.</P>
-     * @todo update to use new CheckServices!
      *
-     * NEEDSDOC @param fName
-     * NEEDSDOC @param checkStr
-     * NEEDSDOC @param comment
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param fName name of file to check
+     * @param checkStr String to look for in the file
+     * @param comment to log with the check() call
+     * @return true if pass, false otherwise
      */
     protected boolean checkFileContains(String fName, String checkStr,
                                         String comment)
@@ -460,8 +583,7 @@ public class ParamTest extends XSLProcessorTestBase
 
     /**
      * Convenience method to print out usage information - update if needed.  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @return String denoting usage of this test class
      */
     public String usage()
     {
@@ -471,8 +593,7 @@ public class ParamTest extends XSLProcessorTestBase
 
     /**
      * Main method to run test from the command line - can be left alone.  
-     *
-     * NEEDSDOC @param args
+     * @param args command line argument array
      */
     public static void main(String[] args)
     {

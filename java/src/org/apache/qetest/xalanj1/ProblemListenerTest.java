@@ -206,16 +206,33 @@ public class ProblemListenerTest extends XSLProcessorTestBase
 
             // Now process a stylesheet
 			problemListener.setExpectProblem(true);
-            processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
+            try
+            {
+                // Use inner try-catch in case it throws an exception anyway
+                processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
+            }
+            catch (Throwable t)
+            {
+                reporter.logThrowable(Logger.WARNINGMSG, t, "processing(1) threw:");
+            }
 
 			problemListener.setExpectProblem(false);
             String problemReport2 = problemListener.getCounterString();
             reporter.logInfoMsg("After running, problemListener reports: " + problemReport2);
+            // SPR SCUU4T5QMH This problem listener never got 
+            //  got notified of problems in the last process()
             reporter.check(problemReport1.equals(problemReport2), false, "Some problems were found");
 
             // Remove problemListener and make sure we don't get the problems/messages
             processor.setProblemListener(null);
-            processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
+            try
+            {
+               processor.process(xmlSource, xslStylesheet, new XSLTResultTarget(outNames.nextName()));
+            }
+            catch (Throwable t)
+            {
+                reporter.logThrowable(Logger.WARNINGMSG, t, "processing(2) threw:");
+            }
             String problemReport3 = problemListener.getCounterString();
             reporter.check(problemReport3.equals(problemReport2), true, "Problems not logged when problemListener removed");
             
