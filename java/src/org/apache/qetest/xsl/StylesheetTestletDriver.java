@@ -71,6 +71,7 @@ import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.Logger;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.Testlet;
+import org.apache.qetest.xslwrapper.TransformWrapper;
 import org.apache.qetest.xslwrapper.TransformWrapperFactory;
 
 /**
@@ -177,6 +178,17 @@ public class StylesheetTestletDriver extends FileBasedTest
     protected String processor = null;
 
     /**
+     * Parameter: Is trace mode on?
+     * <p>Default: null (no trace)
+     * if on, non-null
+     * </p>
+     */
+    public static final String OPT_TRACE = "trace";
+
+    /** Parameter: Are we tracing? */
+    protected String traceMode = null;
+
+    /**
      * Parameter: Name of test (Conf, Accept) as StylesheetTestletDriver
      * can be used for more than one bucket
      * <p>Default: null (use StylesheetTestletDriver)
@@ -196,6 +208,9 @@ public class StylesheetTestletDriver extends FileBasedTest
 
     /** Convenience constant: .out extension for output result file.  */
     public static final String OUT_EXTENSION = ".out";
+
+    /** Convenience constant: .log extension for log file.  */
+    public static final String LOG_EXTENSION = ".log";
 
 
     /** Just initialize test name, comment; numTestCases is not used. */
@@ -225,6 +240,7 @@ public class StylesheetTestletDriver extends FileBasedTest
         embedded = testProps.getProperty(OPT_EMBEDDED, embedded);
         processor = testProps.getProperty(OPT_PROCESSOR, processor);        
         testName = testProps.getProperty(OPT_TESTNAME, testName);
+        traceMode = testProps.getProperty(OPT_TRACE, traceMode);
         // Grab a unique runid for logging out with our tests 
         //  Used in results reporting stylesheets to differentiate 
         //  between different test runs
@@ -673,6 +689,9 @@ public class StylesheetTestletDriver extends FileBasedTest
             //  fileCheckers should not store state, so this 
             //  shouldn't affect the testing at all
             d.options.put("fileCheckerImpl", fileChecker);
+            if (traceMode != null) {
+                d.options.put(TransformWrapper.SET_PROCESSOR_ATTRIBUTES  + "setTraceListener", d.outputName + LOG_EXTENSION);
+            }
             v.addElement(d);
         }
         return v;

@@ -297,6 +297,11 @@ dependencies - users must manually 'build jar' first.
         </antcall>
     </target>
 
+    <target name="conf.trace" description="Run TestletDriver over the conf tree">
+        <property name="conf.trace" value="on"/>
+        <antcall target="conf"/>
+    </target>
+
     <!-- ================================================================== -->
     <!-- Run tests: the normal StylesheetTestletDriver on the accept suite  -->
     <!-- ================================================================== -->
@@ -314,6 +319,11 @@ dependencies - users must manually 'build jar' first.
         <property name="scan.outputDir" value="${accept.xsltc.outputDir}"/>
 	<property name="use-processor" value="${accept.xsltc.processor}"/>
         <antcall target="conf.xsltc" />
+    </target>
+
+    <target name="accept.trace" description="Run TestletDriver over the accept tree">
+        <property name="accept.trace" value="on"/>
+        <antcall target="accept"/>
     </target>
 
     <!-- ================================================================== -->
@@ -1010,8 +1020,15 @@ dependencies - users must manually 'build jar' first.
         </antcall>
     </target>
 
+    <target name="alltest.conf.trace">
+        <property name="conf.trace" value="on"/>
+        <antcall target="alltest.conf"/>
+    </target>
 
-
+    <target name="alltest.accept.trace">
+        <property name="accept.trace" value="on"/>
+        <antcall target="alltest.accept"/>
+    </target>
 
     <target name="test"
         depends="alltest"
