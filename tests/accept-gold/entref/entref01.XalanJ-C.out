@@ -1,0 +1,19 @@
+<out>
+
+    1. "&amp;"   
+<A HREF="&"></A>
+    2. "&lt;"    <A href="<"></A>
+    3. "&gt;"    <A href=">"></A>
+    4. """  <A href="%22"></A>
+    5. "'"  <A href="'"></A>
+    6. "©"  <A HREF="%C2%A9"></A>	
+    7. "#"  <A href="#"></A>	
+    8. "¥"  <A href="%C2%A5"></A>	
+    9. " "  <A href="%20"></A><img src="Test%2031%20Gif.gif">
+   10."%"  <A href="%"></A>	
+   11."	"  <A href="%09"></A>	
+   12."&#127;"  <A href="%7f"></A>	
+   13."Ñ"  <A href="%C3%91"></A>	
+   14."Œ"  <A href="%C5%92"></A><A href="phnix.html">test1</A>
+<A href="ph%C3%85%C2%92nix.html">test2</A>
+</out>
