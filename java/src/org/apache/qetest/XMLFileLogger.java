@@ -85,62 +85,74 @@ public class XMLFileLogger implements Logger
     //-------- Constants for results file structure --------
     //-----------------------------------------------------
 
-    /** XML tagnames for results file structure. */
+    /** XML root element tag: root of our output document.  */
     public static final String ELEM_RESULTSFILE = "resultsfile";
 
-    /** NEEDSDOC Field ELEM_TESTFILE          */
+    /** XML element tag: testFileInit() parent element.  */
     public static final String ELEM_TESTFILE = "testfile";
 
-    /** NEEDSDOC Field ELEM_FILERESULT          */
+    /** XML element tag: testFileClose() leaf element 
+      * emitted immediately before closing ELEM_TESTFILE.
+      */
     public static final String ELEM_FILERESULT = "fileresult";
 
-    /** NEEDSDOC Field ELEM_TESTCASE          */
+    /** XML element tag: testCaseInit() parent element.  */
     public static final String ELEM_TESTCASE = "testcase";
 
-    /** NEEDSDOC Field ELEM_CASERESULT          */
+    /** XML element tag: testCaseClose() leaf element 
+      * emitted immediately before closing ELEM_TESTCASE.
+      */
     public static final String ELEM_CASERESULT = "caseresult";
 
-    /** NEEDSDOC Field ELEM_CHECKRESULT          */
+    /** XML element tag: check*() element.  */
     public static final String ELEM_CHECKRESULT = "checkresult";
 
-    /** NEEDSDOC Field ELEM_STATISTIC          */
+    /** XML element tag: logStatistic() element.  */
     public static final String ELEM_STATISTIC = "statistic";
 
-    /** NEEDSDOC Field ELEM_LONGVAL          */
+    /** XML element tag: logStatistic() child element.  */
     public static final String ELEM_LONGVAL = "longval";
 
-    /** NEEDSDOC Field ELEM_DOUBLEVAL          */
+    /** XML element tag: logStatistic() child element.  */
     public static final String ELEM_DOUBLEVAL = "doubleval";
 
-    /** NEEDSDOC Field ELEM_MESSAGE          */
+    /** XML element tag: log*Msg() element.  */
     public static final String ELEM_MESSAGE = "message";
 
-    /** NEEDSDOC Field ELEM_ARBITRARY          */
+    /** XML element tag: logArbitrary() element.  */
     public static final String ELEM_ARBITRARY = "arbitrary";
 
-    /** NEEDSDOC Field ELEM_HASHTABLE          */
+    /** XML element tag: logHashtable() parent element.  */
     public static final String ELEM_HASHTABLE = "hashtable";
 
-    /** NEEDSDOC Field ELEM_HASHITEM          */
+    /** XML element tag: logHashtable() child element.  */
     public static final String ELEM_HASHITEM = "hashitem";
 
-    /** XML attribute names for results file structure. */
+    /** XML attribute tag: log*Msg(), etc. attribute denoting 
+     * loggingLevel for that element.
+     */
     public static final String ATTR_LEVEL = "level";
 
-    /** NEEDSDOC Field ATTR_DESC          */
+    /** XML attribute tag: comment value for various methods.  */
     public static final String ATTR_DESC = "desc";
 
-    /** NEEDSDOC Field ATTR_TIME          */
+    /** XML attribute tag: Date.toString() attribute on 
+     *  ELEM_TESTFILE and ELEM_FILERESULT.  */
     public static final String ATTR_TIME = "time";
 
-    /** NEEDSDOC Field ATTR_RESULT          */
+    /** XML attribute tag: PASS|FAIL|etc. attribute on 
+     *  ELEM_CHECKRESULT, ELEM_CASERESULT, ELEM_FILERESULT.  
+     */
     public static final String ATTR_RESULT = "result";
 
-    /** NEEDSDOC Field ATTR_KEY          */
+    /** XML attribute tag: key name for ELEM_HASHITEM.  */
     public static final String ATTR_KEY = "key";
 
-    /** NEEDSDOC Field ATTR_FILENAME          */
+    /** XML attribute tag: actual output filename on ELEM_RESULTSFILE.  */
     public static final String ATTR_FILENAME = OPT_LOGFILE;
+
+    /** XML attribute tag: test filename on ELEM_TESTFILE.  */
+    public static final String ATTR_TESTFILENAME = "filename";
 
     //-----------------------------------------------------
     //-------- Class members and accessors --------
@@ -467,10 +479,12 @@ public class XMLFileLogger implements Logger
 
         if (isReady())
         {
-            reportPrinter.println("<" + ELEM_TESTFILE + " " + ATTR_DESC
-                                  + "=\""
-                                  + escapeString(name + ":" + comment)
-                                  + "\" " + ATTR_TIME + "=\""
+            reportPrinter.println("<" + ELEM_TESTFILE + " " 
+                                  + ATTR_TESTFILENAME + "=\""
+                                  + escapeString(name) + "\" " 
+                                  + ATTR_DESC + "=\""
+                                  + escapeString(comment) + "\" " 
+                                  + ATTR_TIME + "=\"" 
                                   + (new Date()).toString() + "\">");
         }
     }
