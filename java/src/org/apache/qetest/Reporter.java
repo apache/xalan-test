@@ -400,6 +400,41 @@ public class Reporter implements Logger
 
     /** NEEDSDOC Field errrCount          */
     protected int[] errrCount = new int[MAX_COUNTERS];
+    
+    /**
+     * Tell if the overall test result is pass or fail.
+     * 
+     * @return true if there are no failures or errors.
+     */
+    public boolean didPass()
+    {
+      /*
+      System.out.println("incpCount[FILES]: "+incpCount[FILES]);
+      System.out.println("incpCount[CASES]: "+incpCount[CASES]);
+      System.out.println("incpCount[CHECKS]: "+incpCount[CHECKS]);
+
+      System.out.println("passCount[FILES]: "+passCount[FILES]);
+      System.out.println("passCount[CASES]: "+passCount[CASES]);
+      System.out.println("passCount[CHECKS]: "+passCount[CHECKS]);
+
+      System.out.println("ambgCount[FILES]: "+ambgCount[FILES]);
+      System.out.println("ambgCount[CASES]: "+ambgCount[CASES]);
+      System.out.println("ambgCount[CHECKS]: "+ambgCount[CHECKS]);
+
+      System.out.println("failCount[FILES]: "+failCount[FILES]);
+      System.out.println("failCount[CASES]: "+failCount[CASES]);
+      System.out.println("failCount[CHECKS]: "+failCount[CHECKS]);
+
+      System.out.println("errrCount[FILES]: "+errrCount[FILES]);
+      System.out.println("errrCount[CASES]: "+errrCount[CASES]);
+      System.out.println("errrCount[CHECKS]: "+errrCount[CHECKS]);
+      */
+
+      if(failCount[CHECKS] > 0 || errrCount[CHECKS] > 0)
+        return false;
+      else
+        return true;
+    }
 
     //-----------------------------------------------------
     //-------- Composite Pattern Variables And Methods --------
@@ -1035,8 +1070,11 @@ public class Reporter implements Logger
      */
     public void logHashtable(int level, Hashtable hash, String msg)
     {
-
         if (level > loggingLevel)
+          return;
+        
+        // Don't log anyway if level is 10 or less.
+        if (loggingLevel <= 10)
             return;
 
         for (int i = 0; i < numLoggers; i++)
