@@ -9,7 +9,9 @@
   <!-- Purpose: Test of default (no functions) conversion of integers. -->
 
 <xsl:template match="/">
-  <out><xsl:text>Positive numbers:&#10;</xsl:text>
+  <out>
+    <set>
+    <xsl:text>Positive numbers:&#10;</xsl:text>
     <xsl:value-of select="1"/><xsl:text>,</xsl:text>
     <xsl:value-of select="12"/><xsl:text>,</xsl:text>
     <xsl:value-of select="123"/><xsl:text>,</xsl:text>
@@ -19,15 +21,15 @@
     <xsl:value-of select="1234567"/><xsl:text>,</xsl:text>
     <xsl:value-of select="12345678"/><xsl:text>,</xsl:text>
     <xsl:value-of select="123456789"/><xsl:text>,</xsl:text>
-    <xsl:value-of select="1234567890"/><xsl:text>&#10;</xsl:text>
+    <xsl:value-of select="1234567890"/></set><set><xsl:text>&#10;</xsl:text>
     <xsl:value-of select="12345678901"/><xsl:text>,</xsl:text>
     <xsl:value-of select="123456789012"/><xsl:text>,</xsl:text>
     <xsl:value-of select="1234567890123"/><xsl:text>,</xsl:text>
     <xsl:value-of select="12345678901234"/><xsl:text>,</xsl:text>
-    <xsl:value-of select="123456789012345"/><xsl:text>&#10;</xsl:text>
+    <xsl:value-of select="123456789012345"/></set><set><xsl:text>&#10;</xsl:text>
     <xsl:value-of select="1234567890123456"/><xsl:text>,</xsl:text>
     <xsl:value-of select="12345678901234567"/><xsl:text>,</xsl:text>
-    <xsl:value-of select="123456789012345678"/><xsl:text>&#10;</xsl:text>
+    <xsl:value-of select="123456789012345678"/></set><set><xsl:text>&#10;</xsl:text>
     <xsl:text>Negative numbers:&#10;</xsl:text>
     <xsl:value-of select="-1"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-12"/><xsl:text>,</xsl:text>
@@ -38,15 +40,16 @@
     <xsl:value-of select="-1234567"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-12345678"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-123456789"/><xsl:text>,</xsl:text>
-    <xsl:value-of select="-1234567890"/><xsl:text>&#10;</xsl:text>
+    <xsl:value-of select="-1234567890"/></set><set><xsl:text>&#10;</xsl:text>
     <xsl:value-of select="-12345678901"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-123456789012"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-1234567890123"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-12345678901234"/><xsl:text>,</xsl:text>
-    <xsl:value-of select="-123456789012345"/><xsl:text>&#10;</xsl:text>
+    <xsl:value-of select="-123456789012345"/></set><set><xsl:text>&#10;</xsl:text>
     <xsl:value-of select="-1234567890123456"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-12345678901234567"/><xsl:text>,</xsl:text>
     <xsl:value-of select="-123456789012345678"/>
+	</set>
   </out>
 </xsl:template>
 
