@@ -9,6 +9,8 @@
 @echo   JAVA_OPTS Will be passed to java.exe or jview.exe
 @echo   EXTRA_CP Will be appended to the classpath
 @echo   END_PKG Will be the subpackage name after org.apache.qetest
+@echo   Special: %1=-jview: Run Microsoft's jview instead of java
+@echo   Special: %1=-crimson: Use crimson.jar instead of xerces.jar
 @echo Common args include (from the java file, ignore first two "ERROR" lines): 
 @REM Call with illegal arg to force Java code to print usage()
 java -classpath %CLASSPATH%;testxsl.jar;%JARDIR%\testxsl.jar org.apache.qetest.xsl.XSLProcessorTestBase -load
@@ -25,6 +27,12 @@ if '%1' == '-H' goto usage
 if '%1' == '-?' goto usage
 if '%1' == '-jview' goto setjv
 if '%1' == '-JVIEW' goto setjv
+@REM Note jview and crimson can't both be done: write your own batch file
+@REM -crimson: Use crimson.jar instead of xerces.jar
+@REM    shift to get rid of -crimson arg; just pass rest of args along
+@REM you'll probably want to change JAVA_OPTS with system properties for crimson too!
+if '%1' == '-crimson' set PARSER_JAR=crimson.jar
+if '%1' == '-crimson' shift
 
 @REM Non-jview: Trickery to guess appropriate location of java.exe program
 if "%JAVA_HOME%" == "" set JAVA_EXE=java
@@ -42,6 +50,9 @@ set CMDCP=/cp
 goto dojardir
 
 :dojardir
+@REM If PARSER_JAR blank, default to xerces
+if "%PARSER_JAR%" == "" set PARSER_JAR=xerces.jar
+
 @REM If JARDIR blank, use the existing classpath first, so we pick up 
 @REM    any classes the user may have specified before default ones
 @REM Note that this could cause conflicts if the user only specified 
@@ -51,7 +62,7 @@ if "%JARDIR%" == "" echo runtest.bat must have JARDIR set!
 if "%JARDIR%" == "" goto done
 
 @REM If JARDIR set, put those references first then default classpath
-if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
 
 @REM Wrappers use EXTRA_CP to add items to our classpath; if set, append
 if not "%EXTRA_CP%" == "" set TEST_CP=%TEST_CP%;%EXTRA_CP%
@@ -74,5 +85,6 @@ echo "%JAVA_EXE%" %JAVA_OPTS% %CMDCP% "%TEST_CP%" org.apache.qetest.%END_PKG%.%1
 set TEST_CP=
 set JAVA_EXE=
 set CMDCP=
+set PARSER_JAR=
 if '%END_PKG%' == 'xsl' set END_PKG=
 :end
