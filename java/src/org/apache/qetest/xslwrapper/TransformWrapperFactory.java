@@ -160,10 +160,14 @@ public abstract class TransformWrapperFactory
         // Attempt to lookup the flavor: if found, use the 
         //  value we got, otherwise default to the same value
         String className = wrapperMapper.getProperty(flavor, flavor);
-
+        
         try
         {
-            Class clazz = Class.forName(className);
+            // Allow people to use bare classnames in popular packages
+            Class clazz = QetestUtils.testClassForName(className, 
+                               QetestUtils.defaultPackages,
+                               "Wrapper Not Found");
+            
             TransformWrapper wrapper = (TransformWrapper) clazz.newInstance();
             return wrapper;
         }
@@ -171,5 +175,18 @@ public abstract class TransformWrapperFactory
         {
             throw new IllegalArgumentException("newWrapper() threw: " + e.toString());
         }
+    }
+
+
+    /**
+     * Simplistic command line support merely prints out wrapperMapper.
+     *
+     * @param args command line args - unused
+     */
+    public static void main(String[] args)
+    {
+        Properties p = getDescriptions();
+        System.out.println("TransformWrapperFactory: installed flavors=wrappers");
+        p.list(System.out);
     }
 }
