@@ -91,6 +91,9 @@ import java.lang.reflect.Constructor;
  * this testlet is effectively only applicable with 
  * TransformWrappers that wrap JAXP-compatible implementations.
  *
+ * Attempts to separate validation between stylesheet parse/build 
+ * errors and transform errors.
+ *
  * //@todo better doc on our algorithim
  *
  * @author Shane_Curcuru@lotus.com
@@ -112,6 +115,55 @@ public class ErrorHandlerTestlet extends StylesheetTestlet
     public String getDescription()
     {
         return "ErrorHandlerTestlet";
+    }
+
+
+    /**
+     * Our testing state: during stylesheet build or transform.
+     */
+    protected boolean duringXSLBuild = true;
+
+
+    /** 
+     * Worker method to actually perform the transform: overridden.  
+     *
+     * Explicitly builds a stylesheet first, then does transform.  
+     * With duringXSLBuild state above, we can then validate 
+     * when exceptions/errors are thrown.
+     * Note: Does not properly handle embedded tests yet!
+     *
+     * @param datalet to test with
+     * @param transformWrapper to have perform the transform
+     * @throws allows any underlying exception to be thrown
+     */
+    protected void testDatalet(StylesheetDatalet datalet, TransformWrapper transformWrapper)
+            throws Exception
+    {
+        //@todo Should we log a custom logElement here instead?
+        logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
+                      + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
+                      + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor);
+
+        // Simply have the wrapper do all the transforming
+        //  or processing for us - we handle either normal .xsl 
+        //  stylesheet tests or just .xml embedded tests
+        long retVal = 0L;
+        if (null == datalet.inputName)
+        {
+            // presume it's an embedded test
+            //@todo make this handle duringXSLBuild state!
+            long [] times = transformWrapper.transformEmbedded(datalet.xmlName, datalet.outputName);
+            retVal = times[TransformWrapper.IDX_OVERALL];
+        }
+        else
+        {
+            // presume it's a normal stylesheet test
+            // First build the stylesheet
+            duringXSLBuild = true;
+            long[] times = transformWrapper.buildStylesheet(datalet.inputName);
+            duringXSLBuild = false;
+            times = transformWrapper.transformWithStylesheet(datalet.xmlName, datalet.outputName);
+        }
     }
 
 
@@ -140,7 +192,7 @@ public class ErrorHandlerTestlet extends StylesheetTestlet
         catch (Throwable t)
         {
             logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " newWrapper/newProcessor threw");
-            logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
+            logger.checkErr(getCheckDescription(datalet) + " newWrapper/newProcessor threw: " + t.toString());
             return null;
         }
     }
@@ -171,7 +223,7 @@ public class ErrorHandlerTestlet extends StylesheetTestlet
             Object[] ctorArgs = new Object[1];
             ctorArgs[0] = (Object) logger;
             LoggingHandler handler = (LoggingHandler) ctor.newInstance(ctorArgs);
-            if ((handler instanceof LoggingErrorListener) && 
+            if ((handler instanceof LoggingErrorListener) || 
                 (handler instanceof LoggingSAXErrorHandler))
             {
                 // Mimic DefaultErrorHandler behavior
@@ -182,7 +234,7 @@ public class ErrorHandlerTestlet extends StylesheetTestlet
         catch (Throwable t)
         {
             logger.logThrowable(Logger.ERRORMSG, t, getDescription() + " newWrapper/newProcessor threw");
-            logger.checkErr(getDescription() + " newWrapper/newProcessor threw: " + t.toString());
+            logger.checkErr(getCheckDescription(datalet) + " newWrapper/newProcessor threw: " + t.toString());
             return null;
         }
     }
