@@ -1,4 +1,4 @@
-<HTML>
+<HTML xmlns:lxslt="http://xml.apache.org/xslt">
 <H1>JavaScript Example.</H1>
 <p>Here are the names in alphabetical order by last name:</p>
 <p>[1]. Auriemma, Stephen</p>
