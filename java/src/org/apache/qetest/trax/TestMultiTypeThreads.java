@@ -614,9 +614,9 @@ public class TestMultiTypeThreads
     {
         File f = new File(filename);
         String tmp = f.getAbsolutePath();
-	    if (File.separatorChar == '\\') {
-	        tmp = tmp.replace('\\', '/');
-	    }
+            if (File.separatorChar == '\\') {
+                tmp = tmp.replace('\\', '/');
+            }
         return "file:///" + tmp;
     }
 }  // end of class TestMultiTypeThreads
@@ -982,10 +982,10 @@ class TMTThreadsRunner implements Runnable
         XMLReader reader = null;
 
         // Use JAXP1.1 ( if possible )
-	    javax.xml.parsers.SAXParserFactory spfactory = javax.xml.parsers.SAXParserFactory.newInstance();
-	    spfactory.setNamespaceAware(true);
-	    javax.xml.parsers.SAXParser jaxpParser = spfactory.newSAXParser();
-	    reader = jaxpParser.getXMLReader();
+            javax.xml.parsers.SAXParserFactory spfactory = javax.xml.parsers.SAXParserFactory.newInstance();
+            spfactory.setNamespaceAware(true);
+            javax.xml.parsers.SAXParser jaxpParser = spfactory.newSAXParser();
+            reader = jaxpParser.getXMLReader();
 
         if (reader == null) 
             reader = XMLReaderFactory.createXMLReader();
@@ -995,10 +995,11 @@ class TMTThreadsRunner implements Runnable
         // Send the SAX events from the parser to the transformer,
         // and thus to the DOM tree.
         print(marker);  // Note presence of this in logs shows which process threw an exception
+        handler.setSystemId(xmlName);
         reader.parse(xmlName);
 
         // Serialize the DOM tree out
-	    FileOutputStream fos = new FileOutputStream(outName);
+            FileOutputStream fos = new FileOutputStream(outName);
         Transformer serializer = factory.newTransformer();
         //serializer.setOutputProperty(OutputKeys.INDENT, "yes");
         //serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
