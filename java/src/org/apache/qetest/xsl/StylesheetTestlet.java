@@ -262,7 +262,19 @@ public class StylesheetTestlet extends TestletImpl
     {
         // See if the datalet already has a fileChecker to use...
         CheckService fileChecker = (CheckService)datalet.options.get("fileCheckerImpl");
+
         // ...if not, construct a default one with attributes
+        if (null == fileChecker) {
+	    String fcName = datalet.options.getProperty("fileChecker");
+	    Class fcClazz = QetestUtils.testClassForName(fcName,
+							 QetestUtils.defaultPackages, 
+							 null);
+	    if (null != fcClazz) {
+		fileChecker = (CheckService) fcClazz.newInstance();
+		fileChecker.applyAttributes(datalet.options);
+	    }
+	}
+	
         if (null == fileChecker)
         {
             fileChecker = QetestFactory.newCheckService(logger, QetestFactory.TYPE_FILES);
