@@ -21,11 +21,12 @@
     the HTML parsing is unimplemented - we need a good HTML->DOM 
     parser we can use in Apache - any suggestions?</li>
     <li>XSLTestfileInfo - simple extension of TestfileInfo to 
-    add xmlName member.</li>
+    add xmlName member. Should be replaced with StylesheetDatalet</li>
     <li>XSLDirectoryIterator - simple implementation that processes 
     xsl/xml file pairs from a fileList or over a directory tree, 
     automatically comparing the result files with a known good 
-    or 'gold' reference tree of outputs.</li>
+    or 'gold' reference tree of outputs. Should be replaced 
+    with StylesheetTestletDriver and various Testlets.</li>
     <li>XSLProcessorTestBase - adds useful XSLT processing 
     utilities, etc. from FileTestBase: including flags like 
     -preprocess, -flavor, -category, etc.  Most xsl and trax 
@@ -34,13 +35,21 @@
     <ul>Current tests include:
     <li>ConformanceTest - generic test driver, including some 
     FilenameFilters.  This essentially uses the XSLDirectoryIterator 
-    for everything.</li>
+    for everything. 
+    Being replaced by StylesheetTestletDriver and 
+    StylesheetTestlet/Datalet</li>
     <li>PerformanceTest - test driver that iterates repeatedly and 
-    reports memory and timing info.</li>
+    reports memory and timing info
+    Being replaced by StylesheetTestletDriver and 
+    PerformanceTestlet, PerfPreloadTestlet</li>
+
     <li>CConformanceTest - generic test driver that constructs a 
     command line and then shells out to execute TestXSLT.exe, which 
     is from the Xalan-C build.  This allows basic comparisons of 
-    results from the Java versions with the C++ versions.</li>
+    results from the Java versions with the C++ versions.
+    I'd like to replace this with a more generic and configurable 
+    CmdlineTestlet, that can run any sort of command-line interface
+    like this in a standard way.</li>
     </ul>
   </body>
 </html>

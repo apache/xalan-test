@@ -73,38 +73,30 @@
 <p>Java Test Drivers</p>
 <p>A Java Test Driver executes a test for each xml/xsl file pair in 
 the specified directory tree or each pair in the specified fileList. 
-For each test, the driver generates an output file which may be 
-compared to the corresponding file in the "gold" tree. The Test 
-Drivers supply the code to determine which files to operate on 
-and the order to do those operations (including logging performance 
-and other data out).</p> 
-<p>The Test Drivers rely on ProcessorWrapper 
+For each test, the driver iterates over the tree or list of files 
+and asks a Testlet to execute a test on each one. 
+The best example is <jump href="apidocs/org/apache/qetest/xsl/StylesheetTestletDriver.html">StylesheetTestletDriver</jump></p> 
+<p>The Test Drivers rely on various Testlet implementations  
+to define the actual testing algorithim to apply to each xml.xsl 
+file pair.  This defines any options to be used when processing the 
+file as well as logging out information about the test in progress.
+Examples include 
+<jump href="apidocs/org/apache/qetest/xsl/StylesheetTestlet.html">StylesheetTestlet</jump> and 
+<jump href="apidocs/org/apache/qetest/xsl/PerformanceTestlet.html">PerformanceTestlet</jump></p>
+<p>The Testlets rely on ProcessorWrapper 
 subclasses to perform the actual test of processing or transformation 
 of the xml.xsl file pair into the output file. We can then plug 
 in different ProcessorWrapper "flavors" easily. Different 
 ProcessorWrappers can process or transform in various ways, like 
 using DOM trees, SAX events, or input/output streams.</p>
+<p>The three levels of iteration, test algorithim, and 
+processor flavor are all independently changeable, so we can 
+easily try out different kinds of tests.</p>
 <gloss>
-<label>org.apache.qetest.xsl.ConformanceTest</label>
-<item>basic test driver, either takes an 
-inputDir to iterate over (using ConformanceDirRules/ConformanceFileRules),
-or an explicit fileList. Processes all files using a specific 
--flavor of a <jump href="apidocs/org/apache/qetest/xslwrapper/ProcessorWrapper.html">ProcessorWrapper</jump>, so identical test runs can be done 
-using different processors (e.g., -flavor xalan = XalanWrapper = Xalan-J 1.x; 
--flavor trax = TraxWrapper = Trax interface using streams by default;
--flavor trax.d2d = TraxWrapper = Trax interface using DOMs)
-<br/>Actually, 'ConformanceTest' is a bad name - this is a generic stylesheet 
-test driver that can be used to run using any matching xml source 
-and xsl stylesheet file names, as specified in the ConformanceFileRules, 
-not just conformance tests.
-<br/>Suggestions for alternate names welcomed!
-'StylesheetTestDriver' perhaps?</item>
-<label>org.apache.qetest.xsl.PerformanceTest</label><item>essentially the same as ConformanceTest, 
-but provides additional timing/memory output, as well as an -iterations
-parameter to iterate over each file a bunch of times to get average timing data
-</item>
 <label>org.apache.qetest.xsl.<link idref="run" anchor="how-to-run-c">CConformanceTest</link></label>
-<item>essentially the same as ConformanceTest, but for Xalan-C.</item>
+<item>essentially the same as ConformanceTest, but for Xalan-C.  I plan to 
+make this use the Testlet model soon to simplify this model, and 
+to provide better support for differing command lines.</item>
 </gloss>
 
 <p>Java API tests for the TRAX (or javax.xml.transform) interface, that 
@@ -114,7 +106,11 @@ All in package: org.apache.qetest.trax</p>
 <label>REPLACE_template_for_new_tests.java</label>
 <item>a template for creating new TRAX API tests, see <link idref="submit" anchor="write-API-tests">Submitting New Tests</link></item>
 <label>LoggingErrorListener.java</label>
-<item><ref>utility:</ref> wraps javax.xml.transform.ErrorListener, and logs info</item>
+<item><ref>utility:</ref> wraps javax.xml.transform.ErrorListener, and logs info; 
+this class also supports setting expected errors to trap, and it will call 
+logger.checkPass/checkFail for you when it gets an expected or unexpected event. 
+This allows us to write very detailed negative tests and have them be 
+fully automated.</item>
 <label>LoggingURIResolver.java</label>
 <item><ref>utility:</ref> wraps javax.xml.transform.URIResolver, and logs info</item>
 <label>ExamplesTest.java</label>
@@ -127,11 +123,21 @@ javax.xml.transform API to process stylesheets.</item>
 <item>API coverage tests for javax.xml.transform.TransformerFactory</item>
 <label>TemplatesAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.Templates</item>
-<label>ResultAPITest.java</label>
-<item>API test for Result class - may be obsolete, should 
-have separate tests for SAXResult, DOMResult, StreamResult</item>
-<label>ProcessorAPITest.java</label>
-<item>API test: obsolete: from a previous version of TRAX</item>
+
+<label>EmbeddedStylesheetTest.java</label>
+<item>Testing various types and kinds of stylesheets embedded with the xml-stylesheet PI</item>
+<label>ErrorListenerAPITest.java</label>
+<item>API Coverage test for ErrorListener</item>
+<label>ErrorListenerTest.java</label>
+<item>Functionality test of error listeners when using illegal stylesheets</item>
+<label>OutputPropertiesTest.java</label>
+<item>Various tests of programmatic access and changing of output properties</item>
+<label>SystemIdImpInclTest.java</label>
+<item>Testing various forms of URLs in setSystemID with imported and included stylesheets</item>
+<label>SystemIdTest.java</label>
+<item>Testing various forms of URLs in setSystemID</item>
+
+
 <label>TestThreads.java</label>
 <item>MANUALLY executed test for running multiple threads 
 and transforming multiple stylesheets simultaneously.</item>
@@ -140,27 +146,27 @@ and transforming multiple stylesheets simultaneously.</item>
 <p>All in subpackages of: org.apache.qetest.trax</p>
 <gloss>
 <label>stream.StreamSourceAPITest.java</label>
-<item>API coverage tests for javax.xml.transform.stream.StreamSource (mostly done)</item>
+<item>API coverage tests for javax.xml.transform.stream.StreamSource</item>
 <label>stream.StreamResultAPITest.java</label>
-<item>API coverage tests for javax.xml.transform.stream.StreamResult (mostly done)</item>
+<item>API coverage tests for javax.xml.transform.stream.StreamResult</item>
 
 <label>dom.DOMSourceAPITest.java</label>
-<item>API coverage tests for javax.xml.transform.dom.DOMSource (mostly done)</item>
+<item>API coverage tests for javax.xml.transform.dom.DOMSource</item>
 <label>dom.DOMResultAPITest.java</label>
-<item>API coverage tests for javax.xml.transform.dom.DOMResult (mostly done)</item>
+<item>API coverage tests for javax.xml.transform.dom.DOMResult</item>
 <label>dom.DOMLocatorAPITest.java</label>
 <item>API coverage tests for javax.xml.transform.dom.DOMLocator (@todo)</item>
 
 <label>sax.SAXSourceAPITest.java (to be done)</label>
-<item>API coverage tests for javax.xml.transform.sax.SAXSource (@todo)</item>
+<item>API coverage tests for javax.xml.transform.sax.SAXSource</item>
 <label>sax.SAXResultAPITest.java (to be done)</label>
-<item>API coverage tests for javax.xml.transform.sax.SAXResult (@todo)</item>
+<item>API coverage tests for javax.xml.transform.sax.SAXResult</item>
 <label>sax.SAXTransformerFactoryAPITest.java (to be done)</label>
-<item>API coverage tests for javax.xml.transform.sax.SAXTransformerFactory (@todo)</item>
+<item>API coverage tests for javax.xml.transform.sax.SAXTransformerFactory</item>
 <label>sax.TemplatesHandlerAPITest.java (to be done)</label>
-<item>API coverage tests for javax.xml.transform.sax.TemplatesHandler (@todo)</item>
+<item>API coverage tests for javax.xml.transform.sax.TemplatesHandler</item>
 <label>sax.TransformerHandlerAPITest.java (to be done)</label>
-<item>API coverage tests for javax.xml.transform.sax.TransformerHandler (@todo)</item>
+<item>API coverage tests for javax.xml.transform.sax.TransformerHandler</item>
 </gloss>
 
 <p>Java API tests for Xalan-J 1.x.</p>

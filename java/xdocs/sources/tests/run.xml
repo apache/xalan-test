@@ -17,23 +17,23 @@
     from your application, or from 
     <jump href="apidocs/org/apache/qetest/xsl/XSLTestHarness.html">XSLTestHarness</jump>.
     There really isn't any magic to them: you can just set your classpath and 
-    execute java.exe to run them.  However we have provided a couple of more 
+    execute java.exe to run them; some Tests and Testlets currently provide defaults
+    for their inputs, so you can run them without any setup at all. 
+    However we have provided a couple of more 
     convenient ways to run the most common tests:</p>
     <p>1: <link idref="getstarted" anchor="how-to-build">Build a fresh copy of testxsl.jar.</link>
     <br/></p>
     <p>2: Set the JARDIR environment variable, and put <code>testxsl.jar</code> and the other required JAR files in the JARDIR directory.<br/></p>
     <note>The tests will now default to using Xalan-J 2.x if JARDIR is not set, 
     presuming that you have the tests in the same tree as xml-xalan\java (just like 
-    you get if you checkout the tree).</note>
+    you get if you checkout the tree); you can use a JARDIR or not if you find it convenient.</note>
     <p>3: cd xml-xalan\test<br/></p>
     <p>4: Run any of the convenience batch files (see below) or run java.exe with the desired test class.<br/></p>
     <p>
-      <code>contribtest.bat [<link anchor="test-options">options</link>]</code>
-        <br/>(runs ConformanceTest driver over tests\contrib test tree)<br/><br/>
-      <code>ConformanceTest.bat [<link anchor="test-options">options</link>]</code>
-        <br/>(runs ConformanceTest driver over tests\conf test tree)<br/><br/>
-      <code>PerformanceTest.bat [<link anchor="test-options">options</link>]</code>
-        <br/>(runs PerformanceTest driver over tests\perf test tree)<br/><br/>
+      <code>conf.bat [<link anchor="test-options">options</link>]</code>
+        <br/>(runs StylesheetTestletDriver over tests\conf test tree using the default StylesheetTestlet)<br/><br/>
+      <code>perf.bat [<link anchor="test-options">options</link>]</code>
+        <br/>(runs StylesheetTestletDriver over tests\perf test tree using the default PerformanceTestlet)<br/><br/>
       <code>traxapitest.bat TRAXAPITestClassName [<link anchor="test-options">options</link>]</code> 
       <br/>(runs TRAX interface tests with Xalan-J 2.x, equivalent to <br/>
         <code>runtest trax.TRAXAPITestClassName -load APITest.properties [<link anchor="test-options">options</link>]</code><br/>
@@ -55,9 +55,11 @@
     also be executed by hand, for those who wish to manage their own classpaths and/or
     simply pass all arguments to the tests on the command line, etc.</p>
     <p>Sorry! We don't have .sh equivalents for the convenience .bat files - 
-    submissions of ports of these files are welcomed!</p>
-    <p>We are also working on integrating the running of tests into 
-    the various Ant build.xml files, both for the testing build.xml 
+    submissions of ports of these files are welcomed!  We do plan to add an Ant 
+    task that can run Xalan Tests and Testlets, so in the future both building 
+    and running tests will mostly be done from an Ant buildfile, which is 
+    cross-platform by default.</p>
+    <p>Some tests are partially integrated into our Ant build.xml files, both for the testing build.xml 
     file as well as the one for Xalan-J 2.x itself.  For example, to run 
     the Xalan-J 2.x Minitest, you may now do:<br/>
     <code>cd xml-xalan\java</code><br/>
@@ -101,19 +103,25 @@
       <p>To see all options, call a test with an illegal argument to force it 
       to print out it's .usage(). You may mix setting options from a properties 
       file and from the command line; command line options will take precedence.</p>
-      <p>For another description of options, see <br/><code>xml-xalan\test\ContribTest.properties</code>,<br/> 
-      which describes most of them as used in the context of running the ConformanceTest driver 
-      over the xml-xalan\tests\contrib tree of stylesheets.  Simply change inputDir and goldDir
-      to run over a different set of files (like a conformance test suite, which we hope to 
+      <p>For another description of options, see <br/><code>xml-xalan\test\conf.properties</code>,<br/> 
+      which describes most of them as used in the context of running the StylesheetTestletDriver 
+      over the xml-xalan\tests\conf tree of stylesheets.  Simply change inputDir and goldDir
+      to run over a different set of files (like a performance test suite, which we hope to 
       add soon).</p>
       <note>Path-like options set in a properties file must use the local system's 
       File.separator character, and backslashes \ must be escaped \\. The checked in 
-      copy of ContribTest.properties is for a Windows platform.</note>
+      copy of conf.properties is for a Windows platform.</note>
       <p>Quick list of options</p>
         <anchor name="test-options-logfile"/>
       <gloss>
         <label>-logFile <ref>resultsFileName.xml</ref></label>
           <item>sends test results to an XML-based results file</item>
+        <label>-loggingLevel <ref>nn</ref></label>
+          <item>determines how much information is sent to your logFile, 0=very little, 99=lots</item>
+        <label>-ConsoleLogger.loggingLevel <ref>nn</ref></label>
+          <item>determines how much information is sent just to the default ConsoleLogger: 
+          since often you won't be watching the console as the test is running, you can set this 
+          lower than your loggingLevel to speed the tests up a little</item>
         <label>-load <ref>file.properties</ref></label>
           <item>(read in a .properties file, that can set any/all of the other opts)</item>
         <label>-inputDir <ref>path/to/tests</ref></label>
@@ -130,16 +138,10 @@
         <label>-flavor <ref>xalan|trax|trax.d2d</ref></label>
           <item>which kind/flavor of Processor to test; see
           <jump href="apidocs/org/apache/qetest/xslwrapper/ProcessorWrapper.html">ProcessorWrapper.java</jump> </item>
-        <label>-noReuse</label>
-          <item>will force the ProcessorWrapper recreate a new processor for each file processed 
-          (normally, it re-uses the same processor when possible by calling reset() or some 
-          like method)</item>
+        <label>-testlet <ref>TestletClassname</ref></label>
+          <item>For StylesheetTestletDriver, use a different class for the testing algorithim</item>
         <label>-debug</label>
           <item>prints extra test debugging info</item>
-        <label>-precompile</label>
-          <item>will use a precompiled stylesheet, if applicable to that ProcessorWrapper</item>
-        <label>-noErrTest</label>
-          <item>will skip running '*err' subdirectory tests, if applicable (<ref>subject to change</ref>)</item>
       </gloss> 	
       <p>Note that most options work equivalently with either Xalan-J or Xalan-C tests.</p>
     </s2>

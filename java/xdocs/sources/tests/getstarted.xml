@@ -32,7 +32,8 @@
   <s2 title="Building the Tests">
     <p>This builds both the test harness/framework/etc. and the specific Java API test files.
     It works similarly for DOS/Windows or your flavor of UNIX; in most cases *.sh files are 
-    provided to match the *.bat files used here.</p>
+    provided to match the *.bat files used here.  Plans are underway to also provide an 
+    Ant-based way to run tests, which is already cross-platform.</p>
     <p>1: Use CVS to check out the whole xml-xalan repository locally.
     <br/><code>e:\builds\xml-xalan</code></p>
     <p>2: Set an environment variable JARDIR to point to directory where you have all applicable jars.  
@@ -53,7 +54,13 @@
       <br/>Xalan-J 2.x:  
       <br/><code>build.bat package.xalan2</code> (<ref>or package.trax</ref>)
     </p>
-    <p>This will create <code>build\testxsl.jar</code>, which you should manually copy into JARDIR before you run any tests.</p>
+    <p>This will create <code>build\testxsl.jar</code>, which you should manually copy 
+    into JARDIR before you <link idref="run" anchor="how-to-run">run any tests</link>.</p>
+    <note>The use of JARDIR is not required; you're free to manage the classpath 
+    yourself, or the test build file will assume it should use the Xalan-J 2.0 
+    directories by default.  I've found that simply putting all the needed jars in 
+    a JARDIR makes it simple to switch between testing different builds.</note>
+
     <p>Note that ProcessorWrapper subclasses for XT and SAXON are currently checked in 
     both as .java source files and as precompiled .class files - the .class files are 
     merely copied into the jar by default, so you don't need the other processors 

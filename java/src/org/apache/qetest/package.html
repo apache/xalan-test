@@ -30,9 +30,14 @@
     Properties block to sub-objects or contained objects for 
     their own initializations.  One future drawback: need to 
     ensure the namespace doesn't have collisions between tests, 
-    reporters, and loggers.</li>
+    reporters, and loggers. Eventually I'd like to have a 
+    'namespace' for just the tests themselves.</li>
     <li>Test, TestImpl, FileBasedTest: these all provide structure 
     and utility methods useful for testing in general.</li>
+    <li>Testlet, Datalet: these small, focused mini-tests 
+    that encourage creating data driven tests and allow you 
+    to separate the specific testing algorithim used from 
+    the set of data to execute it on.</li>
     <li>User subclasses of the Test classes should simply focus on 
     manipulating the product under test and calling log*() or check*() 
     methods to report information.  They shouldn't worry about the 
@@ -51,12 +56,15 @@
     <li>CheckService is a generic service for checking 'equivalence' 
     of two objects and reporting the pass/fail/other result thereof.  
     A SimpleFileCheckService implementation is provided as an 
-    example.</li>
+    example; we have plans to add various other kinds of checkers, 
+    perhaps a DOMCheckService.</li>
     <li>OutputNameManager is a cheap-o helper for tests that create 
     a large number of consecutive output files.</li>
     <li>TestfileInfo is a simple data-holding class to store info 
     about a test data file.  It is used in FileBasedTest, which may 
-    be a useful base class for your tests.</li>
+    be a useful base class for your tests.  This should probably be 
+    replaced with a Datalet which, along with Testlets, provides a 
+    lighter-weight way to write tests.</li>
     </ul>
   </body>
 </html>

@@ -25,7 +25,7 @@
       output file with a .out extension.</item>
       <label>What kinds of tests does Xalan have?</label>
       <item>There are several different ways to categorize the 
-      tests currently used in Xalan: API tests, specific tests 
+      tests currently used in Xalan: API tests and testlets, specific tests 
       for detailed areas of the API in Xalan; Conformance Tests, 
       with stylesheets in the tests\conf directory that each test 
       conformance with a specific part of the XSLT spec, and are 
@@ -46,7 +46,7 @@
       something failed in an unexpected way, and AMBG or ambiguous tests, 
       where the test appears to have completed but the output results 
       haven't been verified to be correct yet. 
-      <link anchor="overview-tests-results">See full description below.</link></item>
+      <link anchor="overview-tests-results">See a full description of test results.</link></item>
       <label>How are test results stored/displayed?</label>
       <item>Xalan tests all use 
       <jump href="apidocs/org/apache/qetest/Reporter.html">Reporter</jump>s and 
@@ -58,9 +58,10 @@
       determines where it will produce it's MyTestResults.xml file, which 
       are the complete report of what the test did, as saved to disk by 
       it's XMLFileLogger.  You can 
-      then use <link idref="run" anchor="how-to-view-results">viewResults.bat</link> 
+      then use <link idref="run" anchor="how-to-view-results">viewResults.xsl</link> 
       to pretty-print the results into a MyTestResults.html
-      file that you can view in your browser.
+      file that you can view in your browser.  We are working on other 
+      stylesheets to output results in different formats.
       </item>
       <label>What are your file/test naming conventions?</label>
       <item>See the sections below for <link anchor="standards-api-tests">API test naming</link> and 
@@ -152,6 +153,16 @@
       <item>As in 'ConformanceTest', 'PerformanceTest', etc.: a single, 
       automated test file designed to be run from the command line or 
       from a testing harness.</item>
+      <label>*Testlet.java/.class</label>
+      <item>As in '<jump href="apidocs/org/apache/qetest/xsl/StylesheetTestlet.html">StylesheetTestlet</jump>', 'PerformanceTestlet', etc.: a single, 
+      automated testlet designed to be run from the command line or 
+      from a testing harness.  Testlets are generally focused on one 
+      or a very few test points, and usually are data-driven.</item>
+      <label>*Datalet.java/.class</label>
+      <item>As in '<jump href="apidocs/org/apache/qetest/xsl/StylesheetDatalet.html">StylesheetDatalet</jump>': a single set of test data for 
+      a Testlet to execute.  Separating a specific set of data from the 
+      testing algorithim to use with the data makes it easy to write 
+      and run large sets of data-driven tests.</item>
       <label>*APITest.java/.class</label>
       <item>As in 'TransformerAPITest', etc.: a single, 
       automated test file designed to be run from the command line or 
@@ -174,8 +185,9 @@
       Thus we can hook a LoggingErrorHandler up to a Transformer, run a 
       stylesheet with known errors through it, and then go back and validate 
       that the Transformer logged the appropriate errors with this service.</item>
-      <label></label>
-      <item></item>
+      <label>QetestUtils.java/.class</label>
+      <item>A simple static utility class with a few general-purpose 
+      utility methods for testing.</item>
     </gloss>
     <p>Please: if you plan to submit Java API tests, use the existing framework 
     as <link idref="submit" anchor="write-API-tests">described</link>.</p>
@@ -201,6 +213,7 @@
       <code>cd xml-xalan\test</code><br/>
       <code>ContribTest.bat -category foo</code><br/>
     </p>
+
   </s2>
 
   <anchor name="testing-links"/>
