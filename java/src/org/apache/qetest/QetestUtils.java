@@ -103,14 +103,7 @@ public abstract class QetestUtils
             return null;
 
         // Don't translate a string that already looks like a URL
-        if (filename.startsWith("file:")
-            || filename.startsWith("http:")
-            || filename.startsWith("ftp:")
-            || filename.startsWith("gopher:")
-            || filename.startsWith("mailto:")
-            || filename.startsWith("news:")
-            || filename.startsWith("telnet:")
-           )
+        if (isCommonURL(filename))
             return filename;
 
         File f = new File(filename);
@@ -141,6 +134,99 @@ public abstract class QetestUtils
             return "file:///" + tmp;
 
     }
+
+
+    /**
+     * Utility method to find a relative path.  
+     *
+     * <p>Attempt to find a relative path based from the current 
+     * directory (usually user.dir property).</p>
+     *
+     * <p>If the name is null, return null.  If the name starts 
+     * with a common URI scheme (namely the ones 
+     * found in the examples of RFC2396), then simply return 
+     * the name itself (future work could attempt to detect 
+     * file: protocols if needed).</p>
+     * 
+     * @param String local path\filename of a file
+     * @return a local path\file that is relative; if we can't 
+     * find one, we return the original name
+     */
+    public static String filenameToRelative(String filename)
+    {
+        // null begets null - something like the commutative property
+        if (null == filename)
+            return null;
+
+        // Don't translate a string that already looks like a URL
+        if (isCommonURL(filename))
+            return filename;
+
+        String base = null;
+        try
+        {
+            File userdir = new File(System.getProperty("user.dir"));
+            // Note: use CanonicalPath, since this ensures casing
+            //  will be identical between the two files
+            base = userdir.getCanonicalPath();
+        } 
+        catch (Exception e)
+        {
+            // If we can't detect this, we can't determine 
+            //  relativeness, so just return the name
+            return filename;
+        }
+        File f = new File(filename);
+        String tmp = null;
+        try
+        {
+            tmp = f.getCanonicalPath();
+        }
+        catch (IOException ioe)
+        {
+            tmp = f.getAbsolutePath();
+        }
+
+        // If it's not relative to the base, just return as-is
+        //  (note: this may not be the answer you expect)
+        if (!tmp.startsWith(base))
+            return tmp;
+
+        // Strip off the base
+        tmp = tmp.substring(base.length());
+        // Also strip off any beginning file separator, since we 
+        //  don't want it to be mistaken for an absolute path
+        if (tmp.startsWith(File.separator))
+            return tmp.substring(1);
+        else
+            return tmp;
+    }
+
+
+    /**
+     * Worker method to detect common absolute URLs.  
+     * 
+     * @param s String path\filename or URL (or any, really)
+     * @return true if s starts with a common URI scheme (namely 
+     * the ones found in the examples of RFC2396); false otherwise
+     */
+    protected static boolean isCommonURL(String s)
+    {
+        if (null == s)
+            return false;
+            
+        if (s.startsWith("file:")
+            || s.startsWith("http:")
+            || s.startsWith("ftp:")
+            || s.startsWith("gopher:")
+            || s.startsWith("mailto:")
+            || s.startsWith("news:")
+            || s.startsWith("telnet:")
+           )
+            return true;
+        else
+            return false;
+    }            
 
 
     /**
