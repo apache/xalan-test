@@ -68,7 +68,10 @@ import java.util.Properties;
 
 import java.io.PrintWriter;  // currently only used in unimplemented setDiagnosticsOutput
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 
@@ -174,6 +177,12 @@ public class TraxWrapper extends ProcessorWrapper
     /** NEEDSDOC Field AS_XML_FILTER_TYPE          */
     public static final int AS_XML_FILTER_TYPE = 7;
 
+    /** NEEDSDOC Field SCOTT          */
+    public static final String SCOTT = "scott";
+
+    /** NEEDSDOC Field AS_XML_FILTER_TYPE          */
+    public static final int SCOTT_TYPE = 8;
+
     /** NEEDSDOC Field DEFAULT_TRANSFORM          */
     public static final String DEFAULT_TRANSFORM = FILE_TO_FILE;
 
@@ -197,6 +206,7 @@ public class TraxWrapper extends ProcessorWrapper
         typeMap.put(DOM_TO_STREAM, new Integer(DOM_TO_STREAM_TYPE));
         typeMap.put(STREAM_TO_DOM, new Integer(STREAM_TO_DOM_TYPE));
         typeMap.put(AS_XML_FILTER, new Integer(AS_XML_FILTER_TYPE));
+        typeMap.put(SCOTT, new Integer(SCOTT_TYPE));
     }
     ;
 
@@ -375,6 +385,9 @@ public class TraxWrapper extends ProcessorWrapper
             xmlTime = processSAXToSAX(xmlSource, xslStylesheet, resultStream);
             break;
 
+        case SCOTT_TYPE :
+            xmlTime = processScott(xmlSource, xslStylesheet, resultStream);
+            break;
         default :
             throw new java.lang.IllegalStateException("bad/unimplemented transformType("
                                                       + transformType
@@ -530,6 +543,57 @@ public class TraxWrapper extends ProcessorWrapper
 
         // Parse the XML input document.
         xmlReader.parse(xmlSource);
+
+        // Stop timing now
+        endTime = System.currentTimeMillis();
+
+        return (endTime - startTime);
+    }
+
+    protected String objectFilename = "TEMP-FILE-TraxWrapper.ser";
+    /**
+     * Perform the transform with Scott's example.
+     * //@todo rename and reevaluate - I'm in a hurry today
+     * //@todo EVALUATE TIMING: currently times entire process
+     * @param xmlSource name of source XML file
+     * @param xslStylesheet name of stylesheet XSL file
+     * @param resultFile name of output file, presumably XML
+     * @return milliseconds process time took
+     * @throws java.lang.Exception covers any underlying exceptions
+     */
+    protected long processScott(String xmlSource, 
+                                   String xslStylesheet, 
+                                   OutputStream resultStream)
+                throws java.lang.Exception  // Cover all exceptions
+    {
+        if (!(processor.getFeature(StreamSource.FEATURE) 
+              && processor.getFeature(StreamResult.FEATURE)))
+        {
+            // If Stream is not supported in either input (Sources)
+            //  or output (Results), then bail
+            return ERROR;
+        }
+        long endTime = 0;
+        long startTime = System.currentTimeMillis();
+
+        // Create templates normally
+        Templates templates = processor.newTemplates(new StreamSource(xslStylesheet));
+
+        // Serialize the Templates to disk using normal Java methods
+        // Note this needs more work to be robust - need to handle
+        //  cleaning up previous files on disk, or maybe use a random
+        //  name generator each time
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(objectFilename));
+        oos.writeObject(templates);
+        oos.close();
+
+        // Deserialize the Templates to disk using normal Java methods
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(objectFilename));
+        Templates templates2 = (Templates)ois.readObject();
+          
+        // Use the transformer as normal to transform
+        Transformer transformer = templates2.newTransformer();
+        transformer.transform(new StreamSource(xmlSource), new StreamResult(resultStream));
 
         // Stop timing now
         endTime = System.currentTimeMillis();
