@@ -113,13 +113,11 @@
     </td>
   </tr>
   <redirect:write select="$redirectFilename" append="true">
-    <p>
-      <b><xsl:value-of select="@result"/><xsl:text> </xsl:text></b>
-      <xsl:if test="@id">
-        <xsl:text>[</xsl:text><xsl:value-of select="@id"/><xsl:text>] </xsl:text>
-      </xsl:if>
-      <xsl:value-of select="@desc"/>    
-    </p>
+    <b><xsl:value-of select="@result"/><xsl:text> </xsl:text></b>
+    <xsl:if test="@id">
+      <xsl:text>[</xsl:text><xsl:value-of select="@id"/><xsl:text>] </xsl:text>
+    </xsl:if>
+    <xsl:value-of select="@desc"/><br/>
   </redirect:write>
 </xsl:template>
 
