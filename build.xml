@@ -1126,6 +1126,7 @@ dependencies - users must manually 'build jar' first.
     </target>
 
     <target name="compile" depends="compile.trax">
+<!-- %TODO%: Decide whether to keep any of these tests for XSLTC
         <echo message="Compile Xalan-J 2.x specific tests" />
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
@@ -1133,6 +1134,7 @@ dependencies - users must manually 'build jar' first.
                excludes="${test.root}dtm/xsltcDocCode.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
+ -->
     </target>
 
     <target name="compile.rwapi" depends="compile">
