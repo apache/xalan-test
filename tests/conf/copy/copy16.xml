@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE t04 [
-  <!ELEMENT main (a*)>
+<!DOCTYPE main [
+  <!ELEMENT main (a|b)*>
   <!ELEMENT a (#PCDATA)>
   <!ATTLIST a id ID #REQUIRED>
   <!ELEMENT b (#PCDATA)>

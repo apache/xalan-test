@@ -10,6 +10,24 @@
 		  id ID #REQUIRED
 		  xmlns:xsl CDATA #FIXED "http://www.w3.org/1999/XSL/Transform"
 		  version NMTOKEN #REQUIRED>
+<!ELEMENT xsl:key EMPTY>
+<!ATTLIST xsl:key 
+		  name CDATA #REQUIRED
+		  match CDATA #REQUIRED
+		  use CDATA #REQUIRED
+		  >
+<!ELEMENT xsl:template ANY>
+<!ATTLIST xsl:template 
+		  match CDATA #REQUIRED
+		  >
+<!ELEMENT xsl:value-of ANY>
+<!ATTLIST xsl:value-of 
+		  select CDATA #REQUIRED
+		  >
+<!ELEMENT transform ANY>
+<!ELEMENT para ANY>
+<!ATTLIST para 
+		  id ID #REQUIRED>
 
 ]>
 <doc>
