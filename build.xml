@@ -199,8 +199,9 @@
         <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan conf test: ${testClass}" />
+        <property name="testType" value="conf." />
         <xalantest test="${testClass}"
-            testType="conf."
+            testType="${testType}"
             classpathref="conf.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
@@ -214,8 +215,9 @@
         <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan perf test: ${testClass}" />
+        <property name="testType" value="perf." />
         <xalantest test="${testClass}"
-            testType="perf."
+            testType="${testType}"
             classpathref="perf.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
@@ -229,8 +231,9 @@
         <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan contrib test: ${testClass}" />
+        <property name="testType" value="contrib." />
         <xalantest test="${testClass}"
-            testType="contrib."
+            testType="${testType}"
             classpathref="contrib.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
@@ -243,12 +246,27 @@
         depends="init.test">
         <!-- Note no default is set; also testClass is not prefixed! -->
         <echo message="Executing Xalan api test: ${testClass}" />
+        <property name="testType" value="api." />
         <xalantest test="${testClass}"
-            testType="api."
+            testType="${testType}"
             classpathref="api.class.path"
             fork="${fork-tests}"
             failonerror="${fail-on-error}" />
     </target>
+
+    <!-- ================================================================== -->
+    <!-- Run tests: Run all available API tests                             -->
+    <!-- ================================================================== -->
+    <target name="harness" description="Run all available API tests">
+        <antcall target="api">
+            <param name="testClass" value="org.apache.qetest.xsl.XSLTestHarness"/>
+            <param name="qetest.tests" value="${harness.tests}"/>
+            <!-- Below line is in case we run ThreadedTestletDriver -->
+            <param name="qetest.testlet" value="${harness.threads.testlet}"/>
+            <param name="qetest.fileList" value="${harness.threads.fileList}"/>
+        </antcall>
+    </target>
+
 
     <!-- ================================================================== -->
     <!-- Run tests: Run the Xalan-J 2.x Minitest                            -->
@@ -258,6 +276,32 @@
             <param name="testClass" value="org.apache.qetest.trax.Minitest"/>
         </antcall>
     </target>
+
+
+    <!-- ================================================================== -->
+    <!-- Run tests: Run the Xalan-J 2.x Smoketest, including several tests  -->
+    <!-- Note: this target is frequently called from outside of this file!  -->
+    <!-- ================================================================== -->
+    <target name="smoketest" description="Run the Xalan-J 2.x Smoketest">
+        <echo message="About to execute the Minitest..." />
+        <antcall target="api">
+            <param name="testClass" value="org.apache.qetest.trax.Minitest"/>
+            <param name="testType" value="minitest."/>
+        </antcall>
+        <echo message="About to execute other API tests..." />
+        <antcall target="api">
+            <param name="testClass" value="org.apache.qetest.xsl.XSLTestHarness"/>
+            <param name="testType" value="smoketest.api."/>
+        </antcall>
+        <echo message="About to execute Conformance tests..." />
+        <antcall target="conf">
+            <param name="qetest.category" value="copy"/> <!-- HACK DEBUGGING -->
+            <param name="testType" value="smoketest.conf."/>
+        </antcall>
+        <!-- Now, evaluate the results to see if we should fail or not -->
+        <!-- TBD -->
+    </target>
+
 
 
     <!-- ================================================================== -->
