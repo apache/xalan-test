@@ -517,13 +517,32 @@ public class TraxWrapper extends ProcessorWrapper
 
         // Use a new XMLReader to parse the XML document
         XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-        xmlReader.setContentHandler(stylesheetHandler);  
+        xmlReader.setContentHandler(stylesheetHandler); 
 
         // Set the ContentHandler to also function as LexicalHandler,
         // includes "lexical" events (e.g., comments and CDATA). 
         xmlReader.setProperty(
                 "http://xml.org/sax/properties/lexical-handler", 
                 stylesheetHandler);
+        xmlReader.setProperty("http://xml.org/sax/properties/declaration-handler",
+                           stylesheetHandler);
+        
+        // These two lines were added by sb.
+        xmlReader.setDTDHandler(stylesheetHandler);
+        stylesheetHandler.setSystemId(xmlSource);
+        
+        try
+        {
+          xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes",
+                            true);
+          xmlReader.setFeature("http://apache.org/xml/features/validation/dynamic",
+                            true);
+        }
+        catch (org.xml.sax.SAXException se)
+        {
+          // We don't care.
+        }
+
 
         // Create a 'pipe'-like identity transformer, so we can 
         //  easily get our results serialized to disk
