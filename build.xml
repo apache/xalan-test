@@ -822,6 +822,7 @@
             <include name="${tarzip-fwdref}/${test.build.apidocs}"/>
             <include name="${tarzip-fwdref}/java/xdocs/"/>
             <include name="${tarzip-fwdref}/java/src/"/>
+            <include name="${tarzip-fwdref}/bin/"/>
           </tarfileset>
         </tar>
         <gzip src="${test.build.dir}/xalan-automation-${DSTAMP}.tar" 
@@ -844,6 +845,7 @@
             <include name="${tarzip-fwdref}/${test.build.apidocs}"/>
             <include name="${tarzip-fwdref}/java/xdocs/"/>
             <include name="${tarzip-fwdref}/java/src/"/>
+            <include name="${tarzip-fwdref}/bin/"/>
           </zipfileset>
         </zip>
           
