@@ -201,6 +201,7 @@ public class TransformerHandlerAPITest extends XSLProcessorTestBase
 
         try
         {
+            // Validate API's for an identity transformer
             factory = TransformerFactory.newInstance();
             saxFactory = (SAXTransformerFactory)factory;
 
@@ -214,23 +215,23 @@ public class TransformerHandlerAPITest extends XSLProcessorTestBase
 
             // set/getSystemId API coverage
             tHandler.setSystemId(NONSENSE_SYSTEMID);
-            reporter.checkObject(tHandler.getSystemId(), NONSENSE_SYSTEMID, "set/getSystemId API coverage");
+            reporter.checkObject(tHandler.getSystemId(), NONSENSE_SYSTEMID, "identityTransformer.set/getSystemId API coverage");
             tHandler.setSystemId(null);
-            reporter.checkObject(tHandler.getSystemId(), null, "set/getSystemId API coverage to null");
+            reporter.checkObject(tHandler.getSystemId(), null, "identityTransformer.set/getSystemId API coverage to null");
 
             // setResult API coverage
             Result unusedResult = new StreamResult(outNames.currentName()); // currentName is probably _0
             tHandler.setResult(unusedResult);
-            reporter.checkPass("Crash test: setResult appears to have worked");
+            reporter.checkPass("Crash test: identityTransformer.setResult appears to have worked");
             reporter.logStatusMsg("Note that we can't verify setResult since there's no getResult!");
             try
             {
-                tHandler.setResult(unusedResult);
-                reporter.checkFail("setResult(null) did not throw an exception");            
+                tHandler.setResult(null);
+                reporter.checkFail("identityTransformer.setResult(null) did not throw an exception");            
             }
             catch (IllegalArgumentException iae)
             {
-                reporter.checkPass("setResult(null) properly threw: " + iae.toString());
+                reporter.checkPass("identityTransformer.setResult(null) properly threw: " + iae.toString());
             }
         }
         catch (Throwable t)
@@ -239,6 +240,46 @@ public class TransformerHandlerAPITest extends XSLProcessorTestBase
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with TransformerHandler set/get API");
         }
 
+        try
+        {
+            // Validate API's for a 'real' transformer, which is different code
+            factory = TransformerFactory.newInstance();
+            saxFactory = (SAXTransformerFactory)factory;
+
+            // Basic construction of identity transformer
+            TransformerHandler tHandler = saxFactory.newTransformerHandler(new StreamSource(filenameToURL(testFileInfo.inputName)));
+            reporter.check((tHandler != null), true, "newTransformerHandler(.." + filenameToURL(testFileInfo.inputName) + ")) returns non-null");
+
+            // getTemplates API coverage - simple
+            Transformer transformer = tHandler.getTransformer();
+            reporter.check((transformer != null), true, "realTransformer.getTransformer() is non-null");
+
+            // set/getSystemId API coverage
+            tHandler.setSystemId(NONSENSE_SYSTEMID);
+            reporter.checkObject(tHandler.getSystemId(), NONSENSE_SYSTEMID, "realTransformer.set/getSystemId API coverage");
+            tHandler.setSystemId(null);
+            reporter.checkObject(tHandler.getSystemId(), null, "realTransformer.set/getSystemId API coverage to null");
+
+            // setResult API coverage
+            Result unusedResult = new StreamResult(outNames.currentName()); // currentName is probably _0
+            tHandler.setResult(unusedResult);
+            reporter.checkPass("Crash test: realTransformer.setResult appears to have worked");
+            reporter.logStatusMsg("Note that we can't verify setResult since there's no getResult!");
+            try
+            {
+                tHandler.setResult(null);
+                reporter.checkFail("realTransformer.setResult(null) did not throw an exception");            
+            }
+            catch (IllegalArgumentException iae)
+            {
+                reporter.checkPass("realTransformer.setResult(null) properly threw: " + iae.toString());
+            }
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with TransformerHandler set/get API");
+            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with TransformerHandler set/get API");
+        }
         reporter.testCaseClose();
         return true;
     }
