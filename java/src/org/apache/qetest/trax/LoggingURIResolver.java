@@ -63,8 +63,9 @@
 package org.apache.qetest.trax;
 
 import org.apache.qetest.*;
-import org.apache.trax.URIResolver;
-import org.apache.trax.TransformException;
+import javax.xml.transform.Source;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Node;
 
@@ -212,9 +213,9 @@ public class LoggingURIResolver implements URIResolver
      * @todo have a settable property to actually return as the InputSource
      * @param inputSource The value returned from the EntityResolver.
      * @return (null currently) a DOM node that represents the resolution of the URI
-     * @exception TransformException never thrown currently
+     * @exception TransformerException never thrown currently
      */
-    public Node getDOMNode(InputSource inputSource) throws TransformException
+    public Node getDOMNode(InputSource inputSource) throws TransformerException
     {
 
         URICtr++;
@@ -237,10 +238,10 @@ public class LoggingURIResolver implements URIResolver
      * @todo have a settable property to actually return as the InputSource
      * @param inputSource The value returned from the EntityResolver.
      * @return (null currently) a SAX2 parser to use with the InputSource.
-     * @exception TransformException never thrown currently
+     * @exception TransformerException never thrown currently
      */
     public XMLReader getXMLReader(InputSource inputSource)
-            throws TransformException
+            throws TransformerException
     {
 
         URICtr++;
@@ -254,5 +255,35 @@ public class LoggingURIResolver implements URIResolver
         }
 
         return null;
+    }
+
+
+    /**
+     * This will be called by the processor when it encounters
+     * an xsl:include, xsl:import, or document() function.
+     *
+     * @param href An href attribute, which may be relative or absolute.
+     * @param base The base URI in effect when the href attribute was encountered.
+     *
+     * @return A non-null Source object.
+     *
+     * @throws TransformerException
+     */
+    public Source resolve(String href, String base) 
+            throws TransformerException
+    {
+
+        URICtr++;
+
+        setLastURI("{" + base + "}" + href);
+
+        if (reporter != null)
+        {
+            reporter.logMsg(level,
+                            prefix + getLastURI() + " " + getCounterString());
+        }
+
+        return null;    // @todo do we need to return anything here?
+
     }
 }
