@@ -485,6 +485,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
         try
         {
             // Create it, optionally with a category
+            String excludes = testProps.getProperty(OPT_EXCLUDES);
             if ((null != excludes) && (excludes.length() > 1))  // Arbitrary check for non-null, non-blank string
             {
                 Class[] parameterTypes = { java.lang.String.class };
@@ -523,7 +524,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
      */
     public String usage()
     {
-        return ("Common [optional] options supported by BugzillaTestletDriver:\n"
+        return ("Additional options supported by BugzillaTestletDriver:\n"
                 + "    (Note: assumes inputDir=test/tests/bugzilla)"
                 + "    (Note: we do *not* support -embedded)"
                 + super.usage());   // Grab our parent classes usage as well

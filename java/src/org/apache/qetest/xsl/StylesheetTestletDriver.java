@@ -145,6 +145,28 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
     protected String fileFilter = null;
 
 
+    /**
+     * Parameter: What flavor of TransformWrapper to use: trax.sax|trax.stream|other?
+     * <p>Default: trax.</p>
+     */
+    public static final String OPT_FLAVOR = "flavor";
+
+    /** Parameter: What flavor of TransformWrapper to use: trax.sax|trax.stream|other?  */
+    protected String flavor = "trax";
+
+
+    /**
+     * Parameter: Are there any embedded stylesheets in XML files?
+     * <p>Default: null (no embedded tests; otherwise specify 
+     * semicolon delimited list of bare filenames something like 
+     * 'axes02.xml;bool98.xml').</p>
+     */
+    public static final String OPT_EMBEDDED = "embedded";
+
+    /** Parameter: Are there any embedded stylesheets in XML files?  */
+    protected String embedded = null;
+
+
     /** Unique runId for each specific invocation of this test driver.  */
     protected String runId = null;
 
@@ -182,6 +204,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
         fileFilter = testProps.getProperty(OPT_FILEFILTER, fileFilter);
         fileList = testProps.getProperty(OPT_FILELIST, fileList);
         flavor = testProps.getProperty(OPT_FLAVOR, flavor);
+        embedded = testProps.getProperty(OPT_EMBEDDED, embedded);
 
         // Grab a unique runid for logging out with our tests 
         //  Used in results reporting stylesheets to differentiate 
@@ -715,6 +738,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
         try
         {
             // Create it, optionally with a category
+            String category = testProps.getProperty(OPT_CATEGORY);
             if ((null != category) && (category.length() > 1))  // Arbitrary check for non-null, non-blank string
             {
                 Class[] parameterTypes = { java.lang.String.class };
@@ -751,6 +775,7 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
         try
         {
             // Create it, optionally with excludes
+            String excludes = testProps.getProperty(OPT_EXCLUDES);
             if ((null != excludes) && (excludes.length() > 1))  // Arbitrary check for non-null, non-blank string
             {
                 Class[] parameterTypes = { java.lang.String.class };
@@ -789,15 +814,19 @@ public class StylesheetTestletDriver extends XSLProcessorTestBase
      */
     public String usage()
     {
-        return ("Common [optional] options supported by StylesheetTestletDriver:\n"
+        return ("Additional options supported by StylesheetTestletDriver:\n"
                 + "    -" + OPT_FILELIST
-                + "  <name of listfile of tests to run>\n"
+                + "   <name of listfile of tests to run>\n"
                 + "    -" + OPT_DIRFILTER
                 + "  <classname of FilenameFilter for dirs>\n"
                 + "    -" + OPT_FILEFILTER
-                + "  <classname of FilenameFilter for files>\n"
+                + " <classname of FilenameFilter for files>\n"
                 + "    -" + OPT_TESTLET
-                + "  <classname of Testlet to execute tests with>\n"
+                + "    <classname of Testlet to execute tests with>\n"
+                + "    -" + OPT_EMBEDDED
+                + "   <list;of;specific file.xml embedded tests to run>\n" 
+                + "    -" + OPT_FLAVOR
+                + "     <trax.sax|trax.dom|etc> which TransformWrapper to use\n"
                 + super.usage());   // Grab our parent classes usage as well
     }
 
