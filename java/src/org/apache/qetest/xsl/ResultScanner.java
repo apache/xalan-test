@@ -348,13 +348,18 @@ public class ResultScanner
         {
             resultDir = args[0];
         }
+        String logFile = resultDir + File.separator + "ResultReport";
+        if (args.length >= 2)
+        {
+            logFile = args[1];
+        }
         //@todo add more arguments; filtering, options 
         //  to pass to stylesheets etc.
         try
         {
             ResultScanner app = new ResultScanner();
-            app.scanResults(resultDir, "ResultReport");
-            System.out.println("ResultScanner complete in: " + resultDir);
+            app.scanResults(resultDir, logFile);
+            System.out.println("ResultScanner of " + resultDir + " complete in: " + logFile + ".html");
         } 
         catch (Exception e)
         {
