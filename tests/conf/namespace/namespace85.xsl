@@ -10,7 +10,7 @@
 
 <xsl:template match = "/">
   <out>
-    <xsl:element name="foo" namespace="testguys.com" xmlns:p2="">
+    <xsl:element name="foo" namespace="testguys.com" xmlns:p2="http://dummy/namespace">
       <yyy/>
     </xsl:element>
   </out>
