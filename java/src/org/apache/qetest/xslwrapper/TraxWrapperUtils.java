@@ -170,6 +170,11 @@ public abstract class TraxWrapperUtils
                 {
                     // Attempt to use as a Properties block..
                     value = ((Properties)attrs).getProperty(key);
+                    // But, if null, then try getting as hash anyway
+                    if (null == value)
+                    {
+                        value = attrs.get(key);
+                    }
                 }
                 catch (ClassCastException cce)
                 {
