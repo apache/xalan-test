@@ -134,7 +134,7 @@ public class TemplatesAPITest extends XSLProcessorTestBase
     public static final String TRAX_PROCESSOR_XSLT = "javax.xml.transform.TransformerFactory";
 
     /** Known outputFormat property name from outputFormatTest  */
-    public static final String OUTPUT_FORMAT_NAME = "cdata-section-elements";
+    public static final String OUTPUT_FORMAT_NAME = OutputKeys.CDATA_SECTION_ELEMENTS;
 
     /** Known outputFormat property value from outputFormatTest  */
     public static final String OUTPUT_FORMAT_VALUE = "cdataHere";
@@ -304,11 +304,14 @@ public class TemplatesAPITest extends XSLProcessorTestBase
             reporter.logHashtable(reporter.STATUSMSG, outputFormat2,
                                   "getOutputProperties for " + outputFormatXSL);
 
-            String tmp = outputFormat2.getProperty(OUTPUT_FORMAT_NAME);
-            reporter.check(tmp, OUTPUT_FORMAT_VALUE, "outputProperty " + OUTPUT_FORMAT_NAME + " has known value ?" + tmp + "?");
-            // HACK: check for another value instead; should cdata-section-elements come back?
+            String tmp = outputFormat2.getProperty(OUTPUT_FORMAT_NAME); // SPR SCUU4RXSG5 - has extra space
+            if (OUTPUT_FORMAT_VALUE.equals(tmp))    // Use if so we can put out id with checkPass/checkFail lines
+                reporter.checkPass("outputProperties " + OUTPUT_FORMAT_NAME + " has known value ?" + tmp + "?", "SCUU4RXSG5");
+            else
+                reporter.checkFail("outputProperties " + OUTPUT_FORMAT_NAME + " has known value ?" + tmp + "?", "SCUU4RXSG5");
+
             tmp = outputFormat2.getProperty("omit-xml-declaration");
-            reporter.check(tmp, "yes", "outputProperty omit-xml-declaration has known value ?" + tmp + "?");
+            reporter.check(tmp, "yes", "outputProperties omit-xml-declaration has known value ?" + tmp + "?");
         }
         catch (Exception e)
         {
