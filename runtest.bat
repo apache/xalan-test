@@ -14,7 +14,7 @@
 @echo   Special: first arg= -crimson: Use crimson.jar instead of xerces.jar
 @echo Common args include (from the java file, ignore first two "ERROR" lines): 
 @REM Call with illegal arg to force Java code to print usage()
-java -classpath %CLASSPATH%;testxsl.jar;%JARDIR%\testxsl.jar org.apache.qetest.xsl.XSLProcessorTestBase -load
+java -classpath %CLASSPATH%;testxsl.jar;java\build\testxsl.jar;%JARDIR%\testxsl.jar org.apache.qetest.xsl.XSLProcessorTestBase -load
 @echo.
 goto done
 @REM ------------------------------------------------------------------------
@@ -66,7 +66,7 @@ if "%PARSER_JAR%" == "" set PARSER_JAR=xerces.jar
 @REM Note also that this assumes that js.jar is in the directory 
 @REM    above xml-xalan, for lack of a better place
 if "%JARDIR%" == "" echo NOTE! JARDIR is not set, defaulting to Xalan-J 2.x!
-if "%JARDIR%" == "" set TEST_CP=build\testxsl.jar;..\java\bin\%PARSER_JAR%;..\java\build\xalan.jar;..\java\bin\bsf.jar;..\..\js.jar;%CLASSPATH%
+if "%JARDIR%" == "" set TEST_CP=java\build\testxsl.jar;..\java\bin\%PARSER_JAR%;..\java\build\xalan.jar;..\java\bin\bsf.jar;..\..\js.jar;%CLASSPATH%
 
 @REM If JARDIR set, put those references first then default classpath
 if not "%JARDIR%" == "" set TEST_CP=%JARDIR%\testxsl.jar;%JARDIR%\%PARSER_JAR%;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%CLASSPATH%
