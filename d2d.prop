@@ -27,15 +27,14 @@ flavor=trax.d2d
 
 # Set excludes to exclude specific tests: foo.xsl;bar.xsl;goo.xsl
 # (58 exclusions for the DOM tests at this time)
+# attribvaltemplate08.xsl excluded because it outputs illegal XML with less 
+#           whitespace outside the document element (DOMs have no whitespace outside 
+#           of the root node.
 # impincl12.xsl excluded because it outputs accesses file via http inside lotus firewall.
 # attribset17.xsl excluded because it outputs HTML that can not be compared.
-# attribvaltemplate08.xsl excluded because it outputs illegal XML with less 
-#           whitespace outside the document element.
 # axes59.xsl excluded because it relies on the order of namespace nodes.
 # axes62.xsl excluded because it relies on the order of namespace nodes.
 # conflictres19.xsl excluded because it relies on the order of attribute and namespace nodes.
-# conflictres24.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
 # idkey01.xsl excluded because it produces multirooted result tree (need document fragment).
 # idkey07.xsl excluded because it uses hash values instead of node IDs for generate-id.
 # idkey09.xsl excluded because non-valid XML has different number blank lines (not a bug, I think).
@@ -46,8 +45,6 @@ flavor=trax.d2d
 # lre08.xsl excluded because it produces multirooted result tree (need document fragment).
 # lre13.xsl excluded because it tries to write text node directly to root (need document fragment).
 # lre15.xsl excluded because it produces multirooted result tree (need document fragment).
-# match01.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
 # message01.xsl excluded because non-valid XML (has no root).
 # message02.xsl excluded because it tries to write text node directly to root (need document fragment).
 # node17.xsl excluded because it relies on the order of namespace nodes.
@@ -60,8 +57,6 @@ flavor=trax.d2d
 # output52.xsl excluded because it outputs HTML that can not be compared.
 # output74.xsl excluded because it outputs HTML that can not be compared.
 # output76.xsl excluded because it tries to write text node directly to root (need document fragment).
-# position70.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
 # predicate37 excluded because it tries to write text node directly to root (need document fragment).
 # predicate38 excluded because it tries to write text node directly to root (need document fragment).
 # select07.xsl excluded because it tries to write text node directly to root (need document fragment).
@@ -74,44 +69,25 @@ flavor=trax.d2d
 # sort31.xsl excluded because it tries to write text node directly to root (need document fragment).
 # sort35.xsl excluded because it tries to write text node directly to root (need document fragment).
 # sort37.xsl excluded because it tries to write text node directly to root (need document fragment).
-# whitespace01.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
-# whitespace02.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
-# whitespace03.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
-# whitespace04.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
-# whitespace05.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
-# whitespace06.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
-# whitespace07.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
 # whitespace11.xsl excluded because it tries to write text node directly to root (need document fragment).
-# whitespace12.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
-# whitespace22.xsl (bug) excluded because it uses xsl:strip-spaces, which is not supported 
-#           in DOM transforms at this time.
+#
 # lre07.xsl (bug [probably relativly harmless]) extra (repeated) namespace node.
 # lre10.xsl (bug [probably relativly harmless]) extra namespace node on ped:out2.
 # namespace02.xsl (bug [probably relativly harmless]) extra (repeated) namespace node.
 # namespace20.xsl (bug [probably relativly harmless]) extra (repeated) namespace node.
 # namespace24.xsl (bug [probably relativly harmless]) extra (repeated) namespace node.
-excludes=impincl12.xsl;attribset17.xsl;attribvaltemplate08.xsl;axes59.xsl;axes62.xsl;\
-conflictres19.xsl;conflictres24.xsl;idkey01.xsl;idkey07.xsl;\
-idkey09.xsl;idkey30.xsl;idkey31.xsl;lre04.xsl;lre05.xsl;lre08.xsl;\
-lre13.xsl;lre15.xsl;match01.xsl\
+excludes=attribvaltemplate08.xsl;impincl12.xsl;attribset17.xsl;axes59.xsl;axes62.xsl\
+;conflictres19.xsl;idkey01.xsl;idkey07.xsl\
+;idkey09.xsl;idkey30.xsl;idkey31.xsl;lre04.xsl;lre05.xsl;lre08.xsl\
+;lre13.xsl;lre15.xsl\
 ;message01.xsl;message02.xsl;\
-;node17.xsl;numbering25.xsl;output26.xsl;output33.xsl;output42.xsl;\
-output43.xsl\
-;output46.xsl;output52.xsl;output74.xsl;output76.xsl;position70.xsl;predicate37.xsl;\
-predicate38.xsl\
+;node17.xsl;numbering25.xsl;output26.xsl;output33.xsl;output42.xsl\
+;output43.xsl\
+;output46.xsl;output52.xsl;output74.xsl;output76.xsl;position70.xsl;predicate37.xsl\
+;predicate38.xsl\
+;whitespace11.xsl\
 ;select07.xsl;select69.xsl\
 ;sort22.xsl;sort23.xsl;sort24.xsl;sort25.xsl;sort30.xsl;sort31.xsl;sort35.xsl;sort37.xsl\
-;whitespace01.xsl;whitespace02.xsl;whitespace03.xsl;whitespace04.xsl;whitespace05.xsl;\
-whitespace06.xsl;whitespace07.xsl\
-;whitespace11.xsl;whitespace12.xsl;whitespace22.xsl\
 ;namespace02.xsl;namespace20.xsl;namespace24.xsl;lre07.xsl;lre10.xsl
 
 # Run a specific list of files in the named file (see XLDirectoryIterator.java)
