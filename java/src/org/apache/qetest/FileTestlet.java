@@ -161,12 +161,12 @@ public class FileTestlet extends TestletImpl
             try
             {
                 boolean btmp = (new File(output)).delete();
-                logger.logMsg(Logger.TRACEMSG, "Deleting OutFile of::" + output
+                logger.logMsg(logger.TRACEMSG, "initDatalet delete: " + output
                                      + " status: " + btmp);
             }
             catch (SecurityException se)
             {
-                logger.logMsg(Logger.WARNINGMSG, "Deleting OutFile of::" + output
+                logger.logMsg(logger.WARNINGMSG, "initDatalet delete: " + output
                                        + " threw: " + se.toString());
             }
         }
@@ -216,7 +216,7 @@ public class FileTestlet extends TestletImpl
         if (null == fileChecker)
         {
             String clazzName = datalet.getOptions().getProperty("fileChecker");
-            if (!(null == clazzName))
+            if (null != clazzName)
             {
                 // ...find and create a class of the default classname given
                 Class fClazz = QetestUtils.testClassForName(clazzName, QetestUtils.defaultPackages, null);
@@ -228,7 +228,10 @@ public class FileTestlet extends TestletImpl
                 fileChecker = QetestFactory.newCheckService(logger, QetestFactory.TYPE_FILES);
             }
             // Apply any testing options to the fileChecker
-            fileChecker.applyAttributes(datalet.getOptions());    
+            fileChecker.applyAttributes(datalet.getOptions());
+            // Note assumption that if we got the fileCheckerImpl 
+            //  directly from the datalet that we do not need to 
+            //  set the Attributes here again
         }
 
         int result = fileChecker.check(logger,
