@@ -107,7 +107,8 @@ import java.io.Reader;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
+// import java.io.FileReader; @DEM - changes for better encoding support
+import java.io.InputStreamReader;  //@DEM
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -443,8 +444,9 @@ public class ExamplesTest extends FileBasedTest
         TransformerFactory tfactory = TransformerFactory.newInstance();
 
         // Note that in this case the XML encoding can not be processed!
-        reporter.logTraceMsg("new BufferedReader(new FileReader(" + xslID);
-        Reader xslReader = new BufferedReader(new FileReader(xslID));
+        reporter.logTraceMsg("new BufferedReader(new InputStreamReader(new FileInputStream(" + xslID);
+        Reader xslReader = new BufferedReader(new InputStreamReader(new FileInputStream(xslID), "UTF-8")); //@DEM
+//        Reader xslReader = new BufferedReader(new FileReader(xslID));  @DEM
         StreamSource xslSource = new StreamSource(xslReader);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
         xslSource.setSystemId(QetestUtils.filenameToURL(xslID));
@@ -454,7 +456,8 @@ public class ExamplesTest extends FileBasedTest
     
         // Note that in this case the XML encoding can not be processed!
         reporter.logTraceMsg("new BufferedReader(new FileReader(" + sourceID);
-        Reader xmlReader = new BufferedReader(new FileReader(sourceID));
+        Reader xmlReader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceID), "UTF-8")); //@DEM
+//        Reader xmlReader = new BufferedReader(new FileReader(sourceID));  @DEM
         StreamSource xmlSource = new StreamSource(xmlReader);
         // Note that if we don't do this, relative URLs can not be resolved correctly!
         xmlSource.setSystemId(QetestUtils.filenameToURL(sourceID));

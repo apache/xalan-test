@@ -88,7 +88,8 @@ import org.w3c.dom.Node;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
+// import java.io.FileReader;      //@DEM - changes for better encoding support
+import java.io.InputStreamReader;  //@DEM
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -422,7 +423,8 @@ public class SystemIdImpInclTest extends FileBasedTest
 //  Answer: write a custom test case that parses the stylesheet
 //  and builds it, but doesn't get imports/includes until later 
 //  when we have setSystemId
-            xslInpSrc = new InputSource(testFileInfo.inputName);
+            xslInpSrc = new InputSource(new InputStreamReader(new FileInputStream(testFileInfo.inputName), "UTF-8")); //@DEM
+//            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));  @DEM
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -433,7 +435,11 @@ public class SystemIdImpInclTest extends FileBasedTest
                                     "SAXSource(inpSrc(str)).systemId(level0: one up)");
 ********************************/
             // level1: same systemId as actual file
-            xslInpSrc = new InputSource(testFileInfo.inputName);
+			// @DEM changes are to allow test to run on various 
+			//	platforms regardeless of encodings; force it to 
+			//	be UTF-8 since that's what's checked in
+            xslInpSrc = new InputSource(new InputStreamReader(new FileInputStream(testFileInfo.inputName), "UTF-8")); //@DEM
+//            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));  @DEM
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -452,7 +458,8 @@ public class SystemIdImpInclTest extends FileBasedTest
 //  Answer: write a custom test case that parses the stylesheet
 //  and builds it, but doesn't get imports/includes until later 
 //  when we have setSystemId
-            xslInpSrc = new InputSource(testFileInfo.inputName);
+            xslInpSrc = new InputSource(new InputStreamReader(new FileInputStream(testFileInfo.inputName), "UTF-8")); //@DEM
+//            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));  @DEM
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -509,7 +516,8 @@ public class SystemIdImpInclTest extends FileBasedTest
             // Verify basic transforms with with various systemId
             //  and a SAXSource(InputSource(Reader))
             // level0: one level up
-            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslInpSrc = new InputSource(new InputStreamReader(new FileInputStream(testFileInfo.inputName), "UTF-8")); //@DEM
+//            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));  @DEM
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -520,7 +528,8 @@ public class SystemIdImpInclTest extends FileBasedTest
                                     "SAXSource(inpSrc(charS)).systemId(level0: one up)");
 
             // level1: same systemId as actual file
-            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslInpSrc = new InputSource(new InputStreamReader(new FileInputStream(testFileInfo.inputName), "UTF-8")); //@DEM
+//            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));  @DEM
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -531,7 +540,8 @@ public class SystemIdImpInclTest extends FileBasedTest
                                     "SAXSource(inpSrc(charS)).systemId(level1: same level)");
 
             // level2: one level down
-            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslInpSrc = new InputSource(new InputStreamReader(new FileInputStream(testFileInfo.inputName), "UTF-8")); //@DEM
+//            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));  @DEM
             xslSource = new SAXSource(xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
@@ -549,7 +559,8 @@ public class SystemIdImpInclTest extends FileBasedTest
             SAXParser saxParser = spfactory.newSAXParser();
     	    XMLReader reader = saxParser.getXMLReader();
             // level0: one level up, with a character stream
-            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));
+            xslInpSrc = new InputSource(new InputStreamReader(new FileInputStream(testFileInfo.inputName), "UTF-8")); //@DEM
+//            xslInpSrc = new InputSource(new FileReader(testFileInfo.inputName));  @DEM
             xslSource = new SAXSource(reader, xslInpSrc);
 
             xmlSource = new StreamSource(new FileInputStream(testFileInfo.xmlName));
