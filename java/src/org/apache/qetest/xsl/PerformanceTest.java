@@ -124,10 +124,11 @@ public class PerformanceTest extends XSLDirectoryIterator
 
     /**
      * Initialize this test - setup description and createNewProcessor.  
+     * Also explicitly initializes parameters related to PerformanceTest, 
+     * like preload and iterations.
      *
-     * NEEDSDOC @param p
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @param p Props (unused currently)
+     * @return False if we should abort
      */
     public boolean doTestFileInit(Properties p)
     {
@@ -339,6 +340,53 @@ public class PerformanceTest extends XSLDirectoryIterator
 
         return PROCESS_OK;
     }
+
+
+    /**
+     * Set our instance variables from a Properties file.
+     * Calls super.initializeFromProperties() to get defaults.
+     * This is needed to explicitly initialize properties 
+     * that are custom to this file, like iterations and 
+     * preload.
+     * //@todo Note that this needs some redesign, since it 
+     * means we have to duplicate too much initialization code 
+     * in different places.
+     *
+     * @param props Properties block to set name=value pairs from
+     * @return status - true if OK, false if error.
+     */
+    public boolean initializeFromProperties(Properties props)
+    {
+        // Be sure to get our parents to initialize everything first!
+        boolean b = super.initializeFromProperties(props);
+
+        // Read in our additional options from properties block (XLTest should have set this)
+        String tmp;
+        tmp = props.getProperty(OPT_PRELOAD, null);
+
+        if ((tmp != null) && tmp.equalsIgnoreCase("true"))
+        {
+            testProps.put(OPT_PRELOAD, "true");
+            preload = true;
+        }
+
+        tmp = null;
+        tmp = props.getProperty(OPT_ITERATIONS, null);
+
+        try
+        {
+            iterations = Integer.parseInt(tmp);
+            testProps.put(OPT_ITERATIONS, tmp);
+        }
+        catch (NumberFormatException numEx)
+        {
+
+            // no-op; leave as default
+        }
+
+        return b;
+    }
+
 
     /**
      * Cheap-o memory logger - just reports Runtime.totalMemory/freeMemory.  
