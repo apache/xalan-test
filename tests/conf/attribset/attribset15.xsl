@@ -6,6 +6,7 @@
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 7.1.3 Creating Attributes -->
+  <!-- Discretionary: name="attribute-name-not-QName" choice="ignore" -->
   <!-- Creator: Paul Dick -->
   <!-- Purpose: The name attribute is interpreted as an attribute value template.
        It is an error if the value of the AVT is not a QNAME or the string "xmlns".
@@ -18,6 +19,6 @@
   	<xsl:attribute name="{doc/Third/@at}">Third</xsl:attribute>
   	<xsl:attribute name="xmlns">xmlns</xsl:attribute>
   </out>
-</xsl:template>													
+</xsl:template>
 
 </xsl:stylesheet>
