@@ -63,6 +63,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.transform.Transformer;
 import org.apache.xalan.trace.GenerateEvent;
 import org.apache.xalan.trace.SelectionEvent;
 import org.apache.xalan.trace.TracerEvent;
@@ -71,10 +72,15 @@ import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.templates.ElemTextLiteral;
 import org.apache.xalan.templates.ElemLiteralResult;
 import org.apache.xalan.templates.Constants;
+import org.apache.xalan.transformer.TransformerImpl;
 import org.apache.xml.utils.QName;
 import org.apache.xpath.XPath;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Properties;
 import java.lang.reflect.Method;
+
 /**
  * Static utility for dumping info about common Xalan objects.
  * Cheap-o string representations of some common properties 
@@ -242,6 +248,58 @@ public abstract class XalanDumper
             return buf.toString();
         else
             return buf.toString() + RBRACKET;
+    }
+
+
+    /**
+     * Return String describing a Transformer.
+     * Currently just returns info about a get selected public 
+     * getter methods from a Transformer.
+     * Only really useful when it can do instanceof TransformerImpl 
+     * to return custom info about Xalan
+     *
+     * @param t the Transformer to print info of
+     * @param dumpLevel what format/how much to dump
+     */
+    public static String dump(Transformer trans, int dumpLevel)
+    {
+        if (null == trans)
+            return "Transformer" + LBRACKET + NULL + RBRACKET;
+
+        StringBuffer buf = new StringBuffer();
+
+        StringWriter sw = new StringWriter();
+        Properties p = trans.getOutputProperties();
+        if (null != p)
+        {
+            p.list(new PrintWriter(sw));
+            buf.append("getOutputProperties{" + sw.toString() + "}");
+        }
+
+        if (trans instanceof TransformerImpl)
+        {
+            final TransformerImpl timpl = (TransformerImpl)trans;
+            // We have a Xalan-J 2.x basic transformer
+            buf.append("getBaseURLOfSource=" + timpl.getBaseURLOfSource() + SEP);
+            // Result getOutputTarget()
+            // ContentHandler getInputContentHandler(boolean doDocFrag)
+            // DeclHandler getInputDeclHandler()
+            // LexicalHandler getInputLexicalHandler()
+            // OutputProperties getOutputFormat()
+            // Serializer getSerializer()
+            // ElemTemplateElement getCurrentElement()
+            // int getCurrentNode()
+            // ElemTemplate getCurrentTemplate()
+            // ElemTemplate getMatchedTemplate()
+            // int getMatchedNode()
+            // DTMIterator getContextNodeList()
+            // StylesheetRoot getStylesheet()
+            // int getRecursionLimit()
+            buf.append("getMode=" + timpl.getMode() + SEP);
+        }
+
+        return "Transformer" + LBRACKET 
+            + buf.toString() + RBRACKET;
     }
 
 
