@@ -67,6 +67,7 @@ import org.apache.qetest.xsl.*;
 
 // Import all relevant TRAX packages
 import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;  // Don't know why this needs explicit importing?!?!
 import javax.xml.transform.stream.*;    // We assume Features.STREAM for some tests
 
 // javax JAXP classes for parser pluggability
@@ -371,25 +372,7 @@ public class TransformerAPITest extends XSLProcessorTestBase
             setParams.put(PARAM1S, "another value1s");
             setParams.put(PARAM2S, "yet another value2s");
 
-            // Verify setting Properties full of params works
-            transformer.setParameters(setParams);
-            tmp = transformer.getParameter(PARAM2S);
-            reporter.checkString((String)tmp, "yet another value2s", PARAM2S + " is now set to ?" + tmp + "?");
-
-            // Verify we overwrite earlier setting of individual param
-            tmp = transformer.getParameter(PARAM1S);
-            reporter.checkString((String)tmp, "another value1s", PARAM1S + " is now set to ?" + tmp + "?");
-
-            // Verify we cleared earlier set params 
-            tmp = transformer.getParameter(PARAM3S);
-            if (tmp == null)
-            {   // @todo should use checkObject instead of this if... construct
-                reporter.checkPass(PARAM3S + " is null after setting params");
-            }
-            else
-            {
-                reporter.checkFail(PARAM3S + " is ?" + tmp + "? after setting params");
-            }
+            // Verify setting Properties full of params works - feature removed from product 13-Nov-00
         } 
         catch (Exception e)
         {
