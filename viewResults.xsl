@@ -16,6 +16,11 @@
 <!-- When set to true, skips (does not) output any checkresult[@result='PASS'] -->
 <xsl:param name="failsonly">false</xsl:param>
 
+<!-- File listing known bugs, so that when we get a result
+     checkresult[@result='$FAIL'] who has an @id that also 
+     matches a known bug, we can print 'SPR' instead of 'Fail' -->
+<xsl:param name="bugfile">../java/bugs.xml</xsl:param>
+
 <!-- Skip any message[@level&lt;=loggingLevel] -->
 <xsl:param name="loggingLevel">50</xsl:param>
 
@@ -23,8 +28,8 @@
 <xsl:param name="summary">false</xsl:param>
 
 <!-- Cheap color background for errors, fails, and messages likely related thereto -->
-<xsl:param name="errfailcolor">pink</xsl:param>
-
+<xsl:param name="errfailcolor">red</xsl:param>
+<xsl:param name="knownfailcolor">pink</xsl:param>
 
 <!-- ================================== -->
 <!-- Main template-standalone: output an HTML page -->
@@ -89,7 +94,7 @@
       <FONT size="-1">
         <xsl:element name="a">
           <xsl:attribute name="href"><xsl:value-of select="$file-results-marker"/><xsl:value-of select="$testfilename"/></xsl:attribute>
-          <xsl:text>Overall results</xsl:text>
+          <xsl:text>Overall testfile results</xsl:text>
         </xsl:element>
       </FONT>
 
@@ -120,7 +125,22 @@
      normally only used within testcase elements -->
 <xsl:template match="checkresult[@result=$FAIL] | checkresult[@result=$ERRR]">
   <TR>
-    <TD bgcolor="{$errfailcolor}"><B><xsl:value-of select="@result"/></B></TD>
+    <xsl:choose>
+    <!-- This needs to be updated to read some bugs.xml file, and 
+         then print this for checkresults where the id is found in 
+         bugs.xml somewhere
+         /Sprs/Spr/Name
+          -->
+      <xsl:when test="@id = document($bugfile)/Sprs/Spr/Name">
+        <TD bgcolor="{$knownfailcolor}"><B><xsl:text>Bug #</xsl:text><xsl:value-of select="@id"/></B></TD>
+      </xsl:when>
+      <xsl:when test="@id = 'known-bug'">
+        <TD bgcolor="{$knownfailcolor}"><B><xsl:text>Reported bug</xsl:text></B></TD>
+      </xsl:when>
+      <xsl:otherwise>
+        <TD bgcolor="{$errfailcolor}"><B><xsl:value-of select="@result"/></B></TD>
+      </xsl:otherwise>
+    </xsl:choose>
     <TD>
       <xsl:if test="@id">
         <xsl:text>[</xsl:text><xsl:value-of select="@id"/><xsl:text>] </xsl:text>
