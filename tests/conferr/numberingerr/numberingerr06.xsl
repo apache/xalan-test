@@ -6,6 +6,8 @@
   <!-- Purpose: Test of attempt to express negative numbers in Roman numerals. -->
   <!-- SpecCitation: Rec="XSLT" Version="1.0" type="OASISptr1" place="id(convert)/ulist[1]/item[5]/p[1]/text()[1]" -->
   <!-- Scenario: operation="message" StandardError="I and i can only format positive numbers" -->
+  <!-- Discretionary: number-not-positive="raise-error" -->
+  <!-- Gray-area: number-NaN-handling="raise-error" -->
 
 <xsl:template match="doc">
   <out>

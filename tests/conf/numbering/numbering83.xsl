@@ -8,6 +8,7 @@
   <!-- SpecCitation: Rec="XSLT" Version="1.0" type="OASISptr1" place="id(number)/ulist[1]/item[2]/p[1]/text()[1]" -->
   <!-- SpecCitation: Rec="XSLT" Version="1.0" type="OASISptr1" place="id(convert)/ulist[1]/item[1]/p[1]/text()[1]" -->
   <!-- Scenario: operation="standard-XML" -->
+  <!-- Gray-area: number-any-no-nodes="return-empty" -->
 
 <xsl:template match="doc">
   <out><xsl:apply-templates/></out>

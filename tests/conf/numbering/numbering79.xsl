@@ -11,6 +11,8 @@
   <!-- SpecCitation: Rec="XSLT" Version="1.0" type="OASISptr1" place="id(convert)/ulist[1]/item[1]/p[1]/text()[1]" -->
   <!-- Scenario: operation="standard-XML" -->
   <!-- Should come out as zero every time. -->
+  <!-- Discretionary: number-not-positive="pass-through" -->
+  <!-- Gray-area: number-NaN-handling="pass-through" -->
 
 <xsl:template match="doc">
   <out>
