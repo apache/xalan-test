@@ -129,6 +129,9 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
      */
     protected String citiesSerializedFileName = null;
 
+    /** Gold file used for tests we haven't validated the correct results of yet.  */
+    protected String NOT_DEFINED;
+
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_SAX_SUBDIR = "trax" + File.separator + "sax";
 
@@ -177,6 +180,7 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
                                 + File.separator + "citiesinclude.xsl"; // Test 004, etc.
 
         citiesSerializedFileName = goldBasePath + "citiesSerialized.out";    // Tests 010 - 013
+        NOT_DEFINED = goldBasePath + "need-validated-output-file-here.out";
 
         try
         {
@@ -216,7 +220,10 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
         SAXTFactoryTest004(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
         SAXTFactoryTest005(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
         SAXTFactoryTest006(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
-        SAXTFactoryTest007(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
+        // Validate the output by comparing against gold
+        // 18-Dec-00 Note: need to check what we should be 
+        //  validating first - this test case seems incomplete
+        // SAXTFactoryTest007(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
         SAXTFactoryTest008(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
         SAXTFactoryTest009(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
         SAXTFactoryTest010(citiesFileInfo.xmlName, citiesFileInfo.inputName, citiesFileInfo.goldName);
@@ -599,9 +606,11 @@ public class SAXTransformerFactoryAPITest extends XSLProcessorTestBase
             transformer.transform(xmlDomSource, result);
 
             // Validate the output by comparing against gold
+            // 18-Dec-00 Note: need to check what we should be 
+            //  validating first - this test case seems incomplete
             returnValue = fileChecker.check(reporter, 
                                             new File(outNames.currentName()), 
-                                            new File(goldName), 
+                                            new File(NOT_DEFINED), 
                                             "SAXTFactoryTest007: into " + outNames.currentName());
             // If validation failed or had a problem, also log out
             //  the reason for the fail or error
