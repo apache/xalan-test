@@ -10,7 +10,8 @@
   <!-- ExpectedException: Name cannot start with a colon -->
   <!-- ExpectedException: A prefix of length 0 was detected -->
   <!-- ExpectedException: Template name is not a valid QName -->
-
+  <!-- ExpectedException: Illegal value: :tmplt1 used for QNAME attribute: name -->
+  
 <xsl:template match="doc">
   <out>
     <xsl:call-template name=":tmplt1">
