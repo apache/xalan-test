@@ -508,11 +508,11 @@ public class XSLTestHarness
         // Report the 'rolled-up' results of the test, combining each of the above data
         switch (testResult)
         {
-            case reporter.INCP_RESULT:
+            case Logger.INCP_RESULT:
                 // There is no 'checkIncomplete' method, so simply avoid calling check at all
                 reporter.logErrorMsg(testName + ".runTest() returned INCP_RESULT!");
                 break;
-            case reporter.PASS_RESULT:
+            case Logger.PASS_RESULT:
                 // Only report a pass if it returned true and didn't abort
                 if (testStat && (!testAborted))
                 {
@@ -524,13 +524,13 @@ public class XSLTestHarness
                     reporter.checkErr(testName + ".runTest()");
                 }
                 break;
-            case reporter.AMBG_RESULT:
+            case Logger.AMBG_RESULT:
                 reporter.checkAmbiguous(testName + ".runTest()");
                 break;
-            case reporter.FAIL_RESULT:
+            case Logger.FAIL_RESULT:
                 reporter.checkFail(testName + ".runTest()");
                 break;
-            case reporter.ERRR_RESULT:
+            case Logger.ERRR_RESULT:
                 reporter.checkErr(testName + ".runTest()");
                 break;
             default:
