@@ -193,11 +193,10 @@ public abstract class ExecTestlet extends FileTestlet
 
             // Also log out a perf element by default
             Hashtable attrs = new Hashtable();
-            attrs.put("idref", datalet.getInput());
             attrs.put("program", getProgram());
             attrs.put("isExternal", "false");
             attrs.put("timeExec", new Long(timeExec));
-            logger.logElement(Logger.STATUSMSG, "perf", attrs, "Performance/timing info");
+            logPerf(datalet, attrs);
             attrs = null;
         }
         catch (Throwable t)
@@ -335,17 +334,18 @@ public abstract class ExecTestlet extends FileTestlet
 
         // Also log out a perf element by default
         attrs = new Hashtable();
-        attrs.put("idref", datalet.getInput());
         attrs.put("program", cmdline[0]);
-        attrs.put("isExternal", new Boolean(isExternal()));
+        attrs.put("isExternal", "true");
         attrs.put("timeExec", new Long(timeExec));
-        logger.logElement(Logger.STATUSMSG, "perf", attrs, "Performance/timing info");
+        logPerf(datalet, attrs);
         attrs = null;
 
         // Also call worker method to allow subclasses to 
         //  override checking of the output streams, as available
         checkStreams(datalet, cmdline, outBuf, errBuf, processReturnVal);
     }
+
+
     /** 
      * Worker method to validate the System.out/.err streams.  
      * 
@@ -364,5 +364,41 @@ public abstract class ExecTestlet extends FileTestlet
         // Default impl is no-op
         return;
     }
+
+
+    /** 
+     * Worker method to write performance data in standard format.  
+     *
+     * Writes out a perf elem with standardized idref, testlet, 
+     * input/output, and fileSize params.
+     *
+     * @param datalet to use for idref, etc.  
+     * @param hash of extra attributes to log.  
+     */
+    protected void logPerf(FileDatalet datalet, Hashtable hash)
+    {
+        if (null == hash)
+            hash = new Hashtable();
+
+        File f = new File(datalet.getInput());
+            
+        hash.put("idref", f.getName());
+        hash.put("input", datalet.getInput());
+        hash.put("output", datalet.getOutput());
+        hash.put("testlet", thisClassName);
+        try
+        {
+            // Attempt to store size of input file, since overall 
+            //  amount of data affects performance
+            hash.put("fileSize", new Long(f.length()));
+        } 
+        catch (Exception e)
+        {
+            hash.put("fileSize", "threw: " + e.toString());
+        }
+
+        logger.logElement(Logger.STATUSMSG, "perf", hash, getCheckDescription(datalet));
+    }
+
 }  // end of class ExecTestlet
 
