@@ -259,7 +259,7 @@ public class XPathASTTestlet extends FileTestlet
             for (Enumeration enum = matchpats.elements();
                     enum.hasMoreElements(); /* no increment portion */ )
             {
-                logXPath((String)enum.nextElement());
+                logXPath((String)enum.nextElement(), datalet.getDescription());
             }
         }
         if (null != selectpats)
@@ -267,7 +267,7 @@ public class XPathASTTestlet extends FileTestlet
             for (Enumeration enum = selectpats.elements();
                     enum.hasMoreElements(); /* no increment portion */ )
             {
-                logXPath((String)enum.nextElement());
+                logXPath((String)enum.nextElement(), datalet.getDescription());
             }
         }
     }
@@ -279,10 +279,11 @@ public class XPathASTTestlet extends FileTestlet
      * <p>NEEDSWORK: Overrideen to put out a default pass record.</p>
      *
      * @param String to construct XPath from
+     * @param String used as comment for where this test came from
      */
-    protected void logXPath(String xpStr)
+    protected void logXPath(String xpStr, String desc)
     {
-        String comment = "XPATH::" + xpStr + "::";
+        String comment = desc + " XPATH{" + xpStr + "}";
         try
         {
             // Construct AST, ensure non-null, and dump
