@@ -1566,13 +1566,19 @@ public class Reporter implements Logger
      */
     public void writeResultsStatus(boolean writeFile)
     {
+        final String DEFAULT_SUMMARY_NAME = "ResultsSummary.xml";
         Hashtable resultsHash = createResultsStatusHash();
         resultsHash.put("desc", testComment);
         resultsHash.put("testName", testName);
         //@todo the actual path in the property below may not necessarily 
         //  either exist or be the correct location vis-a-vis the file
         //  that we're writing out - but it should be close
-        resultsHash.put(OPT_LOGFILE, reporterProps.getProperty(OPT_LOGFILE));
+        resultsHash.put(OPT_LOGFILE, reporterProps.getProperty(OPT_LOGFILE, DEFAULT_SUMMARY_NAME));
+        try
+        {
+            resultsHash.put("baseref", System.getProperty("user.dir"));
+        } 
+        catch (Exception e) { /* no-op, ignore */ }
 
         String elementName = "teststatus";
         String overallResult = resultToString(getCurrentFileResult());
@@ -1595,11 +1601,11 @@ public class Reporter implements Logger
         {
             // CanonicalPath gives a better path, especially if 
             //  you mix your path separators up
-            logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, "ResultsSummary.xml"))).getCanonicalPath();
+            logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, DEFAULT_SUMMARY_NAME))).getCanonicalPath();
         } 
         catch (IOException ioe)
         {
-            logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, "ResultsSummary.xml"))).getAbsolutePath();
+            logFileBase = (new File(reporterProps.getProperty(OPT_LOGFILE, DEFAULT_SUMMARY_NAME))).getAbsolutePath();
         }
         logFileBase = (new File(logFileBase)).getParent();
         final File[] summaryFiles = 
