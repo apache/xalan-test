@@ -1,95 +1,232 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-				xmlns:test="http://www.cnn.com"
-				xmlns:default="http://www.hello.com"
-                xmlns:xalan="http://xml.apache.org/xalan"
-                exclude-result-prefixes="test default xalan">
-                
+                xmlns:cextend="http://xml.apache.org/xalan"
+		        xmlns:test="http://www.extension03.test"
+				xmlns:BTM="www.btm.com"
+                exclude-result-prefixes="cextend test BTM">
 
-  <!-- FileName: extend21 -->
+  <!-- FileName: extension03 -->
   <!-- Document: http://www.w3.org/TR/xslt -->
   <!-- DocVersion: 19991116 -->
   <!-- Section: 14 Extensions -->
-  <!-- Purpose: Testing Lotus-specific extension "xalan:nodeset". -->
+  <!-- Purpose: Testing Lotus-specific extension "Nodeset". More extensive RTF testing -->
  
 <xsl:strip-space elements="*"/>
 <xsl:output indent="yes"/>
              
+<xsl:variable name="rtf">
+	<docelem/>
+	<docelem>
+		<elem1>
+			<elem2>
+				<elem3 attr1="A" attr2="B" attr3="C">Elem3.1</elem3>
+				<test:elem3 attr1="Z" attr2="Y" attr3="X">NS-Elem3.2</test:elem3>
+				<elem3 attr1="D" attr2="E" attr3="F">Elem3.3</elem3>
+				<test:elem3 attr1="W" attr2="V" attr3="U">NS-Elem3.4</test:elem3>
+			</elem2>
+		</elem1>
+		<elem1>
+			<elem2>1</elem2>
+			<elem2>2</elem2>
+			<elem2>3</elem2>
+			<elem2>4</elem2>
+			<BTM:BreakingTheMold/>
+		</elem1>
+		<elem1>
+			<elem2>
+				<elem4 attr1="G" attr2="H" attr3="I">Elem4.1</elem4>
+				<test:elem4 attr1="T" attr2="S" attr3="R">NS-Elem4.2</test:elem4>
+				<elem4 attr1="J" attr2="K" attr3="L">Elem4.3</elem4>
+				<test:elem4 attr1="Q" attr2="P" attr3="O">NS-Elem4.4</test:elem4>
+			</elem2>
+		</elem1>
+	</docelem>
+	<docelem/>
+ </xsl:variable>
+
 <xsl:template match="/">
    <out>
-	  <xsl:variable name="rtf">
-		<docelem xmlns="http://www.hello.com" xmlns:test="http://www.cnn.com">
-			<elem1>
-				<elem1a>ELEMENT1A</elem1a>
-				<elem1b>,ELEMENT1B</elem1b>
-			</elem1>
-			<elem2>
-				<elem2a>ELEMENT2A</elem2a>
-				<elem2b/>
-			</elem2>
-			<elem3>1</elem3>
-			<elem3>2</elem3>
-			<test:elem3>3</test:elem3>
-			<elem3>4</elem3>
-			<elem3>5</elem3>
-			<elem4>Yahoo</elem4>
-		</docelem>
-	  </xsl:variable>
 
-	  <xsl:value-of select="xalan:nodeset($rtf)/default:docelem/default:elem1"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="CountDOCELEM">
+		<xsl:value-of select="count(cextend:nodeset($rtf)/docelem)"/>
+	  </xsl:element>
 
-	  <xsl:for-each select="xalan:nodeset($rtf)/default:docelem/*">
-		  <xsl:value-of select="name(.)"/><xsl:text>,</xsl:text>
-	  </xsl:for-each><xsl:text>&#10;</xsl:text>
-	   
-	  <xsl:for-each select="xalan:nodeset($rtf)/default:docelem/default:elem2/*">
-		  <xsl:value-of select="name(.)"/><xsl:text>,</xsl:text>
-	  </xsl:for-each><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="CountELEM2andELEM3">
+		<xsl:value-of select="count(cextend:nodeset($rtf)/docelem//elem2 |
+									cextend:nodeset($rtf)/docelem//elem3 |
+									cextend:nodeset($rtf)/docelem//test:elem3)"/>
+	  </xsl:element>
+	  <xsl:element name="SumELEM2">
+		<xsl:value-of select="sum(cextend:nodeset($rtf)/docelem/elem1[2]/elem2)"/>
+	  </xsl:element>
 
-	  <xsl:text>Apply-templates match=elem4: </xsl:text>
-	  <xsl:apply-templates select="xalan:nodeset($rtf)/default:docelem/default:elem4"/>
+	  <xsl:element name="NumberELEM2">
+		<xsl:value-of select="number(cextend:nodeset($rtf)/docelem/elem1[2])"/>
+	  </xsl:element>
 
-	  <xsl:text>Sum: </xsl:text> 	  
-	  <xsl:value-of select="sum(xalan:nodeset($rtf)/default:docelem/default:elem3)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="NameBTM">
+		<xsl:value-of select="name(cextend:nodeset($rtf)/docelem/elem1[2]/*[5])"/>
+	  </xsl:element>
 
-	  <xsl:text>Count: </xsl:text> 	  
-	  <xsl:value-of select="count(xalan:nodeset($rtf)/default:docelem/default:elem3)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="LocalNameBTM">
+		<xsl:value-of select="local-name(cextend:nodeset($rtf)/docelem/elem1[2]/*[5])"/>
+	  </xsl:element>
 
-	  <xsl:text>Number: </xsl:text> 	  
-	  <xsl:value-of select="number(xalan:nodeset($rtf)/default:docelem/default:elem3[2])"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="Namespace-URIs">
+	  	<xsl:attribute name="uri1">
+	  		<xsl:value-of select="namespace-uri(cextend:nodeset($rtf)/docelem/elem1/elem2/test:elem3)"/>
+	  	</xsl:attribute>
+	  	<xsl:attribute name="uri2">
+	  		<xsl:value-of select="namespace-uri(cextend:nodeset($rtf)/docelem/elem1[2]/*[5])"/>
+	  	</xsl:attribute>
+	  </xsl:element>
 
-	  <xsl:text>Name: </xsl:text>  
-	  <xsl:value-of select="name(xalan:nodeset($rtf)/*)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="ValueDOCELEM-STAR">
+		<xsl:value-of select="cextend:nodeset($rtf)/docelem/*"/>
+	  </xsl:element>
 
-	  <xsl:text>generate-id: </xsl:text>  
-	  <xsl:value-of select="generate-id(xalan:nodeset($rtf)/default:docelem/default:elem4)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="ValueELEM4">
+		<xsl:value-of select="cextend:nodeset($rtf)/docelem/elem1/elem2/test:elem4[@attr3='O']"/>
+	  </xsl:element>
 
-	  <xsl:text>Local-name: </xsl:text>
-	  <xsl:value-of select="local-name(xalan:nodeset($rtf)/*)"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="ValueTESTELEM4-1">
+		<xsl:value-of select="cextend:nodeset($rtf)/docelem/elem1/elem2/test:elem4[1]"/>
+	  </xsl:element>
 
-	  <xsl:text>Namespace-uri: </xsl:text>
-	  <xsl:value-of select="namespace-uri(xalan:nodeset($rtf)/default:docelem)"/>,
-	  <xsl:value-of select="namespace-uri(xalan:nodeset($rtf)/default:docelem/default:elem1)"/>,
-	  <xsl:value-of select="namespace-uri(xalan:nodeset($rtf)/default:docelem/test:elem3)"/>: <xsl:value-of select="(xalan:nodeset($rtf)/default:docelem/test:elem3)"/>
+	  <xsl:element name="SlashSlashELEM4">
+		<xsl:value-of select="cextend:nodeset($rtf)//elem4"/>
+	  </xsl:element>
 
-	  <xsl:text>&#10;</xsl:text>
-	  <xsl:text>&#10;</xsl:text>
-	  <xsl:text>xsl:copy-of($rtf): &#10; </xsl:text>
-	  <xsl:copy-of select="xalan:nodeset($rtf)/default:docelem"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="SlashSlashELEM4-2Attrs-2">
+		<xsl:value-of select="cextend:nodeset($rtf)//test:elem4[2]/@*[2]"/>
+	  </xsl:element>
 
-	  <xsl:text>&#10;</xsl:text>
-	  <xsl:text>xsl:copy-of(elem1b): &#10; </xsl:text>
-	  <xsl:copy-of select="xalan:nodeset($rtf)/default:docelem/default:elem1/default:elem1b"/><xsl:text>&#10;</xsl:text>
+	  <Axis_Tests>
+	    <xsl:element name="Ancestor">
+		 <xsl:for-each select="cextend:nodeset($rtf)/docelem/elem1[2]/*[5]/ancestor::*">
+		  <xsl:copy/>
+		 </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Ancestor-or-Self">
+		 <xsl:for-each select="cextend:nodeset($rtf)//BTM:BreakingTheMold/ancestor-or-self::*">
+		   <xsl:copy/>
+		 </xsl:for-each>	  
+	    </xsl:element>
+
+	    <xsl:element name="Attribute">
+		  <xsl:for-each select="cextend:nodeset($rtf)//test:elem4/attribute::*">
+			<xsl:copy/>
+		  </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Child">
+		  <xsl:for-each select="cextend:nodeset($rtf)/docelem/*">
+		  	<xsl:copy/>
+		  </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Descendant">
+		  <xsl:for-each select="cextend:nodeset($rtf)/docelem/elem1[2]/descendant::*">
+		  	<xsl:copy/>
+		  </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Descendant-or-Self">
+		  <xsl:for-each select="cextend:nodeset($rtf)/docelem/elem1[2]/descendant-or-self::*">
+		  	<xsl:copy/>
+		  </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Following">
+		  <xsl:for-each select="cextend:nodeset($rtf)/docelem[2]/elem1[2]/following::*">
+		  	<xsl:copy/>
+		  </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Following-Sibling">
+		  <xsl:for-each select="cextend:nodeset($rtf)/docelem[2]/elem1[1]/following-sibling::*">
+		  	<xsl:copy/>
+		  </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Namespace">
+		  <xsl:for-each select="cextend:nodeset($rtf)/docelem/elem1/elem2/*/namespace::* |
+		                        cextend:nodeset($rtf)/docelem/elem1/*/namespace::*">
+			<xsl:copy/>
+		  </xsl:for-each>
+	    </xsl:element>
+
+	    <xsl:element name="Parent0">
+		  <xsl:value-of select="name(cextend:nodeset($rtf)/docelem[2]/parent::*)"/>
+	    </xsl:element>
+
+	    <xsl:element name="Parent1">
+		  <xsl:value-of select="name(cextend:nodeset($rtf)/docelem[2]/elem1[3]/elem2/test:elem4[2]/parent::*)"/>
+	    </xsl:element>
+
+	    <xsl:element name="Preceding">
+		  <xsl:value-of select="name(cextend:nodeset($rtf)//test:elem4[2]/preceding::elem1[2]/*/test:elem3[2])"/>
+	    </xsl:element>
+
+	    <xsl:element name="Preceding-Sibling">
+		  <xsl:value-of select="cextend:nodeset($rtf)//BTM:BreakingTheMold/preceding-sibling::*[4]"/>
+	    </xsl:element>
+
+	    <xsl:element name="Self">
+		  <xsl:value-of select="name(cextend:nodeset($rtf)//BTM:BreakingTheMold/self::*)"/>
+	    </xsl:element>
+
+	  </Axis_Tests>
+
+	  <xsl:element name="AT-Elem3-Elem4">
+	 	<xsl:apply-templates select="cextend:nodeset($rtf)/docelem/elem1/elem2/Elem4 |
+	 								 cextend:nodeset($rtf)/docelem/elem1/elem2/Elem3"/>
+	  </xsl:element>
+
+	  <xsl:element name="AT-NSElem3-NSElem4">
+	 	<xsl:apply-templates select="cextend:nodeset($rtf)/docelem/elem1/elem2/test:Elem4 |
+	 								 cextend:nodeset($rtf)/docelem/elem1/elem2/test:Elem3"/>
+	  </xsl:element> 
 	  
-	  <xsl:text>&#10;</xsl:text>
-	  <xsl:text>xsl:copy-of(test:elem3): &#10; </xsl:text>
-	  <xsl:copy-of select="xalan:nodeset($rtf)/default:docelem/test:elem3"/><xsl:text>&#10;</xsl:text>
+	  <xsl:element name="AT-Elem3-NSElem4">
+	 	<xsl:apply-templates select="cextend:nodeset($rtf)/docelem/elem1/elem2/Elem3 |
+	 								 cextend:nodeset($rtf)/docelem/elem1/elem2/test:Elem4"/>
+	  </xsl:element>	    
+	  
+	  <xsl:element name="FE-FE-AT-Mode">
+		<xsl:for-each select="cextend:nodeset($rtf)/docelem[2]/elem1">
+			<xsl:for-each select="elem2/*">
+				<xsl:apply-templates select="current()" mode="fe"/><xsl:text> </xsl:text>
+			</xsl:for-each>
+		</xsl:for-each>
+	  </xsl:element>
 
-   </out>
+	  <xsl:element name="CopyElem1-1">
+		<xsl:copy-of select="cextend:nodeset($rtf)/docelem/elem1[elem2[Elem3[@attr3='C']]]"/>
+	  </xsl:element>
+
+	  <xsl:element name="CopyElem3-2">
+		<xsl:copy-of select="cextend:nodeset($rtf)/docelem/elem1/elem2/Elem3[2]"/>
+	  </xsl:element>
+
+	</out>
 </xsl:template>
 
-<xsl:template match="default:elem4">
-	  <xsl:value-of select="."/>,
+<xsl:template match="test:Elem3 | test:Elem4">
+	  <xsl:value-of select="."/><xsl:text> modeless </xsl:text>
 </xsl:template>
-  
-</xsl:stylesheet>
+ 
+<xsl:template match="Elem3 | Elem4">
+	  <xsl:value-of select="."/><xsl:text> modeless </xsl:text>
+</xsl:template>
+ 
+<xsl:template match="test:Elem3 | test:Elem4" mode="fe">
+	  <xsl:value-of select="."/><xsl:text> fe </xsl:text>
+</xsl:template>
+ 
+<xsl:template match="Elem3 | Elem4" mode="fe">
+	  <xsl:value-of select="."/><xsl:text> fe </xsl:text>
+</xsl:template>
+
+</xsl:stylesheet>		
