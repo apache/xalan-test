@@ -352,6 +352,31 @@ public class XSLProcessorTestBase extends FileBasedTest
         return true;
     }
 
+    /**
+     * Override mostly blank routine to dump environment info.
+     * <p>Log out information about our environment in a structured way.</p>
+     * @author Shane_Curcuru@lotus.com
+     * @param p unused
+     *
+     * @return true always
+     */
+    public boolean postTestFileInit(Properties p)
+    {
+        logTestProps();
+        return true;
+    }
+
+    /**
+     * Log out any version or system info.
+     * <p>Logs System.getProperties(), and our the testProps block.</p>
+     */
+    public void logTestProps()
+    {
+        reporter.logHashtable(reporter.CRITICALMSG, System.getProperties(),
+                              "System.getProperties");
+        reporter.logHashtable(reporter.CRITICALMSG, testProps, "testProps");
+    }
+
     // use other implementations from FileBasedTest
     //-----------------------------------------------------
     //-------- Initialize our common input params --------

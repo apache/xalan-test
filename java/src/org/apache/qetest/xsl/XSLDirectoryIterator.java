@@ -240,12 +240,9 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
      */
     public void logTestProps()
     {
-
         // Log out system/build info - use crit msg so it's always reported
         reporter.logCriticalMsg(getDescription());
-        reporter.logHashtable(reporter.CRITICALMSG, System.getProperties(),
-                              "System.getProperties");
-        reporter.logHashtable(reporter.CRITICALMSG, testProps, "testProps");
+        super.logTestProps();
     }
 
     /**
@@ -261,8 +258,6 @@ public class XSLDirectoryIterator extends XSLProcessorTestBase
         //      inputDir, reporter, category, outDir, goldDir, noErrTest, 
         //      plus each of the benchmarking variables: 
         //      overallTime, overallFilesProcessed, dirTime, dirFilesProcessed 
-        // report out version info, properties, etc.
-        logTestProps();
 
         // Ensure the inputDir is there - we must have a valid location for input files
         File testDirectory = new File(inputDir);
