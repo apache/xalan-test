@@ -827,30 +827,27 @@ public class Reporter implements Logger
             }
             catch (InvocationTargetException ite)
             {
-
-                // Catch any error, log it as a fail, and allow next test case to run
-                // @todo should we log it as an error instead?
+                // Catch any error, log it as an error, and allow next test case to run
                 gotException = true;
-                testResult = java.lang.Math.max(FAIL_RESULT, testResult);
+                testResult = java.lang.Math.max(ERRR_RESULT, testResult);
+                tmpErrString += ite.toString();
+                logErrorMsg(tmpErrString);
 
-                // Grab the contained error 
+                // Grab the contained error, log it if available 
                 java.lang.Throwable containedThrowable =
                     ite.getTargetException();
-
-                tmpErrString += ite.toString() + ":"
-                                + containedThrowable.toString();
-
-                logErrorMsg(tmpErrString);
-                logThrowable(ERRORMSG, ite, tmpErrString);
+                if (containedThrowable != null)
+                {
+                    logThrowable(ERRORMSG, containedThrowable, tmpErrString + "(1)");
+                }
+                logThrowable(ERRORMSG, ite, tmpErrString + "(2)");
             }  // end of catch
             catch (Throwable t)
             {
-
-                // Catch any Exception or Error, log it as a fail, and allow next test case to run
+                // Catch any error, log it as an error, and allow next test case to run
                 gotException = true;
-                testResult = java.lang.Math.max(FAIL_RESULT, testResult);
+                testResult = java.lang.Math.max(ERRR_RESULT, testResult);
                 tmpErrString += t.toString();
-
                 logErrorMsg(tmpErrString);
                 logThrowable(ERRORMSG, t, tmpErrString);
             }  // end of catch
