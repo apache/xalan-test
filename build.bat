@@ -20,7 +20,7 @@ rem     See:    test.xml
 @echo   You may set JAVA_OPTS to be passed to java program
 @echo   All other command line opts are passed to Ant
 @echo.
-goto done
+goto mainEnd
 rem ------------------------------------------------------------------------
 rem Blatantly modeled on ant.bat
 :start
@@ -92,11 +92,11 @@ echo.
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 
 :runAnt
-%_JAVACMD% -classpath %_ANT_CP% -Dant.home="%_ANT_HOME%" %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 goto end
 
 :runAntWithJikes
-%_JAVACMD% -classpath %_ANT_CP% -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" -classpath "%_ANT_CP%" -Dant.home="%_ANT_HOME%" -Djikes.class.path=%JIKESPATH% %ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 
 :end
 set _ANT_CP=
