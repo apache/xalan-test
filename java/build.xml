@@ -108,7 +108,7 @@
         <!-- Exclude files that haven't caught up to new TRAX api changes -sc -->
         <javac srcdir="${test.dir}/trax" 
                destdir="${build.dir}" 
-               excludes="TemplatesAPITest.java,ProcessorAPITest.java,ResultAPITest.java,TestThreads.java"
+               excludes="ProcessorAPITest.java,ResultAPITest.java"
                debug="${debug}" />
     </target>
     <target name="package.trax" depends="compile.trax">
