@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000, 2001 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,29 +76,17 @@ public class SimpleFileCheckService implements CheckService
 
     /**
      * Compare two objects for equivalence, and return appropriate result.
-     * Implementers should provide the details of their "equals"
-     * algorithim in getCheckMethod().
-     * Note that the order of actual, reference is usually important
-     * important in determining the result.
-     * <li>Typically:
-     * <ul>any unexpected Exceptions thrown -> ERRR_RESULT</ul>
-     * <ul>either object is not a File -> ERRR_RESULT</ul>
-     * <ul>actual does not exist -> FAIL_RESULT</ul>
-     * <ul>reference does not exist -> AMBG_RESULT</ul>
-     * <ul>actual is equivalent to reference -> PASS_RESULT</ul>
-     * <ul>actual is not equivalent to reference -> FAIL_RESULT</ul>
-     * </li>
      *
-     * @param reporter to dump any output messages to
+     * @param logger to dump any output messages to
      * @param actual (current) File to check
      * @param reference (gold, or expected) File to check against
      * @param description of what you're checking
      * @param msg comment to log out with this test point
      * @param id ID tag to log out with this test point
-     * @return Reporter.*_RESULT code denoting status; each method may define
+     * @return Logger.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
-    public int check(Reporter reporter, Object actual, Object reference,
+    public int check(Logger logger, Object actual, Object reference,
                      String msg, String id)
     {
 
@@ -106,96 +94,97 @@ public class SimpleFileCheckService implements CheckService
         {
 
             // Must have File objects to continue
-            reporter.checkErr(
+            logger.checkErr(
                 "SimpleFileCheckService only takes files, with: " + msg, id);
 
-            return reporter.ERRR_RESULT;
+            return Logger.ERRR_RESULT;
         }
 
-        String fVal1 = readFileIntoString(reporter, (File) actual);
+        String fVal1 = readFileIntoString(logger, (File) actual);
 
         // Fail if Actual file doesn't exist
         if (fVal1 == null)
         {
-            reporter.checkFail(msg, id);
+            logger.checkFail(msg, id);
 
-            return Reporter.FAIL_RESULT;
+            return Logger.FAIL_RESULT;
         }
 
-        String fVal2 = readFileIntoString(reporter, (File) reference);
+        String fVal2 = readFileIntoString(logger, (File) reference);
 
         // Ambiguous if gold or reference file doesn't exist
         if (fVal2 == null)
         {
-            reporter.checkAmbiguous(msg, id);
+            logger.checkAmbiguous(msg, id);
 
-            return Reporter.AMBG_RESULT;
+            return Logger.AMBG_RESULT;
         }
 
         // Pass if they're equal, fail otherwise        
         if (fVal1.equals(fVal2))
         {
-            reporter.checkPass(msg, id);
+            logger.checkPass(msg, id);
 
-            return Reporter.PASS_RESULT;
+            return Logger.PASS_RESULT;
         }
         else
         {
-            reporter.checkFail(msg, id);
+            logger.checkFail(msg, id);
 
-            return Reporter.FAIL_RESULT;
+            return Logger.FAIL_RESULT;
         }
     }
 
     /**
      * Compare two objects for equivalence, and return appropriate result.
      *
-     * @param reporter to dump any output messages to
+     * @param logger to dump any output messages to
      * @param actual (current) File to check
      * @param reference (gold, or expected) File to check against
      * @param description of what you're checking
      * @param msg comment to log out with this test point
-     * @return Reporter.*_RESULT code denoting status; each method may define
+     * @return Logger.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
-    public int check(Reporter reporter, Object actual, Object reference,
+    public int check(Logger logger, Object actual, Object reference,
                      String msg)
     {
-        return check(reporter, actual, reference, msg, null);
+        return check(logger, actual, reference, msg, null);
     }
 
     /**
      * Compare two files for equivalence, and return appropriate *_RESULT flag.
-     * <p>Uses appropriate values from Reporter for return values.</p>
+     * <b>Note:</b> Only provided for backwards compatibility!
+     * <p>Uses appropriate values from Logger for return values.</p>
      * @param file1 Actual (current) file to check
      * @param file2 Reference (gold, or expected) file to check against
      * @return PASS if equal, FAIL if not, AMBG if gold does not exist
      */
-    public int checkFiles(Reporter reporter, File file1, File file2)
+    public int checkFiles(Logger logger, File file1, File file2)
     {
 
-        String fVal1 = readFileIntoString(reporter, file1);
+        String fVal1 = readFileIntoString(logger, file1);
 
         // Fail if Actual file doesn't exist
         if (fVal1 == null)
-            return (Reporter.FAIL_RESULT);
+            return Logger.FAIL_RESULT;
 
-        String fVal2 = readFileIntoString(reporter, file2);
+        String fVal2 = readFileIntoString(logger, file2);
 
         // Ambiguous if gold or reference file doesn't exist
         if (fVal2 == null)
-            return (Reporter.AMBG_RESULT);
+            return Logger.AMBG_RESULT;
 
         // Pass if they're equal, fail otherwise        
         if (fVal1.equals(fVal2))
-            return (Reporter.PASS_RESULT);
+            return Logger.PASS_RESULT;
         else
-            return (Reporter.FAIL_RESULT);
+            return Logger.FAIL_RESULT;
     }
 
     /**
      * Compare two files for equivalence, and return appropriate *_RESULT flag.
-     * For backwards compatibility.
+     * <b>Note:</b> Only provided for backwards compatibility!
      * @param file1 Actual (current) file to check
      * @param file2 Reference (gold, or expected) file to check against
      * @return PASS if equal, FAIL if not, AMBG if gold does not exist
@@ -208,10 +197,11 @@ public class SimpleFileCheckService implements CheckService
 
     /**
      * Read text file into string line-by-line.  
+     * @param logger to dump any messages to
      * @param f File object to read
      * @return String of file's contents
      */
-    private String readFileIntoString(Reporter reporter, File f)
+    private String readFileIntoString(Logger logger, File f)
     {
 
         StringBuffer sb = new StringBuffer();
@@ -233,9 +223,9 @@ public class SimpleFileCheckService implements CheckService
         }
         catch (Exception e)
         {
-            if (reporter != null)
+            if (logger != null)
             {
-                reporter.logErrorMsg("SimpleFileCheckService(" + f.getPath()
+                logger.logMsg(Logger.ERRORMSG, "SimpleFileCheckService(" + f.getPath()
                                      + ") threw:" + e.toString());
             }
             else

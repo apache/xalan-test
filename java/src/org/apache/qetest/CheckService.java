@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000, 2001 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,8 +75,10 @@ public interface CheckService
     /**
      * Compare two objects for equivalence, and return appropriate result.
      * Implementers should provide the details of their "equals"
-     * algorithim in getCheckMethod().
-     * Note that the order of actual, reference is usually important
+     * algorithim in getCheckMethod().  They must also call the 
+     * appropriate checkPass()/checkFail()/etc. method on the 
+     * supplied Logger.
+     * Note that the order of actual, reference is usually 
      * important in determining the result.
      * <li>Typically:
      * <ul>any unexpected Exceptions thrown -> ERRR_RESULT</ul>
@@ -86,7 +88,7 @@ public interface CheckService
      * <ul>actual is not equivalent to reference -> FAIL_RESULT</ul>
      * </li>
      *
-     * @param reporter to dump any output messages to
+     * @param logger to dump any output messages to
      * @param actual (current) Object to check
      * @param reference (gold, or expected) Object to check against
      * @param description of what you're checking
@@ -94,13 +96,13 @@ public interface CheckService
      * @return Reporter.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
-    public abstract int check(Reporter reporter, Object actual,
+    public abstract int check(Logger logger, Object actual,
                               Object reference, String msg);
 
     /**
      * Compare two objects for equivalence, and return appropriate result.
      *
-     * @param reporter to dump any output messages to
+     * @param logger to dump any output messages to
      * @param actual (current) Object to check
      * @param reference (gold, or expected) Object to check against
      * @param description of what you're checking
@@ -109,13 +111,13 @@ public interface CheckService
      * @return Reporter.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
-    public abstract int check(Reporter reporter, Object actual,
+    public abstract int check(Logger logger, Object actual,
                               Object reference, String msg, String id);
 
     /**
      * Description of algorithim used to check equivalence.  
      *
-     * NEEDSDOC ($objectName$) @return
+     * @return String describing algorithim
      */
     public abstract String getDescription();
 

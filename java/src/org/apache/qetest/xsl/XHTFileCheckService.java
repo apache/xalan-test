@@ -2,7 +2,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000, 2001 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ import java.io.StringWriter;
 
 /**
  * Uses an XML/HTML/Text diff comparator to check or diff two files.
- * @see #check(Reporter reporter, Object actual, Object reference, String msg, String id)
+ * @see #check(Logger logger, Object actual, Object reference, String msg, String id)
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
  */
@@ -109,16 +109,16 @@ public class XHTFileCheckService implements CheckService
      * returned from getExtendedInfo() - this happens no matter what 
      * the result of the check() call was.
      *
-     * @param reporter to dump any output messages to
+     * @param logger to dump any output messages to
      * @param actual (current) Object to check
      * @param reference (gold, or expected) Object to check against
      * @param description of what you're checking
      * @param msg comment to log out with this test point
      * @param id ID tag to log out with this test point
-     * @return Reporter.*_RESULT code denoting status; each method may define
+     * @return Logger.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
-    public int check(Reporter reporter, Object actual, Object reference,
+    public int check(Logger logger, Object actual, Object reference,
                      String msg, String id)
     {
         // Create our 'extended info' stuff now, so it will 
@@ -130,13 +130,13 @@ public class XHTFileCheckService implements CheckService
         {
 
             // Must have File objects to continue
-            reporter.checkErr("XHTFileCheckService only takes files, with: "
+            logger.checkErr("XHTFileCheckService only takes files, with: "
                               + msg, id);
             pw.println("XHTFileCheckService only takes files, with: " + msg);
             pw.println("   actual: " + actual);
             pw.println("reference: " + reference);
             pw.flush();
-            return reporter.ERRR_RESULT;
+            return logger.ERRR_RESULT;
         }
 
         File actualFile = (File) actual;
@@ -145,19 +145,19 @@ public class XHTFileCheckService implements CheckService
         // Fail if Actual file doesn't exist or is 0 len
         if ((!actualFile.exists()) || (actualFile.length() == 0))
         {
-            reporter.checkFail(msg, id);
+            logger.checkFail(msg, id);
             pw.println("actual(" + actualFile.toString() + ") did not exist or was 0 len");
             pw.flush();
-            return reporter.FAIL_RESULT;
+            return logger.FAIL_RESULT;
         }
 
         // Ambiguous if gold file doesn't exist or is 0 len
         if ((!referenceFile.exists()) || (referenceFile.length() == 0))
         {
-            reporter.checkAmbiguous(msg, id);
+            logger.checkAmbiguous(msg, id);
             pw.println("reference(" + referenceFile.toString() + ") did not exist or was 0 len");
             pw.flush();
-            return Reporter.AMBG_RESULT;
+            return Logger.AMBG_RESULT;
         }
 
         boolean warning[] = new boolean[1];  // TODO: should use this!
@@ -185,11 +185,11 @@ public class XHTFileCheckService implements CheckService
         if (!isEqual)
         {
             // We fail, obviously!
-            reporter.checkFail(msg, id);
+            logger.checkFail(msg, id);
             pw.println("XHTFileCheckService files were not equal");
             pw.flush();
 
-            return Reporter.FAIL_RESULT;
+            return Logger.FAIL_RESULT;
         }
         else if (warning[0])
         {
@@ -197,43 +197,43 @@ public class XHTFileCheckService implements CheckService
             pw.flush();
             if (allowWhitespaceDiff)
             {
-                reporter.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, passing!");
-                reporter.checkPass(msg, id);
-                return Reporter.PASS_RESULT;
+                logger.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, passing!");
+                logger.checkPass(msg, id);
+                return Logger.PASS_RESULT;
             }
             else
             {
-                reporter.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, failing!");
-                reporter.checkFail(msg, id);
-                return Reporter.FAIL_RESULT;
+                logger.logMsg(Logger.TRACEMSG, "XHTFileCheckService whitespace diff warning, failing!");
+                logger.checkFail(msg, id);
+                return Logger.FAIL_RESULT;
             }
         }
         else
         {
-            reporter.checkPass(msg, id);
+            logger.checkPass(msg, id);
             pw.println("XHTFileCheckService files were equal");
             pw.flush();
 
-            return Reporter.PASS_RESULT;
+            return Logger.PASS_RESULT;
         }
     }
 
     /**
      * Compare two objects for equivalence, and return appropriate result.
      *
-     * @see #check(Reporter reporter, Object actual, Object reference, String msg, String id)
-     * @param reporter to dump any output messages to
+     * @see #check(Logger logger, Object actual, Object reference, String msg, String id)
+     * @param logger to dump any output messages to
      * @param actual (current) File to check
      * @param reference (gold, or expected) File to check against
      * @param description of what you're checking
      * @param msg comment to log out with this test point
-     * @return Reporter.*_RESULT code denoting status; each method may define
+     * @return Logger.*_RESULT code denoting status; each method may define
      * it's own meanings for pass, fail, ambiguous, etc.
      */
-    public int check(Reporter reporter, Object actual, Object reference,
+    public int check(Logger logger, Object actual, Object reference,
                      String msg)
     {
-        return check(reporter, actual, reference, msg, null);
+        return check(logger, actual, reference, msg, null);
     }
 
     /**
