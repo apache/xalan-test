@@ -1,0 +1,54 @@
+# Use org.apache.qetest.xsl.ConformanceTest test with this properties 
+#   file to iterate over all the 'contrib' tests
+# This file includes descriptive comments for most major options
+# Most other xml-xalan\test tests use similar options
+
+#---- Choose locations: where to find files, where to log to
+# testDir is where root of test xml/xsl files are
+inputDir=\\xml-xalan\\test\\tests\\conf
+# inputDir=\\xml-xalan\\test\\tests\\temp
+
+# goldDir is where the 'gold' files to check against live
+goldDir=\\xml-xalan\\test\\tests\\conf-gold
+
+# outDir is where we put the actual output files and any logs or error dumps
+outputDir=.\\results-s2s
+
+# All test output will be saved in this file
+logFile=.\\results-s2s\\ConfTest.xml
+
+#---- Choose processor: flavors supported: xalan|trax|other...
+flavor=trax.s2s
+
+#---- Choose tests: Filter to only run specific sets of tests
+# Set category to run only the single named directory
+# category=axes
+
+# Set excludes to exclude specific tests: foo.xsl;bar.xsl;goo.xsl
+# impincl12.xsl excluded because it outputs accesses file via http inside lotus firewall.
+excludes=impincl12.xsl
+
+# Run a specific list of files in the named file (see XLDirectoryIterator.java)
+#fileList=myListOfFiles.txt
+
+# Uncomment noErrTest to skip running any ./err subdir tests
+noErrTest=true
+
+fileChecker=org.apache.qetest.xsl.XHTFileCheckService
+
+#---- Choose output: How much/what kinds of info should we log
+# Choose output: How much logging info is saved: between 0 (very little) and 99 (lots)
+loggingLevel=50
+
+# If we should save performance-oriented info in the logfile
+perfLogging=true
+
+# Set debug for advanced debugging of the tests themselves
+#debug=true
+
+#---- Choose a liaison: only valid with flavor=xalan
+# XDTM  Xalan-J 1.x/Xerces DTM -default- (uses xerces.jar)
+#liaison=org.apache.xalan.xpath.dtm.DTMLiaison
+# XDOM  Xalan-J 1.x/Xerces DOM (uses xerces.jar)
+#liaison=org.apache.xalan.xpath.xdom.XercesLiaison
+
