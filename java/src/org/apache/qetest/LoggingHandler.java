@@ -80,6 +80,36 @@ public class LoggingHandler
 {
 
     /**
+     * Set a default handler for us to wrapper.
+     * Often you may want to keep the default handler for some 
+     * operation while you're logging.  For subclasses that support 
+     * this call, they will log every operation, and then simply 
+     * call-through to this default handler.
+     *
+     * Subclasses should implement this and verify that the default 
+     * is of an appropriate type to use.
+     *
+     * @param default Object of the correct type to pass-through to;
+     * throws IllegalArgumentException if null or incorrect type
+     */
+    public void setDefaultHandler(Object defaultHandler)
+    {
+        throw new java.lang.IllegalArgumentException("LoggingHandler.setDefaultHandler() is unimplemented!");
+    }
+
+
+    /**
+     * Accessor method for our default handler; here returns null.
+     *
+     * @return default (Object) our default handler; null if unset
+     */
+    public Object getDefaultHandler()
+    {
+        return null;
+    }
+
+
+    /**
      * Get a list of counters of all items we've logged.
      * LoggingHandlers each will have various kinds or types of 
      * things they handle (errors, warnings, messages, URIs, etc.).
