@@ -9,8 +9,10 @@
   <!-- Purpose: Issue a message from a literal constant, "no" on terminate option -->                
 
 <xsl:template match="/">
+<out>
   <xsl:message terminate="no">This message came from the MESSAGE02 test.</xsl:message>
   If we got this far, we did not terminate.
+</out>
 </xsl:template>
 
 </xsl:stylesheet>
