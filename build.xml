@@ -176,6 +176,7 @@
                  from the testxsl.jar file instead of below.
            -->
             <pathelement location="${test.src.dir}" />
+            <pathelement location="${test.build.dir}" />
             <pathelement location="${testxsl.jar}" />
         </classpath>
     </taskdef>
