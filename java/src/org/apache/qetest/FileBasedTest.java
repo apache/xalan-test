@@ -348,8 +348,6 @@ public class FileBasedTest extends TestImpl
     public boolean initializeFromProperties(Properties props)
     {
 
-        debugPrintln("FileBasedTest.initializeFromProperties(" + props + ")");
-
         // Parse out any values that match our internal convenience variables
         // default all values to our current values
         // String values are simply getProperty()'d
@@ -432,8 +430,6 @@ public class FileBasedTest extends TestImpl
      */
     public boolean initializeFromArray(String[] args, boolean flag)
     {
-
-        debugPrintln("FileBasedTest.initializeFromArray(" + args + ")");
 
         // Read in command line args and setup internal variables
         String optPrefix = "-";
@@ -651,12 +647,6 @@ public class FileBasedTest extends TestImpl
             }
         }  // end of for() loop
 
-        debugPrintln(
-            "FileBasedTest.initializeFromArray(): testProps are now:");
-
-        if (debug)
-            testProps.list(System.err);
-
         // If we got here, we set the array params OK, so simply return 
         //  the value the initializeFromProperties method returned
         return propsOK;
@@ -717,39 +707,31 @@ public class FileBasedTest extends TestImpl
         return t;
     }
 
-    /**
-     * Debugging the Test infrastructure - dumps to System.err.  
-     *
-     * NEEDSDOC @param s
-     */
-    protected void debugPrintln(String s)
-    {
-
-        if (!debug)
-            return;
-
-        System.err.println(s);
-    }
 
     /**
-     * Main method to run test from the command line.
-     * <p>Test subclasses <b>must</b> override, obviously.
-     * Only provided here for debugging.</p>
-     * @author Shane Curcuru
+     * Main worker method to run test from the command line.
+     * Test subclasses generally need not override.
+     * <p>This is primarily provided to make subclasses implementations
+     * of the main method as simple as possible: in general, they
+     * should simply do:
+     * <code>
+     *   public static void main (String[] args)
+     *   {
+     *       TestSubClass app = new TestSubClass();
+     *       app.doMain(args);
+     *   }
+     * </code>
      *
-     * NEEDSDOC @param args
+     * @param args command line arguments
      */
-    public static void main(String[] args)
+    public void doMain(String[] args)
     {
-
-        FileBasedTest app = new FileBasedTest();
-
         // Initialize any instance variables from the command line 
         //  OR specified properties block
-        if (!app.initializeFromArray(args, true))
+        if (!initializeFromArray(args, true))
         {
             System.err.println("ERROR in usage:");
-            System.err.println(app.usage());
+            System.err.println(usage());
 
             // Don't use System.exit, since that will blow away any containing harnesses
             return;
@@ -757,8 +739,30 @@ public class FileBasedTest extends TestImpl
 
         // Also pass along the command line, in case someone has 
         //  specific code that's counting on this
-        app.testProps.put(MAIN_CMDLINE, args);
-        app.runTest(app.testProps);
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < args.length; i++)
+        {
+            buf.append(args[i]);
+            buf.append(", "); // Ignore messiness of extra trailing ,
+        }
+        testProps.put(MAIN_CMDLINE, buf.toString());
+
+        // Actually go and execute the test
+        runTest(testProps);
+    }
+
+    /**
+     * Main method to run test from the command line.
+     * @author Shane Curcuru
+     * <p>Test subclasses <b>must</b> override, obviously.
+     * Only provided here for debugging.</p>
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args)
+    {
+        FileBasedTest app = new FileBasedTest();
+        app.doMain(args);
     }
 }  // end of class FileBasedTest
 
