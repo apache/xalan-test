@@ -9,6 +9,7 @@
   <!-- Purpose:  It is an error for an element from XSLT namespace to have attributes
        with expanded-names that have null namespace URI's. -->
   <!-- ExpectedException: XSL Error: xsl:copy-of has an illegal attribute: -->
+  <!-- ExpectedException: "test" attribute is not allowed on the xsl:copy-of element! -->
 
 <xsl:template match="doc">
   <out>

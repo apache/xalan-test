@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of grouping-separator after the decimal-separator. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: 0.000,###,###,### -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Put grouping separator adjacent to per-mille character. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: ######, -->
 
 <xsl:template match="doc">
   <out>

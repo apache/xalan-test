@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Put grouping separator adjacent to pattern-separator. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: ######,;000,000 -->
 
 <xsl:template match="doc">
   <out>

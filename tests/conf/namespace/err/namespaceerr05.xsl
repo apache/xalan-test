@@ -10,6 +10,7 @@
   <!-- Purpose: Test placement of namespace-alias inside a template, which is illegal. -->
   <!-- ExpectedException: Must put xsl:namespace-alias outside any template. -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: Must put xsl:namespace-alias outside any template. -->
+  <!-- ExpectedException: xsl:namespace-alias is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="/">
   <out>

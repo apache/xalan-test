@@ -9,6 +9,7 @@
   <!-- Purpose: Show what happens if there are any literal characters between
        two groups of zero digits. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: 000000zip000000 -->
 
 <xsl:template match="doc">
   <out>

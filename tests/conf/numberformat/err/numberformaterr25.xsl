@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of per-mille in middle of format string. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: ###&#8240;###.## --><!-- Note comparison may not work with entity value here -->
 
 <xsl:template match="doc">
   <out>

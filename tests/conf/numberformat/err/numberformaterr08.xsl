@@ -9,6 +9,7 @@
   <!-- Purpose: Show what happens if there are any filler digits (#) between
        zero-digits and the decimal-separator. Change both characters. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: #aa,aaa,!!!.!!!aaa0 -->
 
 <xsl:decimal-format digit="!" zero-digit="a" />
 

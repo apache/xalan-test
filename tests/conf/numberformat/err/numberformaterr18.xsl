@@ -9,6 +9,7 @@
   <!-- Purpose: Show what happens if there are any literal characters between
        two groups of filler digits (#). -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: ######zip###### -->
 
 <xsl:template match="doc">
   <out>

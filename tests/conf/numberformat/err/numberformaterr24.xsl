@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of percent in middle of format string. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: ###%###.## -->
 
 <xsl:template match="doc">
   <out>

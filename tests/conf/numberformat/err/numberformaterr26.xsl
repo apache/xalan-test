@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of more than two patterns. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: +##,###.000;-##,###.###;x##,###.### -->
 
 <xsl:template match="doc">
   <out>

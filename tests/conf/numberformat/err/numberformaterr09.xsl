@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of two occurrences of the decimal-separator. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: ##,000.000.0000 -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test placement of decimal-format inside atemplate, which is illegal. -->
   <!-- ExpectedException: Must put xsl:decimal-format outside any template. -->
+  <!-- ExpectedException: xsl:decimal-format is not allowed in this position in the stylesheet! -->
 
 <xsl:template match="doc">
   <out>

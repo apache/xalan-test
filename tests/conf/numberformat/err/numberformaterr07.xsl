@@ -9,6 +9,7 @@
   <!-- Purpose: Show what happens if there are any filler digits (#) between
        zero-digits and the decimal-separator on the right. -->
   <!-- ExpectedException: java.lang.RuntimeException: Malformed format string -->
+  <!-- ExpectedException: Malformed format string: ##,000,000.###000 -->
 
 <xsl:template match="doc">
   <out>

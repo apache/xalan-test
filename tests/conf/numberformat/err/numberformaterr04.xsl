@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test illegal attribute on decimal-format. -->
   <!-- ExpectedException: Invalid attribute on xsl:decimal-format. -->
+  <!-- ExpectedException: "badattr" attribute is not allowed on the xsl:decimal-format element! -->
 
 <xsl:decimal-format NaN="non-numeric" badattr="bad" />
 

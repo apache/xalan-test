@@ -10,6 +10,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test for meaningful message when attempting to use namespace wildcard (*) -->
   <!-- ExpectedException: XSLT: ElemTemplateElement error: Can not resolve namespace prefix: -->
+  <!-- ExpectedException: Prefix must resolve to a namespace: -->
 
 <xsl:template match="doc">
   <out>
