@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "sbk:/style/dtd/book.dtd">
+
+<book title="Xalan Testing" copyright="2000 The Apache Software Foundation">
+
+  <!--resources source="sbk:/sources/tests/resources.xml"/-->
+  
+  <document id="overview"
+            label="Overview"
+            source="tests/overview.xml"/>
+			
+  <!--document id="getstarted"
+            label="Getting Started"
+            source="tests/getstarted.xml"/-->
+			
+  <separator/>
+  
+  <external href="apidocs/index.html"  label="Java API"/>
+  
+  <!--separator/>
+  
+  <document id="run"
+            label="Running Tests"
+            source="tests/run.xml"/>  
+  
+  <document id="submit"
+            label="Submitting New Tests"
+            source="tests/submit.xml"/>
+			
+  <separator/>
+  
+  <document id="design"
+            label="Testing Design"
+            source="tests/design.xml"/-->
+			
+</book>
+  
