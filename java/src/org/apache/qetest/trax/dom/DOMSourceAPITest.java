@@ -518,14 +518,18 @@ public class DOMSourceAPITest extends XSLProcessorTestBase
             {
                 // Use identity transformer to serialize
                 Transformer identityTransformer = factory.newTransformer();
-                StreamResult streamResult = new StreamResult(new FileOutputStream(outNames.nextName()));
+                String outName = outNames.nextName();
+                FileOutputStream fos = new FileOutputStream(outName);
+                StreamResult streamResult = new StreamResult(fos);
                 DOMSource nodeSource = new DOMSource(dom);
                 reporter.logTraceMsg("serializeDOMAndCheck() into " + outNames.currentName());
                 identityTransformer.transform(nodeSource, streamResult);
+                fos.close();
                 fileChecker.check(reporter, 
                                   new File(outNames.currentName()), 
                                   new File(goldFileName), 
-                                  comment + " into " + outNames.currentName());
+                                  comment + " into " + outNames.currentName()+" gold is "+
+                                  goldFileName+" xsl is identity transform");
                 return true;    // Note: should check return from fileChecker.check!
             }
             else
