@@ -245,6 +245,11 @@
             <param name="conf.flavor" value="trax.dom"/>
         </antcall>
     </target>
+    <target name="conf.one" description="Run a single conf test">
+        <antcall target="conf">
+            <param name="testClass" value="org.apache.qetest.xsl.StylesheetDriver" />
+        </antcall>
+    </target>
 
     <!-- ================================================================== -->
     <!-- Run tests: the StylesheetErrorTestlet on the conferr suite         -->
