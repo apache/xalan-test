@@ -30,8 +30,8 @@ if '%1' == '-?' goto usage
 @echo %0 beginning...
 
 @REM Trickery to guess appropriate location of java.exe program
-if '%JAVA_HOME%' == '' set JAVA_EXE=java
-if not '%JAVA_HOME%' == '' set JAVA_EXE=%JAVA_HOME%\bin\java
+if "%JAVA_HOME%" == "" set JAVA_EXE=java
+if not "%JAVA_HOME%" == "" set JAVA_EXE=%JAVA_HOME%\bin\java
 
 set TANT_HOME=.
 
@@ -41,16 +41,16 @@ set TANT_HOME=.
 @REM    some of the needed jars in the classpath, and then we add separate
 @REM    copies of them later on.
 @REM HACK! Includes only Xalan-J 2.x build
-if '%JARDIR%' == '' set TEST_CP=.\build;%classpath%;%TANT_HOME%\bin\ant.jar;..\..\java\bin\xerces.jar;..\..\java\build\xalan.jar;..\xml-xalan\bsf.jar
+if "%JARDIR%" == "" set TEST_CP=.\build;%classpath%;%TANT_HOME%\bin\ant.jar;..\..\java\bin\xerces.jar;..\..\java\build\xalan.jar;..\xml-xalan\bsf.jar
 
 @REM If JARDIR set, put those references first then default classpath
 @REM note that we still assume you're in xsl-test dir because of .\conf\Extend reference
-if not '%JARDIR%' == '' set TEST_CP=.\build;%TANT_HOME%\bin\ant.jar;%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%classpath%
+if not "%JARDIR%" == "" set TEST_CP=.\build;%TANT_HOME%\bin\ant.jar;%JARDIR%\xerces.jar;%JARDIR%\xalan.jar;%JARDIR%\bsf.jar;%classpath%
 
 :doant
 @REM Simply execute Ant to build it all
-echo %JAVA_EXE% %JAVA_OPTS% -Dant.home=%TANT_HOME% -classpath %TEST_CP% org.apache.tools.ant.Main %1 %2 %3 %4 %5 %6 %7 %8 %9
-%JAVA_EXE% %JAVA_OPTS% -Dant.home=%TANT_HOME% -classpath %TEST_CP% org.apache.tools.ant.Main %1 %2 %3 %4 %5 %6 %7 %8 %9
+echo "%JAVA_EXE%" %JAVA_OPTS% -Dant.home=%TANT_HOME% -classpath "%TEST_CP%" org.apache.tools.ant.Main %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%JAVA_EXE%" %JAVA_OPTS% -Dant.home=%TANT_HOME% -classpath "%TEST_CP%" org.apache.tools.ant.Main %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto done
 
 :done
