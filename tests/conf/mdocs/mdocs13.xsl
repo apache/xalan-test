@@ -13,7 +13,7 @@
      document() is in the imported stylesheet, hence local to it. -->
   <!-- Remember: every top-level node in the stylesheet must have a namespace. -->
 
-<xsl:include href="ximpmdocs13.xsl"/>
+<xsl:import href="ximpmdocs13.xsl"/>
 
 <xsl:template match="doc">
   <out><xsl:text>
