@@ -72,6 +72,11 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
 
+// Use Xalan's own serializers for SAX ContentHandler output
+import org.apache.xalan.serialize.SerializerFactory;
+import org.apache.xalan.serialize.Serializer;
+import org.apache.xalan.templates.OutputProperties;
+
 // Needed SAX, DOM, JAXP classes
 // Needed SAX classes
 import org.xml.sax.InputSource;
@@ -100,6 +105,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.IOException;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -158,6 +164,9 @@ public class ExamplesTest extends XSLProcessorTestBase
 
     /** Sample gold files used for specific transforms - with output format.  */
     protected String outputGoldName;
+
+    /** Sample gold files used for specific transforms - XMLFilter/Reader.  */
+    protected String saxGoldName;
 
     /** Gold file used for tests we haven't validated the correct results of yet.  */
     protected String NOT_DEFINED;
@@ -219,6 +228,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         param1GoldName = goldBasePath + "param1.out";
         param2GoldName = goldBasePath + "param2.out";
         outputGoldName = goldBasePath + "output.out";
+        saxGoldName = goldBasePath + "fooSAX.out";
         NOT_DEFINED = goldBasePath + "need-validated-output-file-here.out";
         return true;
     }
@@ -259,19 +269,17 @@ public class ExamplesTest extends XSLProcessorTestBase
         reporter.logTraceMsg("exampleUseTemplatesObj(" + fooFile.xmlName + ", " + bazFile.xmlName + ", " + fooFile.inputName + ")");
         exampleUseTemplatesObj(fooFile.xmlName, bazFile.xmlName, fooFile.inputName);
 
-        reporter.logTraceMsg("exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName) SKIP");
-        // @todo TEST UPDATE(1) exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName)
-        // Each of these methods needs to be updated to serialize to disk
-        // Simple exercise in plugging in the proper ContentHandler
+        reporter.logTraceMsg("exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName)");
+        exampleContentHandlerToContentHandler(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logTraceMsg("exampleXMLReader(fooFile.xmlName, fooFile.inputName) SKIP");
-        // @todo TEST UPDATE(2) exampleXMLReader(fooFile.xmlName, fooFile.inputName);
+        reporter.logTraceMsg("exampleXMLReader(fooFile.xmlName, fooFile.inputName)");
+        exampleXMLReader(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logTraceMsg("exampleXMLFilter(fooFile.xmlName, fooFile.inputName) SKIP");
-        // @todo TEST UPDATE(3) exampleXMLFilter(fooFile.xmlName, fooFile.inputName);
+        reporter.logTraceMsg("exampleXMLFilter(fooFile.xmlName, fooFile.inputName)");
+        exampleXMLFilter(fooFile.xmlName, fooFile.inputName);
 
-        reporter.logTraceMsg("exampleXMLFilterChain(fooFile.xmlName, fooFile.inputName, foo2File, foo3File) SKIP");
-        // @todo TEST UPDATE(4) exampleXMLFilterChain(fooFile.xmlName, fooFile.inputName, foo2File, foo3File);
+        reporter.logTraceMsg("exampleXMLFilterChain(fooFile.xmlName, fooFile.inputName, foo2File, foo3File)");
+        exampleXMLFilterChain(fooFile.xmlName, fooFile.inputName, foo2File, foo3File);
 
         reporter.logTraceMsg("exampleDOM2DOM(" + fooFile.xmlName + ", " + fooFile.inputName + ")");
         exampleDOM2DOM(fooFile.xmlName, fooFile.inputName);
@@ -312,6 +320,7 @@ public class ExamplesTest extends XSLProcessorTestBase
         // Create a transformer for the stylesheet.
         Transformer transformer 
           = tfactory.newTransformer(new StreamSource(xslID));
+        // No need to setSystemId, the transformer can get it from the URL
     
         // Transform the source XML to System.out.
         transformer.transform( new StreamSource(sourceID),
@@ -340,7 +349,8 @@ public class ExamplesTest extends XSLProcessorTestBase
     
         // Create a transformer for the stylesheet.
         Transformer transformer 
-          = tfactory.newTransformer(new StreamSource(xslID));
+          = tfactory.newTransformer(new StreamSource(new File(xslID)));
+        // No need to setSystemId, the transformer can get it from the File
     
         // Transform the source XML to System.out.
         transformer.transform( new StreamSource(new File(sourceID)),
@@ -496,13 +506,18 @@ public class ExamplesTest extends XSLProcessorTestBase
           
           // A TransformerHandler is a ContentHandler that will listen for 
           // SAX events, and transform them to the result.
+          reporter.logTraceMsg("newTransformerHandler..." + xslID);
           TransformerHandler handler 
             = stfactory.newTransformerHandler(new StreamSource(xslID));
 
-          // Set the result handling to be a serialization to System.out.
-          Result result = null;
-          // @todo TEST UPDATE - send to outNames.nextName()
-          // @todo TEST UPDATE(1) result = new SAXResult(new ExampleContentHandler());
+          // Set the result handling to be a serialization to the file output stream.
+          Serializer serializer = SerializerFactory.getSerializer
+                                  (OutputProperties.getDefaultMethodProperties("xml"));
+          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+      
+          
+          Result result = new SAXResult(serializer.asContentHandler());
+
           handler.setResult(result);
           
           // Create a reader, and set it's content handler to be the TransformerHandler.
@@ -531,10 +546,12 @@ public class ExamplesTest extends XSLProcessorTestBase
           reader.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
           
           // Parse the source XML, and send the parse events to the TransformerHandler.
+          reporter.logTraceMsg("reader.parse " + sourceID);
           reader.parse(sourceID);
 
+          reporter.logTraceMsg("Note: I have not double-checked that we're comparing against the correct gold file! 14-Dec-00");
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(saxGoldName),
                           "exampleContentHandlerToContentHandler fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -560,16 +577,22 @@ public class ExamplesTest extends XSLProcessorTestBase
             reporter.logErrorMsg("exampleXMLReader:Processor does not support SAX");
             return;
         }
+          reporter.logTraceMsg("newXMLFilter..." + xslID);
           XMLReader reader 
             = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(xslID));
           
-          // @todo TEST UPDATE - send to outNames.nextName()
-          // @todo TEST UPDATE(2) reader.setContentHandler(new ExampleContentHandler());
+          // Set the result handling to be a serialization to the file output stream.
+          Serializer serializer = SerializerFactory.getSerializer
+                                  (OutputProperties.getDefaultMethodProperties("xml"));
+          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+      
+          reader.setContentHandler(serializer.asContentHandler());
 
+          reporter.logTraceMsg("reader.parse " + sourceID);
           reader.parse(new InputSource(sourceID));
 
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(saxGoldName),
                           "exampleXMLReader fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -610,9 +633,13 @@ public class ExamplesTest extends XSLProcessorTestBase
         } catch( NoSuchMethodError ex2 ) {
         }
         if( reader==null ) reader = XMLReaderFactory.createXMLReader();
-        // The transformer will use a SAX parser as it's reader.    
-        // @todo TEST UPDATE - send to outNames.nextName()
-        // @todo TEST UPDATE(3) reader.setContentHandler(new ExampleContentHandler());
+
+          // Set the result handling to be a serialization to the file output stream.
+          Serializer serializer = SerializerFactory.getSerializer
+                                  (OutputProperties.getDefaultMethodProperties("xml"));
+          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+          reader.setContentHandler(serializer.asContentHandler());
+
         try
         {
           reader.setFeature("http://xml.org/sax/features/namespace-prefixes",
@@ -627,6 +654,7 @@ public class ExamplesTest extends XSLProcessorTestBase
           // TODO: User diagnostics.
         }
 
+        reporter.logTraceMsg("newXMLFilter..." + xslID);
         XMLFilter filter 
           = ((SAXTransformerFactory) tfactory).newXMLFilter(new StreamSource(xslID));
 
@@ -635,10 +663,11 @@ public class ExamplesTest extends XSLProcessorTestBase
         // Now, when you call transformer.parse, it will set itself as 
         // the content handler for the parser object (it's "parent"), and 
         // will then call the parse method on the parser.
+          reporter.logTraceMsg("filter.parse " + sourceID);
         filter.parse(new InputSource(sourceID));
 
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(saxGoldName),
                           "exampleXMLFilter fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
@@ -689,8 +718,11 @@ public class ExamplesTest extends XSLProcessorTestBase
           }
           if( reader==null ) reader = XMLReaderFactory.createXMLReader();
 
+          reporter.logTraceMsg("newXMLFilter..." + xslID_1);
           XMLFilter filter1 = stf.newXMLFilter(new StreamSource(xslID_1));
+          reporter.logTraceMsg("newXMLFilter..." + xslID_2);
           XMLFilter filter2 = stf.newXMLFilter(new StreamSource(xslID_2));
+          reporter.logTraceMsg("newXMLFilter..." + xslID_3);
           XMLFilter filter3 = stf.newXMLFilter(new StreamSource(xslID_3));
 
           if (null == filter1) // If one success, assume all were success.
@@ -708,8 +740,11 @@ public class ExamplesTest extends XSLProcessorTestBase
             // transform3 will use transform2 as it's reader.
             filter3.setParent(filter2);
 
-            // @todo TEST UPDATE(4) filter3.setContentHandler(new ExampleContentHandler());
-            // filter3.setContentHandler(new org.xml.sax.helpers.DefaultHandler());
+          // Set the result handling to be a serialization to the file output stream.
+          Serializer serializer = SerializerFactory.getSerializer
+                                  (OutputProperties.getDefaultMethodProperties("xml"));
+          serializer.setOutputStream(new FileOutputStream(outNames.nextName()));
+          filter3.setContentHandler(serializer.asContentHandler());
 
             // Now, when you call transformer3 to parse, it will set  
             // itself as the ContentHandler for transform2, and 
@@ -717,9 +752,10 @@ public class ExamplesTest extends XSLProcessorTestBase
             // content handler for transform1, and call transform1.parse, 
             // which will set itself as the content listener for the 
             // SAX parser, and call parser.parse(new InputSource(fooFile.xmlName)).
+          reporter.logTraceMsg("filter3.parse " + sourceID);
             filter3.parse(new InputSource(sourceID));
         fileChecker.check(reporter, new File(outNames.currentName()),
-                          new File(fooFile.goldName),
+                          new File(NOT_DEFINED),
                           "exampleXMLFilterChain fileChecker of:" + outNames.currentName());
     } 
     catch (Throwable t)
