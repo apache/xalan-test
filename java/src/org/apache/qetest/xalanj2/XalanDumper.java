@@ -73,6 +73,7 @@ import org.apache.xalan.templates.ElemTextLiteral;
 import org.apache.xalan.templates.ElemLiteralResult;
 import org.apache.xalan.templates.Constants;
 import org.apache.xalan.transformer.TransformerImpl;
+import org.apache.xml.dtm.ref.DTMNodeProxy;
 import org.apache.xml.utils.QName;
 import org.apache.xpath.XPath;
 
@@ -118,6 +119,8 @@ public abstract class XalanDumper
     public static final int DUMP_CONTAINED = 2;
     /** Simple output formats: don't close block.  */
     public static final int DUMP_NOCLOSE = 4;
+    /** Simple output formats: don't include id's or other items likely to change.  */
+    public static final int DUMP_NOIDS = 8;
 
     /** Cheap-o recursion marker: already recursing in Nodes/NodeLists.  */
     public static final int DUMP_NODE_RECURSION = 16;
@@ -351,6 +354,77 @@ public abstract class XalanDumper
             return LBRACKET + buf.toString() + RBRACKET;
         else
             return "Node" + LBRACKET + buf.toString() + RBRACKET;
+    }
+
+    /**
+     * Return String describing a DTMNodeProxy.
+     * This is the Xalan-J 2.x internal wrapper for Nodes.
+     *
+     * @param n the DTMNodeProxy to print info of
+     * @param dumpLevel what format/how much to dump
+     */
+    public static String dump(DTMNodeProxy n, int dumpLevel)
+    {
+        if (null == n)
+            return "DTMNodeProxy" + LBRACKET + NULL + RBRACKET;
+
+        // Copied but modified from TracerEvent; ditch hashCode
+        StringBuffer buf = new StringBuffer();
+
+        if (DUMP_NOIDS != (dumpLevel & DUMP_NOIDS))
+        {
+            // Only include the DTM node number if asked
+            buf.append(n.getDTMNodeNumber());
+        }
+        
+        if (n instanceof Element)
+        {
+            buf.append(n.getNodeName());
+            // Also output first x chars of value
+            buf.append(substr(n.getNodeValue()));
+
+            DTMNodeProxy c = (DTMNodeProxy)n.getFirstChild();
+
+            while (null != c)
+            {
+                buf.append(dump(c, dumpLevel | DUMP_NODE_RECURSION) + " ");
+                c = (DTMNodeProxy)c.getNextSibling();
+            }
+        }
+        else
+        {
+            if (n instanceof Attr)
+            {
+                buf.append(n.getNodeName() + "=" + n.getNodeValue());
+            }
+            else
+            {
+                buf.append(n.getNodeName());
+                // Also output first x chars of value
+                buf.append(substr(n.getNodeValue()));
+            }
+        }
+
+            
+        // If we're already recursing, don't bother printing out 'Node' again
+        if (DUMP_NODE_RECURSION == (dumpLevel & DUMP_NODE_RECURSION))
+            return LBRACKET + buf.toString() + RBRACKET;
+        else
+            return "DTMNodeProxy" + LBRACKET + buf.toString() + RBRACKET;
+    }
+
+    /** Cheap-o worker method to substring a string.  */
+    public static int MAX_SUBSTR = 8;
+
+    /** Cheap-o worker method to substring a string.  */
+    public static String SUBSTR_PREFIX = ":";
+
+    /** Cheap-o worker method to substring a string.  */
+    protected static String substr(String s)
+    {
+        if (null == s)
+            return "";
+        return SUBSTR_PREFIX + s.substring(0, Math.min(s.length(), MAX_SUBSTR));
     }
 
     /**
