@@ -1062,6 +1062,26 @@
         </antcall>
     </target>
 
+    <target name="perf.xsltc" description="Run TestletDriver over the perf tree using xsltc">
+        <!-- Set the default conformance test driver, user may override -->
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <echo message="Executing Xalan-xsltc perf test: ${testClass}" />
+        <!-- Special: allow explicit test.properties overrides for inputDir, etc for xsltc -->
+        <property name="testType" value="perf.xsltc." />
+        <xalantest test="${testClass}"
+            testType="${testType}"
+            classpathref="xsltc.runtime.class.path"
+            fork="${fork-tests}"
+            failonerror="${fail-on-error}">
+            <!-- Explicitly set TransformerFactory property to use xsltc -->
+            <sysproperty key="javax.xml.transform.TransformerFactory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
+        </xalantest>
+        <antcall target="scan">
+            <param name="scan.outputDir" value="${perf.xsltc.outputDir}"/>
+        </antcall>
+    </target>
+
+
     <!-- ================================================================== -->
     <!-- Run tests: a specific named API test with xsltc code               -->
     <!-- ================================================================== -->
