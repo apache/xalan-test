@@ -57,8 +57,8 @@
 package org.apache.qetest.xslwrapper;
 import org.apache.qetest.QetestUtils;
 
-import org.apache.xalan.xsltc.compiler.XSLTC;
-import org.apache.xalan.xsltc.runtime.DefaultRun;
+import org.apache.xalan.xsltc.cmdline.Compile;
+import org.apache.xalan.xsltc.cmdline.Transform;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -82,8 +82,8 @@ import java.util.Properties;
 public class XsltcMainWrapper extends TransformWrapperHelper
 {
 
-    protected static final String XSLTC_COMPILER_CLASS = "org.apache.xalan.xsltc.compiler.XSLTC";
-    protected static final String XSLTC_RUNTIME_CLASS = "org.apache.xalan.xsltc.runtime.DefaultRun";
+    protected static final String XSLTC_COMPILER_CLASS = "org.apache.xalan.xsltc.cmdline.Compile";
+    protected static final String XSLTC_RUNTIME_CLASS = "org.apache.xalan.xsltc.cmdline.Transform";
 
     /**
      * Cached copy of newProcessor() Hashtable.
@@ -172,8 +172,8 @@ public class XsltcMainWrapper extends TransformWrapperHelper
         long xslBuild = 0;
         long transform = 0;
 
-        // java com.sun.xslt.compiler.XSLTC play1.xsl
-        // java com.sun.xslt.runtime.DefaultRun play.xml play1 >stdout
+        // java com.sun.xslt.cmdline.Compile play1.xsl
+        // java com.sun.xslt.cmdline.Transform play.xml play1 >stdout
 
         // Timed: compile stylesheet class from XSL file
 
@@ -192,14 +192,16 @@ So as a temp fix - strip off the protocol prefix and pass the local path/file
         args1[1] = "-d";
         args1[2] = transletsdirName;
         args1[3] = xslName;
+/* Shane said this didn't need to be done anymore
         int idx = xslName.indexOf("file:////");
         if (idx != -1){
                xslName = new String(xslName.substring(8));
                args1[3] = xslName;
         }
+*/
         startTime = System.currentTimeMillis();
         /// Transformer transformer = factory.newTransformer(new StreamSource(xslName));
-        XSLTC.main(args1);
+        Compile.main(args1);
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Verify output file was created
@@ -217,7 +219,7 @@ So as a temp fix - strip off the protocol prefix and pass the local path/file
         // Timed: read/build xml, transform, and write results
 
 /* TWA - We shouldn't use the -u option unless we are really using URLs.
-With or without the -u option, the files aree getting a file://// prefix 
+With or without the -u option, the files are getting a file://// prefix 
 which caused them to be not found
 */
 
@@ -226,10 +228,12 @@ which caused them to be not found
         String[] args2 = new String[3];
         args2[0] = "-s"; // Don't allow System.exit
         args2[1] = xmlName;
+/* Shane said this doesn't need to be done anymore
         int idx2 = xmlName.indexOf("file:////");
         if (idx2 != -1){
                args2[1] = new String(xmlName.substring(8));
         }
+*/
         args2[2] = baseName;// Just basename of the .class file, without the .class
                             // Note that . must be on CLASSPATH to work!
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -241,7 +245,7 @@ which caused them to be not found
         {
             // Capture System.out into our byte array
             System.setOut(new PrintStream(baos));
-            DefaultRun.main(args2);
+            Transform.main(args2);
         }
         finally
         {
