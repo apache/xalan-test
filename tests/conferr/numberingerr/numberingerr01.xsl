@@ -6,6 +6,7 @@
   <!-- Purpose: Test of excessive size of grouping-separator. -->
   <!-- SpecCitation: Rec="XSLT" Version="1.0" type="OASISptr1" place="id(convert)/p[6]/text()[1]" -->
   <!-- Scenario: operation="message" StandardError="grouping-separator must be one character long." -->
+  <!-- ExpectedException: Illegal value: toobig used for CHAR attribute: grouping-separator.  An attribute of type CHAR must be only 1 character! -->
 
 <xsl:template match="doc">
   <out>
