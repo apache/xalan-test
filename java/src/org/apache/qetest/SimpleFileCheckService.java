@@ -112,7 +112,7 @@ public class SimpleFileCheckService implements CheckService
             return reporter.ERRR_RESULT;
         }
 
-        String fVal1 = readFileIntoString((File) actual);
+        String fVal1 = readFileIntoString(reporter, (File) actual);
 
         // Fail if Actual file doesn't exist
         if (fVal1 == null)
@@ -122,7 +122,7 @@ public class SimpleFileCheckService implements CheckService
             return Reporter.FAIL_RESULT;
         }
 
-        String fVal2 = readFileIntoString((File) reference);
+        String fVal2 = readFileIntoString(reporter, (File) reference);
 
         // Ambiguous if gold or reference file doesn't exist
         if (fVal2 == null)
@@ -166,21 +166,21 @@ public class SimpleFileCheckService implements CheckService
 
     /**
      * Compare two files for equivalence, and return appropriate *_RESULT flag.
+     * <p>Uses appropriate values from Reporter for return values.</p>
      * @param file1 Actual (current) file to check
      * @param file2 Reference (gold, or expected) file to check against
      * @return PASS if equal, FAIL if not, AMBG if gold does not exist
-     * <P>Uses appropriate values from Reporter.</P>
      */
-    public int checkFiles(File file1, File file2)
+    public int checkFiles(Reporter reporter, File file1, File file2)
     {
 
-        String fVal1 = readFileIntoString(file1);
+        String fVal1 = readFileIntoString(reporter, file1);
 
         // Fail if Actual file doesn't exist
         if (fVal1 == null)
             return (Reporter.FAIL_RESULT);
 
-        String fVal2 = readFileIntoString(file2);
+        String fVal2 = readFileIntoString(reporter, file2);
 
         // Ambiguous if gold or reference file doesn't exist
         if (fVal2 == null)
@@ -194,13 +194,24 @@ public class SimpleFileCheckService implements CheckService
     }
 
     /**
-     * Read text file into string line-by-line.  
-     *
-     * NEEDSDOC @param f
-     *
-     * NEEDSDOC ($objectName$) @return
+     * Compare two files for equivalence, and return appropriate *_RESULT flag.
+     * For backwards compatibility.
+     * @param file1 Actual (current) file to check
+     * @param file2 Reference (gold, or expected) file to check against
+     * @return PASS if equal, FAIL if not, AMBG if gold does not exist
      */
-    private String readFileIntoString(File f)
+    public int checkFiles(File file1, File file2)
+    {
+
+        return checkFiles(null, file1, file2);
+    }
+
+    /**
+     * Read text file into string line-by-line.  
+     * @param f File object to read
+     * @return String of file's contents
+     */
+    private String readFileIntoString(Reporter reporter, File f)
     {
 
         StringBuffer sb = new StringBuffer();
@@ -222,19 +233,34 @@ public class SimpleFileCheckService implements CheckService
         }
         catch (Exception e)
         {
-            System.err.println("SimpleFileCheckService(" + f.getPath()
-                               + ") exception :" + e.toString());
+            if (reporter != null)
+            {
+                reporter.logErrorMsg("SimpleFileCheckService(" + f.getPath()
+                                     + ") threw:" + e.toString());
+            }
+            else
+                System.err.println("SimpleFileCheckService(" + f.getPath()
+                                   + ") threw:" + e.toString());
 
-            return (null);
+            return null;
         }
 
         return sb.toString();
     }
 
     /**
+     * Read text file into string line-by-line.  
+     * For backwards compatibility.
+     * @param f File object to read
+     * @return String of file's contents
+     */
+    private String readFileIntoString(File f)
+    {
+        return readFileIntoString(null, f);
+    }
+    /**
      * Description of algorithim used to check file equivalence.  
-     *
-     * NEEDSDOC ($objectName$) @return
+     * @return String description of algorithim
      */
     public String getDescription()
     {
