@@ -15,42 +15,88 @@
       <dd>Many other <a href="http://xml.apache.org/mail.html">xalan-dev</a> subscribers</dd>
       <dd>Many other helpers who we still need to credit! Sorry!</dd>
     </dl>
-<p>These tests are provided for Xalan contributors to evaluate the impact of code changes. 
+<hr>
+<p><b>Special Note:</b> the documentation for the tests is still in the process of being
+migrated into Apache, so expect changes and improvements over the next couple of weeks. 
+The eventual plan is to have both doc here, in the source tree, as well as a copy of 
+pre-built docs up on the xml.apache.org website, to make it easier to start diving 
+in and running (or submitting!) tests. The doc will also be much better organized - 
+for the time being, I'm simply putting most everything into this one file.</p>
+
+<h4>Contents:</h4>
+<ul>
+<li><a href="#purpose">Purpose</a></li>
+<li><a href="#standards">Testing Standards</a></li>
+<li><a href="#directories">Directory structure</a></li>
+<li><a href="#how-to-build">How-to: Build the test framework and Java API tests</a></li>
+<li><a href="#how-to-run">How-to: Run tests (ConformanceTest-like drivers or API tests)</a></li>
+<li><a href="#test-options">Common Test Options</a></li>
+<li><a href="#how-to-write">How-to: Write new Java API tests</a></li>
+<li><a href="#how-to-use-c">How-to: Use Xalan-C tests</a></li>
+<li><a href="#testmap">Map of existing Java API tests and Java test drivers</a></li>
+<li><a href="#OASIS">OASIS notes about conformance tests</a></li>
+</ul>
+
+<p><b><a name="purpose">Purpose:</a></b> These tests are provided for Xalan contributors to evaluate the impact of code changes. 
 Run the tests on the unchanged code, make the change and rebuild, then run the tests again 
 and compare the results. Results should also be compared to the files in the "-gold" 
-directory trees.</p>
+directory trees. Even though not all tests have "gold" files, it's still valuable to run 
+the tests before and after a code change. That way you can at least ensure yourself that 
+your changes didn't cause any regressions to the code before checking in.</p>
+
+<hr>
+<p><b><a name="standards">Test Standards:</a></b> There are a number of coding and design 
+standards we've been using for the tests - both for Java files (whether they're framework 
+or utility classes, specific API test files, or test drivers for bunches of xsl stylesheets),
+and for the various XSL stylesheet test files we have, along with their corresponding 
+XML data files, etc.</p>
+<p></p>
 
 <dl>
-  <dt><b>Brief overview of directory structure:</b></dt>
+  <dt><b><a name="directories">Brief overview of directory structure:</a></b></dt>
   <dt>xml-xalan/test/.</dt><dd>Top level dir for all Xalan versions/products tests</dd>
   <dt>..test/java</dt><dd>Top level for Java test automation</dd>
   <dt>....java/bin</dt><dd>Java test automation dependencies (includes 
   <a href="http://jakarta.apache.org/ant/index.html">Ant 1.2</a>)</dd>
-  <dt>....java/src</dt><dd>Java test automation source tree (primary packages: 
+  <dt>....java/src</dt><dd>Java test automation source tree - this includes both 
+  a generic testing framework as well as both specific API tests for parts of Xalan 
+  and several test drivers for testing conformance/performance/etc. over a large 
+  number of xsl test stylesheets.
+  <br>Primary packages are: 
   <a href="java/src/org/apache/qetest/package.html">org.apache.qetest</a>, 
   <a href="java/src/org/apache/qetest/xsl/package.html">org.apache.qetest.xsl</a>, 
   <a href="java/src/org/apache/qetest/trax/package.html">org.apache.qetest.trax</a>, 
+  <a href="java/src/org/apache/qetest/trax/stream/package.html">org.apache.qetest.trax.stream</a>, 
   <a href="java/src/org/apache/qetest/xalanj1/package.html">org.apache.qetest.xalanj1</a>, 
-  )</dd>
+  </dd>
   <dt>..test/tests</dt><dd>Top level for XSLT stylesheet trees</dd>
   <dt>....tests/contrib</dt><dd>Directory tree of user-contributed stylesheets</dd>
   <dt>....tests/contrib-gold</dt><dd>Directory tree of user-contributed stylesheets gold 
   output reference files (this tree should mirror the structure of contrib)</dd>
-  <dt>....tests/apitest</dt><dd>Directory tree for stylesheets used in Java API tests</dd>
-  <dt>....tests/apitest-gold</dt><dd>Matching Directory tree of gold files for Java API tests</dd>
+  <dt>....tests/api</dt><dd>Directory tree for stylesheets used in Java API tests</dd>
+  <dt>....tests/api/trax</dt><dd>Stylesheets used in Java API tests in 
+  <a href="java/src/org/apache/qetest/trax/package.html">org.apache.qetest.trax</a></dd>
+  <dt>....tests/api-gold</dt><dd>Matching Directory tree of gold files for Java API tests</dd>
   <dt>....tests/extension</dt><dd>Directory tree for stylesheets used in Xalan-specific extension tests</dd>
   <dt>....tests/extension/xalanj1</dt><dd>Xalan-J 1.x version-specific extension tests</dd>
   <dt>....tests/extension/xalanj2</dt><dd>Xalan-J 2.x version-specific extension tests</dd>
   <dt>....tests/extension-gold</dt><dd>Matching Directory tree of gold files for Xalan-specific extension tests</dd>
-  <dt>....tests/...</dt><dd>More stylesheet trees to be added!</dd>
+  <dt>....tests/...</dt><dd>More stylesheet trees of testfiles to be added!
+  (namely: tests/conf - Conformance tests to the XSLT spec)</dd>
   <dt>....tests/...-gold</dt><dd></dd>
 </dl>
 <p>Some tests are ones that Xalan has not passed to date, but we know the 
-correct ("gold") result by analysis or by trying the test on other processors. At Lotus/IBM, 
-we have some additional test cases that we can't give away, so a patch may pass all these 
-tests and fail others, but those cases should be rare.</p>
+correct ("gold") result by analysis or by trying the test on other processors. 
+A number of tests may also be missing matching "gold" files, if we haven't 
+yet had time to confirm the correct output.  It's still useful to run these 
+tests (although the ConformanceTest driver will report an AMBG or 'Ambiguous' 
+result) because you can still see if the output looks basically correct, and 
+compare the output to previous test runs before your code changes, etc. 
+At Lotus/IBM, we have some additional test cases that we can't give away, so a 
+patch may pass all these tests and fail others, but those cases should be rare.</p>
 
-<p>Test cases in the "conf" group will ultimately be submitted to OASIS as part of 
+<hr>
+<p><a name="OASIS">Test cases in the "conf" group will ultimately be submitted to OASIS</a> as part of 
 their vendor-independent project on XSLT/XPath Conformance Testing. For more 
 information about this project, visit 
 <a href="http://www.oasis-open.org/committees/xslt/index.html">http://www.oasis-open.org/committees/xslt/index.html</a></p>
@@ -59,34 +105,204 @@ information about this project, visit
 customize the set of tests according to design decisions made for each processor 
 under test. We expect that when the OASIS test system is delivered, it will supplant 
 most or all of the "conf" group provided here. Conformance tests are designed as 
-streamlined "atomic" (or at least "molecular") tests, so there are several hundred of them.</p>
+streamlined "atomic" (or at least "molecular") tests, so there are several hundred of them.
+While </p>
 
 <p>You are invited to submit additional test cases by checking them into the "contrib" 
-area or mailing them to <a href="mailto:David_Marston@lotus.com">David_Marston@lotus.com</a>. If you want to help with testing Xalan and wish to be 
+area or mailing them to <a href="mailto:David_Marston@lotus.com">David_Marston@lotus.com</a>. 
+If you want to help with testing Xalan and wish to be 
 assigned to write some cases, send email to David Marston stating your interest. 
 Contributed tests may be sent along to the OASIS conformance project if they test 
 conformance. Guidelines for comments in tests are still evolving as part of the 
 OASIS project, so it may be necessary to add more comments or other annotation 
 after the test is submitted.</p>
-<hr>
-<p>Quick-doc: to build/run automation:</p>
-<p>Build (DOS format, UNIX is similar): <br>
-<code>set JARDIR=c:\all-jars-here</code> (put xalan.jar, xerces.jar, etc. there)<br>
-<code>cd xml-xalan\test\java</code><br>
-either: <code>build.bat package.trax</code> (packages build\testxsl.jar for Xalan-J 2.x build testing with TRAX interface)<br>
-or: <code>build.bat package.xalan1</code> (packages build\testxsl.jar for Xalan-J 1.x build testing)<br>
-</p>
-<p>Run (DOS format, UNIX is similar): <br>
-<code>set JARDIR=c:\all-jars-here</code> (put xalan.jar, xerces.jar, <b>and</b> testxsl.jar etc. there)<br>
 
-<code>cd xml-xalan\test</code><br>
-Any of:<br>
-<code>runtest.bat TestClassName [options]</code> (see batch file for comments)<br>
-<code>traxapitest.bat TestClassName [options]</code> (runs TRAX interface tests with Xalan-J 2.x)<br>
-<code>xalanj1apitest.bat TestClassName [options]</code> (runs Xalan-J 1.x API tests)<br>
-<code>contribtest.bat [options]</code> (runs ConformanceTest driver over contrib test tree)<br>
+
+<hr>
+<h4><a name="how-to-build">How-to: Build the test framework and Java API tests</a></h4>
+<p>(This builds both the test harness/framework/etc. and the specific Java API test files)
+Works the same for DOS/Windows or UNIXes</p>
+<p>1: Checkout the whole xml-xalan repository locally
+<code>e:\builds\xml-xalan    <br>/home/builds/xml-xalan</code></p>
+<p>2: Set an environment variable JARDIR to point to the directory where you have all applicable jars.  
+Be sure that you delete the testxsl.jar there, since you want to rebuild a new one!
+<br>Required: xalan.jar, xerces.jar (or your parser's jar), testxsl.jar , bsf.jar, 
+js.jar (see Xalan-J doc for how to get this from Mozilla)
+<br><code>set JARDIR=e:\builds\myjars	<br>export JARDIR=/home/builds/myjars</code></p>
+<p>3: Copy all product jars to the aforementioned JARDIR, obviously</p>
+<p>4: cd to the test directory and be safe: cleanup the tests first</p>
+<code>cd e:\builds\xml-xalan\test\java     
+<br>build.bat clean       
+<br>cd /home/builds/xml-xalan/test/java
+<br>build.sh clean</code></p>
+<p>5: Build the tests appropriate to your product
+<code>Xalan-J 1.x:  
+<br>build.bat package.xalan     
+<br>build.sh package.xalan
+<br>Xalan-J 2.x:  
+<br>build.bat package.trax     
+<br>build.sh package.trax</code><p>
+<p>This will create <code>build\testxsl.jar</code>, which you should manually copy into your JARDIR set above before running any tests.</p>
+<p>Note that ProcessorWrapper subclasses for XT and SAXON are currently checked in 
+both as .java source files and as precompiled .class files - the .class files are 
+merely copied into the jar by default, so you don't need the other processors 
+on the classpath when building the jar. These classes aren't strictly necessary
+unless you're running tests with those flavors.</p>
+
+<hr>
+<h4><a name="how-to-run">How-to: Run tests (ConformanceTest-like drivers or API tests)</a></h4>
+<p>1: Build a fresh copy of testxsl.jar as described <a href="#how-to-build">above</a>, 
+including setting the environment variable JARDIR and putting all the needed .jar files 
+there, including <code>testxsl.jar</code></p>
+<p>2: <code>cd xml-xalan\test</code></p>
+<p>3: (either) Run Any of the 'convenience' batch files provided:<br>
+<code>traxapitest.bat TRAXAPITestClassName [options]</code> (runs TRAX interface tests with Xalan-J 2.x)<br>
+<code>(equivalent to runtest trax.TRAXAPITestClassName -load APITest.properties [options]</code><br><br>
+<code>xalanj1apitest.bat ParamTest [options]</code> (runs Xalan-J 1.x API tests)<br>
+<code>(equivalent to runtest xalanj1.ParamTest -load APITest.properties [options]</code><br><br>
+<code>contribtest.bat [options]</code> (runs ConformanceTest driver over contrib test tree)<br><br>
+<code>runtest.bat end_pkg.AnyTestClassName [options]</code> (see batch file for comments) This is 
+a generic way to run any tests - it assumes org.apache.qetest as the package; you may 
+need to provide the last part of the end_pkg name as well as the classname - as well 
+as providing any extra arguments for the test too.<br>
 </p>
-  </body>
+<p>3: (or) Run java.exe and the desired test class yourself:<br>
+<p><b>Note:</b> the above batch and shell files, and the JARDIR environment variable, 
+are simply conveniences for running the tests. The Java API tests and test drivers can 
+also be executed by hand, for those who wish to manage their own classpaths and/or
+simply pass all arguments to the tests on the command line, etc.</p>
+<p>Sorry! We don't have .sh equivalents for all the convenience .bat files 
+- submissions of ports of these files are welcomed!</p>
+
+<hr>
+<h4><a name="test-options">Common Test Options</a></h4>
+<p>Most tests can either accept options from a properties file, via:<br>
+<code>TestName -load file.properties</code><br>
+or simply from the command line (which ovverrides the properties file) like:<br>
+<code>TestName -arg1 value1 -arg2 -arg3 value3</code><br></p>
+<p>To see all options, call a test with an illegal argument to force it 
+to print out it's .usage().</p>
+<p>For another description of options, see xml-xalan\test\ContribTest.properties, 
+which describes most of them as used in the context of running the ConformanceTest driver 
+over the xml-xalan\tests\contrib tree of stylesheets.  Simply change inputDir and goldDir
+to run over a different set of files (like a conformance test suite, which we hope to 
+add soon).</p>
+<ul>Quick list of options<br>
+<li><code>-load <i>file.properties</i></code>  (read in a .properties file, that can set any/all of the other opts)</li>
+<li><code>-logFile <i>resultsFileName</i></code> sends test results to file</li>
+<li><code>-inputDir <i>path to tests</i></code> input *.xml/*.xsl files</li>
+<li><code>-outputDir <i>path to output area</i></code> - where all output is sent</li>
+<li><code>-goldDir <i>path to gold reference output</i></code></li>
+<li>(paths should be appropriate to the platform you're on, 
+and must be \\escaped\\properly if in a .properties file)</li>
+<li><code>-category <i>name of single subdir within testDir to run</i></code></li>
+<li><code>-excludes <i>'test1.xsl;test2.xsl'</i></code>  (will skip running any specifically named tests)</li>
+<li><code>-flavor <i>xalan|trax|trax.d2d</i></code> - which kind/flavor of Processor to test></li>
+<li><code>-noReuse</code>   (will force recreate processor each time)</li>
+<li><code>-debug</code>     (prints extra test debugging info everywhere)</li>
+<li><code>-precompile</code> (will use precompiled stylesheet, if applicable)</li>
+<li><code>-noErrTest</code>  (will skip running 'err' tests, if applicable)</li>
+</ul> 	
+
+
+<hr>
+<h4><a name="how-to-write">How-to: Write new Java API tests</a></h4>
+<p>Use the existing framework!  It provides lots of useful functionality, 
+and will help us to maintain your tests.</p>
+<p>To write new TRAX/javax.xml.transform API tests:</p>
+<p>- open org.apache.qetest.trax.REPLACE_template_for_new_tests.java</p>
+<p>- follow directions to rename the file (and put in the correct dom/sax/stream
+ subdir, if needed) and search-and-replace all REPLACE_* tokens</p>
+<p>- write one-time-only setup code in testFileInit()</p>
+<p>- write a number of testCase<i>n</i> methods. Each one should 
+be independent from the other test cases. Try to test between one 
+and ten or so individual test points (or calls to reporter.check(...)
+for each testCase method.</p>
+<p>- <b>Never</b> use System.out/.err - always use reporter.log*Msg() (to report 
+general messages), or reporter.check() (to validate a specific test point)</p>
+<p>- Build the tests, including your new one, <a href="#how-to-build">as described</a></p>
+<p>- Put your test's supporting xml/xsl files in xml-xalan/test/tests/api/trax or 
+subdirectories</p>
+<p>- Use xml-xalan\test\traxapitest.bat (and APITest.properties) <a href="#how-to-run">to run your test</a>!
+Results will be placed by default into xml-xalan\test\results-api\APITest.xml</p>
+<p>You can pretty-print the results by using the viewResults.xsl stylesheet to turn
+the XML into an HTML format.</p>
+
+
+<hr>
+<h4><a name="how-to-use-c">How-to: Use Xalan-C tests</a></h4>
+<p>TBD - in progress.  A few C++ API tests are checked into the xml-xalan\c
+repository area already.  To execute any set of 'conformance' tests with the 
+Xalan-C processor, we currently use the 
+<a href="java/src/org/apache/qetest/xsl/package.html">org.apache.qetest.xsl.CConformanceTest</a>
+driver.  This is written in Java to take advantage of the framework and 
+results reporting, but basically constructs a command line for each test 
+and then shells out to 'TestXSLT.exe -in file.xsl...' to run the test; 
+it then uses the same validation routines as the Java ConformanceTest.</p>
+
+<hr>
+<h4><a name="testmap">Map of existing Java API tests and Java test drivers</a></h4>
+<ul>Java Test Drivers (primarily to execute directory trees full of or 
+explicit fileLists of xsl/xml file pairs to produce output files, which 
+are then verified against a corresponding '-gold' tree)<br>
+<li>org.apache.qetest.xsl.ConformanceTest - basic test driver, either takes an 
+<code>inputDir</code> to iterate over (using ConformanceDirRules/ConformanceFileRules),
+or an explicit <code>-fileList</code>. Processes all files using a specific 
+<code>-flavor</code> of a ProcessorWrapper, so identical test runs can be done 
+using different processors (eg. -flavor xalan = XalanWrapper = Xalan-J 1.x; 
+-flavor trax = TraxWrapper = Trax interface using streams by default;
+-flavor trax.d2d = TraxWrapper = Trax interface using DOMs)
+<br>Actually, 'ConformanceTest' is a bad name - this is a generic stylesheet 
+test driver that can be used to run any sort of stylesheet tests, not 
+just conformance tests - this is a common bit of confusion.  Alternate names welcomed.
+'StylesheetTestDriver' perhaps?</li>
+<li>org.apache.qetest.xsl.PerformanceTest - essentially the same as ConformanceTest, 
+but provides additional timing/memory output, as well as an <code>-iterations</code>
+parameter to iterate over each file a bunch of times to get average timing data
+</li>
+<li>org.apache.qetest.xsl.<a href="how-to-use-c">CConformanceTest</a> - essentially the same as ConformanceTest, 
+but for Xalan-C.</li>
+</ul>
+
+<ul>Java API tests for the TRAX (or javax.xml.transform) interface, that 
+Xalan-J 2.x implements.<br>
+<li>All in package: org.apache.qetest.trax</li>
+<li>REPLACE_template_for_new_tests.java - a template for creating new TRAX API tests, see <a href="#how-to-write">How-To-Write-Tests</a></li>
+<li>LoggingErrorListener.java - utility: wraps javax.xml.transform.ErrorListener, and logs info</li>
+<li>LoggingURIResolver.java - utility: wraps javax.xml.transform.URIResolver, and logs info</li>
+<li>TransformerAPITest.java (sc) - API coverage tests for javax.xml.transform.Transformer</li>
+<li>TransformerFactoryAPITest.java (sc) - API coverage tests for javax.xml.transform.TransformerFactory</li>
+<li>TemplatesAPITest.java (sc) - API coverage tests for javax.xml.transform.Templates</li>
+<li>ResultAPITest.java (sc) - API test for Result class - may be obsolete, should 
+have separate tests for SAXResult, DOMResult, StreamResult</li>
+<li>ProcessorAPITest.java (sc) - API test: obsolete: from a previous version of TRAX</li>
+<li>TestThreads.java (sc) - MANUALLY executed test for running multiple threads 
+and transforming multiple stylesheets simultaneously.</li>
+
+<li><br>All in package: org.apache.qetest.trax.stream</li>
+<li>StreamSourceAPITest.java (sc) - API coverage tests for javax.xml.transform.stream.StreamSource (mostly done)</li>
+<li>StreamResultAPITest.java (sc) - API coverage tests for javax.xml.transform.stream.StreamResult (in progress)</li>
+
+<li><br>All in package: org.apache.qetest.trax.dom</li>
+<li>DOMSourceAPITest.java (sc) - API coverage tests for javax.xml.transform.dom.DOMSource (@todo)</li>
+<li>DOMResultAPITest.java (sc) - API coverage tests for javax.xml.transform.dom.DOMResult (@todo)</li>
+<li>DOMLocatorAPITest.java (sc) - API coverage tests for javax.xml.transform.dom.DOMLocator (@todo)</li>
+
+<li><br>All in package: org.apache.qetest.trax.sax</li>
+<li>SAXSourceAPITest.java (km/rm) - API coverage tests for javax.xml.transform.sax.SAXSource (@todo)</li>
+<li>SAXResultAPITest.java (km/rm) - API coverage tests for javax.xml.transform.sax.SAXResult (@todo)</li>
+<li>SAXTransformerFactoryAPITest.java (km/rm) - API coverage tests for javax.xml.transform.sax.SAXTransformerFactory (@todo)</li>
+<li>TemplatesHandlerAPITest.java (km/rm) - API coverage tests for javax.xml.transform.sax.TemplatesHandler (@todo)</li>
+<li>TransformerHandlerAPITest.java (km/rm) - API coverage tests for javax.xml.transform.sax.TransformerHandler (@todo)</li>
+</ul>
+
+<ul>Java API tests for Xalan-J 1.x.
+<li>org.apache.qetest.xalanj1.ParamTest - setting parameters and verifies 
+they're used correctly in a transform/process</li>
+</ul>
+
+
+</body>
 </html>
 
 
