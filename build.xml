@@ -633,7 +633,7 @@
         <!-- Should only be dependent on JAXP, not Xalan specifically -->
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java"
+               includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java,${test.root}xslwrapper/XalanProcessWrapper.java"
                debug="${debug}"
                classpathref="compiletest.class.path" />
     </target>
