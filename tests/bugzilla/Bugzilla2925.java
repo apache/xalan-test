@@ -22,6 +22,13 @@ import org.apache.xalan.transformer.*;
 import org.apache.xpath.*;
 import org.apache.xpath.objects.*;
 
+import org.apache.xml.dtm.*;
+import org.apache.xml.dtm.ref.*;
+import org.apache.xml.dtm.ref.sax2dtm.*;
+
+import org.apache.xpath.XPathContext.XPathExpressionContext;
+import org.apache.xpath.axes.OneStepIterator;
+
 import java.io.File;
 
 /**
@@ -65,7 +72,9 @@ public class Bugzilla2925 extends TestletImpl
 
       t.setParameter("stylesheets", doc.getDocumentElement());
       t.transform(new StreamSource("bugzilla2925.xml"),
-                  new StreamResult("bugzilla2925.xsr"));
+                  new StreamResult("bugzilla2925.xsr")
+                  // new StreamResult(System.err)
+                  );
 
       // If we get here, attempt to validate the contents of 
       //  the outputFile created
@@ -80,13 +89,62 @@ public class Bugzilla2925 extends TestletImpl
     {
       logger.checkFail(e.getMessage());
     }
-
+    
     // Optional: use the Datalet d if supplied
     // Call code to reproduce the bug here
     // Call logger.checkFail("desc") (like Junit's assert(true, "desc")
     //  or logger.checkPass("desc")  (like Junit's assert(false, "desc")
     //  to report the actual bug fail/pass status
   }
+  
+  public static DTM dtmTest(org.apache.xalan.extensions.ExpressionContext exprContext, 
+                     String relativeURI)
+  {
+    XPathExpressionContext xpathExprContext = (XPathExpressionContext)exprContext;
+    DTMManager dtmMgr = xpathExprContext.getDTMManager();
+    
+    DTM dtm = dtmMgr.getDTM(new StreamSource(relativeURI), true, null, false, true);
+    // System.err.println("Returning a DTM: "+dtm);
+    // ((DTMDefaultBase)dtm).dumpDTM();
+    return dtm;
+  }
+  
+  public static DTMAxisIterator DTMAxisIteratorTest(
+                     org.apache.xalan.extensions.ExpressionContext exprContext, 
+                     String relativeURI)
+  {
+    XPathExpressionContext xpathExprContext = (XPathExpressionContext)exprContext;
+    DTMManager dtmMgr = xpathExprContext.getDTMManager();
+    
+    DTM dtm = dtmMgr.getDTM(new StreamSource(relativeURI), true, null, false, true);
+    // System.err.println("Returning a DTM: "+dtm);
+    // ((DTMDefaultBase)dtm).dumpDTM();
+    
+    DTMAxisIterator iter = dtm.getAxisIterator(Axis.SELF);
+    iter.setStartNode(dtm.getDocument());
+        
+    return iter;
+  }
+  
+  public static DTMIterator DTMIteratorTest(
+                     org.apache.xalan.extensions.ExpressionContext exprContext, 
+                     String relativeURI)
+      throws Exception
+  {
+    XPathExpressionContext xpathExprContext = (XPathExpressionContext)exprContext;
+    DTMManager dtmMgr = xpathExprContext.getDTMManager();
+    
+    DTM dtm = dtmMgr.getDTM(new StreamSource(relativeURI), true, null, false, true);
+    // System.err.println("Returning a DTM: "+dtm);
+    // ((DTMDefaultBase)dtm).dumpDTM();
+    
+    DTMIterator iterator = new OneStepIterator(dtm.getAxisIterator(Axis.SELF));
+    iterator.setRoot(dtm.getDocument(), xpathExprContext.getXPathContext());
+
+    return iterator;
+  }
+
+
 
   /**
    * <a href="http://nagoya.apache.org/bugzilla/show_bug.cgi?id=2925">
