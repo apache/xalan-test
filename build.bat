@@ -60,7 +60,6 @@ if not "%OS%"=="Windows_NT" goto win9xStart
 @setlocal
 
 set classpath=..\java\bin\ant.jar;..\java\bin\xercesImpl.jar;..\java\bin\xalan.jar;..\java\bin\xml-apis.jar;%CLASSPATH%
-rem set classpath=..\java\bin\ant.jar;..\java\bin\xercesImpl.jar;..\java\bin\xalan.jar;..\java\bin\xml-apis.jar;%CLASSPATH%
 
 
 rem On NT/2K grab all arguments at once
@@ -137,9 +136,7 @@ set _ANT_OPTS=%_ANT_OPTS% -Dparserjar=%_PARSER_JAR%
 if not "%JIKESPATH%" == "" goto runAntWithJikes
 
 :runAnt
-echo on
 "%_JAVACMD%" %JAVA_OPTS% -classpath "%_CLASSPATH%" -Dant.home="%_ANT_HOME%" %_ANT_OPTS% org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
-echo off
 goto end
 
 :runAntWithJikes
