@@ -8,7 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Step through names on the namespace axis. Ensure attributes aren't counted. -->
 
-<xsl:output method="xml" encoding="UTF-8" indent="yes" />
+<xsl:output method="xml" encoding="UTF-8" indent="no" />
 
 <xsl:template match="/">
   <out>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <xsl:output method="html" doctype-public="-//W3C//DTD HTML 4.0 Transitional"/>
+  <xsl:output method="html" indent="no" doctype-public="-//W3C//DTD HTML 4.0 Transitional"/>
 
   <!-- FileName: OUTP60 -->
   <!-- Document: http://www.w3.org/TR/xslt -->

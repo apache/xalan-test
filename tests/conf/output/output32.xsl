@@ -10,7 +10,7 @@
   	   HTML 4.0 Spec. -->
 
   <!-- test for SCRIPT handling -->
-  <xsl:output method="html"/>
+  <xsl:output method="html" indent="no"/>
 
   <xsl:template match="/">
     <HTML>

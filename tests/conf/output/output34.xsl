@@ -1,6 +1,6 @@
 <?xml version="1.0"?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-  <xsl:output method="html" doctype-system="html"/>
+  <xsl:output method="html" doctype-system="html" indent="no"/>
 
   <!-- FileName: OUTP34 -->
   <!-- Document: http://www.w3.org/TR/xslt -->

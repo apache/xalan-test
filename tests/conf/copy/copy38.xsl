@@ -18,7 +18,7 @@
        except in the case of brief quotations embodied in critical articles or reviews. -->
   <!-- Origin: copy-of/soccer.xml, copy-of/soccer.xsl, Chapter/Page: 4-185, was MK015 before -->
 
-<xsl:output method="html"/>
+<xsl:output method="html" indent="no"/>
 
 <xsl:variable name="table-heading">
   <tr>

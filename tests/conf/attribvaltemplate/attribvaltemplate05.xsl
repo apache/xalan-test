@@ -8,7 +8,7 @@
   <!-- Creator: Paul Dick -->
   <!-- Purpose: Use of Curly brace to set value of HTML attribute. -->
 
-<xsl:output method="html" indent="yes"/>
+<xsl:output method="html" indent="no"/>
 
 <xsl:template match="/">
 <HTML>
