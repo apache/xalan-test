@@ -72,10 +72,6 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
-// Solely for postTestFileInit() and logTestProps()
-import org.apache.xalan.xslt.EnvironmentCheck;
-
-//------------------------------------------------------------------------
 
 /**
  * Base class for all Xalan tests.
@@ -226,6 +222,7 @@ public class XSLProcessorTestBase extends FileBasedTest
      * <p>We auto-create a reporter and some loggers: if logFile is 
      * set, we add an XMLFileLogger, and we usually add a 
      * ConsoleLogger.  We also create a fileChecker for later use.</p>
+     * // REFACTOR: should call QetestFactory.newReporter(...) instead.
      * @author Shane_Curcuru@lotus.com
      *
      * @param p unused
