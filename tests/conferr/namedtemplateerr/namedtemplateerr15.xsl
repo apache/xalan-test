@@ -8,6 +8,8 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to set prefix part of QName to null string. -->
   <!-- ExpectedException: Name cannot start with a colon -->
+  <!-- ExpectedException: A prefix of length 0 was detected -->
+  <!-- ExpectedException: Template name is not a valid QName -->
 
 <xsl:template match="doc">
   <out>

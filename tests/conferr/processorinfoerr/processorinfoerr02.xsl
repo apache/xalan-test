@@ -6,7 +6,7 @@
   <!-- DocVersion: 19991116 -->
   <!-- Section: 12.4 -->
   <!-- Purpose: Test bad argument to system-property, no namespace -->
-  <!-- ExpectedException: property not supported -->
+  <!-- ExpectedException: Property not supported -->
 
 <xsl:template match="doc">
   <out>

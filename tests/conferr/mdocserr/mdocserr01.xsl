@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test document() function with non-existent file. -->
   <!-- ExpectedException: File not found -->
+  <!-- ExpectedException: The system cannot find the path specified -->
 
 <xsl:template match="defaultcontent">
   <out>

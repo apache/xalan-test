@@ -9,6 +9,7 @@
   <!-- Creator: David Marston -->
   <!-- ExpectedException: This message came from the MESSAGE03 test. -->
   <!-- ExpectedException: org.apache.xalan.xslt.XSLProcessorException: This message came from the MESSAGE03 test. -->
+  <!-- ExpectedException: Stylesheet directed termination -->
 
 <xsl:template match="/">
   <xsl:message terminate="yes">This message came from the MESSAGE03 test.</xsl:message>

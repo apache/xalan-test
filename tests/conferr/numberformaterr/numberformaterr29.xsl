@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of format-number with too many arguments. -->
   <!-- ExpectedException: format-number() must have at most 3 arguments -->
+  <!-- ExpectedException: only allows 2 or 3 arguments -->
 
 <xsl:decimal-format name="myminus" minus-sign='_' />
 

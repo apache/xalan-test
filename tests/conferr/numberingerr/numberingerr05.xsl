@@ -6,6 +6,7 @@
   <!-- Purpose: Test invalid path specified in count. -->
   <!-- SpecCitation: Rec="XSLT" Version="1.0" type="OASISptr1" place="id(number)/ulist[1]/item[2]/p[1]/text()[1]" -->
   <!-- Scenario: operation="message" StandardError="count attribute must be a node-set" -->
+  <!-- ExpectedException: Unknown nodetype: true -->
 
 <xsl:template match="doc">
   <out><xsl:apply-templates/></out>

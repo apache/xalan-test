@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to follow '//' by a predicate, without node-test. -->
   <!-- ExpectedException: Found '[' without node test -->
+  <!-- ExpectedException: Unexpected token -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Test of format-number with too few arguments. -->
   <!-- ExpectedException: format-number() must have at least 2 arguments -->
+  <!-- ExpectedException: only allows 2 or 3 arguments -->
 
 <xsl:template match="doc">
   <out>

@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to select a '//' without a following node-test. -->
   <!-- ExpectedException: Abbreviation '//' must be followed by a step expression -->
+  <!-- ExpectedException: Unexpected token -->
 
 <xsl:template match="doc">
   <out>

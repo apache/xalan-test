@@ -8,6 +8,7 @@
   <!-- Creator: David Marston -->
   <!-- Purpose: Try to put '//' at end of path. -->
   <!-- ExpectedException: Abbreviation '//' must be followed by a step expression -->
+  <!-- ExpectedException: Unexpected token -->
 
 <xsl:template match="doc">
   <out>

@@ -6,6 +6,7 @@
   <!-- Purpose: Put xsl:number at top level, which is illegal. -->
   <!-- SpecCitation: Rec="XSLT" Version="1.0" type="OASISptr1" place="id(stylesheet-element)/p[3]/text()[1]" -->
   <!-- Scenario: operation="message" StandardError="xsl:number not allowed inside a stylesheet" -->
+  <!-- ExpectedException: xsl:number is not allowed in this position in the stylesheet -->
 
 <xsl:number count="item" from="ol"/>
 
