@@ -10,14 +10,12 @@
 #---- Choose tests: which tests should we run
 # Semicolon delimited list of tests, either FQCNs or just 
 #   package.ClassName assuming org.apache.qetest. will be prepended
-tests=trax.TemplatesAPITest;trax.TransformerFactoryAPITest;trax.stream.StreamResultAPITest;trax.stream.StreamSourceAPITest;trax.dom.DOMResultAPITest;trax.dom.DOMSourceAPITest;trax.sax.SAXSourceAPITest;trax.sax.SAXTransformerFactoryAPITest;trax.sax.TemplatesHandlerAPITest;trax.sax.TransformerHandlerAPITest;trax.SystemIdTest;trax.SystemIdImpInclTest;trax.EmbeddedStylesheetTest;trax.OutputPropertiesTest;trax.URIResolverTest;trax.ErrorListenerAPITest;trax.TransformerAPITest
+tests=trax.TemplatesAPITest;trax.TransformerAPITest;trax.TransformerFactoryAPITest;trax.stream.StreamResultAPITest;trax.stream.StreamSourceAPITest;trax.dom.DOMResultAPITest;trax.dom.DOMSourceAPITest;trax.sax.SAXSourceAPITest;trax.sax.SAXTransformerFactoryAPITest;trax.sax.TemplatesHandlerAPITest;trax.sax.TransformerHandlerAPITest;trax.SystemIdTest;trax.SystemIdImpInclTest;trax.EmbeddedStylesheetTest;trax.OutputPropertiesTest;trax.Minitest;trax.ErrorListenerAPITest;trax.ExamplesTest;trax.URIResolverTest;xalanj2.SerializedStylesheetTest;xalanj2.TraceListenerTest
 
-# Tests that do not pass as-is on the current CVS code 
-#   should be commented out with descriptions below:
-# trax.ExamplesTest; commented out due to smoketest problems I haven't had time to solve yet
-# trax.sax.SAXResultAPITest; commented out due to Bugzilla
-# trax.ErrorListenerTest; commented out due to Bugzilla
-# trax.SystemIdTest; commented out since it's very sensitive to environment issues
+# Note: list of tests must be carefully managed to ensure 
+# 'build smoketest' will normally pass on current good builds 
+# to make it easier for developers to spot problems (and for GUMP)
+
 
 #---- Choose locations: where to find files, where to log to
 # Note that improperly written tests may respond differently 
