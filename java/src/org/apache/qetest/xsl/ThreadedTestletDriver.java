@@ -124,7 +124,7 @@ public class ThreadedTestletDriver extends StylesheetTestletDriver
     public void processInputDir()
     {
         // Implement this later!
-        throw new RuntimeException("processInputDir not yet implemented use -fileList list.txt instead!");
+        reporter.checkErr("processInputDir not yet implemented use -fileList list.txt instead!");
     }
 
 
