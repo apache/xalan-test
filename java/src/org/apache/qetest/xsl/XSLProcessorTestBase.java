@@ -220,7 +220,7 @@ public class XSLProcessorTestBase extends FileBasedTest
 
     /** NEEDSDOC Field fileCheckerName          */
     protected String fileCheckerName =
-        "org.apache.qetest.SimpleFileCheckService";
+        "org.apache.qetest.xsl.XHTFileCheckService";
 
     /** NEEDSDOC Field fileChecker          */
     protected CheckService fileChecker = null;
