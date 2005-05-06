@@ -11,6 +11,7 @@
   <xsl:output method="xml" version="1.1" encoding="UTF-8" 
               indent="yes"/>
   <xsl:template match="/">
+    <out/>
     <xsl:comment> This is a comment &#x2028; </xsl:comment>
     <xsl:processing-instruction name="hellopi"> hello &#x2028;   &#x85;   </xsl:processing-instruction>
   </xsl:template>
