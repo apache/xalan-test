@@ -43,6 +43,7 @@ import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 //-------------------------------------------------------------------------
 
@@ -159,6 +160,7 @@ public class TransformerHandlerAPITest extends FileBasedTest
         {
             // Validate API's for an identity transformer
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Basic construction of identity transformer
@@ -167,6 +169,7 @@ public class TransformerHandlerAPITest extends FileBasedTest
 
             // getTemplates API coverage - simple
             Transformer transformer = tHandler.getTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer != null), true, "getTransformer() is non-null on new identity TransformerHandler");
 
             // set/getSystemId API coverage
@@ -200,6 +203,7 @@ public class TransformerHandlerAPITest extends FileBasedTest
         {
             // Validate API's for a 'real' transformer, which is different code
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Basic construction of identity transformer
@@ -208,6 +212,7 @@ public class TransformerHandlerAPITest extends FileBasedTest
 
             // getTemplates API coverage - simple
             Transformer transformer = tHandler.getTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer != null), true, "realTransformer.getTransformer() is non-null");
 
             // set/getSystemId API coverage
@@ -264,12 +269,14 @@ public class TransformerHandlerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Validate an identity transformerHandler is valid 
             //  and performs as an identity stylesheet
             transformerHandler = saxFactory.newTransformerHandler();
             transformer = transformerHandler.getTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer != null), true, "identity newTransformerHandler is non-null");
             transformer.transform(new StreamSource(xmlURI), new StreamResult(outNames.nextName()));
             int res = fileChecker.check(reporter, 
@@ -289,12 +296,14 @@ public class TransformerHandlerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Validate newTransformerHandler(Source) works
             Source xslSource = new StreamSource(xslURI);
             transformerHandler = saxFactory.newTransformerHandler(xslSource);
             transformer = transformerHandler.getTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer != null), true, "newTransformerHandler(Source) is non-null");
             transformer.transform(new StreamSource(xmlURI), new StreamResult(outNames.nextName()));
             int res = fileChecker.check(reporter, 
@@ -314,6 +323,7 @@ public class TransformerHandlerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Validate newTransformerHandler(Templates) works
@@ -321,6 +331,7 @@ public class TransformerHandlerAPITest extends FileBasedTest
             Templates otherTemplates = factory.newTemplates(xslSource);
             transformerHandler = saxFactory.newTransformerHandler(otherTemplates);
             transformer = transformerHandler.getTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer != null), true, "newTransformerHandler(Templates) is non-null");
             transformer.transform(new StreamSource(xmlURI), new StreamResult(outNames.nextName()));
             int res = fileChecker.check(reporter, 

@@ -42,6 +42,7 @@ import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -278,6 +279,7 @@ public class SAXSourceAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
         }
         catch (Throwable t)
@@ -297,9 +299,11 @@ public class SAXSourceAPITest extends FileBasedTest
             
             xslSAXSrc = new SAXSource(new InputSource(xslURI));
             Transformer transformer1 = factory.newTransformer(xslSAXSrc);
+            transformer1.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer1 != null), true, "Create transformer from SAXSource(new InputSource(URL))");
 
             Transformer transformer2 = templates.newTransformer();
+            transformer2.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer2 != null), true, "Create transformer from earlier templates");
 
             reporter.logTraceMsg("Validate transform of SAXSource(XML) using above transformers");
@@ -327,6 +331,7 @@ public class SAXSourceAPITest extends FileBasedTest
             Templates templatesStream = factory.newTemplates(xslSAXSrc);
             reporter.check((templatesStream != null), true, "Create templates from SAXSource(FileInputStream())");
             Transformer transformerStream = templatesStream.newTransformer();
+            transformerStream.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformerStream != null), true, "Create transformer from templates");
             
             reporter.logTraceMsg("Validate transform of SAXSource(...new InputStream(" + testFileInfo.xmlName + " )) using above transformers");
@@ -360,9 +365,11 @@ public class SAXSourceAPITest extends FileBasedTest
             
             xslSAXSrc = new SAXSource(new InputSource(xslImpInclURI));
             Transformer transformer1 = factory.newTransformer(xslSAXSrc);
+            transformer1.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer1 != null), true, "Create transformer from SAXSource(new InputSource(" + xslImpInclURI + "))");
 
             Transformer transformer2 = factory.newTransformer(xslSAXSrc);
+            transformer2.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer2 != null), true, "Create transformer from earlier templates");
 
             reporter.logTraceMsg("Validate transform of SAXSource(" + xmlImpInclURI + ") using above transformers");

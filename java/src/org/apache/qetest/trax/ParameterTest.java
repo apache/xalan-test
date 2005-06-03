@@ -43,6 +43,7 @@ import org.apache.qetest.Logger;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 //-------------------------------------------------------------------------
 
@@ -354,6 +355,7 @@ public class ParameterTest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             templates = factory.newTemplates(new StreamSource(paramTest.inputName));
         }
         catch (Exception e)
@@ -368,6 +370,7 @@ public class ParameterTest extends FileBasedTest
         {
             // Process the file as-is, without any params set
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             transformer.transform(new StreamSource(paramTest.xmlName), 
                                   new StreamResult(outNames.nextName()));
             transformer.clearParameters();
@@ -470,7 +473,9 @@ public class ParameterTest extends FileBasedTest
         try
         {
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             Transformer transformer = factory.newTransformer(xslStylesheet);
+            transformer.setErrorListener(new DefaultErrorHandler());
 
             reporter.logTraceMsg("setParameter(" + paramName + ", " + paramVal +")");
             transformer.setParameter(paramName, paramVal);

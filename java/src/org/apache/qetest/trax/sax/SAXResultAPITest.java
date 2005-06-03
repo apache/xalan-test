@@ -49,6 +49,7 @@ import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.LoggingContentHandler;
 import org.apache.qetest.xsl.LoggingLexicalHandler;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -179,6 +180,7 @@ public class SAXResultAPITest extends FileBasedTest
             TransformerFactory factory = null;
             SAXTransformerFactory saxFactory = null;
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // ctor(Handler) with identity transformer, which is both
@@ -280,6 +282,7 @@ public class SAXResultAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
             // Process a simple stylesheet for use later
             reporter.logTraceMsg("factory.newTemplates(new StreamSource(" + xslURI + "))");
@@ -312,6 +315,7 @@ public class SAXResultAPITest extends FileBasedTest
             
             // Just do a normal transform to this result
             Transformer transformer = streamTemplates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.logTraceMsg("transform(new StreamSource(" + xmlURI + "), saxResult)");
             transformer.transform(new StreamSource(xmlURI), saxResult);
             fos.close(); // must close ostreams we own
@@ -334,6 +338,7 @@ public class SAXResultAPITest extends FileBasedTest
             
             // Just do a normal transform to this result
             Transformer transformer = streamTemplates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.logTraceMsg("transform(..., nullsaxResult)");
             transformer.transform(new StreamSource(xmlURI), saxResult);
             reporter.checkFail("transform(..., nullsaxResult) should have thrown exception");
@@ -371,6 +376,7 @@ public class SAXResultAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
             // Process a simple stylesheet for use later
             reporter.logTraceMsg("factory.newTemplates(new StreamSource(" + xslURI + "))");
@@ -415,6 +421,7 @@ public class SAXResultAPITest extends FileBasedTest
             
             // Just do a normal transform to this result
             Transformer transformer = streamTemplates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.logTraceMsg("transform(new StreamSource(" + xmlURI + "), loggingSaxResult)");
             transformer.transform(new StreamSource(xmlURI), saxResult);
             fos.close(); // must close ostreams we own
@@ -453,6 +460,7 @@ public class SAXResultAPITest extends FileBasedTest
             
             // Do an identityTransform to this result
             Transformer identityTransformer = TransformerFactory.newInstance().newTransformer();
+            identityTransformer.setErrorListener(new DefaultErrorHandler());
             reporter.logTraceMsg("identityTransform(new StreamSource(" + xmlURI + "), loggingSaxResult)");
             identityTransformer.transform(new StreamSource(xmlURI), saxResult);
             fos.close(); // must close ostreams we own
@@ -502,6 +510,7 @@ public class SAXResultAPITest extends FileBasedTest
             
             // Just do a normal transform to this result
             Transformer transformer = streamTemplates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.logTraceMsg("transform(new DOMSource(" + xmlURI + "), loggingSaxResult)");
             transformer.transform(new DOMSource(xmlNode), saxResult);
             fos.close(); // must close ostreams we own

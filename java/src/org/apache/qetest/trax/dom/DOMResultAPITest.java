@@ -37,6 +37,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
@@ -206,6 +207,7 @@ public class DOMResultAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
             dfactory.setNamespaceAware(true);
             docBuilder = dfactory.newDocumentBuilder();
@@ -235,6 +237,7 @@ public class DOMResultAPITest extends FileBasedTest
             // Verify a 'blank' Result object gets filled up properly
             DOMResult blankResult = new DOMResult();
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             transformer.transform(xmlSource, blankResult);
             reporter.logTraceMsg("blankResult is now: " + blankResult);
             Node blankNode = blankResult.getNode();
@@ -263,6 +266,7 @@ public class DOMResultAPITest extends FileBasedTest
             // Reuse the same result for multiple transforms
             DOMResult reuseResult = new DOMResult(docBuilder.newDocument());
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             transformer.transform(xmlSource, reuseResult);
             Node reuseNode = reuseResult.getNode();
             serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reuseable1 DOMResult");
@@ -270,6 +274,7 @@ public class DOMResultAPITest extends FileBasedTest
             // Get a new transformer just to avoid extra complexity
             reporter.logTraceMsg("About to re-use DOMResult from previous transform, should throw");
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reusePass = true; // Next line should throw an exception
             transformer.transform(xmlSource, reuseResult); // SPR SCUU4RJKG4 throws DOM006
             reporter.checkFail("Re-using DOMResult should have thrown exception", "SCUU4RJKG4");
@@ -290,6 +295,7 @@ public class DOMResultAPITest extends FileBasedTest
             // Reuse the same result for multiple transforms, after resetting node
             DOMResult reuseResult = new DOMResult(docBuilder.newDocument());
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             transformer.transform(xmlSource, reuseResult);
             Node reuseNode = reuseResult.getNode();
             serializeDOMAndCheck(reuseNode, testFileInfo.goldName, "transform into reuseable2 DOMResult");
@@ -297,6 +303,7 @@ public class DOMResultAPITest extends FileBasedTest
             // Get a new transformer just to avoid extra complexity
             reporter.logTraceMsg("About to re-use DOMResult from previous transform after setNode()");
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reuseResult.setNode(docBuilder.newDocument());
             transformer.transform(xmlSource, reuseResult);
             reuseNode = reuseResult.getNode();

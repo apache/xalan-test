@@ -44,6 +44,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.Reporter;
@@ -202,6 +203,7 @@ public class StreamResultAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             // Create re-useable sources
             xslSource = new StreamSource(new FileInputStream(outputFileInfo.inputName));
             reporter.logTraceMsg("Create stream sources, templates");
@@ -220,6 +222,7 @@ public class StreamResultAPITest extends FileBasedTest
             // Test some OutputStreams
             // Simple FileOutputStream is tested in numerous other tests
             Transformer transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Result result1 = new StreamResult(baos);
             reporter.logTraceMsg("About to Transform into ByteArrayOutputStream");
@@ -258,6 +261,7 @@ public class StreamResultAPITest extends FileBasedTest
         {
             // Test some Writers
             Transformer transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             StringWriter sw = new StringWriter();
             Result result1 = new StreamResult(sw);
             reporter.logTraceMsg("About to Transform into StringWriter");
@@ -297,6 +301,7 @@ public class StreamResultAPITest extends FileBasedTest
                 reporter.logTraceMsg("System.getProperty(user.dir) threw SecurityException");
             }
             Transformer transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             StringWriter sw1 = new StringWriter();
             Result result1 = new StreamResult(sw1);
             reporter.logTraceMsg("About to Transform into StringWriter w/out systemId set");

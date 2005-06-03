@@ -41,6 +41,7 @@ import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
@@ -208,6 +209,7 @@ public class DOMSourceAPITest extends FileBasedTest
         {
             // Startup a factory, create some nodes/DOMs
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
             dfactory.setNamespaceAware(true);
             docBuilder = dfactory.newDocumentBuilder();
@@ -259,6 +261,7 @@ public class DOMSourceAPITest extends FileBasedTest
             templates = factory.newTemplates(xslDOM);
             reporter.check((templates != null), true, "factory.newTemplates(DOMSource) is non-null");
             transformerXSL = factory.newTransformer(xslDOM);
+            transformerXSL.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformerXSL != null), true, "factory.newTransformer(DOMSource) is non-null");
             
             // A simple DOM-DOM-DOM transform
@@ -313,6 +316,7 @@ public class DOMSourceAPITest extends FileBasedTest
             // Note that inputName, xmlName are already URL'd
             xslDOM.setSystemId(impInclFileInfo.inputName);
             transformerXSL = factory.newTransformer(xslDOM);
+            transformerXSL.setErrorListener(new DefaultErrorHandler());
             DOMSource xmlDOM = new DOMSource(xmlImpInclNode);
             // Do we really need to set SystemId on both XML and XSL?
             xmlDOM.setSystemId(impInclFileInfo.xmlName);
@@ -344,6 +348,7 @@ public class DOMSourceAPITest extends FileBasedTest
             }
             DOMSource xslDOM = new DOMSource(xslImpInclNode);
             transformerXSL = factory.newTransformer(xslDOM);
+            transformerXSL.setErrorListener(new DefaultErrorHandler());
             DOMSource xmlDOM = new DOMSource(xmlImpInclNode);
             DOMResult emptyResult = new DOMResult();
             reporter.logStatusMsg("About to transform without systemID; probably throws exception");
@@ -382,6 +387,7 @@ public class DOMSourceAPITest extends FileBasedTest
         {
             // Startup a factory, create some nodes/DOMs
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
             dfactory.setNamespaceAware(true);
             docBuilder = dfactory.newDocumentBuilder();
@@ -403,6 +409,7 @@ public class DOMSourceAPITest extends FileBasedTest
             DOMResult result1 = new DOMResult(docBuilder.newDocument());
             DOMSource xslSource = new DOMSource(xslNode);
             Transformer transformer1 = factory.newTransformer(xslSource);
+            transformer1.setErrorListener(new DefaultErrorHandler());
             transformer1.transform(xmlSource1, result1);
             Node node1 = result1.getNode();
             serializeDOMAndCheck(node1, testFileInfo.goldName, "transform first time xslSource worked");
@@ -410,6 +417,7 @@ public class DOMSourceAPITest extends FileBasedTest
             DOMSource xmlSource2 = new DOMSource(xmlNode);
             DOMResult result2 = new DOMResult(docBuilder.newDocument());
             Transformer transformer2 = factory.newTransformer(xslSource);
+            transformer2.setErrorListener(new DefaultErrorHandler());
             transformer2.transform(xmlSource2, result2);
             Node node2 = result2.getNode();
             serializeDOMAndCheck(node2, testFileInfo.goldName, "transform second time xslSource worked");
@@ -417,6 +425,7 @@ public class DOMSourceAPITest extends FileBasedTest
             // Re-use DOMSource for XML doc; with the same stylesheet
             DOMResult result3 = new DOMResult(docBuilder.newDocument());
             Transformer transformer3 = factory.newTransformer(xslSource);
+            transformer3.setErrorListener(new DefaultErrorHandler());
             transformer3.transform(xmlSource2, result3);
             Node node3 = result3.getNode();
             serializeDOMAndCheck(node3, testFileInfo.goldName, "transform reusing both xsl/xml Sources");
@@ -433,6 +442,7 @@ public class DOMSourceAPITest extends FileBasedTest
             DOMSource xmlSource = new DOMSource(xmlNode);
             DOMSource xslSource = new DOMSource(xslNode);
             Transformer transformer1 = factory.newTransformer(xslSource);
+            transformer1.setErrorListener(new DefaultErrorHandler());
             DOMResult result1 = new DOMResult(docBuilder.newDocument());
             transformer1.transform(xmlSource, result1);
             Node node1 = result1.getNode();
@@ -444,6 +454,7 @@ public class DOMSourceAPITest extends FileBasedTest
             xslSource.setNode(xslImpInclNode);
             xslSource.setSystemId(impInclFileInfo.inputName);
             Transformer transformer2 = factory.newTransformer(xslSource);
+            transformer2.setErrorListener(new DefaultErrorHandler());
             DOMResult result2 = new DOMResult(docBuilder.newDocument());
             transformer2.transform(xmlSource, result2);
             Node node2 = result2.getNode();
@@ -478,6 +489,7 @@ public class DOMSourceAPITest extends FileBasedTest
             {
                 // Use identity transformer to serialize
                 Transformer identityTransformer = factory.newTransformer();
+                identityTransformer.setErrorListener(new DefaultErrorHandler());
                 String outName = outNames.nextName();
                 FileOutputStream fos = new FileOutputStream(outName);
                 StreamResult streamResult = new StreamResult(fos);

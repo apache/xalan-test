@@ -41,6 +41,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.xsl.XSLTestfileInfo;
@@ -220,6 +221,7 @@ public class StreamSourceAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             // Create URLs for the filenames
             // What's the simplest way to do this?!? i.e. as a solution 
             //  to the general problem of having a String denoting a 
@@ -253,6 +255,7 @@ public class StreamSourceAPITest extends FileBasedTest
             Result result1 = new StreamResult(fos1);
             Templates templates1 = factory.newTemplates(xslSource1);
             Transformer transformer1 = templates1.newTransformer();
+            transformer1.setErrorListener(new DefaultErrorHandler());
             reporter.logTraceMsg("about to transform to streams after setSystemId");
             transformer1.transform(xmlSource1, result1);
             fos1.close(); // must close ostreams we own
@@ -281,6 +284,7 @@ public class StreamSourceAPITest extends FileBasedTest
             reporter.logInfoMsg("Transform into " + outNames.currentName());
             Templates templates2 = factory.newTemplates(xslSource2);
             Transformer transformer2 = templates2.newTransformer();
+            transformer2.setErrorListener(new DefaultErrorHandler());
             transformer2.transform(xmlSource2, result2);
             fos2.close(); // must close ostreams we own
             int result = fileChecker.check(reporter, 
@@ -320,6 +324,7 @@ public class StreamSourceAPITest extends FileBasedTest
 
             Templates templates3 = factory.newTemplates(xslSource3);
             Transformer transformer3 = templates3.newTransformer();
+            transformer3.setErrorListener(new DefaultErrorHandler());
             reporter.logStatusMsg("About to transform without systemID; probably throws exception");
             transformer3.transform(xmlSource3, result3);
             reporter.checkFail("The above transform should probably have thrown an exception; into " + outNames.currentName());

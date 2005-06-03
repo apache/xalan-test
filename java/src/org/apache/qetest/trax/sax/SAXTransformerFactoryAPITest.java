@@ -45,6 +45,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
@@ -206,6 +207,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest001: newTransformerhandler() method which takes StreamSource as argument. ");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             XMLReader reader = getJAXPXMLReader();
@@ -248,6 +250,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest002: This tests newTransformerhandler() method which takes SAXSource as argument. ");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             XMLReader reader = getJAXPXMLReader();
@@ -347,6 +350,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         String tmpOutName = outNames.nextName();
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -448,6 +452,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest006: This tests newTransformerhandler() method which takes DOMSource as argument.  Here a relative URI is used in citiesinclude.xsl file. setSystemId is used for DOMSource. Here Constructor that takes systemId as argument is used for creating DOMSource. It should run well. ");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
@@ -499,6 +504,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest007: This tests newTransformerhandler() method which takes DOMSource as argument.  Here a relative URI is used in citiesinclude.xsl file. setSystemId is used for DOMSource. Here Constructor that takes systemId as argument is used for creating DOMSource. It should run well. ");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -556,6 +562,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest008: Simple SAX: TemplatesHandler to FileOutputStream");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
@@ -602,6 +609,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest009: Simple SAX with included stylesheet");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             XMLReader reader = getJAXPXMLReader();
@@ -652,6 +660,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest010: The transformer will use a SAX parser as it's reader");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tfactory;
@@ -701,6 +710,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest011: The transformer will use a SAX parser as it's reader");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             // The transformer will use a SAX parser as it's reader.
@@ -758,6 +768,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest012: The transformer will use a SAX parser as it's reader");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             // The transformer will use a SAX parser as it's reader.
@@ -811,6 +822,7 @@ public class SAXTransformerFactoryAPITest extends FileBasedTest
         reporter.logStatusMsg("SAXTFactoryTest013: The transformer will use a SAX parser as it's reader");
 
         TransformerFactory tfactory = TransformerFactory.newInstance();
+        tfactory.setErrorListener(new DefaultErrorHandler());
         try 
         {
             // The transformer will use a SAX parser as it's reader.

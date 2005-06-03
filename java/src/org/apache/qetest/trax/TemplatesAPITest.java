@@ -38,6 +38,7 @@ import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 //-------------------------------------------------------------------------
 
@@ -149,6 +150,7 @@ public class TemplatesAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
         }
         catch (Exception e)
         {

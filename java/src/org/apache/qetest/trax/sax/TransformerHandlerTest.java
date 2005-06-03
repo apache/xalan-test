@@ -40,6 +40,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.Logger;
 import org.apache.qetest.OutputNameManager;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 //-------------------------------------------------------------------------
 
@@ -117,6 +118,7 @@ public class TransformerHandlerTest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             boolean gotExpectedException = false;
@@ -126,6 +128,7 @@ public class TransformerHandlerTest extends FileBasedTest
                 reporter.logInfoMsg("About to newTransformer(xslStr)");
                 reusedTransformer = saxFactory.newTransformer(
                                     new StreamSource(new java.io.StringReader(xslStr)));
+                reusedTransformer.setErrorListener(new DefaultErrorHandler());
                 reporter.logInfoMsg("About to transform(xmlErrorStr, " + outNames.nextName() + ")");
                 reusedTransformer.transform(new StreamSource(new java.io.StringReader(xmlErrorStr)),
                             new StreamResult(outNames.currentName()));

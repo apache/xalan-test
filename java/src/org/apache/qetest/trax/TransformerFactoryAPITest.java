@@ -46,6 +46,8 @@ import org.apache.qetest.Logger;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
+
 import org.w3c.dom.Document;
 
 //-------------------------------------------------------------------------
@@ -268,6 +270,7 @@ public class TransformerFactoryAPITest extends FileBasedTest
             reporter.logStatusMsg("System property " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             Transformer identityTransformer = factory.newTransformer();
             reporter.check((identityTransformer != null), true, "newTransformer() APICoverage");
 
@@ -305,6 +308,7 @@ public class TransformerFactoryAPITest extends FileBasedTest
             reporter.logStatusMsg("System property " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             if (factory.getFeature(StreamSource.FEATURE))
             {
                 Templates templates = factory.newTemplates(new StreamSource(testFileInfo.inputName));
@@ -339,6 +343,7 @@ public class TransformerFactoryAPITest extends FileBasedTest
             reporter.logStatusMsg("System property " + defaultPropName 
                                   + " is: " + System.getProperty(defaultPropName));
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             String media= null;     // currently untested
             String title = null;    // currently untested
             String charset = null;  // currently untested
@@ -353,6 +358,7 @@ public class TransformerFactoryAPITest extends FileBasedTest
             reporter.check((null != stylesheet), true, "getAssociatedStylesheet returns a non-null Source");
 
             Transformer transformer = factory.newTransformer(stylesheet);
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.logCriticalMsg("SPR SCUU4RXTSQ occours in below line, even though check reports pass (missing linefeed)");
             transformer.transform(new StreamSource(embeddedFileInfo.xmlName), new StreamResult(resultStream));
             resultStream.close();   // just in case
@@ -387,6 +393,7 @@ public class TransformerFactoryAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             URIResolver URIRes = factory.getURIResolver();
             reporter.logInfoMsg("factory.getURIResolver() default is: " + URIRes);
             
@@ -463,6 +470,7 @@ public class TransformerFactoryAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();

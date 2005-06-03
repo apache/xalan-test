@@ -43,6 +43,7 @@ import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.TestletImpl;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 //-------------------------------------------------------------------------
 
@@ -202,7 +203,9 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             identityTransformer = factory.newTransformer();
+            identityTransformer.setErrorListener(new DefaultErrorHandler());
             templates = factory.newTemplates(new StreamSource(paramTest.inputName));
         }
         catch (Exception e)
@@ -241,6 +244,7 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             transformer = templates.newTransformer(); // may throw TransformerConfigurationException
+            transformer.setErrorListener(new DefaultErrorHandler());
             // Default Transformer should not have any parameters..
             Object tmp = transformer.getParameter("This-param-does-not-exist");
             reporter.checkObject(tmp, null, "This-param-does-not-exist is null by default");
@@ -284,6 +288,7 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             // Verify simple set/get of a single parameter - Integer
             transformer.setParameter(PARAM3S, new Integer(1234));
             reporter.logTraceMsg("Just set " + PARAM3S + " to Integer(1234)");
@@ -355,6 +360,7 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             transformer.setParameter(PARAM1S, "'test-param-1s'"); // note single quotes
             transformer.setParameter(PARAM1N, new Integer(1234));
             // Verify basic params actually affect transformation
@@ -415,16 +421,21 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             outputTemplates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
             outputTransformer = outputTemplates.newTransformer();
+            outputTransformer.setErrorListener(new DefaultErrorHandler());
 
             htmlTemplates = factory.newTemplates(new StreamSource(htmlFormatTest.inputName));
             htmlTransformer = htmlTemplates.newTransformer();
+            htmlTransformer.setErrorListener(new DefaultErrorHandler());
 
             identityTemplates = factory.newTemplates(new StreamSource(simpleTest.inputName));
             identityTransformer = identityTemplates.newTransformer();
+            identityTransformer.setErrorListener(new DefaultErrorHandler());
 
             defaultTransformer = factory.newTransformer();
+            defaultTransformer.setErrorListener(new DefaultErrorHandler());
         }
         catch (Throwable t)
         {
@@ -535,6 +546,7 @@ public class TransformerAPITest extends FileBasedTest
 
             // See what we have by default, from our testfile
             outputTransformer = outputTemplates.newTransformer();
+            outputTransformer.setErrorListener(new DefaultErrorHandler());
             try
             {
                 // Inner try-catch
@@ -633,6 +645,7 @@ public class TransformerAPITest extends FileBasedTest
             {   // Inner try-catch
                 // Simple set/getOutputProperty
                 outputTransformer = outputTemplates.newTransformer();
+                outputTransformer.setErrorListener(new DefaultErrorHandler());
                 String tmp = outputTransformer.getOutputProperty(OutputKeys.OMIT_XML_DECLARATION); // SPR SCUU4RXR6E
                     // SPR SCUU4R3JZ7 - throws npe
                 reporter.logTraceMsg(OutputKeys.OMIT_XML_DECLARATION + " is currently: " + tmp);
@@ -649,6 +662,7 @@ public class TransformerAPITest extends FileBasedTest
             {   // Inner try-catch
                 // Try getting the whole properties block, so we can see what it thinks it has
                 outputTransformer = outputTemplates.newTransformer();
+                outputTransformer.setErrorListener(new DefaultErrorHandler());
                 Properties newOutProps = outputTransformer.getOutputProperties();
                 reporter.logHashtable(reporter.STATUSMSG, newOutProps, 
                                       "Another getOutputProperties()");
@@ -710,7 +724,9 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             identityTransformer = factory.newTransformer();
+            identityTransformer.setErrorListener(new DefaultErrorHandler());
             outputTemplates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
         }
         catch (Throwable t)
@@ -756,7 +772,9 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             identityTransformer = factory.newTransformer();
+            identityTransformer.setErrorListener(new DefaultErrorHandler());
             outputTemplates = factory.newTemplates(new StreamSource(outputFormatTest.inputName));
         }
         catch (Throwable t)
@@ -918,6 +936,7 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
         }
         catch (Throwable t)
         {
@@ -929,6 +948,7 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             Transformer transformer = factory.newTransformer(new StreamSource(simpleTest.inputName));
+            transformer.setErrorListener(new DefaultErrorHandler());
             // Re-use the transformer multiple times on identity
             transformer.transform(new StreamSource(simpleTest.xmlName), 
                                   new StreamResult(outNames.nextName()));
@@ -952,6 +972,7 @@ public class TransformerAPITest extends FileBasedTest
                 "transform(#3) identity into: " + outNames.currentName());
             
             transformer = factory.newTransformer(new StreamSource(multiTest.inputName));
+            transformer.setErrorListener(new DefaultErrorHandler());
             // Re-use the transformer multiple times on file with variable
             transformer.transform(new StreamSource(multiTest.xmlName), 
                                   new StreamResult(outNames.nextName()));
@@ -967,6 +988,9 @@ public class TransformerAPITest extends FileBasedTest
                 new File(multiTest.goldName), 
                 "transform(#2-a) var test into: " + outNames.currentName());
 
+            // Reset the transformer to its original state
+            transformer.reset();
+            
             transformer.transform(new StreamSource(multiTest.xmlName), 
                                   new StreamResult(outNames.nextName()));
             fileChecker.check(reporter, 
@@ -981,6 +1005,9 @@ public class TransformerAPITest extends FileBasedTest
                 new File(outNames.currentName()), 
                 new File(multi2Test.goldName), 
                 "transform(#4-b) var test into: " + outNames.currentName());
+
+            // Reset the transformer to its original state
+            transformer.reset();
 
             // Now re-use with original xml doc
             transformer.transform(new StreamSource(multiTest.xmlName), 
@@ -1021,7 +1048,7 @@ public class TransformerAPITest extends FileBasedTest
         {
             factory = TransformerFactory.newInstance();
             // Grab a stylesheet to use for this testcase
-            factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             templates = factory.newTemplates(new StreamSource(simpleTest.inputName));
         }
         catch (Throwable t)
@@ -1069,6 +1096,7 @@ public class TransformerAPITest extends FileBasedTest
         try
         {
             Transformer transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             // URIResolver should be null by default; try to set/get one
             reporter.checkObject(transformer.getURIResolver(), null, "getURIResolver is null by default");
             LoggingURIResolver myURIResolver = new LoggingURIResolver(reporter);

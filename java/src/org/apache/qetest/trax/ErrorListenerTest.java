@@ -190,35 +190,6 @@ public class ErrorListenerTest extends FileBasedTest
             // Clear out any setExpected or counters
             loggingErrorListener.reset();
             reporter.checkPass("set ErrorListener prevented any exceptions in newTemplates()");
-
-            // This stylesheet will still work, even though errors 
-            //  were detected during it's building.  Note that 
-            //  future versions of Xalan or other processors may 
-            //  not be able to continue here...
-            transformer = templates.newTransformer();
-
-            reporter.logTraceMsg("default transformer's getErrorListener is: " + transformer.getErrorListener());
-            // Set the errorListener and validate it
-            transformer.setErrorListener(loggingErrorListener);
-            reporter.check((transformer.getErrorListener() == loggingErrorListener),
-                           true, "set/getErrorListener on transformer");
-
-            // Validate the first xsl:message call in the stylesheet
-            loggingErrorListener.setExpected(transformExpectedType, 
-                                             transformExpectedValue);
-            reporter.logTraceMsg("about to transform(...)");
-            transformer.transform(new StreamSource(QetestUtils.filenameToURL(testFileInfo.xmlName)), 
-                                  new StreamResult(outNames.nextName()));
-            reporter.logTraceMsg("after transform(...)");
-            // Clear out any setExpected or counters
-            loggingErrorListener.reset();
-
-            // Validate the actual output file as well: in this case, 
-            //  the stylesheet should still work
-            fileChecker.check(reporter, 
-                    new File(outNames.currentName()), 
-                    new File(testFileInfo.goldName), 
-                    "transform of error xsl into: " + outNames.currentName());
         }
         catch (Throwable t)
         {
@@ -274,42 +245,6 @@ public class ErrorListenerTest extends FileBasedTest
             // Clear out any setExpected or counters
             loggingErrorListener.reset();
             reporter.checkPass("set ErrorListener prevented any exceptions in newTransformerHandler()");
-
-            // This stylesheet will still work, even though errors 
-            //  were detected during it's building.  Note that 
-            //  future versions of Xalan or other processors may 
-            //  not be able to continue here...
-
-            // Create a result and setup SAX parsing 'tree'
-            Result result = new StreamResult(outNames.nextName());
-            handler.setResult(result);
-            reader.setContentHandler(handler);
-
-            LoggingSAXErrorHandler loggingSAXErrorHandler = new LoggingSAXErrorHandler(reporter);
-            loggingSAXErrorHandler.setThrowWhen(LoggingSAXErrorHandler.THROW_NEVER);
-            reporter.logTraceMsg("LoggingSAXErrorHandler originally setup:" + loggingSAXErrorHandler.getQuickCounters());
-            reader.setErrorHandler(loggingSAXErrorHandler);
-            
-            // Validate the first xsl:message call in the stylesheet
-            loggingErrorListener.setExpected(transformExpectedType, 
-                                             transformExpectedValue);
-            reporter.logInfoMsg("about to parse/transform(" + QetestUtils.filenameToURL(testFileInfo.xmlName) + ")");
-            reader.parse(QetestUtils.filenameToURL(testFileInfo.xmlName));
-            reporter.logTraceMsg("LoggingSAXErrorHandler after parse:" + loggingSAXErrorHandler.getQuickCounters());
-            // Clear out any setExpected or counters
-            loggingErrorListener.reset();
-            loggingSAXErrorHandler.reset();
-
-            // Validate the actual output file as well: in this case, 
-            //  the stylesheet should still work
-            reporter.logErrorMsg("Output file validation Moved to SmoketestOuttakes.java.testCase3 Oct-01 -sc Bugzilla#4044");
-/* **** Moved to SmoketestOuttakes.java.testCase3 Oct-01 -sc 
-            fileChecker.check(reporter, 
-                    new File(outNames.currentName()), 
-                    new File(testFileInfo.goldName), 
-                    "SAX transform of error xsl into: " + outNames.currentName());
-**** Moved to SmoketestOuttakes.java.testCase3 Oct-01 -sc **** */
-            
         }
         catch (Throwable t)
         {

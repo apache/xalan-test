@@ -47,6 +47,7 @@ import org.apache.qetest.Logger;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.xml.sax.XMLReader;
 
 //-------------------------------------------------------------------------
@@ -163,6 +164,7 @@ public class TemplatesHandlerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Basic construction
@@ -214,6 +216,7 @@ public class TemplatesHandlerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Validate a templatesHandler can create a valid stylesheet
@@ -232,6 +235,7 @@ public class TemplatesHandlerAPITest extends FileBasedTest
             reporter.check((xslOutProps != null), true, "getTemplates().getOutputProperties() returns non-null with valid stylesheet");
             //@todo validate a specific output property
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer != null), true, "getTemplates().newTransformer() returns non-null with valid stylesheet");
 
             // Validate that this transformer actually works
@@ -256,6 +260,7 @@ public class TemplatesHandlerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Validate a templatesHandler can create a stylesheet 
@@ -275,6 +280,7 @@ public class TemplatesHandlerAPITest extends FileBasedTest
             reporter.check((xslOutProps != null), true, "getTemplates().getOutputProperties() returns non-null with impincl stylesheet");
             //@todo validate a specific output property
             transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
             reporter.check((transformer != null), true, "getTemplates().newTransformer() returns non-null with impincl stylesheet");
 
             // Validate that this transformer actually works
@@ -299,6 +305,7 @@ public class TemplatesHandlerAPITest extends FileBasedTest
         try
         {
             factory = TransformerFactory.newInstance();
+            factory.setErrorListener(new DefaultErrorHandler());
             saxFactory = (SAXTransformerFactory)factory;
 
             // Validate a templatesHandler with an incorrect 
