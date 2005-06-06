@@ -29,12 +29,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
@@ -548,13 +550,13 @@ public class TransformerFactoryAPITest extends FileBasedTest
 
 
     /**
-     * Coverage tests for getFeature, set/getAttribute API's.
+     * Coverage tests for set/getFeature, set/getAttribute API's.
      *
      * @return false if we should abort the test; true otherwise
      */
     public boolean testCase7()
     {
-        reporter.testCaseInit("Coverage tests for getFeature, set/getAttribute API's");
+        reporter.testCaseInit("Coverage tests for set/getFeature, set/getAttribute API's");
         // This test case should be JAXP-generic, and must not rely on Xalan-J 2.x functionality
         reporter.logInfoMsg("Note: only simple validation: most are negative tests");
         TransformerFactory factory = null;
@@ -623,7 +625,54 @@ public class TransformerFactoryAPITest extends FileBasedTest
             reporter.logThrowable(reporter.ERRORMSG, t, "getFeature/Attribute()2 tests threw");
         }
 
-
+        try
+        {
+            reporter.logStatusMsg("Calling: factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING)");
+            factory = TransformerFactory.newInstance();
+            try
+            {
+                // All implementations are required to support the XMLConstants.FEATURE_SECURE_PROCESSING feature
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                boolean b = factory.getFeature(XMLConstants.FEATURE_SECURE_PROCESSING);
+                reporter.check(b, true, "factory.getFeature(XMLConstants.FEATURE_SECURE_PROCESSING)");
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
+                b = factory.getFeature(XMLConstants.FEATURE_SECURE_PROCESSING);
+                reporter.check(b, false, "factory.getFeature(XMLConstants.FEATURE_SECURE_PROCESSING)");
+                
+            }
+            catch (TransformerConfigurationException tce)
+            {
+                reporter.checkFail("set/getFeature(XMLConstants.FEATURE_SECURE_PROCESSING) tests threw: " + tce.toString());
+                reporter.logThrowable(reporter.ERRORMSG, tce, "set/getFeature(XMLConstants.FEATURE_SECURE_PROCESSING) tests threw");
+            }
+            
+            try
+            {
+                factory.setFeature(BOGUS_NAME, true);
+                reporter.checkFail("factory.setFeature(BOGUS_NAME) did not throw expected exception");
+                
+            }
+            catch (TransformerConfigurationException tce)
+            {
+                reporter.checkPass("factory.setFeature(BOGUS_NAME) threw expected TransformerConfigurationException");
+            }
+            
+            try
+            {
+                factory.setFeature(null, true);
+                reporter.checkFail("factory.setFeature(null, true) did not throw expected exception");
+            }
+            catch (NullPointerException npe)
+	    {
+	        reporter.checkPass("factory.setFeature(null, true) threw expected NullPointerException");
+            }
+                
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("set/getFeature() tests threw: " + t.toString());
+            reporter.logThrowable(reporter.ERRORMSG, t, "set/getFeature() tests threw");
+        }
 
         reporter.testCaseClose();
         return true;

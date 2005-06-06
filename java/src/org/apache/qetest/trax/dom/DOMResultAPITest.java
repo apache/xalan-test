@@ -42,6 +42,8 @@ import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.QetestUtils;
 import org.apache.qetest.xsl.XSLTestfileInfo;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
@@ -174,6 +176,24 @@ public class DOMResultAPITest extends FileBasedTest
             
             wackyDOM.setSystemId("another-system-id");
             reporter.checkObject(wackyDOM.getSystemId(), "another-system-id", "set/getSystemId API coverage");
+            
+            // Test the DOMResult(Node node, Node nextSibling) constructor
+            Document doc = docBuilder.newDocument();
+            Element a = doc.createElementNS("", "a");
+            Element b = doc.createElementNS("", "b");
+            Element c = doc.createElementNS("", "c");
+            doc.appendChild(a);
+            a.appendChild(b);
+            a.appendChild(c);
+            DOMResult nodeNextSiblingDOM = new DOMResult(a, c);
+            reporter.checkObject(nodeNextSiblingDOM.getNode(), a, "DOMResult(node, nextSibling) has Node: " + nodeNextSiblingDOM.getNode());
+            reporter.checkObject(nodeNextSiblingDOM.getNextSibling(), c, "DOMResult(node, nextSibling) has nextSibling: " + nodeNextSiblingDOM.getNextSibling());
+        
+            // Test the DOMResult(Node node, Node nextSibling, String systemId) constructor
+	    DOMResult nodeNextSiblingIdDOM = new DOMResult(a, b, "this-is-system-id");
+	    reporter.checkObject(nodeNextSiblingIdDOM.getNode(), a, "DOMResult(node, nextSibling, systemId) has Node: " + nodeNextSiblingIdDOM.getNode());
+            reporter.checkObject(nodeNextSiblingIdDOM.getNextSibling(), b, "DOMResult(node, nextSibling, systemId) has nextSibling: " + nodeNextSiblingIdDOM.getNextSibling());
+            reporter.check(nodeNextSiblingIdDOM.getSystemId(), "this-is-system-id", "DOMResult(node, nextSibling, systemId) has SystemId: " + nodeNextSiblingIdDOM.getSystemId());
         }
         catch (Throwable t)
         {
@@ -320,6 +340,43 @@ public class DOMResultAPITest extends FileBasedTest
             reporter.checkFail("Problem with re-using results(2)");
             reporter.logThrowable(reporter.ERRORMSG, t,
                                   "Problem with re-using results(2)");
+        }
+
+        try
+        {
+            // The gold file when transforming with a DOMResult created by
+            // the DOMResult(Node node, Node nextSibling) constructor.
+            String goldFileName2 = goldDir 
+                              + File.separator 
+                              + TRAX_DOM_SUBDIR
+                              + File.separator
+                              + "DOMTest2.out";
+            
+            DOMSource xmlSource = new DOMSource(xmlNode);
+	    DOMSource xslSource = new DOMSource(xslNode);
+            templates = factory.newTemplates(xslSource);
+            
+            // Create a DOMResult using the DOMResult(Node node, Node nextSibling) constructor
+            Document doc = docBuilder.newDocument();
+            Element a = doc.createElementNS("", "a");
+            Element b = doc.createElementNS("", "b");
+            Element c = doc.createElementNS("", "c");
+            doc.appendChild(a);
+            a.appendChild(b);
+            a.appendChild(c);
+            DOMResult result = new DOMResult(a, c);
+            
+            transformer = templates.newTransformer();
+            transformer.setErrorListener(new DefaultErrorHandler());
+            transformer.transform(xmlSource, result);
+            Node resultNode = result.getNode();
+            serializeDOMAndCheck(resultNode, goldFileName2, "transform into DOMResult with nextSibling");            
+        }
+        catch (Throwable t)
+        {
+            reporter.checkFail("Problem with DOMResult with nextSibling");
+            reporter.logThrowable(reporter.ERRORMSG, t,
+                                  "Problem with DOMResult with nextSibling");        
         }
 
         reporter.testCaseClose();
