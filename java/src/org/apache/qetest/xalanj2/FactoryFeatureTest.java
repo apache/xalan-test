@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -37,6 +38,7 @@ import org.apache.qetest.Logger;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.xsl.TraxDatalet;
 import org.apache.xalan.processor.TransformerFactoryImpl;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 //-------------------------------------------------------------------------
 
@@ -58,7 +60,7 @@ public class FactoryFeatureTest extends FileBasedTest
     /** Just initialize test name, comment, numTestCases. */
     public FactoryFeatureTest()
     {
-        numTestCases = 3;  // REPLACE_num
+        numTestCases = 4;  // REPLACE_num
         testName = "FactoryFeatureTest";
         testComment = "Basic functionality test of various Factory configuration APIs";
     }
@@ -297,6 +299,54 @@ public class FactoryFeatureTest extends FileBasedTest
 
         reporter.testCaseClose();
         return true;
+    }
+    
+    /**
+     * Validate transforms with FEATURE_SECURE_PROCESSING on/off.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+        reporter.testCaseInit("Validate transforms with FEATURE_SECURE_PROCESSING on/off");
+        
+        try
+        {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            
+            // The test xsl contains an extension function. The transformation is successful
+            // when FEATURE_SECURE_PROCESSING is set to false.
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
+            
+            TraxDatalet datalet = new TraxDatalet();
+            datalet.setDescription("Test secure processing feature:");
+            datalet.setNames(inputDir + File.separator + "xalanj2", "SecureProcessingTest");
+            datalet.goldName = goldDir + File.separator + "xalanj2" + File.separator + "SecureProcessingTest.out";
+            datalet.outputName = outNames.nextName();
+            transformAndCheck(factory, datalet);
+                        
+            try
+            {
+                // TransformerException is thrown when FEATURE_SECURE_PROCESSING is set to true.
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                Transformer transformer = factory.newTransformer(datalet.getXSLSource());
+                transformer.setErrorListener(new DefaultErrorHandler());
+                transformer.transform(datalet.getXMLSource(), new StreamResult(datalet.outputName));
+                reporter.checkFail("Expected TransformerException not thrown when secure processing feature is set to true.");
+            }
+            catch (javax.xml.transform.TransformerException e)
+            {
+                reporter.checkPass("TransformerFactory with FEATURE_SECURE_PROCESSING set to true threw TransformerException:  " + e.toString());
+            }
+        }
+        catch (Throwable t)
+        {
+            reporter.logThrowable(Logger.ERRORMSG, t, "Failed in secure processing feature test");
+            reporter.checkFail("Failed in secure processing feature test");
+        }
+        
+        reporter.testCaseClose();
+        return true;        
     }
 
 
