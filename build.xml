@@ -431,6 +431,47 @@ dependencies - users must manually 'build jar' first.
     </target>
 
     <!-- ================================================================== -->
+    <!-- Run tests: the normal StylesheetTestletDriver on the EXSLT suite    -->
+    <!-- ================================================================== -->
+    <target name="exslt" description="Run TestletDriver over the exslt tree"
+        depends="init.test">
+        <!-- Set the default conformance test driver, user may override -->
+        <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
+        <echo message="Executing Xalan exslt test: ${testClass}" />
+        <property name="testType" value="exslt." />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="exslt.class.path" />
+        </antcall>
+        <property name="scan.outputDir" value="${exslt.outputDir}"/>
+        <antcall target="scan"/>
+    </target>
+
+    <target name="exslt.dom" description="Run TestletDriver over exslt with DOM excludes">
+        <antcall target="exslt">
+            <param name="exslt.excludes" value="${trax.dom.excludes}"/>
+            <param name="exslt.flavor" value="trax.dom"/>
+        </antcall>
+    </target>
+
+    <target name="exslt.one" description="Run a single exslt test">
+        <antcall target="exslt">
+            <param name="testClass" value="org.apache.qetest.xsl.StylesheetDriver" />
+        </antcall>
+    </target>
+
+    <target name="exslt.xsltc.dom" description="Run TestletDriver over exslt with DOM excludes">
+        <antcall target="exslt.xsltc">
+            <param name="exslt.xsltc.excludes" value="${trax.dom.excludes}"/>
+            <param name="exslt.xsltc.flavor" value="trax.dom"/>
+        </antcall>
+    </target>
+
+    <target name="exslt.trace" description="Run TestletDriver over the conf tree">
+        <property name="exslt.trace" value="on"/>
+        <antcall target="exslt"/>
+    </target>
+
+    <!-- ================================================================== -->
     <!-- Run tests: the normal StylesheetTestletDriver on the accept suite  -->
     <!-- ================================================================== -->
     <target name="accept" description="Run TestletDriver over the accept tree">
