@@ -200,13 +200,7 @@ dependencies - users must manually 'build jar' first.
 
     <!-- Gump build xml-xalan2-smoketest should use xalan.unbundled.jar -->
     <path id="boot.class.path.gump">
-        <pathelement location="${xalan.unbundled.jar}" />
-        <pathelement location="${xsltc.jar}" />  <!-- add this so we can test the
-                                                      separate jar distribution -->  
-        <pathelement location="${ser.jar}" />                                                       
-        <pathelement location="${java.class.path}" />
-        <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${sun.boot.class.path}" />
     </path>
     
     <!-- Classpath used when running perf or performance tests -->
