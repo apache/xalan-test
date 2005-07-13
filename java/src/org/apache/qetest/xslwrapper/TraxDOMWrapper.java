@@ -32,6 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.qetest.QetestUtils;
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
@@ -133,6 +134,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         //@todo do we need to do any other cleanup?
         reset(false);
         factory = TransformerFactory.newInstance();
+        factory.setErrorListener(new DefaultErrorHandler());
         // Verify the factory supports DOM!
         if (!(factory.getFeature(DOMSource.FEATURE)
               && factory.getFeature(DOMResult.FEATURE)))
@@ -192,6 +194,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         // Timed: build Transformer from DOMSource
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
+        transformer.setErrorListener(new DefaultErrorHandler());
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Timed: read xml into a DOM
@@ -222,6 +225,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         // Untimed: prepare serializer with outputProperties 
         //  from the stylesheet
         Transformer resultSerializer = factory.newTransformer();
+        resultSerializer.setErrorListener(new DefaultErrorHandler());
         Properties serializationProps = transformer.getOutputProperties();
         resultSerializer.setOutputProperties(serializationProps);
         
@@ -342,6 +346,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         
         // Untimed: get Transformer from Templates
         Transformer transformer = builtTemplates.newTransformer();
+        transformer.setErrorListener(new DefaultErrorHandler());
 
         DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
         dfactory.setNamespaceAware(true);
@@ -374,6 +379,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         // Untimed: prepare serializer with outputProperties 
         //  from the stylesheet
         Transformer resultSerializer = factory.newTransformer();
+        resultSerializer.setErrorListener(new DefaultErrorHandler());
         Properties serializationProps = transformer.getOutputProperties();
         resultSerializer.setOutputProperties(serializationProps);
         
@@ -447,6 +453,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         // Timed: build Transformer from Source
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
+        transformer.setErrorListener(new DefaultErrorHandler());
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Untimed: create DOMResult
@@ -467,6 +474,7 @@ public class TraxDOMWrapper extends TransformWrapperHelper
         // Untimed: prepare serializer with outputProperties 
         //  from the stylesheet
         Transformer resultSerializer = factory.newTransformer();
+        resultSerializer.setErrorListener(new DefaultErrorHandler());
         Properties serializationProps = transformer.getOutputProperties();
         resultSerializer.setOutputProperties(serializationProps);
         

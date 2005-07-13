@@ -36,6 +36,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.qetest.QetestUtils;
+import org.apache.xml.utils.DefaultErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -131,6 +132,7 @@ public class TraxSAXWrapper extends TransformWrapperHelper
         //@todo do we need to do any other cleanup?
         reset(false);
         factory = TransformerFactory.newInstance();
+        factory.setErrorListener(new DefaultErrorHandler());
         // Verify the factory supports SAX!
         if (!(factory.getFeature(SAXSource.FEATURE)
               && factory.getFeature(SAXResult.FEATURE)))

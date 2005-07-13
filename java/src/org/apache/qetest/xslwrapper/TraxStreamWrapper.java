@@ -34,6 +34,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.qetest.QetestUtils;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 /**
  * Implementation of TransformWrapper that uses the TrAX API and 
@@ -129,6 +130,7 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         //@todo do we need to do any other cleanup?
         reset(false);
         factory = TransformerFactory.newInstance();
+        factory.setErrorListener(new DefaultErrorHandler());
         // Verify the factory supports Streams!
         if (!(factory.getFeature(StreamSource.FEATURE)
               && factory.getFeature(StreamResult.FEATURE)))
@@ -190,6 +192,7 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         // Timed: build Transformer from StreamSource
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
+        transformer.setErrorListener(new DefaultErrorHandler());
         xslBuild = System.currentTimeMillis() - startTime;
 
         File xmlFile = new File(xmlName);
@@ -348,7 +351,8 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         // Timed: get Transformer from Templates
 		startTime = System.currentTimeMillis();
         Transformer transformer = builtTemplates.newTransformer();
-		getTransformer = System.currentTimeMillis() - startTime;
+        transformer.setErrorListener(new DefaultErrorHandler());
+	getTransformer = System.currentTimeMillis() - startTime;
 
         File xmlFile = new File(xmlName);
         int xmlLength = new Long(xmlFile.length()).intValue(); //@todo warning: possible overflow
@@ -452,6 +456,7 @@ public class TraxStreamWrapper extends TransformWrapperHelper
         // Timed: build xsl from a URL
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
+        transformer.setErrorListener(new DefaultErrorHandler());
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Re-read the XML file for use in transform; not timed

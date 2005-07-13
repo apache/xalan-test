@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.apache.xml.utils.DefaultErrorHandler;
 
 /**
  * Implementation of TransformWrapper that uses the TrAX API and 
@@ -122,6 +123,7 @@ public class TraxLocalPathWrapper extends TransformWrapperHelper
         //@todo do we need to do any other cleanup?
         reset(false);
         factory = TransformerFactory.newInstance();
+        factory.setErrorListener(new DefaultErrorHandler());
         // Verify the factory supports Streams!
         if (!(factory.getFeature(StreamSource.FEATURE)
               && factory.getFeature(StreamResult.FEATURE)))
@@ -166,6 +168,7 @@ public class TraxLocalPathWrapper extends TransformWrapperHelper
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(
                 new StreamSource(xslName));
+        transformer.setErrorListener(new DefaultErrorHandler());
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Untimed: Set any of our options as Attributes on the transformer
@@ -269,6 +272,7 @@ public class TraxLocalPathWrapper extends TransformWrapperHelper
         
         // UNTimed: get Transformer from Templates
         Transformer transformer = builtTemplates.newTransformer();
+        transformer.setErrorListener(new DefaultErrorHandler());
 
         // Untimed: Set any of our options as Attributes on the transformer
         TraxWrapperUtils.setAttributes(transformer, newProcessorOpts);
@@ -329,6 +333,7 @@ public class TraxLocalPathWrapper extends TransformWrapperHelper
         // Timed: build xsl from a URL
         startTime = System.currentTimeMillis();
         Transformer transformer = factory.newTransformer(xslSource);
+        transformer.setErrorListener(new DefaultErrorHandler());
         xslBuild = System.currentTimeMillis() - startTime;
 
         // Untimed: Set any of our options as Attributes on the transformer
