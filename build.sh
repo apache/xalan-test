@@ -33,15 +33,15 @@ uname | grep WIN && CLS_PATH_SEP=\;
 
 # If PARSER_JAR is not set, default to xercesImpl.jar
 if [ "$PARSER_JAR" = "" ] ; then
-    PARSER_JAR=../java/bin/xercesImpl.jar
+    PARSER_JAR=../java/lib/xercesImpl.jar
 fi
 
 if [ "$XML_APIS_JAR" = "" ]; then
-    XML_APIS_JAR=../java/bin/xml-apis.jar
+    XML_APIS_JAR=../java/lib/xml-apis.jar
 fi
 
 if [ "$SERIALIZER_JAR" = "" ]; then
-    SERIALIZER_JAR=../java/bin/serializer.jar
+    SERIALIZER_JAR=../java/lib/serializer.jar
 fi
 
 if [ "$ANT_HOME" = "" ] ; then
@@ -68,7 +68,7 @@ fi
  
 # add in the dependency .jar files (copied from ant)
 DIRLIBS=${ANT_HOME}/lib/*.jar
-_ANT_CP=$ANT_HOME/bin/ant.jar
+_ANT_CP=$ANT_HOME/tools/ant.jar
 for i in ${DIRLIBS}
 do
     # if the directory is empty, then it will return the input string

@@ -59,7 +59,7 @@ if not "%OS%"=="Windows_NT" goto win9xStart
 :winNTStart
 @setlocal
 
-set classpath=..\java\bin\ant.jar;..\java\bin\xercesImpl.jar;..\java\bin\xalan.jar;..\java\bin\serializer.jar;..\java\bin\xml-apis.jar;%CLASSPATH%
+set classpath=..\java\tools\ant.jar;..\java\lib\xercesImpl.jar;..\java\lib\xalan.jar;..\java\lib\serializer.jar;..\java\lib\xml-apis.jar;%CLASSPATH%
 
 
 rem On NT/2K grab all arguments at once
@@ -98,21 +98,21 @@ set _ANT_OPTS=%ANT_OPTS% -Dos.name=Windows_NT
 
 rem Note: classpath handling is special for testing Xalan
 rem If PARSER_JAR blank, default to xerces in the xalan dir
-if "%PARSER_JAR%" == "" set _PARSER_JAR=..\java\bin\xercesImpl.jar
+if "%PARSER_JAR%" == "" set _PARSER_JAR=..\java\lib\xercesImpl.jar
 if not "%PARSER_JAR%" == "" set _PARSER_JAR=%PARSER_JAR%
 set _XML-APIS_JAR=%XML-APIS_JAR%
-if "%_XML-APIS_JAR%" == "" set _XML-APIS_JAR=..\java\bin\xml-apis.jar
+if "%_XML-APIS_JAR%" == "" set _XML-APIS_JAR=..\java\lib\xml-apis.jar
 
 rem If JARDIR is blank, then only add Ant, PARSER_JAR, and XML-APIS_JAR to the 
 rem    classpath before running Ant - then within the Ant file, it 
 rem    will add other .jars from default locations
-if "%JARDIR%" == "" set _CLASSPATH=%CLASSPATH%;%_ANT_HOME%\bin\ant.jar;%_XML-APIS_JAR%;%_PARSER_JAR%
+if "%JARDIR%" == "" set _CLASSPATH=%CLASSPATH%;%_ANT_HOME%\tools\ant.jar;%_XML-APIS_JAR%;%_PARSER_JAR%
 
 rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files 
 rem    in the classpath first from that one dir
 rem Note: Does not yet support xsltc testing! TBD -sc
 rem Note: Does not yet support using crimson from JARDIR (forces xercesImpl.jar)! TBD -sc
-if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xml-apis.jar;%JARDIR%\xercesImpl.jar;%JARDIR%\xalan.jar;%JARDIR%\serializer.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\bin\ant.jar;%JARDIR%\Tidy.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xml-apis.jar;%JARDIR%\xercesImpl.jar;%JARDIR%\xalan.jar;%JARDIR%\serializer.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\js.jar;%_ANT_HOME%\tools\ant.jar;%JARDIR%\Tidy.jar;%CLASSPATH%
 
 rem Attempt to automatically add system classes to very end of _CLASSPATH
 if exist "%JAVA_HOME%\lib\tools.jar" set _CLASSPATH=%_CLASSPATH%;%JAVA_HOME%\lib\tools.jar

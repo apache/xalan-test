@@ -68,6 +68,7 @@ dependencies - users must manually 'build jar' first.
     <property name="test.src.dir" value="java/src"/>
     <property name="test.root" value="org/apache/qetest/"/>
     <property name="test.dir" value="${test.src.dir}/${test.root}"/>
+    <property name="test.tools.dir" value="./tools"/>    
     <property name="test.build.dir" value="java/build"/>
     <property name="test.build.docs" value="${test.build.dir}/docs"/>
     <property name="test.build.apidocs" value="${test.build.docs}/apidocs"/>
@@ -85,7 +86,8 @@ dependencies - users must manually 'build jar' first.
 	
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
     <property name="xalan.relpath" value="../java"/>
-    <property name="xalan.bin.dir" value="${xalan.relpath}/bin"/> 
+    <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
+    <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
     <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/>
     <property name="xalan.generator.styletargz" value="${xalan.xdocs.dir}/xml-site-style.tar.gz"/>
@@ -96,12 +98,12 @@ dependencies - users must manually 'build jar' first.
             value="${xalan.build.dir}/xalan-unbundled.jar"/>
     <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
-    <property name="xml-apis.jar" value="${xalan.bin.dir}/xml-apis.jar"/>
-    <property name="parserjar" value="${xalan.bin.dir}/xercesImpl.jar"/>
-    <property name="bcel.jar" value="${xalan.bin.dir}/BCEL.jar"/>
+    <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
+    <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
+    <property name="bcel.jar" value="${xalan.lib.dir}/BCEL.jar"/>
 
     <!-- JTidy is used by the XSLTC comparator -->
-    <property name="jtidy.jar" value="${xalan.bin.dir}/Tidy.jar"/>
+    <property name="jtidy.jar" value="${test.tools.dir}/Tidy.jar"/>
     
     <!-- The js.jar is for Javascript extensions tests; you must get this .jar yourself.  
          Feel free to reset the location. -->
@@ -116,8 +118,8 @@ dependencies - users must manually 'build jar' first.
     <property name="bsf.jar" value="../../bsf.jar"/>
 
     <!-- Documentation-specific files and locations -->
-    <property name="stylebook.jar" value="${xalan.bin.dir}/stylebook-1.0-b3_xalan-2.jar"/>
-    <property name="doclet.jar" value="${xalan.bin.dir}/xalan2jdoc.jar"/>
+    <property name="stylebook.jar" value="${xalan.tools.dir}/stylebook-1.0-b3_xalan-2.jar"/>
+    <property name="doclet.jar" value="${xalan.tools.dir}/xalan2jdoc.jar"/>
     <property name="test.xdocs.dir" value="java/xdocs"/>
     <property name="test.generator.styletar" value="${test.xdocs.dir}/xml-site-style.tar"/>
     <property name="test.xdocs.book" value="${test.xdocs.dir}/sources/xalantest.xml"/>
@@ -1559,7 +1561,7 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${xalan.bin.dir}/Tidy.jar" />
+        <pathelement location="${jtidy.jar}" />
     </path>
     <path id="xsltc.compile.class.path">
         <pathelement path="${java.class.path}" />
@@ -1571,7 +1573,7 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${xalan.bin.dir}/Tidy.jar" />
+        <pathelement location="${jtidy.jar}" />
         <!-- Note addition of . to the classpath to enable loading 
              of translets; this needs more work and coordination 
              with tests and translet output dirs.
