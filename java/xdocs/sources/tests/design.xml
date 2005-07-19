@@ -211,8 +211,6 @@
     </gloss>
     <p>Please: if you plan to submit Java API tests, use the existing framework 
     as <link idref="submit" anchor="write-API-tests">described</link>.</p>
-    <p>Contact <jump href="paul_dick@lotus.com">Paul_Dick@lotus.com</jump> if you'd 
-    like to help in the Xalan-C API testing effort.</p>
   </s2>
       
   <anchor name="standards-xsl-tests"/>

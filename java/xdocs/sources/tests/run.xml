@@ -116,7 +116,7 @@
       whatever data they can as results are generated; afterwards, we then 
       post-process the results into whatever presentation format is needed, 
       including perhaps re-calculating overall results (example: if we have 
-      a list of known fails correlated to Bugzilla numbers, then a stylesheet 
+      a list of known fails correlated to JIRA numbers, then a stylesheet 
       could filter out these fails and report them as known bugs instead.
       </p>
     </s2>
@@ -187,12 +187,10 @@
       <p>In progress.  A few C++ API tests are checked into the <code>xml-xalan/c/Tests</code>
       repository area already.  To execute any set of 'conformance' tests with the 
       Xalan-C processor, we currently use the 
-      org.apache.qetest.xsl.<jump href="apidocs/org/apache/qetest/xsl/CConformanceTest.html">CConformanceTest</jump>
+      org.apache.qetest.xsl.<jump href="apidocs/org/apache/qetest/xsl/XalanCTestlet.html">XalanCTestlet</jump>
       driver.  This is written in Java to take advantage of the framework and 
       results reporting, but basically constructs a command line for each test 
       and then shells out to <code>TestXSLT.exe -in file.xsl...</code> to run the test; 
       it then uses the same validation routines as the Java ConformanceTest.</p>
-      <p>Contact <jump href="paul_dick@lotus.com">Paul_Dick@lotus.com</jump> if you'd 
-      like to help in the Xalan-C API testing effort.</p>
     </s2>    
 </s1>

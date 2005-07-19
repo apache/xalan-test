@@ -92,15 +92,10 @@
     </p><p>To download Xalan builds, see the:
     <jump href="http://xml.apache.org/xalan-j/dist/">Xalan-J download page</jump> or the 
     <jump href="http://xml.apache.org/xalan-c/dist/">Xalan-C download page</jump>
-    </p><p>To get the test sources, do either of the following:
+    </p><p>To get the test sources, do the following:
     <br/>Check out the xml-xalan\test repository <jump href="http://xml.apache.org/cvs.html">directly from CVS</jump> 
-    (<jump href="http://xml.apache.org/cvs.html">read-only access</jump> is available to all), or:
-    <br/><br/>Get the latest <jump href="http://xml.apache.org/from-cvs/xml-xalan/">dev-snapshot</jump>: 
-    these are .tar.gz files of the entire xml-xalan repository, including both the 
-    development sources and the test sources (they are just source, however, and are not prebuilt), or:
-    <br/><br/>Get the latest <jump href="http://xml.apache.org/xalan-j/dist/nightly/">GUMP build output</jump>: 
-    which includes full compiled distribution builds as well as a full set of 
-    prcompiled tests and test results in a *smoketest.tar.gz file.   
+    (<jump href="http://xml.apache.org/cvs.html">read-only access</jump> is available to all).
+    <br/><br/>
     </p>
     
   </s2>
@@ -109,7 +104,7 @@
   <s2 title="Building the Tests">
     <p>Since the test automation is written in Java, you must build it before running 
     any tests.  Like Xalan-J, we use Ant build.xml files as 'makefiles' to build the 
-    project.  A copy of the Ant runtime files is provided in the xml-xalan/java/bin directory if you 
+    project.  A copy of the Ant runtime files is provided in the xml-xalan/java/tools directory if you 
     need them; you may also use your own copy of Ant if you have it installed.  
     Unless specifically noted, all testing code should work either on Windows or 
     UNIX systems; adjust .sh/.bat and path\separators/as needed.  Note that paths 

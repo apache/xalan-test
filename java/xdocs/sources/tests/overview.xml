@@ -48,7 +48,9 @@
     a rolled-up report of their pass/fail/other status.  Our existing testing library includes 
     a wide array of tests, from XSLT conformance to detailed API tests, and welcomes 
     user-submitted tests as well.  The 'smoketest' target (a subset of the most important 
-    tests) are also integrated into the <jump href="http://jakarta.apache.org/builds/gump">GUMP nightly build system</jump>, and thus ensure a 
+    tests) are also integrated into the 
+    <jump href="http://vmgump.apache.org/gump/public/xml-xalan/xml-xalan2-smoketest/index.html">GUMP nightly build system</jump>, 
+    and thus ensure a 
     minimum baseline of functionality on a daily basis.  Developers can run the smoketest 
     and ensure it passes before checking in code changes.</p>
     </s2>
@@ -60,11 +62,11 @@
       <label><code>xml-xalan/test</code></label>
       <item>Top level dir for all Xalan versions/products tests</item>
       <label></label>
-      <label><code>xml-xalan/test/bin</code> (no longer included)</label>
-      <item>All dependent .jar files, (including 
-        <jump href="http://jakarta.apache.org/ant/index.html">Ant</jump>
-         and the Xerces parser) are included in the corresponding xml-xalan/java development 
-        tree</item>
+      <label><code>xml-xalan/test/tools</code></label>
+      <item>Tools required by the test harness, such as JTidy.  Note that all .jars
+        required to run Xalan, including Ant, the Xerces parser, etc, are
+        included in the lib and tools directories under xml-xalan/java. 
+        </item>
       <label><code>xml-xalan/test/java/src</code></label>
       <item>Java test automation source tree - this includes 
       a generic testing framework as well as specific API tests for parts of Xalan 

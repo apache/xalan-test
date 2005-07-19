@@ -181,7 +181,7 @@
     see debugconf.properties for settable options.  Note that this method does not 
     directly support 'conf.one' to run only a <b>single</b> test.<br/></li>
     <li>Setup everything manually.  Minimal setup is: CLASSPATH has 
-    xalan.jar;xercesImpl.jar;xml-apis.jar;testxsl.jar, command line parameters or 
+    xalan.jar;serializer.jar,xercesImpl.jar;xml-apis.jar;testxsl.jar, command line parameters or 
     -load file.properties includes other test properties, like inputDir, goldDir, 
     outputDir, logFile, etc.</li>
     </ul>
