@@ -52,8 +52,8 @@ public abstract class QeDtmUtils
 /** Subdirectory under test\tests\api for our xsl/xml files.  */
 public static final String DTM_SUBDIR = "dtm";
 public static final String DTM_Prefix = "DTM_";
-public static final String deepFile = "/tests/perf/xtestdata/elem10kdeep.xml";
-public static final String flatFile = "/tests/perf/xtestdata/words-repeat.xml";
+public static final String deepFile = "./tests/perf/xtestdata/elem10kdeep.xml";
+public static final String flatFile = "./tests/perf/xtestdata/words-repeat.xml";
 
 
 public static final String defaultSource=
