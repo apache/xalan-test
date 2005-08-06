@@ -21,10 +21,10 @@ REM This bat file is for testing the DTM.
 rem ------------ Initialize variables -------------
 set JAVAPROG=java
 set savedCLASSPATH=%CLASSPATH%
-set pathdist=..\java\bin\
+set pathdist=..\java\lib\
 set XCLASSPATH=%pathdist%xercesImpl.jar;%pathdist%xml-apis.jar;%pathdist%bsf.jar;%CLASSPATH%
 set pathxalan=..\java\build\
-set XCLASSPATH=%pathxalan%xalan.jar;%pathxalan%xsltc.jar;%XCLASSPATH%
+set XCLASSPATH=%pathxalan%xalan.jar;%pathxalan%serializer.jar;%pathxalan%xsltc.jar;%XCLASSPATH%
 set pathtest=.\java\build\
 set XCLASSPATH=%pathtest%testxsl.jar;%XCLASSPATH%;.\
 type blank.out

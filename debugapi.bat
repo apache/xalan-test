@@ -23,7 +23,7 @@ rem
 @REM Usage: debugapi.bat org.apache.qetest.package.TestName [other options]
 
 :start
-set APICP=..\java\build\xalan.jar;..\java\bin\xml-apis.jar;..\java\bin\xercesImpl.jar;java\build\testxsl.jar;%CLASSPATH%
+set APICP=..\java\build\xalan.jar;..\java\build\serializer.jar;..\java\lib\xml-apis.jar;..\java\lib\xercesImpl.jar;java\build\testxsl.jar;%CLASSPATH%
 @echo Executing: java -classpath %APICP% %1 -load debugapi.properties %2 %3 %4 %5 %6 %7 %8 %9
 java -classpath %APICP% %1 -load debugapi.properties %2 %3 %4 %5 %6 %7 %8 %9
 set APICP=
