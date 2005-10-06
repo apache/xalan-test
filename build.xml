@@ -210,6 +210,11 @@ dependencies - users must manually 'build jar' first.
         <path refid="conf.class.path" />
     </path>
 
+    <!-- Classpath used when running EXSLT tests -->
+    <path id="exslt.class.path">
+        <path refid="conf.class.path" />
+    </path>
+
     <!-- Classpath used when running contrib or user-contributed tests -->
     <path id="contrib.class.path">
         <path refid="conf.class.path" />
