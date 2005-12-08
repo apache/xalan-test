@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <!-- Bugzilla#4056 See also whitespace20.xsl for similar test of xml:space -->
-<!-- $RCSfile$ $Revision$ $Date$ -->
+<!-- $RCSfile: Bugzilla4056.xsl,v $ $Revision$ $Date$ -->
 <xsl:stylesheet 
  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  
  version="1.0"
@@ -62,8 +62,6 @@
 	<STRING name="{../TopicType/@FormalName}"><xsl:value-of select="@Value"/></STRING>
 	<STRING name="any"><xsl:value-of select="@Value"/></STRING>
   </xsl:template>
-  
-</xsl:stylesheet>
 
   <!-- Copyright 1999-2004 The Apache Software Foundation.
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,4 +71,4 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and limitations under the License. -->
 
-
+</xsl:stylesheet>
