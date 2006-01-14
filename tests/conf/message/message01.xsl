@@ -9,7 +9,7 @@
   <!-- Purpose: Issue a message from a literal constant, default on terminate option -->
 
 <xsl:template match="/">
-  <xsl:message>This message came from the MESSAGE01 test.</xsl:message>
+  <xsl:message>This message came from the MESSAGE01 test.</xsl:message><out/>
 </xsl:template>
 
 
