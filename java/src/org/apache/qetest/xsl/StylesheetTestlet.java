@@ -41,7 +41,7 @@ import org.apache.qetest.xslwrapper.TransformWrapperFactory;
 /**
  * Testlet for conformance testing of xsl stylesheet files.
  *
- * This class provides the default algorithim used for verifying 
+ * This class provides the default algorithm used for verifying 
  * Xalan's conformance to the XSLT spec.  It works in conjunction 
  * with StylesheetTestletDriver, which supplies the logic for 
  * choosing the testfiles to iterate over, and with 
@@ -51,7 +51,7 @@ import org.apache.qetest.xslwrapper.TransformWrapperFactory;
  * as different processing models, like SAX, DOM or Streams).
  *
  * This class is broken up into common worker methods to make 
- * subclassing easier for alternate testing algoritims.
+ * subclassing easier for alternate testing algorithm.
  *
  * @author Shane_Curcuru@lotus.com
  * @version $Id$
