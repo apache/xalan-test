@@ -36,7 +36,7 @@ import java.util.Hashtable;
  * Testlets and Datalets are matched.</p>
  *
  * <p>This makes creating data-driven tests simpler, by separating 
- * the test algorithim from the definition of the test data.  Note 
+ * the test algorithm from the definition of the test data.  Note 
  * that logging what happened during the test is already separated 
  * out into the Logger interface.</p>
  *
