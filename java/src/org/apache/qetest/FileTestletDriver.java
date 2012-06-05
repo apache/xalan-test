@@ -39,7 +39,7 @@ import java.util.Vector;
  * creates a tree for outputs.</p>
  *
  * <p>Key methods are separated into worker methods so subclasses can 
- * override just the parts of the algorithim they need to change.</p>
+ * override just the parts of the algorithm they need to change.</p>
  *
  * <p>//@todo move and refactor XSLProcessorTestBase to 
  * be more generic and reduce dependencies; also reduce dependency 
