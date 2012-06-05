@@ -130,8 +130,7 @@ public abstract class TransformWrapperFactory
                                QetestUtils.defaultPackages,
                                "Wrapper Not Found");
             
-            TransformWrapper wrapper = (TransformWrapper) clazz.newInstance();
-            return wrapper;
+            return (TransformWrapper) clazz.newInstance();
         }
         catch (Exception e)
         {
