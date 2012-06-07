@@ -47,6 +47,8 @@ public class XsltcMainWrapper extends TransformWrapperHelper
     protected static final String XSLTC_COMPILER_CLASS = "org.apache.xalan.xsltc.cmdline.Compile";
     protected static final String XSLTC_RUNTIME_CLASS = "org.apache.xalan.xsltc.cmdline.Transform";
 
+    private static final char FILE_SEPARATOR = System.getProperty("file.separator").charAt(0);
+    
     /**
      * Cached copy of newProcessor() Hashtable.
      */
@@ -149,9 +151,9 @@ So I strip off the protocol prefix and pass the local path/file
         args1[2] = xslName;
 */
 /* TWA - temporay hack to construct and pass a directory for translets */
-        int last = resultName.lastIndexOf('/');
+        int last = resultName.lastIndexOf(FILE_SEPARATOR);
         String tdir = resultName.substring(0, last);
-        int next = tdir.lastIndexOf('/');
+        int next = tdir.lastIndexOf(FILE_SEPARATOR);
         String transletsdirName = tdir.substring(0, next);
 
         String[] args1 = new String[4];
@@ -171,7 +173,7 @@ So I strip off the protocol prefix and pass the local path/file
 
         // Verify output file was created
         // WARNING: assumption of / here, which means we assume URI not local path - needs revisiting
-        int nameStart = xslName.lastIndexOf('/') + 1;
+        int nameStart = xslName.lastIndexOf(FILE_SEPARATOR) + 1;
         String baseName = xslName.substring(nameStart);
         int extStart = baseName.lastIndexOf('.');
         if (extStart > 0)
