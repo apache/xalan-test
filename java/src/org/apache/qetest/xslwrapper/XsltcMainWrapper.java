@@ -44,6 +44,7 @@ import org.apache.xalan.xsltc.cmdline.Transform;
 public class XsltcMainWrapper extends TransformWrapperHelper
 {
 
+    private static final char CLEAN_CHAR = '_';
     protected static final String XSLTC_COMPILER_CLASS = "org.apache.xalan.xsltc.cmdline.Compile";
     protected static final String XSLTC_RUNTIME_CLASS = "org.apache.xalan.xsltc.cmdline.Transform";
 
@@ -142,13 +143,12 @@ the translets
 
         // Timed: compile stylesheet class from XSL file
 //        String[] args1 = new String[2];
-//        args1[0] = "-s"; // Don't allow System.exit
 /* TWA - commented out the following for short-term
 Problem when local path/file is being used, somewhere a file://// prefix is 
 being appended to the filename and xsltc can't find the file even with the -u
 So I strip off the protocol prefix and pass the local path/file
-        args1[1] = "-u"; // Using URIs
-        args1[2] = xslName;
+        args1[0] = "-u"; // Using URIs
+        args1[1] = xslName;
 */
 /* TWA - temporay hack to construct and pass a directory for translets */
         int last = resultName.lastIndexOf(FILE_SEPARATOR);
@@ -156,15 +156,14 @@ So I strip off the protocol prefix and pass the local path/file
         int next = tdir.lastIndexOf(FILE_SEPARATOR);
         String transletsdirName = tdir.substring(0, next);
 
-        String[] args1 = new String[4];
-        args1[0] = "-s";
-        args1[1] = "-d";
-        args1[2] = transletsdirName;
-        args1[3] = xslName;
+        String[] args1 = new String[3];
+        args1[0] = "-d";
+        args1[1] = transletsdirName;
+        args1[2] = xslName;
         int idx = xslName.indexOf("file:////");
         if (idx != -1){
                xslName = new String(xslName.substring(8));
-               args1[3] = xslName;
+               args1[2] = xslName;
         }
         startTime = System.currentTimeMillis();
         /// Transformer transformer = factory.newTransformer(new StreamSource(xslName));
@@ -176,9 +175,20 @@ So I strip off the protocol prefix and pass the local path/file
         int nameStart = xslName.lastIndexOf(FILE_SEPARATOR) + 1;
         String baseName = xslName.substring(nameStart);
         int extStart = baseName.lastIndexOf('.');
-        if (extStart > 0)
+        if (extStart > 0) {
             baseName = baseName.substring(0, extStart);
-
+        }
+        
+        // Replace illegal class name chars with underscores.
+        StringBuffer sb = new StringBuffer(baseName.length());
+        char charI = baseName.charAt(0);
+        sb.append(Character.isJavaLetter(charI) ? charI :CLEAN_CHAR);
+        for (int i = 1; i < baseName.length(); i++) {
+            charI = baseName.charAt(i);
+            sb.append(Character.isJavaLetterOrDigit(charI) ? charI :CLEAN_CHAR);
+        }
+        baseName = sb.toString();
+        
         // Untimed: Apply any parameters needed
         // applyParameters(transformer);
 
