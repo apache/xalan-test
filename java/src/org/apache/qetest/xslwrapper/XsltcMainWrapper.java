@@ -183,7 +183,7 @@ So I strip off the protocol prefix and pass the local path/file
         // Timed: read/build xml, transform, and write results
 
 /* TWA - I don't see how this could have worked, there is no -s option in DefaultRun
-so passing it in the args2 caused usuage messages to be output.
+so passing it in the args2 caused usage messages to be output.
 Also, we shouldn't use the -u option unless we are really using URLs, 
 I'm just trying to get it to work with local path/files. With or without the 
 -u option, the files were getting a file://// prefix with caused them to be not found
