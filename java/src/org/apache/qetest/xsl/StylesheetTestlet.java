@@ -196,6 +196,7 @@ public class StylesheetTestlet extends TestletImpl
                       + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor
                       + " paramName="  + datalet.paramName);
 
+        // Optional: configure a test with XSLT parameters.
         final File paramFile = new File(datalet.paramName);
         if (paramFile.exists()) {
             Properties params = new Properties();
@@ -211,6 +212,7 @@ public class StylesheetTestlet extends TestletImpl
                 inStream.close();
             }
         }
+        
         // Simply have the wrapper do all the transforming
         //  or processing for us - we handle either normal .xsl 
         //  stylesheet tests or just .xml embedded tests
