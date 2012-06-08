@@ -19,6 +19,6 @@
 # Run org.apache.qetest.xsl.StylesheetTestletDriver -goldDir tests/conf-gold -param.lang ru 
 # Run org.apache.qetest.xsl.StylesheetTestletDriver -goldDir tests/conf-gold -param.lang ru -flavor xsltc
 # Make sure you have the "output" directory on the classpath.
-# $Id: $
+# $Id$
 
 lang=ru
