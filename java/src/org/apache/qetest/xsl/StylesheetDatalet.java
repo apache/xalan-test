@@ -26,7 +26,9 @@
  */
 package org.apache.qetest.xsl;
 
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -42,6 +44,9 @@ public class StylesheetDatalet implements Datalet
 {
     /** URL of the stylesheet; default:.../identity.xsl.  */
     public String inputName = "tests/api/trax/identity.xsl";
+
+    /** URL of the stylesheet params; default:.../identity.xsl.  */
+    public String paramName = "tests/api/trax/identity.param";
 
     /** URL of the xml document; default:.../identity.xml.  */
     public String xmlName = "tests/api/trax/identity.xml";
@@ -71,8 +76,10 @@ public class StylesheetDatalet implements Datalet
      */
     public Properties options = new Properties();
 
+    public Map params = new HashMap();
+
     /** Description of what this Datalet tests.  */
-    protected String description = "StylesheetDatalet: String inputName, String xmlName, String outputName, String goldName, String flavor";
+    protected String description = "StylesheetDatalet: String inputName, String xmlName, String outputName, String goldName, String flavor, String paramName";
 
 
     /**
@@ -96,7 +103,8 @@ public class StylesheetDatalet implements Datalet
                        + " xmlName=" + xmlName 
                        + " outputName=" + outputName 
                        + " goldName=" + goldName 
-                       + " flavor=" + flavor);
+                       + " flavor=" + flavor
+                       + " paramName=" + paramName);
     }
 
 
@@ -120,7 +128,8 @@ public class StylesheetDatalet implements Datalet
                        + " xmlName=" + xmlName 
                        + " outputName=" + outputName 
                        + " goldName=" + goldName 
-                       + " flavor=" + flavor);
+                       + " flavor=" + flavor
+                       + " paramName=" + paramName);
     }
 
 
@@ -162,6 +171,7 @@ public class StylesheetDatalet implements Datalet
             return; //@todo should this have a return val or exception?
 
         inputName = (String)h.get("inputName");
+        paramName = (String)h.get("paramName");
         xmlName = (String)h.get("xmlName");
         outputName = (String)h.get("outputName");
         goldName = (String)h.get("goldName");
@@ -183,6 +193,7 @@ public class StylesheetDatalet implements Datalet
             return; //@todo should this have a return val or exception?
 
         inputName = (String)p.getProperty("inputName");
+        paramName = (String)p.getProperty("paramName");
         xmlName = (String)p.getProperty("xmlName");
         outputName = (String)p.getProperty("outputName");
         goldName = (String)p.getProperty("goldName");
@@ -209,6 +220,9 @@ public class StylesheetDatalet implements Datalet
             outputName = args[2];
             goldName = args[3];
             flavor = args[4];
+            if (args.length > 4) {
+                paramName = args[5];
+            }
         }
         catch (ArrayIndexOutOfBoundsException  aioobe)
         {
@@ -250,6 +264,12 @@ public class StylesheetDatalet implements Datalet
                         if (st.hasMoreTokens())
                         {
                             flavor = st.nextToken();
+
+                            if (st.hasMoreTokens())
+                            {
+                                paramName = st.nextToken();
+                            }
+                        
                         }
                     }
                 }

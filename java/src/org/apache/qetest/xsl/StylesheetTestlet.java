@@ -27,7 +27,11 @@
 package org.apache.qetest.xsl;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.qetest.CheckService;
 import org.apache.qetest.Datalet;
@@ -189,8 +193,24 @@ public class StylesheetTestlet extends TestletImpl
         //@todo Should we log a custom logElement here instead?
         logger.logMsg(Logger.TRACEMSG, "executing with: inputName=" + datalet.inputName
                       + " xmlName=" + datalet.xmlName + " outputName=" + datalet.outputName
-                      + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor);
+                      + " goldName=" + datalet.goldName + " flavor="  + datalet.flavor
+                      + " paramName="  + datalet.paramName);
 
+        final File paramFile = new File(datalet.paramName);
+        if (paramFile.exists()) {
+            Properties params = new Properties();
+            final FileInputStream inStream = new FileInputStream(paramFile);
+            try {
+                params.load(inStream);
+                final Iterator iter = params.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry entry = (Map.Entry) iter.next();
+                    transformWrapper.setParameter(null, entry.getKey().toString(), entry.getValue());
+                }
+            } finally {
+                inStream.close();
+            }
+        }
         // Simply have the wrapper do all the transforming
         //  or processing for us - we handle either normal .xsl 
         //  stylesheet tests or just .xml embedded tests
