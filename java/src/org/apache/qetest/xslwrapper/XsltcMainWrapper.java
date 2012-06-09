@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.xalan.xsltc.cmdline.Compile;
@@ -54,7 +56,6 @@ public class XsltcMainWrapper extends TransformWrapperHelper
      * Cached copy of newProcessor() Hashtable.
      */
     protected Hashtable newProcessorOpts = null;
-
 
     /**
      * Get a general description of this wrapper itself.
@@ -206,13 +207,16 @@ I'm just trying to get it to work with local path/files. With or without the
         args2[3] = baseName;    // Just basename of the .class file, without the .class
                                 // Note that . must be on CLASSPATH to work!
 */
-        String[] args2 = new String[2];
+        
+        String[] tempParam = makeParamArray();
+        String[] args2 = new String[2 + tempParam.length];
         args2[0] = xmlName;
         int idx2 = xmlName.indexOf("file:////");
         if (idx2 != -1){
                args2[0] = new String(xmlName.substring(8));
         }
         args2[1] = baseName;
+        System.arraycopy(tempParam, 0, args2, 2, tempParam.length);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream newSystemOut = new PrintStream(baos);
         PrintStream saveSystemOut = System.out;
@@ -249,6 +253,19 @@ I'm just trying to get it to work with local path/files. With or without the
         return times;
     }
 
+    private String[] makeParamArray() {
+        if (m_params == null) {
+            return new String[0];
+        }
+        String[] params = new String[m_params.size()];
+        Iterator iter = m_params.entrySet().iterator();
+        int i = 0;
+        while (iter.hasNext()) {
+            Map.Entry entry = (Map.Entry) iter.next();
+            params[i++] = entry.getKey() + "=" + entry.getValue();
+        }
+        return params;
+    }
 
     /**
      * Pre-build/pre-compile a stylesheet.
@@ -373,8 +390,7 @@ I'm just trying to get it to work with local path/files. With or without the
             }
         }
     }
-
-
+    
     /**
      * Apply a single parameter to a Transformer.
      *
