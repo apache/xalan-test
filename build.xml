@@ -92,7 +92,8 @@ dependencies - users must manually 'build jar' first.
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
     <property name="xalan.relpath" value="../java"/>
     <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
-    <property name="xalan.endorsed.dir" value="${xalan.lib.dir}/endorsed"/>  
+    <property name="xalan.endorsed.dir" value="${xalan.lib.dir}/endorsed"/>
+    <property name="xalan.endorsed.jvmarg" value="-Djava.endorsed.dirs=&quot;${xalan.endorsed.dir}&quot;" />
     <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
     <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/>
@@ -251,7 +252,7 @@ dependencies - users must manually 'build jar' first.
     <!-- Initialize: Define an Ant task that executes Xalan test automation -->
     <!-- ================================================================== -->
     <taskdef name="xalantest" classname="org.apache.qetest.xsl.XSLTestAntTask">
-        <classpath>
+        <classpath>        	
             <pathelement path="${java.class.path}" />
             <!-- Needed so this build file can run: this refers to 
                  a precompiled version of XSLTestAntTask.class that 
@@ -282,7 +283,9 @@ dependencies - users must manually 'build jar' first.
             classpathref="${xalantest.classpathref}"
             bootclasspathref="boot.class.path.gump"
             fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+            failonerror="${fail-on-error}">
+          <jvmarg value="${xalan.endorsed.jvmarg}" />
+        </xalantest>
     </target>
 
     <target name="run.xalantest.default.normal" unless="gump" >
@@ -291,7 +294,9 @@ dependencies - users must manually 'build jar' first.
             classpathref="${xalantest.classpathref}"
             bootclasspathref="boot.class.path"
             fork="${fork-tests}"
-            failonerror="${fail-on-error}" />    
+            failonerror="${fail-on-error}">
+    	  <jvmarg value="${xalan.endorsed.jvmarg}" />
+		</xalantest>
     </target>
 
     <target name="run.xalantest.transfact" if="sysprop.transfact" >
@@ -309,6 +314,7 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use -->
             <sysproperty key="javax.xml.transform.TransformerFactory"
                          value="${sysprop.transfact}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>
     </target>
 
@@ -322,6 +328,7 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use -->
             <sysproperty key="javax.xml.transform.TransformerFactory"
                          value="${sysprop.transfact}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>    
     </target>
     
@@ -339,6 +346,7 @@ dependencies - users must manually 'build jar' first.
             failonerror="${fail-on-error}" >
             <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
                          value="${sysprop.BSFManager}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>
     </target>
 
@@ -351,6 +359,7 @@ dependencies - users must manually 'build jar' first.
             failonerror="${fail-on-error}" >
             <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
                          value="${sysprop.BSFManager}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>    
     </target>
 
