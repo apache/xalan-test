@@ -53,7 +53,10 @@ dependencies - users must manually 'build jar' first.
     <!-- Then, read in the default checked-in properties -->
     <property file="test.properties" />
 
-    <property name="smoketest.conf.excludes" value="${smoketest.conf.normal.excludes};${smoketest.conf.supplemental.excludes}"/>
+	<property name="compiler.target" value="1.3"/>
+	<property name="compiler.source" value="1.3"/>
+
+	<property name="smoketest.conf.excludes" value="${smoketest.conf.normal.excludes};${smoketest.conf.supplemental.excludes}"/>
     <property name="smoketest.xsltc.conf.excludes" value="${smoketest.xsltc.conf.normal.excludes};${smoketest.xsltc.conf.supplemental.excludes}"/>
     <!-- Also provide environment properties with a special prefix which 
          allows us to detect if JARDIR is set.
@@ -89,6 +92,8 @@ dependencies - users must manually 'build jar' first.
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
     <property name="xalan.relpath" value="../java"/>
     <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
+    <property name="xalan.endorsed.dir" value="${xalan.lib.dir}/endorsed"/>
+    <property name="xalan.endorsed.jvmarg" value="-Djava.endorsed.dirs=&quot;${xalan.endorsed.dir}&quot;" />
     <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
     <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/>
@@ -100,8 +105,8 @@ dependencies - users must manually 'build jar' first.
             value="${xalan.build.dir}/xalan-unbundled.jar"/>
     <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
-    <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
-    <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
+    <property name="xml-apis.jar" value="${xalan.endorsed.dir}/xml-apis.jar"/>
+    <property name="parserjar" value="${xalan.endorsed.dir}/xercesImpl.jar"/>
     <property name="bcel.jar" value="${xalan.lib.dir}/BCEL.jar"/>
 
     <!-- JTidy is used by the XSLTC comparator -->
@@ -247,7 +252,7 @@ dependencies - users must manually 'build jar' first.
     <!-- Initialize: Define an Ant task that executes Xalan test automation -->
     <!-- ================================================================== -->
     <taskdef name="xalantest" classname="org.apache.qetest.xsl.XSLTestAntTask">
-        <classpath>
+        <classpath>        	
             <pathelement path="${java.class.path}" />
             <!-- Needed so this build file can run: this refers to 
                  a precompiled version of XSLTestAntTask.class that 
@@ -278,7 +283,9 @@ dependencies - users must manually 'build jar' first.
             classpathref="${xalantest.classpathref}"
             bootclasspathref="boot.class.path.gump"
             fork="${fork-tests}"
-            failonerror="${fail-on-error}" />
+            failonerror="${fail-on-error}">
+          <jvmarg value="${xalan.endorsed.jvmarg}" />
+        </xalantest>
     </target>
 
     <target name="run.xalantest.default.normal" unless="gump" >
@@ -287,7 +294,9 @@ dependencies - users must manually 'build jar' first.
             classpathref="${xalantest.classpathref}"
             bootclasspathref="boot.class.path"
             fork="${fork-tests}"
-            failonerror="${fail-on-error}" />    
+            failonerror="${fail-on-error}">
+    	  <jvmarg value="${xalan.endorsed.jvmarg}" />
+		</xalantest>
     </target>
 
     <target name="run.xalantest.transfact" if="sysprop.transfact" >
@@ -305,6 +314,7 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use -->
             <sysproperty key="javax.xml.transform.TransformerFactory"
                          value="${sysprop.transfact}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>
     </target>
 
@@ -318,6 +328,7 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use -->
             <sysproperty key="javax.xml.transform.TransformerFactory"
                          value="${sysprop.transfact}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>    
     </target>
     
@@ -335,6 +346,7 @@ dependencies - users must manually 'build jar' first.
             failonerror="${fail-on-error}" >
             <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
                          value="${sysprop.BSFManager}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>
     </target>
 
@@ -347,6 +359,7 @@ dependencies - users must manually 'build jar' first.
             failonerror="${fail-on-error}" >
             <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
                          value="${sysprop.BSFManager}" />
+        	<jvmarg value="${xalan.endorsed.jvmarg}" />
         </xalantest>    
     </target>
 
@@ -1246,7 +1259,8 @@ dependencies - users must manually 'build jar' first.
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}*.java" 
-               debug="${debug}" />
+               debug="${debug}" 
+        	   target="${compiler.target}" source="${compiler.source}"/>
     </target>
 
 
@@ -1268,13 +1282,15 @@ dependencies - users must manually 'build jar' first.
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xslwrapper/TransformWrapperHelper.java,${test.root}xslwrapper/TransformWrapper.java,${test.root}xslwrapper/TransformWrapperFactory.java"
-               debug="${debug}" />
+               debug="${debug}" 
+         	   target="${compiler.target}" source="${compiler.source}"/>
         <!-- This javac depends on JAXP, SAX, DOM; hence the specific classpathref -->
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xsl/*.java"
                debug="${debug}" 
-               classpathref="compiletest.class.path" />
+               classpathref="compiletest.class.path" 
+        	   target="${compiler.target}" source="${compiler.source}"/>
     </target>
 
     <target name="compile.trax.xslwrappers" depends="compile.xsl"
@@ -1284,7 +1300,8 @@ dependencies - users must manually 'build jar' first.
                destdir="${test.build.dir}" 
                includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java,${test.root}xslwrapper/XalanProcessWrapper.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" />
+               classpathref="compiletest.class.path" 
+        	   target="${compiler.target}" source="${compiler.source}"/>
     </target>
 
     <target name="compile.trax" depends="compile.xsl,compile.trax.xslwrappers"
@@ -1295,22 +1312,26 @@ dependencies - users must manually 'build jar' first.
                destdir="${test.build.dir}" 
                includes="${test.root}trax/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" />
+               classpathref="compiletest.class.path" 
+               target="${compiler.target}" source="${compiler.source}"/>
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}trax/stream/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" />
+               classpathref="compiletest.class.path" 
+         	   target="${compiler.target}" source="${compiler.source}"/>        	
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}trax/dom/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" />
+               classpathref="compiletest.class.path" 
+         	   target="${compiler.target}" source="${compiler.source}"/>        	
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}trax/sax/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" />
+               classpathref="compiletest.class.path" 
+        	   target="${compiler.target}" source="${compiler.source}"/>        	
     </target>
 
     <target name="compile" depends="compile.trax">
@@ -1320,7 +1341,8 @@ dependencies - users must manually 'build jar' first.
                includes="${test.root}xalanj2/*.java,${test.root}dtm/*.java"
                excludes="${test.root}dtm/xsltcDocCode.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" />
+               classpathref="compiletest.class.path" 
+        	   target="${compiler.target}" source="${compiler.source}"/>
     </target>
 
     <target name="compile.rwapi" depends="compile">
@@ -1329,7 +1351,8 @@ dependencies - users must manually 'build jar' first.
                destdir="${test.build.dir}" 
                includes="${test.root}rwapi/*.*"
                debug="${debug}"
-               classpathref="rwapitest.class.path" />
+               classpathref="rwapitest.class.path" 
+        	   target="${compiler.target}" source="${compiler.source}"/>
     </target>
 
     <!-- Note that this target must *not* depend on any XSLTC tests, 
@@ -1351,7 +1374,8 @@ dependencies - users must manually 'build jar' first.
                destdir="${tests.bugzilla.build.dir}" 
                debug="${debug}"
                excludes="Bugzilla1288.java"
-               classpathref="bugzilla.class.path" />
+               classpathref="bugzilla.class.path" 
+        	   target="${compiler.target}" source="${compiler.source}"/>
     </target>
 
     <target name="extensions.classes" depends="jar"
@@ -1360,7 +1384,8 @@ dependencies - users must manually 'build jar' first.
         <javac srcdir="${tests.extensions.dir}" 
                destdir="${tests.extensions.build.dir}" 
                debug="${debug}"
-               classpathref="extensions.class.path" />
+               classpathref="extensions.class.path" 
+        	   target="${compiler.target}" source="${compiler.source}"/>
         <!-- Add more javac calls if we add more Java extensions dirs -->        
     </target>
 

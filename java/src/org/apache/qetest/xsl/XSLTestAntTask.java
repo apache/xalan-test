@@ -51,8 +51,7 @@ import java.util.Vector;
  *
  * Cheap-o (for now) way to run qetest or Xalan tests directly
  * from an Ant build file.  Current usage:
- * <code>
- * &lt;taskdef name="QetestTask" classname="org.apache.qetest.xsl.XSLTestAntTask"/>
+ * <pre>&lt;taskdef name="QetestTask" classname="org.apache.qetest.xsl.XSLTestAntTask"/>
  *  &lt;target name="test">
  *      &lt;QetestTask
  *          test="Minitest"
@@ -63,8 +62,7 @@ import java.util.Vector;
  *          outputDir="../tests/minitest"
  *          logFile="../tests/minitest/log.xml"
  *          flavor="trax"
- *       />
- * </code>
+ *       /></pre>
  * To be improved: I'd like to basically convert XSLTestHarness
  * into an Ant task, so you can run multiple tests at once.
  * Other obvious improvements include an AntLogger implementation
