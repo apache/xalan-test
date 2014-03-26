@@ -92,6 +92,7 @@ dependencies - users must manually 'build jar' first.
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
     <property name="xalan.relpath" value="../java"/>
     <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
+    <property name="xalan.endorsed.dir" value="${xalan.lib.dir}/endorsed"/>  
     <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
     <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/>
@@ -103,8 +104,8 @@ dependencies - users must manually 'build jar' first.
             value="${xalan.build.dir}/xalan-unbundled.jar"/>
     <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
-    <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
-    <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
+    <property name="xml-apis.jar" value="${xalan.endorsed.dir}/xml-apis.jar"/>
+    <property name="parserjar" value="${xalan.endorsed.dir}/xercesImpl.jar"/>
     <property name="bcel.jar" value="${xalan.lib.dir}/BCEL.jar"/>
 
     <!-- JTidy is used by the XSLTC comparator -->

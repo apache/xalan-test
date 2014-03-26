@@ -59,7 +59,7 @@ if not "%OS%"=="Windows_NT" goto win9xStart
 :winNTStart
 @setlocal
 
-set classpath=..\java\tools\ant.jar;..\java\lib\xercesImpl.jar;..\java\lib\xalan.jar;..\java\lib\serializer.jar;..\java\lib\xml-apis.jar;%CLASSPATH%
+set classpath=..\java\tools\ant.jar;..\java\lib\endorsed\xercesImpl.jar;..\java\lib\xalan.jar;..\java\lib\serializer.jar;..\java\lib\endorsed\xml-apis.jar;%CLASSPATH%
 
 
 rem On NT/2K grab all arguments at once

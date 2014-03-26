@@ -33,11 +33,11 @@ uname | grep WIN && CLS_PATH_SEP=\;
 
 # If PARSER_JAR is not set, default to xercesImpl.jar
 if [ "$PARSER_JAR" = "" ] ; then
-    PARSER_JAR=../java/lib/xercesImpl.jar
+    PARSER_JAR=../java/lib/endorsed/xercesImpl.jar
 fi
 
 if [ "$XML_APIS_JAR" = "" ]; then
-    XML_APIS_JAR=../java/lib/xml-apis.jar
+    XML_APIS_JAR=../java/lib/endorsed/xml-apis.jar
 fi
 
 if [ "$SERIALIZER_JAR" = "" ]; then
