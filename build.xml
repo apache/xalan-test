@@ -87,7 +87,7 @@ dependencies - users must manually 'build jar' first.
     <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
 	
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
-    <property name="xalan.relpath" value="../java"/>
+    <property name="xalan.relpath" value="../xalan-java"/>
     <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
     <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
