@@ -731,7 +731,7 @@ dependencies - users must manually 'build jar' first.
     </target>
     <target name="smoketest.xsltc" 
             description="Run the Xalan-J 2.x XSLTC Smoketest"
-            depends="smoketest.xsltc-execute,smoketest.xsltc-notpass,smoketest.xsltc-pass">
+            depends="jar,smoketest.xsltc-execute,smoketest.xsltc-notpass,smoketest.xsltc-pass">
     </target>
     <target name="smoketest.dev" 
             description="Run the Xalan-J 2.x Smoketest with dependencies"
