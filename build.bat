@@ -55,8 +55,6 @@ if '%1' == '-H' goto usage
 if '%1' == '-?' goto usage
 @echo %0 beginning...
 
-set ANT_HOME=..\xalan-java
-
 if not "%OS%"=="Windows_NT" goto win9xStart
 :winNTStart
 @setlocal
