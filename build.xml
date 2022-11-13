@@ -109,7 +109,7 @@ dependencies - users must manually 'build jar' first.
     
     <!-- The js.jar is for Javascript extensions tests; you must get this .jar yourself.  
          Feel free to reset the location. -->
-    <property name="js.jar" value="../../js.jar"/>
+    <property name="js.jar" value="../xalan-java/lib/rhino-1.7.14.jar"/>
     
     <!-- The Bean Scripting Framework is required for extensions written in languages 
          other than Java. Xalan Java will attempt to use the Jakarta BSF implementation
@@ -117,7 +117,8 @@ dependencies - users must manually 'build jar' first.
          bsf.jar is no longer distributed with Xalan Java; you must get this .jar yourself.  
          For more information, see the Apache Jakarta project, http://jakarta.apache.org/
          Feel free to reset the location.  -->    
-    <property name="bsf.jar" value="../../bsf.jar"/>
+    <property name="bsf.jar" value="../xalan-java/lib/bsf.jar"/>
+    <property name="commons-logging.jar" value="../xalan-java/lib/commons-logging-1.2.jar"/>
 
     <!-- Documentation-specific files and locations -->
     <property name="stylebook.jar" value="${xalan.tools.dir}/stylebook-1.0-b3_xalan-2.jar"/>
@@ -232,6 +233,7 @@ dependencies - users must manually 'build jar' first.
     <path id="extensions.class.path">
         <path refid="api.class.path" />
         <pathelement location="${bsf.jar}" />
+        <pathelement location="${commons-logging.jar}" />
         <pathelement location="${js.jar}" />
         <pathelement location="${tests.extensions.build.dir}" />
         <!-- Add more pathelements if we add more Java extensions dirs -->        
