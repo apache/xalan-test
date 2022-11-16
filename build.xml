@@ -102,7 +102,7 @@ dependencies - users must manually 'build jar' first.
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
     <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
     <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
-    <property name="bcel.jar" value="${xalan.lib.dir}/BCEL.jar"/>
+    <!--<property name="bcel.jar" value="${xalan.lib.dir}/BCEL.jar"/>-->
 
     <!-- JTidy is used by the XSLTC comparator -->
     <property name="jtidy.jar" value="${test.tools.dir}/Tidy.jar"/>
