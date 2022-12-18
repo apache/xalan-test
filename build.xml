@@ -60,7 +60,7 @@ dependencies - users must manually 'build jar' first.
    -->
     <property environment="ENV" />
 
-    <property name="year" value="2000-2004"/>
+    <property name="year" value="2000-2022"/>
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -87,7 +87,7 @@ dependencies - users must manually 'build jar' first.
     <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
 	
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
-    <property name="xalan.relpath" value="../xalan-java"/>
+    <property name="xalan.relpath" value="../xalan-java"/>    
     <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
     <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
@@ -107,17 +107,16 @@ dependencies - users must manually 'build jar' first.
     <!-- JTidy is used by the XSLTC comparator -->
     <property name="jtidy.jar" value="${test.tools.dir}/Tidy.jar"/>
     
-    <!-- The js.jar is for Javascript extensions tests; you must get this .jar yourself.  
-         Feel free to reset the location. -->
+    <!-- The Mozilla Rhino jar is needed, to run Javascript extensions tests -->
     <property name="js.jar" value="${xalan.relpath}/lib/rhino-1.7.14.jar"/>
     
     <!-- The Bean Scripting Framework is required for extensions written in languages 
          other than Java. Xalan Java will attempt to use the Jakarta BSF implementation
-         by default (see the "extensions" target).  
-         bsf.jar is no longer distributed with Xalan Java; you must get this .jar yourself.  
-         For more information, see the Apache Jakarta project, http://jakarta.apache.org/
-         Feel free to reset the location.  -->    
+         by default (see the "extensions" target). For more information, see the 
+         Apache Commons BSF project https://commons.apache.org/proper/commons-bsf/.
+    -->     
     <property name="bsf.jar" value="${xalan.relpath}/lib/bsf.jar"/>
+    
     <property name="commons-logging.jar" value="${xalan.relpath}/lib/commons-logging-1.2.jar"/>
 
     <!-- Documentation-specific files and locations -->
