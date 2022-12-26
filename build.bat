@@ -36,6 +36,9 @@ rem     See:    build.xml
 @echo     on the end of the classpath; see build.xml for details
 @echo.
 @echo   You should have set JAVA_HOME
+
+@echo   You can set ANT_HOME if you use your own Ant install
+
 @echo   You may set PARSER_JAR to specific path/filename.jar of parser
 @echo     Note: PARSER_JAR is ignored when JARDIR is set
 @echo   You may set JAVA_OPTS to be passed to java program
@@ -61,7 +64,6 @@ if not "%OS%"=="Windows_NT" goto win9xStart
 
 set classpath=..\java\tools\ant.jar;..\java\lib\xercesImpl.jar;..\java\lib\xalan.jar;..\java\lib\serializer.jar;..\java\lib\xml-apis.jar;%CLASSPATH%
 
-
 rem On NT/2K grab all arguments at once
 set ANT_CMD_LINE_ARGS=%*
 goto doneStart
@@ -82,9 +84,17 @@ goto setupArgs
 rem This label provides a place for the argument list loop to break out 
 rem and for NT handling to skip to.
 
-rem Default ANT_HOME to the one in the java dir
-if "%ANT_HOME%"=="" set _ANT_HOME=..\java
+rem Default ANT_HOME to the one what user has set
 if not "%ANT_HOME%"=="" set _ANT_HOME=%ANT_HOME%
+if "%ANT_HOME%"=="" set _ANT_HOME=..\xalan-java
+
+if EXIST "%_ANT_HOME%\tools\ant.jar" (
+   set _ANT_JARS=%_ANT_HOME%\tools\ant.jar
+) else if EXIST "%_ANT_HOME%\..\tools\ant.jar" (
+   set _ANT_JARS=%_ANT_HOME%\..\tools\ant.jar
+) else (
+   set _ANT_JARS=%_ANT_HOME%\lib\ant.jar;%_ANT_HOME%\lib\ant-launcher.jar
+)
 
 rem Patch for Ant limitation:
 rem   <property environment="xxx" /> is only available on certain platforms.
@@ -106,13 +116,14 @@ if "%_XML-APIS_JAR%" == "" set _XML-APIS_JAR=..\java\lib\xml-apis.jar
 rem If JARDIR is blank, then only add Ant, PARSER_JAR, and XML-APIS_JAR to the 
 rem    classpath before running Ant - then within the Ant file, it 
 rem    will add other .jars from default locations
-if "%JARDIR%" == "" set _CLASSPATH=%CLASSPATH%;%_ANT_HOME%\tools\ant.jar;%_XML-APIS_JAR%;%_PARSER_JAR%
+if "%JARDIR%" == "" set _CLASSPATH=%CLASSPATH%;%_ANT_JARS%;%_XML-APIS_JAR%;%_PARSER_JAR%
 
 rem Else if JARDIR is set, then put all Xalan-J 2.x required .jar files 
 rem    in the classpath first from that one dir
 rem Note: Does not yet support xsltc testing! TBD -sc
+rem [XalanJ Team] Note: Since XalanJ 2.7.3 release, xsltc testing is supported
 rem Note: Does not yet support using crimson from JARDIR (forces xercesImpl.jar)! TBD -sc
-if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xml-apis.jar;%JARDIR%\xercesImpl.jar;%JARDIR%\xalan.jar;%JARDIR%\serializer.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\commons-logging-1.2.jar;%JARDIR%\regexp.jar;%JARDIR%\rhino-1.7.14.jar;%_ANT_HOME%\tools\ant.jar;%JARDIR%\Tidy.jar;%CLASSPATH%
+if not "%JARDIR%" == "" set _CLASSPATH=%JARDIR%\xml-apis.jar;%JARDIR%\xercesImpl.jar;%JARDIR%\xalan.jar;%JARDIR%\serializer.jar;%JARDIR%\testxsl.jar;%JARDIR%\bsf.jar;%JARDIR%\commons-logging-1.2.jar;%JARDIR%\regexp.jar;%JARDIR%\rhino-1.7.14.jar;%JARDIR%\Tidy.jar;%_ANT_JARS%;%CLASSPATH%
 
 rem Attempt to automatically add system classes to very end of _CLASSPATH
 if exist "%JAVA_HOME%\lib\tools.jar" set _CLASSPATH=%_CLASSPATH%;%JAVA_HOME%\lib\tools.jar
