@@ -2,20 +2,21 @@
 
 REM "Testing XalanJ integer truncation bug fix, when using XSLTC"
 
-REM Set JAVA_HOME environment variable, for the local environment 
+REM Set JAVA_HOME environment variable, for the local environment
 
-REM Set JARDIR environment variable, for the local environment.
-REM For the definition of, JARDIR environment variable, please see 
-REM the document https://gitbox.apache.org/repos/asf?p=xalan-java.git;a=blob_plain;f=README;hb=refs/heads/xalan-j_2_7_1_maint.
+set XALAN_BUILD_DIR_PATH=..\..\xalan-java\build;..\..\build
 
-if EXIST "test1.class" (
+set XERCES_ENDORSED_DIR_PATH=..\..\xalan-java\lib\endorsed;..\..\lib\endorsed
+
+if exist "test1.class" (
   REM clear the result XalanJ translet file, if that exists
-  DEL test1.class
+  del test1.class
 )
 
-%JAVA_HOME%\bin\java -Djava.endorsed.dirs=%JARDIR% org.apache.xalan.xslt.Process -XSLTC -IN test1.xml -XSL test1.xsl -SECURE -XX -XT 2>NUL
+REM in the future, we'll try to run this test as an API test
+%JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% org.apache.xalan.xslt.Process -XSLTC -IN test1.xml -XSL test1.xsl -SECURE -XX -XT 2>NUL
 
-if EXIST "test1.class" (
+if exist "test1.class" (
     echo Test failed. Please solve this, before checking in! 
 ) else (
     echo CONGRATULATIONS! The test passed!

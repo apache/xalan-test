@@ -60,7 +60,7 @@ dependencies - users must manually 'build jar' first.
    -->
     <property environment="ENV" />
 
-    <property name="year" value="2000-2022"/>
+    <property name="year" value="2000-2023"/>
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -75,9 +75,10 @@ dependencies - users must manually 'build jar' first.
     <property name="test.build.docs" value="${test.build.dir}/docs"/>
     <property name="test.build.apidocs" value="${test.build.docs}/apidocs"/>
     <property name="tests.bugzilla.dir" value="tests/bugzilla"/>
-    <property name="tests.bugzilla.build.dir" value="tests/bugzilla/build"/>
-    <property name="tests.extensions.dir" value="${extensions.inputDir}/java"/>
-    <property name="tests.extensions.build.dir" value="${extensions.inputDir}/java/build"/>
+    <property name="tests.bugzilla.build.dir" value="${tests.bugzilla.dir}/build"/>
+    <property name="extensions.dir" value="tests/extensions"/>
+    <property name="tests.extensions.dir" value="${extensions.dir}/java"/>
+    <property name="tests.extensions.build.dir" value="${extensions.dir}/java/build"/>
 
     
     <!-- Names/locations of .jar files we build -->
@@ -97,12 +98,11 @@ dependencies - users must manually 'build jar' first.
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
     <property name="xalan.unbundled.jar" 
-            value="${xalan.build.dir}/xalan-unbundled.jar"/>
+              value="${xalan.build.dir}/xalan-unbundled.jar"/>
     <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
     <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
     <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
-    <!--<property name="bcel.jar" value="${xalan.lib.dir}/BCEL.jar"/>-->
 
     <!-- JTidy is used by the XSLTC comparator -->
     <property name="jtidy.jar" value="${test.tools.dir}/Tidy.jar"/>
@@ -135,7 +135,6 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
-        <pathelement path="${java.class.path}" />
     </path>
 
     <!-- Note: given that many of the tests interact with xerces and 
@@ -157,7 +156,6 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <!-- Classpath used when compiling tests -->
     <path id="compiletest.class.path">
-        <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
         <pathelement location="${xsltc.jar}" />  <!-- add this so we can test the
                                                       separate jar distribution -->
@@ -169,18 +167,20 @@ dependencies - users must manually 'build jar' first.
 
     <!-- Classpath used when running API tests -->
     <path id="api.class.path">
-        <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${jtidy.jar}" />
+    </path>
+    
+    <path id="testxsl.class.path">
+       <pathelement location="${testxsl.jar}" />
     </path>
 
     <!-- Classpath used when running conf or conformance tests -->
     <path id="conf.class.path">
-        <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.jar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
@@ -189,17 +189,15 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${jtidy.jar}" />
     </path>
 
-    <!-- Boot class path for JDK 1.4. Order is important to ensure
-         GUMP builds work correctly, and people who don't use the
-         build.bat/build.sh can still build on JDK 1.4 as normal. -->
+    <!-- Boot class path for JDK 1.4+ -->
     <path id="boot.class.path">
-        <pathelement location="${xalan.jar}" />
-        <pathelement location="${xsltc.jar}" />  <!-- add this so we can test the
+        <!--<pathelement location="${xalan.jar}" />
+        <pathelement location="${xsltc.jar}" />-->  <!-- add this so we can test the
                                                       separate jar distribution -->  
-        <pathelement location="${ser.jar}" />                                                       
-        <pathelement location="${java.class.path}" />
+        <pathelement location="${ser.jar}" />        
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
+        <pathelement path="${sun.boot.class.path}" />
     </path>
 
     <!-- Gump build xml-xalan2-smoketest should use xalan.unbundled.jar -->
@@ -230,11 +228,14 @@ dependencies - users must manually 'build jar' first.
 
     <!-- Classpath used when running extensions tests -->
     <path id="extensions.class.path">
-        <path refid="api.class.path" />
-        <pathelement location="${bsf.jar}" />
+        <pathelement location="${xalan.jar}" />         
+        <path refid="testxsl.class.path" />
         <pathelement location="${commons-logging.jar}" />
+        <pathelement location="${bsf.jar}" />        
         <pathelement location="${js.jar}" />
+        <pathelement location="${jtidy.jar}" />
         <pathelement location="${tests.extensions.build.dir}" />
+        <pathelement location="${tests.bugzilla.build.dir}" />        
         <!-- Add more pathelements if we add more Java extensions dirs -->        
     </path>
 
@@ -249,7 +250,6 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <taskdef name="xalantest" classname="org.apache.qetest.xsl.XSLTestAntTask">
         <classpath>
-            <pathelement path="${java.class.path}" />
             <!-- Needed so this build file can run: this refers to 
                  a precompiled version of XSLTestAntTask.class that 
                  is checked in: normally at runtime, it should come 
@@ -323,7 +323,7 @@ dependencies - users must manually 'build jar' first.
     </target>
     
     <target name="run.xalan-extension-test" >
-        <antcall target="run.xalan-extension-test.gump"/>
+        <!--<antcall target="run.xalan-extension-test.gump"/>-->
         <antcall target="run.xalan-extension-test.normal"/>
     </target>
 
@@ -339,7 +339,7 @@ dependencies - users must manually 'build jar' first.
         </xalantest>
     </target>
 
-    <target name="run.xalan-extension-test.normal" unless="gump">
+    <target name="run.xalan-extension-test.normal">
         <xalantest test="${testClass}"
             testType="${testType}"
             classpathref="${xalantest.classpathref}"
@@ -365,7 +365,7 @@ dependencies - users must manually 'build jar' first.
         <!-- Note this is case-sensitive, even on Windows! -->
         <!-- Note JARDIR support should probably be removed, since it's a maintenance hassle Jul-02 -sc -->
         <echo message="Your ==JARDIR== is set to ==${ENV.JARDIR}==" />
-        <echo message="JVM Classpath is ${java.class.path}" />
+        <!--<echo message="JVM Classpath is ${java.class.path}" />-->
         <mkdir dir="${test.build.dir}" />
         <mkdir dir="${test.build.dir}/${test.root}" />
         <!-- Also copy over precompiled external processor wrapper classes -->
@@ -633,9 +633,9 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="extensions" 
             description="Run extensions tests.  
-                         Non-Java extensions will use the Jakarta BSF implementation."
+                         Non-Java extensions will use the Apache BSF implementation."
             depends="init.test">
-        <echo message="Executing Xalan extensions tests. Non-Java extensions will use the Jakarta BSF implementation." />
+        <echo message="Executing Xalan extensions tests. Non-Java extensions will use the Apache BSF implementation." />
         <!-- Set the default conformance test driver, user may 
              override; note test.properties:extensions.testlet= 
         -->
@@ -1246,7 +1246,7 @@ dependencies - users must manually 'build jar' first.
         description="Compile base qetest files; no Xalan dependencies">
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
-               includes="${test.root}*.java" 
+               includes="${test.root}*.java"
                debug="${debug}" />
     </target>
 
@@ -1255,7 +1255,7 @@ dependencies - users must manually 'build jar' first.
         description="Jar base qetest files; no Xalan dependencies">
         <jar jarfile="${qetest.jar}" 
              basedir="${test.build.dir}" 
-             includes="${test.root}*.java,${test.root}*.properties" />
+             includes="${test.root}*.java,${test.root}*.properties"/>
     </target>
 
 
@@ -1274,7 +1274,7 @@ dependencies - users must manually 'build jar' first.
         <javac srcdir="${test.src.dir}" 
                destdir="${test.build.dir}" 
                includes="${test.root}xsl/*.java"
-               debug="${debug}" 
+               debug="${debug}"
                classpathref="compiletest.class.path" />
     </target>
 
@@ -1352,7 +1352,7 @@ dependencies - users must manually 'build jar' first.
                destdir="${tests.bugzilla.build.dir}" 
                debug="${debug}"
                excludes="Bugzilla1288.java"
-               classpathref="bugzilla.class.path" />
+               classpath="${xalan.jar}:${testxsl.jar}" />
     </target>
 
     <target name="extensions.classes" depends="jar"
@@ -1559,7 +1559,6 @@ dependencies - users must manually 'build jar' first.
     -->
 
     <path id="xsltc.runtime.class.path">
-        <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.build.dir}/xalan.jar" />
         
         <!-- add xsltc.jar so we can test the separate jar distribution -->
@@ -1572,7 +1571,6 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${jtidy.jar}" />
     </path>
     <path id="xsltc.compile.class.path">
-        <pathelement path="${java.class.path}" />
         <pathelement location="${xalan.build.dir}/xalan.jar" />
         
         <!-- add xsltc.jar so we can test the separate jar distribution -->
