@@ -18,8 +18,8 @@ rem ==========================================================================
 rem
 rem     Name:   build.bat
 rem     Author: shane_curcuru@lotus.com,
-                ggregory@apache.org,
-                mukulg@apache.org
+rem             ggregory@apache.org,
+rem             mukulg@apache.org
                 
 rem     See:    build.xml
 
