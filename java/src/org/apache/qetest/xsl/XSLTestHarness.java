@@ -25,12 +25,15 @@
  *
  */
 package org.apache.qetest.xsl;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Set;
+import java.util.Iterator;
 
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.Logger;
@@ -163,7 +166,23 @@ public class XSLTestHarness
         }
 
         // Grab the list of tests, which is specific only to the harness
-        String testNames = harnessProps.getProperty(OPT_TESTS);
+        // String testNames = harnessProps.getProperty(OPT_TESTS);
+        StringBuffer testNamesStrBuff = new StringBuffer();      
+        Set<String> strPropNames = harnessProps.stringPropertyNames();
+        Iterator<String> strPropIter = strPropNames.iterator();
+        while (strPropIter.hasNext()) {
+           String propName = strPropIter.next();
+           if (propName.endsWith(DOT + OPT_TESTS)) {
+              String propValue = harnessProps.getProperty(propName);
+              testNamesStrBuff.append(propValue + TESTS_DELIMITER);
+           }
+        }
+
+        String testNames = testNamesStrBuff.toString();
+        if (testNames.length() > 0) {
+           testNames = testNames.substring(0, testNames.length());
+        } 
+
         if ((testNames == null) || (testNames.length() == 0))
         {
             System.err.println("ERROR! No tests(1) were supplied in the properties file!");

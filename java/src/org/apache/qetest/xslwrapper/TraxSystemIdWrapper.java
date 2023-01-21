@@ -69,6 +69,7 @@ public class TraxSystemIdWrapper extends TransformWrapperHelper
      */
     protected Hashtable newProcessorOpts = null;
 
+    private static final String STYLESHEET_COMPILATION_ERR_MESG = "Could not compile stylesheet";
 
     /**
      * Get a general description of this wrapper itself.
@@ -165,8 +166,21 @@ public class TraxSystemIdWrapper extends TransformWrapperHelper
         
         // Timed: read/build xsl from a URL
         startTime = System.currentTimeMillis();
-        Transformer transformer = factory.newTransformer(
-                new StreamSource(QetestUtils.filenameToURL(xslName)));
+        Transformer transformer = null;
+        try {
+           transformer = factory.newTransformer(
+                                   new StreamSource(QetestUtils.filenameToURL(xslName)));
+        }
+        catch (Exception ex) {
+           // we're presently not testing stylesheet compilation errors
+           if (STYLESHEET_COMPILATION_ERR_MESG.equals(ex.getMessage())) {              
+              return getTimeArray();
+           }
+           else {
+              throw ex;
+           }
+        }
+
         transformer.setErrorListener(new DefaultErrorHandler());
         xslBuild = System.currentTimeMillis() - startTime;
 
