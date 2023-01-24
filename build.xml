@@ -913,12 +913,10 @@ dependencies - users must manually 'build jar' first.
         <echo message=" [minitest] Please fix any smoketest problems before checking in!" />
         <fail message="Please fix any smoketest problems before checking in!" />
     </target>
+    
     <target name="smoketest-pass" if="smoketest-passed">
-        <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />
-        <!-- below echo messages, TBD -->
-        <!--<echo message=" [minitest] Details are in ${smoketest.conf.logFile}, ${smoketest.api.logFile}, ${smoketest.extensions.logFile}" />
-        -->
-        <!--<echo message=" [minitest] Details are in ${smoketest.conf.logFile}" />-->
+        <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />        
+        <echo message=" [minitest] Details are in ${smoketest.extensions.logFile}, ${smoketest.conf.logFile}, ${smoketest.accept.logFile}" />
     </target>
 
     <target name="apitest-pass-file-check" unless="apitest-file-check-passed">
