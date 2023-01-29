@@ -196,7 +196,7 @@ public class XsltcTestsTask extends Task {
     }
 
     /*
-       Given XSLTC overall test results, produced by this class (avilable as Map object),
+       Given XSLTC overall test results, produced by this class (available as Map object),
        this method serializes those results to an XML document.
     */
     private void serializeTestResultsToXmlDocument(Map testResultsMap) 
