@@ -56,8 +56,12 @@ if exist "%_ANT_HOME%\tools\ant.jar" (
 
 set _CLASSPATH=%_CLASSPATH%;%_ANT_JARS%
 
+set XALAN_BUILD_DIR_PATH=..\xalan-java\build;..\build
+
+set XERCES_ENDORSED_DIR_PATH=..\xalan-java\lib\endorsed;..\lib\endorsed
+
 @echo on
-"%_JAVACMD%" -mx1024m -classpath "%_CLASSPATH%" org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" -mx1024m -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% -classpath "%_CLASSPATH%" org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 @echo off
 
 goto end

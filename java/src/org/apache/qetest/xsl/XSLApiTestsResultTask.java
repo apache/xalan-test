@@ -40,14 +40,16 @@ public class XSLApiTestsResultTask extends Task {
                if (!PASS.equals(testResultFilePassStatus)) {
                   String[] dirNameParts = (this.resultDir).split("/"); 
                   String errorContextFileName = dirNameParts[dirNameParts.length - 1] + "/" + fileName;
-                  throw new BuildException("One or more tests in an 'api' target failed. Test failure was found, while inspecting the file " + errorContextFileName + ". Please fix any api tests problems before checking in!", location);
+                  throw new BuildException("One or more tests in an 'api' target failed. Test failure was found, " + 
+                                           "while inspecting the file " + errorContextFileName + ". Please fix any api tests " + 
+                                           "problems before checking in!", location);
                }
            } 
         }
     }
 
-    public void setResultDir(String dirPath) {
-        this.resultDir = dirPath;
+    public void setResultDir(String resultDir) {
+        this.resultDir = resultDir;
     }
 
     public void setFileNamePrefix(String fileNamePrefix) {
