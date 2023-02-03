@@ -1699,18 +1699,20 @@ dependencies - users must manually 'build jar' first.
         <property name="scan.outputDir" value="${conf.xsltc.outputDir}"/>
         <antcall target="scan" />
 
-        <echo message=" [minitest] COMPLETED, running the conf.xsltc tests (excluding the xsltc compile tests)" />
-        <echo message=""/>
-
-        <mkdir dir="results-xsltc-compile-tests"/>
+        <mkdir dir="results-xsltc-compile-verification-tests"/>
         
         <xsltcTestsTask inputDir="tests/xsltc/attribset" 
-                        resultDir="results-xsltc-compile-tests" 
+                        resultDir="results-xsltc-compile-verification-tests" 
                         bootclasspathref="boot.class.path"/>
 
         <echo message=""/>
-        <echo message=" [minitest] CONGRATULATIONS! The xsltc compile tests have passed!" />
-        <echo message=" [minitest] See details of the xsltc compile tests results, at results-xsltc-compile-tests/actual_test_results.xml" />                        
+        <echo message=" [minitest] Completed, running the 'xsltc compilation error verification' tests, and these have passed" />
+        <echo message=" [minitest] See details of the 'xsltc compilation error verification' test results, at results-xsltc-compile-verification-tests/actual_test_results.xml" />
+        
+        <echo message=""/>
+        
+        <echo message=" [minitest] CONGRATULATIONS! The conf.xsltc tests passed!" />
+
     </target>
 
     <target name="perf.xsltc" description="Run TestletDriver over the perf tree using xsltc">
