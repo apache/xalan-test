@@ -218,10 +218,10 @@ public class XsltcTestsTask extends Task {
           Element fileNameElem = resultDocument.createElement("fileName");
           fileNameElem.appendChild(resultDocument.createTextNode(fileName));
           resultElem.appendChild(fileNameElem);
-          Element passElem = resultDocument.createElement("pass");
-          passElem.appendChild(resultDocument.createTextNode(passStatus == 
-                                                   Boolean.TRUE ? "true" : "false"));
-          resultElem.appendChild(passElem);
+          Element statusElem = resultDocument.createElement("status");
+          statusElem.appendChild(resultDocument.createTextNode(passStatus == 
+                                                   Boolean.TRUE ? "pass" : "fail"));
+          resultElem.appendChild(statusElem);
           
           testResultsElem.appendChild(resultElem);
        }
