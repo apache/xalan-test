@@ -620,12 +620,13 @@ dependencies - users must manually 'build jar' first.
     </target>
 
 
-    <!-- ================================================================== -->
-    <!-- Run tests: specific named API tests                               -->
-    <!-- ================================================================== -->
-    <target name="api" description="Run specific API tests" depends="init.test">
-        <!-- Note no default is set; also testClass is not prefixed! -->
-        <!--<echo message="Executing Xalan api test: ${testClass}" />-->
+    <!-- Run specific named API tests.
+    
+         What tests this build target runs, are defined within test.properties file
+         (please see the section, 'Various tests, that run for ant build.xml's "apitest" 
+          target' within ./test.properties file).
+    -->
+    <target name="apitest" description="Run specific API tests" depends="init.test">
         <property name="testClass" value="org.apache.qetest.xsl.XSLTestHarness" />
         <property name="testType" value="api." />
         
