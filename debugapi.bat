@@ -22,9 +22,18 @@ rem
 @REM Wrapper for running tests without Ant in a debugger
 @REM Usage: debugapi.bat org.apache.qetest.package.TestName [other options]
 
+rem     Setup:
+rem        - you must set JAVA_HOME environment variable
+
 :start
-set APICP=..\java\build\xalan.jar;..\java\build\serializer.jar;..\java\lib\xml-apis.jar;..\java\lib\xercesImpl.jar;java\build\testxsl.jar;%CLASSPATH%
-@echo Executing: java -classpath %APICP% %1 -load debugapi.properties %2 %3 %4 %5 %6 %7 %8 %9
-java -classpath %APICP% %1 -load debugapi.properties %2 %3 %4 %5 %6 %7 %8 %9
+set _JAVACMD=%JAVA_HOME%\bin\java
+
+set XALAN_BUILD_DIR_PATH=..\xalan-java\build;..\build
+
+set XERCES_ENDORSED_DIR_PATH=..\xalan-java\lib\endorsed;..\lib\endorsed
+
+set APICP=java\build\testxsl.jar;tools\jtidy-r938.jar
+@echo Executing: java -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% -classpath %APICP% %1 -load debugapi.properties %2 %3 %4 %5 %6 %7 %8 %9
+"%_JAVACMD%" -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% -classpath %APICP% %1 -load debugapi.properties %2 %3 %4 %5 %6 %7 %8 %9
 set APICP=
 :end
