@@ -116,9 +116,22 @@ public class SystemIDResolverAPITest extends FileBasedTest
                 baseURL = "";
 
             // Add the default file scheme and a separator between 
-            //  the (blank) authority component and the hierarchical 
-            //  pathing component
-            baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
+            // the (blank) authority component and the hierarchical 
+            // pathing component
+            String osName = (System.getProperty("os.name")).toUpperCase();
+            if (osName != null) {
+               if (osName.contains("WINDOWS")) {
+                  baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
+               } else if (osName.contains("LINUX")) {
+                  baseURL = FILE_SCHEME + baseURL + URL_SEP;
+               } else {
+                  baseURL = FILE_SCHEME + baseURL + URL_SEP;
+               }
+            } 
+            else {
+               baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
+            }
+
             reporter.logStatusMsg("user.dir baseURI is: " + baseURL);
 
             reporter.logTraceMsg("Now testing getAbsoluteURIFromRelative...");
