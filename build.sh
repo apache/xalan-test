@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 #=========================================================================
-# Copyright 2001-2004 The Apache Software Foundation.
+# Copyright 2001-2023 The Apache Software Foundation.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,110 +17,78 @@
 #=========================================================================
 #
 #	Name:   build.sh
-#	Author: Shane Curcuru
+#	Author: Joe Kesselman
+#		Fresh port from Mukul Gandhi's revised build.bat.
+#		WARNING: This currently does not include the hooks needed
+#		to make the script compatable with cygwin (unix/Linux shell
+#		and commands ported to run under Windows). See 
+#		deprecated_build.sh to see how we handled the cygwin
+#		syntax differences back in 2001. These days, Windows users
+#		are more likely to use WSL, which simplifies matters.
 
-echo "build.sh beginning..."
+#	See:	build.xml
 
-if [ "$1" = "-h" ] ; then
+#	Setup:
+#          1) You must set JAVA_HOME, for example,
+#	      $ export JAVA_HOME=/etc/alternatives/java_sdk
+
+#          2) You can set ANT_HOME if you use your own Ant install, for example,
+#	      $ export ANT_HOME=/usr/share/ant
+
+echo
+echo Xalan-J test automation build
+echo -----------------------------
+
+if [ "$1" = "-h" ]; then 
     echo build.sh - executes Xalan Java-based test automation
     echo   Usage:   build [target] [-D options]
     echo   Example: build api -DtestClass=TransformerAPITest -Dqetest.loggingLevel=30
+    echo
+    echo You MUST export the JAVA_HOME environment variable to point to the JDK
+    echo You CAN export ANT_HOME environment variable if you use your own Ant install
+
     exit 1
 fi
-CLS_PATH_SEP=:
-# if we're on windows, override that:
-uname | grep WIN && CLS_PATH_SEP=\;
 
-# If PARSER_JAR is not set, default to xercesImpl.jar
-if [ "$PARSER_JAR" = "" ] ; then
-    PARSER_JAR=../java/lib/xercesImpl.jar
+if [ "$JAVA_HOME" = "" ]; then 
+    echo Warning: JAVA_HOME environment variable is not exported
+    echo You may have meant to set it to $(ls -l /etc/alternatives/java_sdk | sed -e 's/.* -> \(.*\)/\1/')
+    exit 1
 fi
 
-if [ "$XML_APIS_JAR" = "" ]; then
-    XML_APIS_JAR=../java/lib/xml-apis.jar
+JAVACMD=$JAVA_HOME/bin/java
+    
+CLASSPATH=$CLASSPATH:$JAVA_HOME/lib/tools.jar
+
+# Since Linux has scoped environments, we don't need explicit temporary vars.
+# Default is to use a copy of ant bundled with xalan-java.
+if [ "$ANT_HOME"=="" ]; then 
+    ANT_HOME=../xalan-java
 fi
 
-if [ "$SERIALIZER_JAR" = "" ]; then
-    SERIALIZER_JAR=../java/lib/serializer.jar
-fi
 
-if [ "$ANT_HOME" = "" ] ; then
-  # try to find ANT
-  if [ -d /opt/ant ] ; then 
-    ANT_HOME=/opt/ant
-  elif [ -d ${HOME}/opt/ant ] ; then 
-    ANT_HOME=${HOME}/opt/ant
-  else
-     # Otherwise, just default the one over in java
-     ANT_HOME=../java
-  fi
-fi
-
-if [ "$JAVA_HOME" != "" ] ; then
-  if [ "$JAVACMD" = "" ] ; then 
-    JAVACMD=$JAVA_HOME/bin/java
-  fi
+# Check user's ANT_HOME to make sure it actually has what we need
+if [ -f "$ANT_HOME/tools/ant.jar" ]; then
+    ANT_JARS=$ANT_HOME/tools/ant.jar
+elif [ -f "$ANT_HOME/../tools/ant.jar" ]; then
+    ANT_JARS=$ANT_HOME/../tools/ant.jar
 else
-  if [ "$JAVACMD" = "" ] ; then 
-    JAVACMD=java
-  fi
-fi
- 
-# add in the dependency .jar files (copied from ant)
-DIRLIBS=${ANT_HOME}/lib/*.jar
-_ANT_CP=$ANT_HOME/tools/ant.jar
-for i in ${DIRLIBS}
-do
-    # if the directory is empty, then it will return the input string
-    # this is stupid, so check for it
-    if [ "$i" != "${DIRLIBS}" ] ; then
-        _ANT_CP=$_ANT_CP${CLS_PATH_SEP}"$i"
-    fi
-done
-
-# If JARDIR is set, prepend all .jars there to our classpath
-if [ "$JARDIR" != "" ] ; then
-    CLASSPATH=${_ANT_CP}${CLS_PATH_SEP}${CLASSPATH}
-
-    DIRLIBS=${JARDIR}/*.jar
-    for i in ${DIRLIBS}
-    do
-        if [ "$i" != "${DIRLIBS}" ] ; then
-            CLASSPATH="$i"${CLS_PATH_SEP}${CLASSPATH}
-        fi
-    done
-else
-    CLASSPATH=${CLASSPATH}${CLS_PATH_SEP}${_ANT_CP}${CLS_PATH_SEP}${PARSER_JAR}${CLS_PATH_SEP}${XML_APIS_JAR}${CLS_PATH_SEP}${SERIALIZER_JAR}
+    ANT_JARS=$ANT_HOME/lib/ant.jar:$ANT_HOME/lib/ant-launcher.jar
 fi
 
-if [ "$JAVA_HOME" != "" ] ; then
-  if test -f $JAVA_HOME/lib/tools.jar ; then
-    CLASSPATH=${CLASSPATH}${CLS_PATH_SEP}${JAVA_HOME}/lib/tools.jar
-  fi
+CLASSPATH=$CLASSPATH:$ANT_JARS
 
-  if test -f $JAVA_HOME/lib/classes.zip ; then
-    CLASSPATH="${CLASSPATH}${CLS_PATH_SEP}${JAVA_HOME}/lib/classes.zip"
-  fi
-else
-  echo "Warning: JAVA_HOME environment variable is not set."
-  echo "  If build fails because sun.* classes could not be found"
-  echo "  you will need to set the JAVA_HOME environment variable"
-  echo "  to the installation directory of java."
-fi
+# NOTE: deprecated_build.sh had a bit more fallback searching for java and
+# ant resources, plus more hooks for overriding paths and parameters. We
+# found those occasionally useful during development, so we left them in the
+# standard scripts. But they aren't strictly needed.
 
-# supply JIKESPATH to Ant as jikes.class.path
-if [ "$JIKESPATH" != "" ] ; then
-  if [ "$ANT_OPTS" != "" ] ; then
-    ANT_OPTS="$ANT_OPTS -Djikes.class.path=$JIKESPATH"
-  else
-    ANT_OPTS=-Djikes.class.path=$JIKESPATH
-  fi
-fi
+XALAN_BUILD_DIR_PATH=../xalan-java/build:../build
 
-# also pass along the selected parser to Ant
-ANT_OPTS="${ANT_OPTS} -Dparserjar=${PARSER_JAR}"
+XERCES_ENDORSED_DIR_PATH=../xalan-java/lib/endorsed:../lib/endorsed
 
-echo Running:  $JAVACMD ${JAVA_OPTS} -classpath "${CLASSPATH}" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
-$JAVACMD ${JAVA_OPTS} -classpath "${CLASSPATH}" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
+# Reminder: Note $* versus $@ distinction
+echo Running: $JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
+$JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
 
 echo "build.sh complete!"

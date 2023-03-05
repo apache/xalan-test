@@ -20,12 +20,13 @@ rem     Name:   build.bat
 rem     Author: shane_curcuru@lotus.com,
 rem             ggregory@apache.org,
 rem             mukulg@apache.org
-                
+rem                
 rem     See:    build.xml
-
+rem
 rem     Setup:
-rem        - you must set JAVA_HOME environment variable
-rem        - you can set ANT_HOME environment variable if you use your own Ant install
+rem        1) You must set JAVA_HOME
+rem
+rem        2) You can set ANT_HOME if you use your own Ant install
 
 echo.
 echo Xalan-J test automation build
