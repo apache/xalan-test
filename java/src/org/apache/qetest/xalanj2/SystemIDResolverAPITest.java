@@ -118,7 +118,9 @@ public class SystemIDResolverAPITest extends FileBasedTest
             // Add the default file scheme and a separator between 
             // the (blank) authority component and the hierarchical 
             // pathing component
-            String osName = (System.getProperty("os.name")).toUpperCase();
+            baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
+            
+            /*String osName = (System.getProperty("os.name")).toUpperCase();
             if (osName != null) {
                if (osName.contains("WINDOWS")) {
                   baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
@@ -130,7 +132,7 @@ public class SystemIDResolverAPITest extends FileBasedTest
             } 
             else {
                baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
-            }
+            }*/
 
             reporter.logStatusMsg("user.dir baseURI is: " + baseURL);
 

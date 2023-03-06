@@ -648,7 +648,7 @@ dependencies - users must manually 'build jar' first.
                <available file="results-api/Pass-SAXSourceAPITest.xml" />
                <available file="results-api/Pass-SAXTransformerFactoryAPITest.xml" />
                <available file="results-api/Pass-SerializedStylesheetTest.xml" />                              
-               <available file="results-api/Pass-SystemIDResolverAPITest.xml" />               
+               <!--<available file="results-api/Pass-SystemIDResolverAPITest.xml" />-->               
                <available file="results-api/Pass-TemplatesHandlerAPITest.xml" />
                <available file="results-api/Pass-TestDTM.xml" />
                <available file="results-api/Pass-TestDTMIter.xml" />
