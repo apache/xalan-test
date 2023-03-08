@@ -687,8 +687,9 @@ public class XHTComparator
     	        tidy.setXHTML(true);
     	        tidy.setTidyMark(false);
     	        tidy.setShowWarnings(false);
+                tidy.setShowErrors(0);
     	        tidy.setQuiet(true);
-    	        doc  = tidy.parseDOM(new URL(docURI).openStream(), null);
+    	        doc = tidy.parseDOM(new URL(docURI).openStream(), null);
             }
             catch (Exception e)
             {
