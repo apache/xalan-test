@@ -28,7 +28,8 @@ import org.apache.xml.utils.SystemIDResolver;
  *
  * Very simple coverage test.
  * 
- * @author shane_curcuru@us.ibm.com
+ * @author shane_curcuru@us.ibm.com,
+ *         Joe Kesselman  
  * @version $Id$
  */
 public class SystemIDResolverAPITest extends FileBasedTest
@@ -112,27 +113,23 @@ public class SystemIDResolverAPITest extends FileBasedTest
         {
             String prevUserDir = System.getProperty("user.dir");
             String baseURL = prevUserDir.replace('\\', '/');
-            if (null == baseURL)
-                baseURL = "";
+            if (baseURL == null) {
+               baseURL = "";
+            }
 
-            // Add the default file scheme and a separator between 
-            // the (blank) authority component and the hierarchical 
-            // pathing component
-            baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
+            // To turn a posix user.dir into a filesystem URL, prefix it with
+            // FILE_SCHEME (normally with a blank authority component) and
+            // follow it with URL_SEP to ensure it is taken as a directory.
+            //
+            // HOWEVER: On Windows, where absolute paths begin with a drive letter rather
+            // than the root-directory URL_SEP, XalanJ is expected to insert a URL_SEP
+            // between the scheme and user.dir, so the baseURI always starts with
+            // "file:///".
+            if (baseURL.length() > 0 && baseURL.charAt(0) != '/') {
+               baseURL = URL_SEP + baseURL;
+            }               
             
-            /*String osName = (System.getProperty("os.name")).toUpperCase();
-            if (osName != null) {
-               if (osName.contains("WINDOWS")) {
-                  baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
-               } else if (osName.contains("LINUX")) {
-                  baseURL = FILE_SCHEME + baseURL + URL_SEP;
-               } else {
-                  baseURL = FILE_SCHEME + baseURL + URL_SEP;
-               }
-            } 
-            else {
-               baseURL = FILE_SCHEME + URL_SEP + baseURL + URL_SEP;
-            }*/
+            baseURL = FILE_SCHEME + baseURL + URL_SEP;
 
             reporter.logStatusMsg("user.dir baseURI is: " + baseURL);
 
