@@ -22,6 +22,7 @@ package org.apache.qetest.xalanj2;
 
 import org.apache.qetest.FileBasedTest;
 import org.apache.xml.utils.SystemIDResolver;
+import java.nio.file.Paths;
 
 /**
  * Functionality/system/integration tests for SystemIDResolver.
@@ -112,24 +113,7 @@ public class SystemIDResolverAPITest extends FileBasedTest
         try
         {
             String prevUserDir = System.getProperty("user.dir");
-            String baseURL = prevUserDir.replace('\\', '/');
-            if (baseURL == null) {
-               baseURL = "";
-            }
-
-            // To turn a posix user.dir into a filesystem URL, prefix it with
-            // FILE_SCHEME (normally with a blank authority component) and
-            // follow it with URL_SEP to ensure it is taken as a directory.
-            //
-            // HOWEVER: On Windows, where absolute paths begin with a drive letter rather
-            // than the root-directory URL_SEP, XalanJ is expected to insert a URL_SEP
-            // between the scheme and user.dir, so the baseURI always starts with
-            // "file:///".
-            if (baseURL.length() > 0 && baseURL.charAt(0) != '/') {
-               baseURL = URL_SEP + baseURL;
-            }               
-            
-            baseURL = FILE_SCHEME + baseURL + URL_SEP;
+            String baseURL = ((Paths.get(prevUserDir)).toUri()).toString();
 
             reporter.logStatusMsg("user.dir baseURI is: " + baseURL);
 
