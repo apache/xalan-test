@@ -8,10 +8,10 @@
   <!-- Creator: Maynard Demmons (maynard@organic.com) -->
   <!-- Purpose: Test for whitespace stripping from source documents retrieved
                 with the document() function. -->
-  <!-- Elaboration: doc/node() [excluding "XPath data model" attribute nodes and the 
+  <!-- Elaboration: doc/node() [excluding XDM (XPath data model) attribute nodes and the 
                 root node] might contain several whitespace nodes if not stripped. 
                 The built-in template for text would cause them to be emitted. But 
-                the strip operation is defined as being applied to "XPath data model" 
+                the strip operation is defined as being applied to XDM 
                 nodes originating from "XML source documents" and nodes returned by 
                 the document() function, as described in XSLT 1.0 spec's section 
                 "12.1 Multiple Source Documents", so they can be stripped (using XSLT 1.0 
