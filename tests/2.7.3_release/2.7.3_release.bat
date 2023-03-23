@@ -25,11 +25,13 @@ if exist "test1.class" (
 REM #Test 2 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ interpretive processor)
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% org.apache.xalan.xslt.Process -IN jira_xalanj_2623.xml -XSL jira_xalanj_2623.xsl > jira_xalanj_2623.out 
 
+REM For this test to succeed, following XML Schema validation should pass
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XERCES_ENDORSED_DIR_PATH% jaxp.SourceValidator -i jira_xalanj_2623.out -a jira_xalanj_2623.xsd -f
 
 REM #Test 3 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ XSLTC processor)
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% org.apache.xalan.xslt.Process -XSLTC -IN jira_xalanj_2623.xml -XSL jira_xalanj_2623.xsl > jira_xalanj_2623.out 
 
+REM For this test to succeed, following XML Schema validation should pass
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XERCES_ENDORSED_DIR_PATH% jaxp.SourceValidator -i jira_xalanj_2623.out -a jira_xalanj_2623.xsd -f
 
 del jira_xalanj_2623.out
