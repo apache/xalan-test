@@ -19,7 +19,7 @@ if exist "test1.class" (
 if exist "test1.class" (
     echo Test failed. Please solve this, before checking in! 
 ) else (
-    echo CONGRATULATIONS! The test passed!
+    echo Congratulations! The test passed!
 )
 
 REM #Test 2 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ interpretive processor)
