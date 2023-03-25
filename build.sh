@@ -60,23 +60,24 @@ JAVACMD=$JAVA_HOME/bin/java
     
 CLASSPATH=$CLASSPATH:$JAVA_HOME/lib/tools.jar
 
-# Since Linux has scoped environments, we don't need explicit temporary vars.
-# Default is to use a copy of ant bundled with xalan-java.
-if [ "$ANT_HOME"=="" ]; then 
-    ANT_HOME=../xalan-java
+# Default is to use a copy of ant bundled with xalan-java
+if [ $ANT_HOME = "" ]; then
+   _ANT_HOME=../xalan-java   
+else
+   _ANT_HOME=$ANT_HOME
 fi
 
 
 # Check user's ANT_HOME to make sure it actually has what we need
-if [ -f "$ANT_HOME/tools/ant.jar" ]; then
-    ANT_JARS=$ANT_HOME/tools/ant.jar
-elif [ -f "$ANT_HOME/../tools/ant.jar" ]; then
-    ANT_JARS=$ANT_HOME/../tools/ant.jar
+if [ -f "$_ANT_HOME/tools/ant.jar" ]; then
+    _ANT_JARS=$_ANT_HOME/tools/ant.jar
+elif [ -f "$_ANT_HOME/../tools/ant.jar" ]; then
+    _ANT_JARS=$_ANT_HOME/../tools/ant.jar
 else
-    ANT_JARS=$ANT_HOME/lib/ant.jar:$ANT_HOME/lib/ant-launcher.jar
+    _ANT_JARS=$_ANT_HOME/lib/ant.jar:$_ANT_HOME/lib/ant-launcher.jar
 fi
 
-CLASSPATH=$CLASSPATH:$ANT_JARS
+CLASSPATH=$CLASSPATH:$_ANT_JARS
 
 # NOTE: deprecated_build.sh had a bit more fallback searching for java and
 # ant resources, plus more hooks for overriding paths and parameters. We
@@ -88,7 +89,7 @@ XALAN_BUILD_DIR_PATH=../xalan-java/build:../build
 XERCES_ENDORSED_DIR_PATH=../xalan-java/lib/endorsed:../lib/endorsed
 
 # Reminder: Note $* versus $@ distinction
-echo Running: $JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
-$JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" -Dant.home="${ANT_HOME}" $ANT_OPTS org.apache.tools.ant.Main "$@"
+echo Running: $JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" org.apache.tools.ant.Main "$@"
+$JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" org.apache.tools.ant.Main "$@"
 
 echo "build.sh complete!"
