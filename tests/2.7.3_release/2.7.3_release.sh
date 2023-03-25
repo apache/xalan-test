@@ -39,25 +39,37 @@ XERCES_ENDORSED_DIR_PATH=../../../xalan-java/lib/endorsed:../../../lib/endorsed
 TEST_XSL_DIR=../../java/build:../../../java/build
 
 #Test 1 (Testing XalanJ integer truncation bug fix, with XalanJ XSLTC processor)
-if [ -f "test1.class" ]; then
+if [ -f "int_trunc.class" ]; then
   # delete the result XalanJ translet file, if that exists
-  rm test1.class
+  rm int_trunc.class
 fi
 
 $JAVACMD -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH org.apache.xalan.xslt.Process -XSLTC -IN int_trunc.xml -XSL int_trunc.xsl -SECURE -XX -XT 2>NUL
 
-if [ -f "test1.class" ]; then
+if [ -f "int_trunc.class" ]; then
     echo Test failed. Please solve this, before checking in! 
 else
     echo The xalanj integer truncation bug fix test passed!
 fi
 
-#Test 2 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ interpretive processor)
+#Test 2 (Testing bug fix of the jira issue XALANJ-2584, with XalanJ interpretive processor)
+$JAVACMD -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH org.apache.xalan.xslt.Process -IN jira_xalanj_2584.xml -XSL jira_xalanj_2584.xsl > jira_xalanj_2584.out 
+
+$JAVACMD -Djava.endorsed.dirs=$XERCES_ENDORSED_DIR_PATH -classpath $TEST_XSL_DIR/testxsl.jar org.apache.qetest.XMLParserTestDriver jira_xalanj_2584.out xalan_interpretive
+
+#Test 3 (Testing bug fix of the jira issue XALANJ-2584, with XalanJ XSLTC processor)
+$JAVACMD -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH org.apache.xalan.xslt.Process -XSLTC -IN jira_xalanj_2584.xml -XSL jira_xalanj_2584.xsl > jira_xalanj_2584.out 
+
+$JAVACMD -Djava.endorsed.dirs=$XERCES_ENDORSED_DIR_PATH -classpath $TEST_XSL_DIR/testxsl.jar org.apache.qetest.XMLParserTestDriver jira_xalanj_2584.out xalan_xsltc
+
+rm jira_xalanj_2584.out
+
+#Test 4 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ interpretive processor)
 $JAVACMD -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH org.apache.xalan.xslt.Process -IN jira_xalanj_2623.xml -XSL jira_xalanj_2623.xsl > jira_xalanj_2623.out 
 
 $JAVACMD -Djava.endorsed.dirs=$XERCES_ENDORSED_DIR_PATH -classpath $TEST_XSL_DIR/testxsl.jar org.apache.qetest.XSValidationTestDriver jira_xalanj_2623.out jira_xalanj_2623.xsd xalan_interpretive
 
-#Test 3 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ XSLTC processor)
+#Test 5 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ XSLTC processor)
 $JAVACMD -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH org.apache.xalan.xslt.Process -XSLTC -IN jira_xalanj_2623.xml -XSL jira_xalanj_2623.xsl > jira_xalanj_2623.out 
 
 $JAVACMD -Djava.endorsed.dirs=$XERCES_ENDORSED_DIR_PATH -classpath $TEST_XSL_DIR/testxsl.jar org.apache.qetest.XSValidationTestDriver jira_xalanj_2623.out jira_xalanj_2623.xsd xalan_xsltc
