@@ -1,25 +1,27 @@
 @echo off
 rem
 rem ==========================================================================
-rem = Licensed to the Apache Software Foundation (ASF) under one or more
-rem = contributor license agreements.  See the NOTICE file distributed with
-rem = this work for additional information regarding copyright ownership.
-rem = The ASF licenses this file to You under the Apache License, Version 2.0
-rem = (the "License"); you may not use this file except in compliance with
-rem = the License.  You may obtain a copy of the License at
-rem =
-rem =     http://www.apache.org/licenses/LICENSE-2.0
-rem =
-rem = Unless required by applicable law or agreed to in writing, software
-rem = distributed under the License is distributed on an "AS IS" BASIS,
-rem = WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-rem = See the License for the specific language governing permissions and
-rem = limitations under the License.
+rem Copyright 2001-2023 The Apache Software Foundation.
+rem
+rem Licensed to the Apache Software Foundation (ASF) under one or more
+rem contributor license agreements.  See the NOTICE file distributed with
+rem this work for additional information regarding copyright ownership.
+rem The ASF licenses this file to You under the Apache License, Version 2.0
+rem (the "License"); you may not use this file except in compliance with
+rem the License.  You may obtain a copy of the License at
+rem
+rem     http://www.apache.org/licenses/LICENSE-2.0
+rem
+rem Unless required by applicable law or agreed to in writing, software
+rem distributed under the License is distributed on an "AS IS" BASIS,
+rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+rem See the License for the specific language governing permissions and
+rem limitations under the License.
 rem ==========================================================================
 
 rem     Author: mukulg@apache.org
 
-REM Set JAVA_HOME environment variable, for the local environment
+rem Set JAVA_HOME environment variable, for the local environment
 
 if "%JAVA_HOME%"=="" goto noJavaHome
 
@@ -27,9 +29,9 @@ set XALAN_BUILD_DIR_PATH=..\..\..\xalan-java\build;..\..\..\build
 
 set XERCES_ENDORSED_DIR_PATH=..\..\..\xalan-java\lib\endorsed;..\..\..\lib\endorsed
 
-REM #Test 1 (Testing XalanJ integer truncation bug fix, with XalanJ XSLTC processor)
+rem #Test 1 (Testing XalanJ integer truncation bug fix, with XalanJ XSLTC processor)
 if exist "test1.class" (
-  REM clear the result XalanJ translet file, if that exists
+  rem delete the result XalanJ translet file, if that exists
   del test1.class
 )
 
@@ -41,13 +43,13 @@ if exist "test1.class" (
     echo The xalanj integer truncation bug fix test passed!
 )
 
-REM #Test 2 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ interpretive processor)
+rem #Test 2 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ interpretive processor)
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% org.apache.xalan.xslt.Process -IN jira_xalanj_2623.xml -XSL jira_xalanj_2623.xsl > jira_xalanj_2623.out 
 
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XERCES_ENDORSED_DIR_PATH% -classpath ..\..\java\build\testxsl.jar org.apache.qetest.XSValidationTestDriver jira_xalanj_2623.out jira_xalanj_2623.xsd xalan_interpretive
 
 
-REM #Test 3 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ XSLTC processor)
+rem #Test 3 (Testing bug fix of the jira issue XALANJ-2623, with XalanJ XSLTC processor)
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% org.apache.xalan.xslt.Process -XSLTC -IN jira_xalanj_2623.xml -XSL jira_xalanj_2623.xsl > jira_xalanj_2623.out 
 
 %JAVA_HOME%\bin\java -Djava.endorsed.dirs=%XERCES_ENDORSED_DIR_PATH% -classpath ..\..\java\build\testxsl.jar org.apache.qetest.XSValidationTestDriver jira_xalanj_2623.out jira_xalanj_2623.xsd xalan_xsltc

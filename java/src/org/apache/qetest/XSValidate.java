@@ -47,7 +47,6 @@ public class XSValidate implements ErrorHandler {
 	private static final String SCHEMA_FULL_CHECKING_FEATURE_ID = 
 	                                          "http://apache.org/xml/features/validation/schema-full-checking";
 
-
 	public XSValidate(String xmlFilePath, String xsdFilePath) {
 		this.xmlFilePath = xmlFilePath;
 		this.xsdFilePath = xsdFilePath;
