@@ -33,6 +33,11 @@ import java.io.File;
 
 /**
  * Testlet for reproducing Bugzilla reported bugs.
+ * 
+ * NOTE: This test depends on org.apache.xalan.stree, which does not appear to exist
+ * in the current Xalan codebase. We should probably remove this class, or replace it
+ * if appropriate with a test that runs against Xalan 2.0 as shipping.
+ * 
  * @author rylsky@hotmail.com (Vladimir Rylsky)
  * @author shane_curcuru@lotus.com
  */
@@ -87,7 +92,7 @@ public class Bugzilla1288 extends TestletImpl
       Element n_tool;
 
       // Note must call public constructor! -sc
-      x_doc = new DocumentImpl(1024);
+      x_doc = new DTMDocumentImpl(1024);
 
       n_tool = (Element)x_doc.appendChild(x_doc.createElement("TOOL_NAME"));
       n_tool.setAttribute("date", "date-string-here" /* new Date().toString() */);

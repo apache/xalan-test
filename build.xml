@@ -77,6 +77,8 @@ dependencies - users must manually 'build jar' first.
     <property name="test.build.apidocs" value="${test.build.docs}/apidocs"/>
     <property name="tests.bugzilla.dir" value="tests/bugzilla"/>
     <property name="tests.bugzilla.build.dir" value="${tests.bugzilla.dir}/build"/>
+    <property name="tests.jira.dir" value="tests/jira"/>
+    <property name="tests.jira.build.dir" value="${tests.jira.dir}/build"/>
     <property name="extensions.dir" value="tests/extensions"/>
     <property name="tests.extensions.dir" value="${extensions.dir}/java"/>
     <property name="tests.extensions.build.dir" value="${extensions.dir}/java/build"/>
@@ -228,6 +230,12 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${tests.bugzilla.build.dir}" />
     </path>
 
+    <!-- Classpath used when running Jira tests -->
+    <path id="jira.class.path">
+        <path refid="api.class.path" />
+        <pathelement location="${tests.jira.build.dir}" />
+    </path>
+
     <!-- Classpath used when running extensions tests -->
     <path id="extensions.class.path">
         <pathelement location="${xalan.jar}" />         
@@ -238,6 +246,7 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${jtidy.jar}" />
         <pathelement location="${tests.extensions.build.dir}" />
         <pathelement location="${tests.bugzilla.build.dir}" />        
+        <pathelement location="${tests.jira.build.dir}" />        
         <!-- Add more pathelements if we add more Java extensions dirs -->        
     </path>
 
@@ -702,10 +711,23 @@ dependencies - users must manually 'build jar' first.
         <antcall target="run.xalantest">
             <param name="xalantest.classpathref" value="bugzilla.class.path" />
         </antcall>
+	<!-- Why isn't classes a dependency? -->
         <echo message="If you got ClassNotFound, did you 'build bugzilla.classes' first?" />
     </target>
 
-    <!-- ================================================================== -->
+    <target name="jira" description="Run all Jira Testlets and tests to regress bugs"
+        depends="init.test">
+        <echo message="Executing Xalan Jira Testlets and tests to regress bugs" />
+        <property name="testClass" value="org.apache.qetest.xsl.JiraTestletDriver" />
+        <property name="testType" value="jira." />
+        <antcall target="run.xalantest">
+            <param name="xalantest.classpathref" value="jira.class.path" />
+        </antcall>
+	<!-- Why isn't classes a dependency? -->
+        <echo message="If you got ClassNotFound, did you 'build jira.classes' first?" />
+    </target>
+
+    <!-- ============================================================== ==== -->
     <!-- Run tests: various extensions tests                                -->
     <!-- ================================================================== -->
     <target name="extensions" 
@@ -998,7 +1020,7 @@ dependencies - users must manually 'build jar' first.
 
     <target name="alltest.other">
         <property name="alltest.resultDir" value="results-alltest" />
-        <echo message="About to execute various API, extensions, bugzilla tests, results under ${alltest.resultDir}/..." />
+        <echo message="About to execute various API, extensions, bugzilla tests, jira tests, results under ${alltest.resultDir}/..." />
         <!-- Run all individual API tests through the harness -->
         <antcall target="harness">
             <param name="api.outputDir" value="${alltest.resultDir}/harness"/>
@@ -1012,6 +1034,10 @@ dependencies - users must manually 'build jar' first.
         <antcall target="bugzilla">
             <param name="bugzilla.outputDir" value="${alltest.resultDir}/bugzilla"/>
             <param name="bugzilla.logFile" value="${alltest.resultDir}/bugzilla/results.xml"/>
+        </antcall>
+        <antcall target="jira">
+            <param name="jira.outputDir" value="${alltest.resultDir}/jira"/>
+            <param name="jira.logFile" value="${alltest.resultDir}/jira/results.xml"/>
         </antcall>
         <!-- Run the threading tests once -->
         <antcall target="threads">
@@ -1449,6 +1475,16 @@ dependencies - users must manually 'build jar' first.
                nowarn="${compiler.nowarn}"/>
     </target>
 
+    <target name="jira.classes" depends="jar"
+        description="Compile any jira testlet classes">
+        <mkdir dir="${tests.jira.build.dir}" />
+        <javac srcdir="${tests.jira.dir}" 
+               destdir="${tests.jira.build.dir}" 
+               debug="${debug}"
+               classpath="${xalan.jar}:${testxsl.jar}" 
+               nowarn="${compiler.nowarn}"/>
+    </target>
+
     <target name="extensions.classes" depends="jar"
         description="Compile any extensions test classes">
         <mkdir dir="${tests.extensions.build.dir}" />
@@ -1465,7 +1501,7 @@ dependencies - users must manually 'build jar' first.
          various other classes in subdirs under tests/
     -->
     <target name="all" description="Build testxsl.jar *and* compile .java under tests/"
-        depends="jar,bugzilla.classes,extensions.classes">
+        depends="jar,bugzilla.classes,jira.classes,extensions.classes">
     </target>
 
     <target name="main"
@@ -1490,6 +1526,7 @@ dependencies - users must manually 'build jar' first.
         description="Clean up the compiled tests and docs">
         <delete dir="${test.build.dir}"/>
         <delete dir="${tests.bugzilla.build.dir}"/>
+        <delete dir="${tests.jira.build.dir}"/>
         <delete dir="${tests.extensions.build.dir}"/>
         <delete dir="${xdocs.style}"/> <!-- init.build.docs creates this tree -->
     </target>

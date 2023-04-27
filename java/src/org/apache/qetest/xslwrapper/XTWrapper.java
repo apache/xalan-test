@@ -28,9 +28,16 @@ import java.util.Properties;
 
 import org.xml.sax.InputSource;
 
+import com.jclark.xsl.sax.XSLProcessorImpl;
+
 /**
  * Implementation of TransformWrapper that uses the simplest method 
  * possible to use James Clark's XT processor.
+ * 
+ * 
+ * NOTE: This test depends on com.jclark.xsl.sax, which is not part of the Xalan codebase.
+ * It is arguable that this test, if it remains relevant, should be implemented as part of
+ * the XT project rather than here in xalan-test.
  *
  * @author Shane Curcuru
  * @version $Id$
@@ -53,7 +60,7 @@ public class XTWrapper extends TransformWrapperHelper
     public XTWrapper(){}
 
     /** Reference to current processor - XT flavor - convenience method. */
-    protected com.jclark.xsl.sax.XSLProcessorImpl processor = null;
+    protected XSLProcessorImpl processor = null;
 
     /**
      * Cached copy of newProcessor() Hashtable.
@@ -97,7 +104,7 @@ public class XTWrapper extends TransformWrapperHelper
         // Cleanup any prior objects 
         reset(false);
 
-        processor = new com.jclark.xsl.sax.XSLProcessorImpl();
+        processor = XSLProcessorImpl();
 
         String liaisonClassName = "com.jclark.xml.sax.CommentDriver";  // default
 
