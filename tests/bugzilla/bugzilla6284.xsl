@@ -2,7 +2,11 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <!-- FileName: bugzilla6284 -->
-  <!-- Creator: David Marston, from Daniel Gilder's bug report -->
+  <!-- Creator: David Marston, from Daniel Gilder's bug report 
+
+       jkesselmn sez: Appears to now be passing. Close as resolved, and
+       decide whether and where to keep this test.
+  -->
 
 <xsl:output method="xml" indent="no" encoding="UTF-8"/>
 
