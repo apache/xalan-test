@@ -1,3 +1,7 @@
+<!-- jkesselmn: Appears to now be working as designed. Close as resolved.
+     Discard test, add to extension tests, or add to contrib tests?
+-->
+
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     version="1.0"
     xmlns:lxslt="http://xml.apache.org/xslt"

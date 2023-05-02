@@ -4,6 +4,15 @@
 Bugzilla1009: Malformed attribute expression lacks line/column information 
 http://nagoya.apache.org/bugzilla/show_bug.cgi?id=1009
 bevan.arps@clear.net.nz (Bevan Arps)
+
+jkesselm: NO LONGER TRUE:
+
+[xalantest] file:///home/keshlam/git/xalan-test/tests/bugzilla/Bugzilla1009.xsl; Line #13; Column #24; Attr Template, Attribute: ref has an illegal value: {foo(bar)
+
+Should be closed as resolved. We *could* turn this into a regression
+test with a Java testlet, but I don't think that's especially worth
+doing since if it arises again it'll probably be with a different
+error message.
 -->
 
   <xsl:template match="doc">

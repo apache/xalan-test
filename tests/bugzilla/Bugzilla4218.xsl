@@ -9,6 +9,8 @@ incorrect.  If you uncomment the commented value-of and variable, it results
 "Variable accessed before it is bound!" error message.  The bug seems to be
 related to the inner call-template... it looks like something in the stack
 frame is not being restored???
+
+jkesselm: Could not reproduce. Probably solved long ago. Close as resolved.
 -->
 <xsl:template match="/">
     <out>

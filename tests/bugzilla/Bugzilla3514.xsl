@@ -1,6 +1,20 @@
 <?xml version="1.0" ?> 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<!-- "computational (recursive) template is very slow compared to xalan 1.2.2" c.mallwitz@intershop.de -->
+<!-- "computational (recursive) template is very slow compared to xalan 1.2.2" c.mallwitz@intershop.de 
+
+jkesselm notes:
+     To actually evaluate this complaint, we would need to run the
+     stylesheet under both Xalan 1 and Xalan 2 and compare the results.
+     The comment has not given us any information about the configuration(s) in
+     which the performance difference was noted, nor whether the issue appears
+     to be stylesheet preparation or execution. 
+
+     Java performance is something of a black art, especially under
+     hotspot JVMs. We do have a tests/perf collection. but using it
+     requires running both old and new versions of the code in
+     otherwise-identical environments. We could make checking for performance
+     regression part of the release process, and perhaps should.
+-->
   <xsl:template match="/">
     <foo>
     <xsl:call-template name="func1">
