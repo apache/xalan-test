@@ -34,9 +34,16 @@ import java.io.File;
 /**
  * Testlet for reproducing Bugzilla reported bugs.
  * 
- * NOTE: This test depends on org.apache.xalan.stree, which does not appear to exist
- * in the current Xalan codebase. We should probably remove this class, or replace it
- * if appropriate with a test that runs against Xalan 2.0 as shipping.
+ * jkesselm: This test is EXCLUDED in build.xml, since it refers to an
+ * absent class in org.apache.xalan.stree. That doesn't keep the
+ * framework from trying to execute it and reporting it as a
+ * class-not-found failure, unfortunately.
+ *
+ * SUGGESTION: Delete this test entirely and close bug as obsolete.
+ * Or attempt to reproduce the issue with another DOM. Note that it's an
+ * attempt, within an extension function ("inner transform"?), to
+ * transform a _subtree_ of a DOM rather than the entire document; I'm
+ * not sure at this late date whether we ever supported that.
  * 
  * @author rylsky@hotmail.com (Vladimir Rylsky)
  * @author shane_curcuru@lotus.com
@@ -104,6 +111,11 @@ public class Bugzilla1288 extends TestletImpl
         try
         {
           Transformer copier = TransformerFactory.newInstance().newTransformer();
+	  // Note: This is trying to transform a SUBTREE (the
+	  // TOOL_NAME element), not the full document. I'm not sure
+	  // we supported that... And I'm not sure executing it in an
+	  // extension function, as here, is at all related to that
+	  // question... except that we are recursively transforming.
           copier.transform(new DOMSource(n_tool), new DOMResult(context));
         }
         catch (TransformerException ex)
