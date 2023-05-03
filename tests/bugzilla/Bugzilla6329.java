@@ -25,6 +25,15 @@ import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
+// jkesselmn: Can not reproduce user-reported error. There _may_ be
+// some subtle quibbles about when adjacent text nodes (including the
+// CDATA Section node) get merged by the parser and processor; we seem
+// to be combining the newline before the CDATA Section into the
+// latter's node but not the newline following it. The DOM does not
+// forbid adjacent text nodes (CDATA section subclass or not), but it
+// seems to me we should have merged either both newlines or neither
+// into that node.
+
 /**
  * Testlet for reproducing Bugzilla reported bugs.
  *
@@ -63,7 +72,6 @@ public class Bugzilla6329 extends TestletImpl
      */
     public void execute(Datalet d)
 	{
-        // Use logger.logMsg(...) instead of System.out.println(...)
         logger.logMsg(Logger.STATUSMSG, "Reproducing Bugzilla#6329");
 
         String input =
@@ -110,7 +118,7 @@ public class Bugzilla6329 extends TestletImpl
             }
 
 
-            logger.checkAmbiguous("Test needs manual validation! (But Joe hints it may be invalid)");
+            logger.checkAmbiguous("Bugzilla6229 would need proper validation written to replace the console output above, if we could still provoke the error.");
         } 
         catch (Throwable t)
         {
