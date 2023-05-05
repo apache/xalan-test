@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding='iso-8859-1'?>
 
+<!-- jkesselm: The significan difference between current and expected output is
+
+< <?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/TR/REC-html40">
+<   <body><a xmlns="" xmlns:html="http://www.w3.org/TR/REC-html40" name="prefix_1"/>
+.....
+> <?xml version="1.0" encoding="UTF-8"?>
+> <html xmlns="http://www.w3.org/TR/REC-html40">
+>   <body><a xmlns:html="http://www.w3.org/TR/REC-html40" name="prefix_1"/>
+
+That is, the processor is explicitly setting setting the default namespace
+back to none ("") after having used it on the <html> element.
+
+THIS IS CORRECT. The <a> element is being copied/generated from the stylesheet
+in the beginning-of-body template, and the stylesheet does NOT have a default
+namespace binding. The user should have declared the default namespace 
+in the stulesheet if they wanted it applied, either on the <a> element
+in the template or on one of the elements containing that (up to, and
+including, the <xsl:stylesheet> element
+
+WORKING AS DESIGNED.
+
+Delete this test, or fix the "gold" output and move it to appropriate regression
+or contrib bucket.
+-->
+
 <!-- this stylesheet looks the first a element (html anchor) whose
      name attribute starts with the string 'prefix_', then copies this
      anchor to the beginning of the document (right after the body
