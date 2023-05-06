@@ -84,8 +84,8 @@ public class Bugzilla2925 extends TestletImpl
       Document doc = db.parse("Bugzilla2925Params.xml");
 
       t.setParameter("stylesheets", doc.getDocumentElement());
-      t.transform(new StreamSource("bugzilla2925.xml"),
-                  new StreamResult("bugzilla2925.xsr")
+      t.transform(new StreamSource("Bugzilla2925.xml"),
+                  new StreamResult("Bugzilla2925.xsr")
                   // new StreamResult(System.err)
                   );
 
