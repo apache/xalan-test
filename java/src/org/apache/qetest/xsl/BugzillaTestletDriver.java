@@ -177,10 +177,11 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
         // Iterate over every datalet and test it
         for (int ctr = 0; ctr < numDatalets; ctr++)
         {
+	    // Factor out of try so it's available in catch
+	    Datalet d = (Datalet)datalets.elementAt(ctr);
             try
             {
                 // Depending on the Datalet class, run a different algorithim
-                Datalet d = (Datalet)datalets.elementAt(ctr);
                 if (d instanceof TraxDatalet)
                 {
                     // Assume we the datalet holds the name of a 
@@ -211,9 +212,9 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
             catch (Throwable t)
             {
                 // Log any exceptions as fails and keep going
-                //@todo improve the below to output more useful info
-                reporter.checkFail("Datalet num " + ctr + " threw: " + t.toString());
-                reporter.logThrowable(Logger.ERRORMSG, t, "Datalet threw");
+                //@todo further improve the below to output more useful info
+                reporter.checkFail("Datalet num " + ctr + " (" + d.getDescription() + ") threw: " + t.toString());
+                reporter.logThrowable(Logger.ERRORMSG, t, "Datalet "+d.getDescription()+" threw");
             }
             reporter.testCaseClose();
         }  // of while...

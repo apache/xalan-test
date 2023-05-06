@@ -35,9 +35,9 @@ import java.io.File;
  * Testlet for reproducing Bugzilla reported bugs.
  * 
  * jkesselm: This test refers to an absent class in
- * org.apache.xalan.stree. That doesn't keep the framework from trying
- * to execute it and reporting it as a class-not-found failure,
- * unfortunately.
+ * org.apache.xalan.stree and fails to compile. That doesn't keep the
+ * xalan test framework from trying to execute it and reporting it as a
+ * class-not-found failure, unfortunately.
  *
  * SUGGESTION:  Delete this test entirely and close bug as obsolete.
  * Or attempt to reproduce the issue with another DOM. Note that it's an
