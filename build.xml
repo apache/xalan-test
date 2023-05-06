@@ -1470,7 +1470,7 @@ dependencies - users must manually 'build jar' first.
         <javac srcdir="${tests.bugzilla.dir}" 
                destdir="${tests.bugzilla.build.dir}" 
                debug="${debug}"
-               excludes="Bugzilla1288"
+               excludes="Bugzilla1288.java"
                classpath="${xalan.jar}:${testxsl.jar}" 
                nowarn="${compiler.nowarn}"/>
     </target>

@@ -94,8 +94,8 @@ public class Bugzilla2925 extends TestletImpl
       CheckService fileChecker = new XHTFileCheckService();
 
       if (Logger.PASS_RESULT
-              != fileChecker.check(logger, new File("bugzilla2925.xsr"),
-                                   new File("bugzilla2925.out"),
+              != fileChecker.check(logger, new File("Bugzilla2925.xsr"),
+                                   new File("Bugzilla2925.out"),
                                    getDescription())){}
     }
     catch (Exception e)
