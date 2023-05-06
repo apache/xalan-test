@@ -34,16 +34,17 @@ import java.io.File;
 /**
  * Testlet for reproducing Bugzilla reported bugs.
  * 
- * jkesselm: This test is EXCLUDED in build.xml, since it refers to an
- * absent class in org.apache.xalan.stree. That doesn't keep the
- * framework from trying to execute it and reporting it as a
- * class-not-found failure, unfortunately.
+ * jkesselm: This test refers to an absent class in
+ * org.apache.xalan.stree. That doesn't keep the framework from trying
+ * to execute it and reporting it as a class-not-found failure,
+ * unfortunately.
  *
- * SUGGESTION: Delete this test entirely and close bug as obsolete.
+ * SUGGESTION:  Delete this test entirely and close bug as obsolete.
  * Or attempt to reproduce the issue with another DOM. Note that it's an
  * attempt, within an extension function ("inner transform"?), to
  * transform a _subtree_ of a DOM rather than the entire document; I'm
- * not sure at this late date whether we ever supported that.
+ * not sure at this late date whether we ever supported that. At the very
+ * least, exclude the test.
  * 
  * @author rylsky@hotmail.com (Vladimir Rylsky)
  * @author shane_curcuru@lotus.com

@@ -1463,14 +1463,13 @@ dependencies - users must manually 'build jar' first.
              includes="**/*.class,**/*.properties" />
     </target>
 
-    <!-- excludes="Bugzilla1288.java"; test refers to removed classes -->
     <target name="bugzilla.classes" depends="jar"
         description="Compile any bugzilla testlet classes">
         <mkdir dir="${tests.bugzilla.build.dir}" />
         <javac srcdir="${tests.bugzilla.dir}" 
                destdir="${tests.bugzilla.build.dir}" 
                debug="${debug}"
-               excludes="Bugzilla1288.java"
+               excludes="Bugzilla1288" <!-- ... what's our exclude syntax? -->
                classpath="${xalan.jar}:${testxsl.jar}" 
                nowarn="${compiler.nowarn}"/>
     </target>
