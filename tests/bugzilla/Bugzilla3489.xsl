@@ -2,11 +2,36 @@
 		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	    xmlns:redirect="org.apache.xalan.xslt.extensions.Redirect"
 		extension-element-prefixes="redirect">		
-<!-- Reproducing Bugzilla 3489 -->
+
+<!-- Reproducing Bugzilla 3489 
+
+jkesselmn analysis:
+
+Throws a WrappedRuntimeException, "Could not find variable with the name of name." 
+
+In the template for /workspace/project/ant/property. $name IS NOT
+BOUND, so the exception is correct. The user did bind $projname and
+$refname, also referenced in that select expression, which suggests
+this was a simple coding error.
+
+Adding a binding in that template resolves the could-not-find-variable
+problem. 
+
+That leaves us with the fact that the input file, Bugzilla3489.xml, is
+not well formed; there are "-" characters before some element names,
+including the root element, which produces a "Content not allowed in
+prolog" error. As a quick test, I did a global replace of \n- to
+comment those out, and the stylesheet ran.
+
+Conclusion: XALAN IS WORKING AS DESIGNED.
+Recommendation: Discard this test. 
+-->
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
 	<xsl:strip-space elements="*"/>
 	<xsl:param name="output-dir"/>
+
 	<xsl:template match="*|@*"/>
+
 	<xsl:template match="/workspace">
 		<xsl:apply-templates/>
 	</xsl:template>
@@ -260,12 +285,14 @@
 						<xsl:if test="@reference and @project">
 			              <xsl:variable name="projname" select="@project"/>
 			              <xsl:variable name="refname" select="@reference"/>
+				      
 			              <xsl:choose>
 			                <xsl:when test="@id">
 			                  <xsl:variable name="propid" select="@id"/>
 			                  <xsl:value-of select="/workspace/project[@name=$projname]/*[name()=$refname and @id=$propid]"/>
 			                </xsl:when>
 			                <xsl:otherwise>
+					  <!-- USER ERROR: NO BINDING FOR $name -->
 			                  <xsl:value-of select="/workspace/project[@name=$name]/*[name()=$refname]"/>
 			                </xsl:otherwise>
 			              </xsl:choose>

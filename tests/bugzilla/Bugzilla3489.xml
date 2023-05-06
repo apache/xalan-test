@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!-- Reproducing Bugzilla 3489 -->
+<!-- USER ERROR: The "\n-" before root element is forbidden in XML, as "content in prolog". See comments in Bugzilla3489.xsl -->
 - <workspace banner-image="http://jakarta.apache.org/images/jakarta-logo.gif" banner-link="http://jakarta.apache.org" logdir="o:\desproto\ichannel/log" build-sequence="bulk" version="0.2" basedir="o:\desproto\ichannel" viewdir="../../.." outputdir="o:\desproto\ichannel\build\results\sb_desproto">
   <property name="build.sysclasspath" value="only" /> 
   <property name="deprecation" value="no" /> 
