@@ -15,6 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// jkesselmn: Have not been able to reproduce hang *or* fatalError.
+// It isn't clear why the user expected a TransformerException.
+
 // Common Qetest / Xalan testing imports
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
