@@ -44,6 +44,32 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Properties;
 
+// jkesselm: CONFIRMED that console shows
+//   Warning:  The encoding 'illegal-encoding-value' is not supported by the Java runtime.
+//   Warning: encoding "illegal-encoding-value" not supported, using UTF-8
+// but LoggingErrorHandler is not invoked.
+//
+// This appears because at the time serializer.ToXMLStream.setProp() is invoked
+// for this value, the object's SerializerBase.m_transformer field has not been
+// initialized, preventing setProp() from being able to access the errHandler.
+//
+// It's been decades since I looked at the initialization sequence for this,
+// so the question is whether m_transformer can be set earlier without that
+// disrupting other dependencies.
+//
+// Slightly simplified call stack at failing operation:
+//
+// owns: Boolean
+// ToXMLStream(ToStream).setProp(String,String,boolean):line 437
+// ToXMLStream(SerializerBase).setOutputProperty(String,String))
+// ToXMLStream(ToStream).setOutputFormat(Properties)
+// ToUnknownStream.setOutputFormat(Properties)
+// SerializerFactory.getSerializer(Properties)
+// TransformerImpl.createSerializationHandler(Result,OutputProperties)
+// TransformerImpl.transform(Source,Result,boolean)
+// Bugzilla1266.execute(Datalet)
+
+
 /**
  * Testlet for reproducing Bugzilla reported bugs.
  *
