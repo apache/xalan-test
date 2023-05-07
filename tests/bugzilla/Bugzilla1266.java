@@ -53,22 +53,17 @@ import java.util.Properties;
 // for this value, the object's SerializerBase.m_transformer field has not been
 // initialized, preventing setProp() from being able to access the errHandler.
 //
-// It's been decades since I looked at the initialization sequence for this,
-// so the question is whether m_transformer can be set earlier without that
-// disrupting other dependencies.
+// To resolve this, I think we would want to have
+// SerializerFactory.getSerializer() call ser.setTransformer() before
+// ser.setOutputFormat. Unfortunately, as currently coded, the Transformer
+// is not being passed in as an argument to SerializerFactory.
 //
-// Slightly simplified call stack at failing operation:
+// Least-impact change might be to add a second SerializerFactory.getSerializer()
+// method which takes Transformer as a second argument, and alter 
+// TransformerImpl.createSerializationHandler() to call that entry point,
+// passing in itself ("this").
 //
-// owns: Boolean
-// ToXMLStream(ToStream).setProp(String,String,boolean):line 437
-// ToXMLStream(SerializerBase).setOutputProperty(String,String))
-// ToXMLStream(ToStream).setOutputFormat(Properties)
-// ToUnknownStream.setOutputFormat(Properties)
-// SerializerFactory.getSerializer(Properties)
-// TransformerImpl.createSerializationHandler(Result,OutputProperties)
-// TransformerImpl.transform(Source,Result,boolean)
-// Bugzilla1266.execute(Datalet)
-
+// RECOMMENDATION: REVIEW THAT PROPOSAL.
 
 /**
  * Testlet for reproducing Bugzilla reported bugs.
