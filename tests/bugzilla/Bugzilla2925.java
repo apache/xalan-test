@@ -16,6 +16,11 @@
  * limitations under the License.
  */
 
+// jkesselm: User's .error file was malformed (bad end tag).
+// After fixing that, and dropping in hook to find the goldfile when
+// run under the test framework, test PASSES.
+// Recommendation: WORKING AS DESIGNED, CLOSE AND DISCARD
+
 // Common Qetest / Xalan testing imports
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
@@ -43,6 +48,7 @@ import org.apache.xpath.XPathContext.XPathExpressionContext;
 import org.apache.xpath.axes.OneStepIterator;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Testlet for reproducing
@@ -93,9 +99,23 @@ public class Bugzilla2925 extends TestletImpl
       //  the outputFile created
       CheckService fileChecker = new XHTFileCheckService();
 
+      // When run under the test frameword, current directory is usually
+      // xalan-test/, whereas goldfile will be in tests/bugzilla/. Check
+      // both if necessary
+      String[] goldLocations=new String[]{".","tests/bugzilla"};
+      String goldfileName="Bugzilla2925.out";
+      File goldfile=null;
+      for (String location : goldLocations) {
+	  goldfile=new File(location+"/"+goldfileName);
+	  if(goldfile.exists())
+	      break;
+      }
+      if(goldfile==null || !goldfile.exists())
+	  logger.checkFail("Could not find "+goldfileName+" in likely locations "+Arrays.toString(goldLocations));
+
       if (Logger.PASS_RESULT
               != fileChecker.check(logger, new File("Bugzilla2925.xsr"),
-                                   new File("Bugzilla2925.out"),
+                                   goldfile,
                                    getDescription())){}
     }
     catch (Exception e)

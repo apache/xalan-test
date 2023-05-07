@@ -8,6 +8,6 @@
     <list-bad-tag>
       <item>Xalan documentation</item>
       <item>Xalan tests</item>
-    </list>
+    </list-bad-tag> <!-- As submitted, user just wrote </list> -->
   </list>
 </doc>
