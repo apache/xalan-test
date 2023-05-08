@@ -38,21 +38,18 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * Reported-by: slobo@matavnet.hu
  * 
- * jkesselm: Despite opposite claim from user, identity transformer reports FAIL (throws exception), 
+ * jkesselm: CONFIRMED OPPOSITE. Despite claim from user, identity transformer reports FAIL (throws exception), 
  * real transformer reports PASS (exception caught and handled as intended).
  * 
  * In real transformer, ElemCopy catches the SaxException, throws it wrapped in TransformerException;
  * TransformerImpl catches that, sees that it has an m_serializationHandler. and passes it off to
  * that. Since that reports checkPass, test is considered good.
  * 
- * In TransformerIdentityImpl.startElement(), there is no equivalent handler hook; TransformerIdentityImpl
- * doesn't seem to accept or use m_serializationHandler at all. 
+ * In TransformerIdentityImpl.startElement(), there is no equivalent catch-and-handle for exceptions.
  * 
  * RECOMMENDATION: SANITY CHECK. User appears to have misstated the problem. If so -- if the description is
  * backward and the problem is that IdentityTransformer is not invoking the custom handler -- we would
- * need to replicate the catch-and-hand-off logic from TransformerImpl to TransformerIdentityImpl.
- * This wouldn't greatly surprise me. WORKAROUND is to use a real transformer with the identity
- * stylesheet.
+ * need to add this feature to TransformerntityImpl.
  */
 public class Bugzilla1251 extends TestletImpl
 {
