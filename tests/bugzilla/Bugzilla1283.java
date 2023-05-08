@@ -16,10 +16,7 @@
  * limitations under the License.
  */
 
-// jkesselmn May 2023: Have not been able to reproduce hang *or* fatalError.
-// jkesselmn May 2023: Have not been able to reproduce hang *or* fatalError.
-// jkesselmn May 2023: Have not been able to reproduce hang *or* fatalError.
-// jkesselmn May 2023: Have not been able to reproduce hang *or* fatalError.
+// jkesselm May 2023: Have not been able to reproduce hang *or* fatalError.
 // It isn't clear why the user expected a TransformerException.
 
 // Common Qetest / Xalan testing imports

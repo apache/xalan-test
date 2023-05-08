@@ -11,7 +11,6 @@ related to the inner call-template... it looks like something in the stack
 frame is not being restored???
 
 jkesselm May2023: Could not reproduce. Probably solved long ago. Close as resolved.
-jkesselm May2023: Could not reproduce. Probably solved long ago. Close as resolved.
 -->
 <xsl:template match="/">
     <out>

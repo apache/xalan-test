@@ -4,10 +4,7 @@
   <!-- FileName: bugzilla6284 -->
   <!-- Creator: David Marston, from Daniel Gilder's bug report 
 
-       jkesselmn May 2023 sez: Appears to now be passing. Close as resolved, and
-       jkesselmn May 2023 sez: Appears to now be passing. Close as resolved, and
-       jkesselmn May 2023 sez: Appears to now be passing. Close as resolved, and
-       jkesselmn May 2023 sez: Appears to now be passing. Close as resolved, and
+       jkesselm May 2023 sez: Appears to now be passing. Close as resolved, and
        decide whether and where to keep this test.
   -->
 

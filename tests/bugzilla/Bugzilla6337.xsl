@@ -8,7 +8,6 @@ when using the XML example file shown below.
 xml-xalan CVS 11-Feb-02 9AM returns <out>1<br/></out> -sc
 
 jkesselm May2023 notes:
-jkesselm May2023 notes:
 
 The question is whether the first of these
   <colData colId="L">2</colData>

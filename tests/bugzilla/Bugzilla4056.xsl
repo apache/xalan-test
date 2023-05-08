@@ -2,7 +2,6 @@
 <!-- Bugzilla#4056 See also whitespace20.xsl for similar test of xml:space 
 
 jkesselm May2023 note: Appears to be functioning correctly at this time.
-jkesselm May2023 note: Appears to be functioning correctly at this time.
 We could make it one of the whitespace regression tests if desired, or
 a contrib/ test, but I'm not sure I see a need to do so.
 Close as resolved?

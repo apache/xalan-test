@@ -5,10 +5,7 @@
 
 <!-- Reproducing Bugzilla 3489 
 
-jkesselmn May 2023 analysis:
-jkesselmn May 2023 analysis:
-jkesselmn May 2023 analysis:
-jkesselmn May 2023 analysis:
+jkesselm May 2023 analysis:
 
 Throws a WrappedRuntimeException, "Could not find variable with the name of name." 
 

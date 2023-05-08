@@ -16,10 +16,7 @@
  * limitations under the License.
  */
 
-// jkesselmn May 2023: Passing. Retain (where?) or discard?
-// jkesselmn May 2023: Passing. Retain (where?) or discard?
-// jkesselmn May 2023: Passing. Retain (where?) or discard?
-// jkesselmn May 2023: Passing. Retain (where?) or discard?
+// jkesselm May 2023: Passing. Retain (where?) or discard?
 
 // Common Qetest / Xalan testing imports
 import org.apache.qetest.Datalet;
