@@ -10,7 +10,8 @@ incorrect.  If you uncomment the commented value-of and variable, it results
 related to the inner call-template... it looks like something in the stack
 frame is not being restored???
 
-jkesselm: Could not reproduce. Probably solved long ago. Close as resolved.
+jkesselm May2023: Could not reproduce. Probably solved long ago. Close as resolved.
+jkesselm May2023: Could not reproduce. Probably solved long ago. Close as resolved.
 -->
 <xsl:template match="/">
     <out>

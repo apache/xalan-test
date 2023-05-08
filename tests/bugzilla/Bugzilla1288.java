@@ -34,7 +34,8 @@ import java.io.File;
 /**
  * Testlet for reproducing Bugzilla reported bugs.
  * 
- * jkesselm: This test refers to an absent class in
+ * jkesselm May2023: This test refers to an absent class in
+ * jkesselm May2023: This test refers to an absent class in
  * org.apache.xalan.stree and fails to compile. That doesn't keep the
  * xalan test framework from trying to execute it and reporting it as a
  * class-not-found failure, unfortunately.

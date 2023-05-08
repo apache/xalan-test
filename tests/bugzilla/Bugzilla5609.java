@@ -33,7 +33,8 @@ import java.io.File;
  * @author howejr77@yahoo.com
  * @author shane_curcuru@us.ibm.com
  * 
- * jkesselm: At this time, processor behavior appears correct; different values appear in the two outputs.
+ * jkesselm May2023: At this time, processor behavior appears correct; different values appear in the two outputs.
+ * jkesselm May2023: At this time, processor behavior appears correct; different values appear in the two outputs.
  * We *are* having a problem finding the .out files in the XHTFileCheckService(); that needs to be resolved.
  * Note that in Bugzilla tests, only 1266, 2925, 5609 and NodeInfo drivers use this particular file checker.
  * STATUS: ORIGINAL PROBLEM NOT REPRODUCED; DIFFERENT ISSUE DURING CONFIRMATION.

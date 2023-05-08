@@ -2,7 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <!-- "computational (recursive) template is very slow compared to xalan 1.2.2" c.mallwitz@intershop.de 
 
-jkesselm notes:
+jkesselm May2023 notes:
+jkesselm May2023 notes:
      To actually evaluate this complaint, we would need to run the
      stylesheet under both Xalan 1 and Xalan 2 and compare the results.
      The comment has not given us any information about the configuration(s) in

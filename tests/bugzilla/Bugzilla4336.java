@@ -29,7 +29,8 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.apache.xpath.XPathAPI;
 
-// jkesselm: The onliy "strange Attribute" I see in the output is a namespace declaration,
+// jkesselm May2023: The onliy "strange Attribute" I see in the output is a namespace declaration,
+// jkesselm May2023: The onliy "strange Attribute" I see in the output is a namespace declaration,
 // node type string type DOM2DTMdefaultNamespaceDeclaractionNode, binding xmlns:xml to
 // http://www.w3.org/XML/1998/namespace, which "is bound by definition to the prefix
 // xml" -- see the documentation page found at that URI. Note that it is reported as

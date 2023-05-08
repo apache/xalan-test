@@ -44,7 +44,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Properties;
 
-// jkesselm: CONFIRMED that console shows
+// jkesselm May2023: CONFIRMED that console shows
+// jkesselm May2023: CONFIRMED that console shows
 //   Warning:  The encoding 'illegal-encoding-value' is not supported by the Java runtime.
 //   Warning: encoding "illegal-encoding-value" not supported, using UTF-8
 // but LoggingErrorHandler is not invoked.

@@ -25,7 +25,10 @@ import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
-// jkesselmn: Can not reproduce user-reported error. There _may_ be
+// jkesselmn May 2023: Can not reproduce user-reported error. There _may_ be
+// jkesselmn May 2023: Can not reproduce user-reported error. There _may_ be
+// jkesselmn May 2023: Can not reproduce user-reported error. There _may_ be
+// jkesselmn May 2023: Can not reproduce user-reported error. There _may_ be
 // some subtle quibbles about when adjacent text nodes (including the
 // CDATA Section node) get merged by the parser and processor; we seem
 // to be combining the newline before the CDATA Section into the

@@ -38,7 +38,8 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * Reported-by: slobo@matavnet.hu
  * 
- * jkesselm: CONFIRMED OPPOSITE. Despite claim from user, identity transformer reports FAIL (throws exception), 
+ * jkesselm May2023: CONFIRMED OPPOSITE. Despite claim from user, identity transformer reports FAIL (throws exception), 
+ * jkesselm May2023: CONFIRMED OPPOSITE. Despite claim from user, identity transformer reports FAIL (throws exception), 
  * real transformer reports PASS (exception caught and handled as intended).
  * 
  * In real transformer, ElemCopy catches the SaxException, throws it wrapped in TransformerException;
