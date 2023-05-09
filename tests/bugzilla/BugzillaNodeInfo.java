@@ -36,6 +36,18 @@ import java.io.IOException;
 /**
  * Custom Testlet for testing NodeInfo extension.
  *
+ * jkesselm May 2023: What this test seems to be demonstrating is that
+ * the custom TrAX property SOURCE_LOCATION, which records the data
+ * needed for NodeInfo to report node location, is not implemented for
+ * Temporary Trees filled from stylesheet literal content. One can
+ * debate whether we should be attempting to do so.
+ *
+ * RECOMMENDATION: consider this a Feature Request rather than a bug,
+ * unless the definition of
+ * "http://xml.apache.org/xalan/features/source_location" says
+ * otherwise. (There is not currently a documentation page at that
+ * URI; we'd need to dig into Xalan docs to establish this.)
+ *
  * @author shane_curcuru@us.ibm.com
  */
 public class BugzillaNodeInfo extends TestletImpl

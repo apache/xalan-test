@@ -10,7 +10,7 @@
   <!-- Section: 14 Extensions -->
   <!-- Purpose: Testing Xalan custom extension "NodeInfo", implemented in lib/NodeInfo.java. -->
  
-  <!-- jkesselm: What this test seems to be demonstrating is that the
+  <!-- jkesselm May 2023: What this test seems to be demonstrating is that the
        custom TrAX property SOURCE_LOCATION, which records the data needed
        for NodeInfo to report node location, is not implemented for
        Temporary Trees filled from stylesheet literal content. One can debate
