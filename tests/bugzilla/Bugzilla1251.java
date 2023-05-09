@@ -47,8 +47,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * In TransformerIdentityImpl.startElement(), there is no equivalent catch-and-handle for exceptions.
  * 
- * RECOMMENDATION: SANITY CHECK. User appears to have misstated the problem. If so -- if the description is
- * backward and the problem is that IdentityTransformer is not invoking the custom handler -- we would
+ * RECOMMENDATION: SANITY CHECK. User appears to have misstated the problem. If so — if the description is
+ * backward and the problem is that IdentityTransformer is not invoking the custom handler — we would
  * need to add this feature to TransformerntityImpl.
  */
 public class Bugzilla1251 extends TestletImpl
