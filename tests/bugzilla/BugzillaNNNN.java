@@ -22,6 +22,12 @@ import org.apache.qetest.TestletImpl;
 
 // REPLACE_imports needed for reproducing the bug
 
+// jkesselmn May2023: As written, this is set up to run with its input files in the current directory.
+// The xalan-test BugzillaTestletDriver is currently trying to run from xalan-test, and failing to
+// find files as a result. See open Jira issue; while this is not an intolerable situation it does
+// mean that currently just saying "build.sh bugzilla" is likely to fail. Short-term hack would be
+// to have BugzillaTestletDriver cd to xalan-test/tests/bugzilla before running the Java-based
+// tests, permitting the simple local file references to succeed.
 
 /**
  * Testlet for reproducing Bugzilla reported bugs.
