@@ -16,10 +16,18 @@
  * limitations under the License.
  */
 
-// jkesselm May2023: User's .error file was malformed (bad end tag).
-// After fixing that, and dropping in hook to find the goldfile when
-// run under the test framework, test PASSES.
-// Recommendation: WORKING AS DESIGNED, CLOSE AND DISCARD
+// jkesselm, May 2023: STATUS UNDETERMINED. This seems to be an attempt to use extension functions
+// to directly apply an XPath to an instance of the DTM document model. Many of the imports are
+// in fact unused (and I've commented them out). Some of the test logic was already commented out --
+// for example, DTMIteratorTest() fetches a DTM and then does nothing with it since the attempt to
+// apply an iterator is disabled, apparently because the function signature doesn't match.
+//
+// Note too that this code currently runs only when invoked locally (current directory being
+// xalan-test/tests/bugzilla), which is not how the build driver is currently trying to run it.
+// (I have a Jira Issue open regarding that conceptual mismatch.)
+//
+// We need to figure out what the actual intent of this test was, rewrite it so it actually
+// tests that, determine whether there is actually a bug, and proceed from there. 
 
 // Common Qetest / Xalan testing imports
 import org.apache.qetest.Datalet;
@@ -34,15 +42,15 @@ import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
-import org.apache.xalan.templates.*;
-import org.apache.xalan.extensions.*;
-import org.apache.xalan.transformer.*;
-import org.apache.xpath.*;
-import org.apache.xpath.objects.*;
+//import org.apache.xalan.templates.*;
+//import org.apache.xalan.extensions.*;
+//import org.apache.xalan.transformer.*;
+//import org.apache.xpath.*;
+//import org.apache.xpath.objects.*;
 
 import org.apache.xml.dtm.*;
-import org.apache.xml.dtm.ref.*;
-import org.apache.xml.dtm.ref.sax2dtm.*;
+//import org.apache.xml.dtm.ref.*;
+//import org.apache.xml.dtm.ref.sax2dtm.*;
 
 import org.apache.xpath.XPathContext.XPathExpressionContext;
 import org.apache.xpath.axes.OneStepIterator;
