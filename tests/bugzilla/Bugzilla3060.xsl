@@ -1,6 +1,10 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             xmlns:foo="foo" >
 
+<!-- jkesselm May 2023: Output now matches expected sample.
+     Make regression test, move into contrib, or discard?
+-->
+
   <xsl:template match="foo:bar">
     <out><xsl:apply-templates /></out>
   </xsl:template>
