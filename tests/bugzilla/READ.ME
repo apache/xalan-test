@@ -1,0 +1,15 @@
+Note that this directory behaves a bit differently from most other test dirs.
+
+First, it can contain a mix of Java-based and direct stylesheet
+tests. That's nice, and we should probably permit it in more of the
+test directories.
+
+Second, for the stylesheet tests, the reference output kept here and
+called ".out" rather than residing in a separate -gold directory (or
+even being named .gold).This is a historical artifact from
+development of the test framework, and at this point is much more
+confusing than helpful... especially since it may create confusion
+when bug-report tests are moved into the main test suite (as they
+should be when fixed).
+
+At some point we really should reconcile the test drivers for consistency.

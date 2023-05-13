@@ -29,6 +29,19 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.apache.xpath.XPathAPI;
 
+// jkesselm May2023: The onliy "strange Attribute" I see in the output is a namespace declaration,
+// node type string type DOM2DTMdefaultNamespaceDeclaractionNode, binding xmlns:xml to
+// http://www.w3.org/XML/1998/namespace, which "is bound by definition to the prefix
+// xml" -- see the documentation page found at that URI. Note that it is reported as
+// specified=false; as the node type says, this is inherent in XML, and is correctly
+// being reported on the root element so it's inherited throughout the document.
+//
+// Note that according to comments in the code this was first reported back in Xerces 1
+// days, when many people were still trying to come to grips with the concept of namespaces.
+//
+// Recommendation: WORKING AS DESIGNED. And it isn't a self-evaluating test; we'd have to
+// rework it somewhat to make it compatable with the Xalan test framework. CLOSE/DISCARD.
+
 /**
  * Testlet for reproducing Bugzilla reported bugs.
  *

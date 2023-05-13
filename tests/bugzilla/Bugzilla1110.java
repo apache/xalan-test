@@ -31,6 +31,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.InputSource;
 
+// jkesselm May 2023: CAN NOT REPRODUCE; prints what the user says they expected to see.
+// Truly Ancient bug report, presumably was cured long ago.
+//
+// RECOMMENDATION: Either make self-validating and put in appropriate bucket,
+// or close and discard.
+
 /**
  * Testlet for reproducing Bugzilla reported bugs.
  * @author kent@hauN.org

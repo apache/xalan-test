@@ -32,6 +32,12 @@ import java.io.File;
  * Testlet for reproducing Bugzilla reported bugs.
  * @author howejr77@yahoo.com
  * @author shane_curcuru@us.ibm.com
+ * 
+ * jkesselm May2023: At this time, processor behavior appears correct; different values appear in the two outputs.
+ * 
+ * We *are* having a problem finding the files when invoked from the test framework rather than directly, due
+ * to differences in current directory; I have opened a Bugzilla issue on that.
+ * STATUS: ORIGINAL PROBLEM NOT REPRODUCED, BUT TEST DOES NOT RUN UNDER "build bugzilla".
  */
 public class Bugzilla5609 extends TestletImpl
 {

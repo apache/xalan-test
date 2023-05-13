@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><out>
+  <item num="1"><text>This is a string</text><normalized>This is a string</normalized></item>
+  <item num="2"><text> This is a string </text><normalized>This is a string</normalized></item>
+  <item num="3"><text>	This is a string	</text><normalized>This is a string</normalized></item>
+  <item num="4"><text>This	 is	 a	 string</text><normalized>This is a string</normalized></item>
+  <item num="5"><text>This  		is 	a	string 	 	 </text><normalized>This is a string</normalized></item>
+  <item num="6"><text>This  		is 
+  	a	string 	 	 </text><normalized>This is a string</normalized></item>
+  <item num="7"><text>This is &amp;a string</text><normalized>This is &amp;a string</normalized></item>
+  <item num="8"><text>This is &lt;a string</text><normalized>This is &lt;a string</normalized></item>
+  <item num="9"><text>This is &gt;a string</text><normalized>This is &gt;a string</normalized></item>
+  <item num="10"><text>This is "a string</text><normalized>This is "a string</normalized></item>
+  <item num="11"><text>This is 'a string</text><normalized>This is 'a string</normalized></item>
+  <item num="12"><text>This is ©a string</text><normalized>This is ©a string</normalized></item>	
+  <item num="13"><text>This is #a string</text><normalized>This is #a string</normalized></item>	
+  <item num="14"><text>This is ¥a string</text><normalized>This is ¥a string</normalized></item>	
+  <item num="15"><text>This is  a string</text><normalized>This is a string</normalized></item>
+  <item num="16"><text>This is %a string</text><normalized>This is %a string</normalized></item>	
+  <item num="17"><text>This is 	a string</text><normalized>This is a string</normalized></item>	
+  <item num="18"><text>This is &#127;a string</text><normalized>This is &#127;a string</normalized></item>	
+  <item num="19"><text>This is Ña string</text><normalized>This is Ña string</normalized></item>	
+  <item num="20"><text>This is Œa string</text><normalized>This is Œa string</normalized></item>  
+  <item num="21"><text>This is                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 a string</text><normalized>This is a string</normalized></item>  
+</out>

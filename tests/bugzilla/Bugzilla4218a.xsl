@@ -9,6 +9,12 @@ incorrect.  If you uncomment the commented value-of and variable, it results
 "Variable accessed before it is bound!" error message.  The bug seems to be
 related to the inner call-template... it looks like something in the stack
 frame is not being restored???
+
+jkesselm May 2023 notes:
+	The current output is
+<?xml version="1.0" encoding="UTF-8"?><out><test-template>abc-should-appear-oncedef-should-appear-onceghi-should-appear-once</test-template></out>
+
+	Recommendation: Close as could-not-reproduce/solved.
 -->
 <xsl:template match="/">
     <out>

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<!-- Bugzilla#4056 See also whitespace20.xsl for similar test of xml:space -->
+<!-- Bugzilla#4056 See also whitespace20.xsl for similar test of xml:space 
+
+jkesselm May2023 note: Appears to be functioning correctly at this time.
+We could make it one of the whitespace regression tests if desired, or
+a contrib/ test, but I'm not sure I see a need to do so.
+Close as resolved?
+-->
 <!-- $RCSfile: Bugzilla4056.xsl,v $ $Revision$ $Date$ -->
 <xsl:stylesheet 
  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  

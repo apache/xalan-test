@@ -44,6 +44,26 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Properties;
 
+// jkesselm May2023: CONFIRMED that console shows
+//   Warning:  The encoding 'illegal-encoding-value' is not supported by the Java runtime.
+//   Warning: encoding "illegal-encoding-value" not supported, using UTF-8
+// but LoggingErrorHandler is not invoked.
+//
+// This appears because at the time serializer.ToXMLStream.setProp() is invoked
+// for this value, the object's SerializerBase.m_transformer field has not been
+// initialized, preventing setProp() from being able to access the errHandler.
+//
+// To resolve this, I think we would want to have
+// SerializerFactory.getSerializer() call ser.setTransformer() before
+// ser.setOutputFormat. Unfortunately, as currently coded, the Transformer
+// is not being passed in as an argument to SerializerFactory.
+//
+// Least-impact change might be to add a second SerializerFactory.getSerializer()
+// method which takes Transformer as a second argument, and alter 
+// TransformerImpl.createSerializationHandler() to call that entry point,
+// passing in itself ("this").
+//
+// RECOMMENDATION: REVIEW THAT PROPOSAL.
 
 /**
  * Testlet for reproducing Bugzilla reported bugs.
@@ -63,7 +83,7 @@ public class Bugzilla1266 extends TestletImpl
      * @param d (optional) Datalet to use as data point for the test.
      */
     public void execute(Datalet d)
-	{
+    {
         // Use logger.logMsg(...) instead of System.out.println(...)
         logger.logMsg(Logger.STATUSMSG, "Reproducing Bugzilla#1266");
         LoggingErrorListener loggingErrorListener = new LoggingErrorListener(logger);
@@ -74,52 +94,58 @@ public class Bugzilla1266 extends TestletImpl
         Templates templates = null;
         Transformer transformer = null;
         try
-        {
-            factory = TransformerFactory.newInstance();
-            logger.logMsg(Logger.STATUSMSG, "About to factory.newTemplates(" + QetestUtils.filenameToURL("identity.xsl") + ")");
-            templates = factory.newTemplates(new StreamSource(QetestUtils.filenameToURL("identity.xsl")));
-            transformer = templates.newTransformer();
+            {
+                factory = TransformerFactory.newInstance();
+                logger.logMsg(Logger.STATUSMSG, "About to factory.newTemplates(" + QetestUtils.filenameToURL("identity.xsl") + ")");
+                templates = factory.newTemplates(new StreamSource(QetestUtils.filenameToURL("identity.xsl")));
+                transformer = templates.newTransformer();
 
-            // Set the errorListener and validate it
-            transformer.setErrorListener(loggingErrorListener);
-            if (transformer.getErrorListener() == loggingErrorListener)
-                logger.checkPass("set/getErrorListener on transformer");
-            else
-                logger.checkFail("set/getErrorListener on transformer");
+                // Set the errorListener and validate it
+                transformer.setErrorListener(loggingErrorListener);
+                if (transformer.getErrorListener() == loggingErrorListener)
+                    logger.checkPass("set/getErrorListener on transformer");
+                else {
+                    logger.checkFail("set/getErrorListener on transformer");
+		    throw new Exception("failed set/getErrorListener on transformer");
+                }
 
-            logger.logMsg(Logger.STATUSMSG, "Reproduce Bugzilla1266 - warning due to bad output props not propagated");
-            logger.logMsg(Logger.STATUSMSG, "transformer.setOutputProperty(encoding, illegal-encoding-value)");
-            transformer.setOutputProperty("encoding", "illegal-encoding-value");
+                logger.logMsg(Logger.STATUSMSG, "Reproduce Bugzilla1266 - warning due to bad output props not propagated");
+                logger.logMsg(Logger.STATUSMSG, "transformer.setOutputProperty(encoding, illegal-encoding-value)");
+                transformer.setOutputProperty("encoding", "illegal-encoding-value");
 
-            logger.logMsg(Logger.STATUSMSG, "about to transform(...)");
-            transformer.transform(new StreamSource(QetestUtils.filenameToURL("identity.xml")), 
-                                  new StreamResult("Bugzilla1266.out"));
-            logger.logMsg(Logger.STATUSMSG, "after transform(...)");
-            logger.logMsg(Logger.STATUSMSG, "loggingErrorListener after transform:" + loggingErrorListener.getQuickCounters());
+                logger.logMsg(Logger.STATUSMSG, "about to transform(...)");
+                transformer.transform(new StreamSource(QetestUtils.filenameToURL("identity.xml")), 
+                                      new StreamResult("Bugzilla1266.out"));
+                logger.logMsg(Logger.STATUSMSG, "after transform(...)");
+                logger.logMsg(Logger.STATUSMSG, "loggingErrorListener after transform:" + loggingErrorListener.getQuickCounters());
 
-            // Validate that one warning (about illegal-encoding-value) should have been reported
-            int[] errCtr = loggingErrorListener.getCounters();
-            if (errCtr[LoggingErrorListener.TYPE_WARNING] > 0)
-                logger.checkPass("At least one Warning listned to for illegal-encoding-value");
-            else
-                logger.checkFail("At least one Warning listned to for illegal-encoding-value");
+                // Validate that one warning (about illegal-encoding-value) should have been reported
+                int[] errCtr = loggingErrorListener.getCounters();
+                            
+                if (errCtr[LoggingErrorListener.TYPE_WARNING] > 0)
+                    logger.checkPass("At least one Warning listned to for illegal-encoding-value");
+                else {
+                    logger.checkFail("No Warning reported by listener for illegal-encoding-value");
+		    throw new Exception("No Warning reported by listener for illegal-encoding-value");
+                }
                 
-            // Validate the actual output file as well: in this case, 
-            //  the stylesheet should still work
-            CheckService fileChecker = new XHTFileCheckService();
-            fileChecker.check(logger, 
-                    new File("Bugzilla1266.out"), 
-                    new File("identity.gold"), 
-                    "transform of good xsl w/bad output props into: " + "Bugzilla1266.out");
+                // Validate the actual output file as well: in this case, 
+                //  the stylesheet should still work
+                CheckService fileChecker = new XHTFileCheckService();
+                fileChecker.check(logger, 
+                                  new File("Bugzilla1266.out"), 
+                                  new File("identity.xml"), 
+                                  "transform of good xsl w/bad output props into: " + "Bugzilla1266.out");
             
-        }
+            }
         catch (Throwable t)
-        {
-            logger.checkFail("Bugzilla1266 unexpectedly threw: " + t.toString());
-            logger.logThrowable(Logger.ERRORMSG, t, "Bugzilla1266 unexpectedly threw");
-        }
+            {
+                logger.checkFail("Bugzilla1266 unexpectedly threw: " + t.toString());
+                logger.logThrowable(Logger.ERRORMSG, t, "Bugzilla1266 unexpectedly threw");
+                
+            }
 
-	}
+    }
 
     /**
      * <a href="http://nagoya.apache.org/bugzilla/show_bug.cgi?id=1266">

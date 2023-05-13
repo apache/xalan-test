@@ -15,6 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// jkesselm May 2023: Have not been able to reproduce hang *or* fatalError.
+// It isn't clear why the user expected a TransformerException.
+
 // Common Qetest / Xalan testing imports
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
@@ -26,6 +30,16 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 import java.io.File;
 
+// jkesselm, May 2023: Can not reproduce error. The run correctly catches the TransformerException
+// complaining about unbalanced tags. (<list-bad-tag></list>), and does not hang as the user reported.
+// I presume this was cured long ago.
+// RECOMMENDATION: Do we already have tests for catching parse failures and reporting them as
+// TransformerExceptions? If so, this should be covered thereby... If it isn't, it may be worth
+// retaining as a regression test.
+//
+// This also has the problem of not running under the xalan-test framework due to assumption of local
+// input files whereas BugzillaTestletDriver currently runs with current directory up at xalan-test.
+// See Jira for issue opened on that topic, and related issue of regularization of test framework.
 
 /**
  * Testlet for reproducing Bugzilla reported bugs.

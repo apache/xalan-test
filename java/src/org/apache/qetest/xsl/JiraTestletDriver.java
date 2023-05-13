@@ -21,7 +21,7 @@
 
 /*
  *
- * BugzillaTestletDriver.java
+ * JiraTestletDriver.java
  *
  */
 package org.apache.qetest.xsl;
@@ -42,7 +42,7 @@ import org.apache.qetest.Testlet;
 //-------------------------------------------------------------------------
 
 /**
- * Test driver for Bugzilla tests with .java/.xsl files..
+ * Test driver for Jira tests with .java/.xsl files..
  * 
  * This driver does not iterate over a directory tree; only 
  * over a single directory.  It supports either 'classic' tests
@@ -55,7 +55,7 @@ import org.apache.qetest.Testlet;
  * @author shane_curcuru@lotus.com
  * @version $Id$
  */
-public class BugzillaTestletDriver extends StylesheetTestletDriver
+public class JiraTestletDriver extends StylesheetTestletDriver
 {
 
     /** Convenience constant: .java extension for Java Testlet source.  */
@@ -73,19 +73,19 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
      * both .java and .xsl files, with slightly different 
      * naming conventions than normal.
      */
-    protected String defaultFileFilter = "org.apache.qetest.xsl.BugzillaFileRules";
+    protected String defaultFileFilter = "org.apache.qetest.xsl.JiraFileRules";
 
 
     /** Just initialize test name, comment; numTestCases is not used. */
-    public BugzillaTestletDriver()
+    public JiraTestletDriver()
     {
-        testName = "BugzillaTestletDriver";
-        testComment = "Test driver for Bugzilla tests with .java/.xsl files.";
+        testName = "JiraTestletDriver";
+        testComment = "Test driver for Jira tests with .java/.xsl files.";
     }
 
 
     /**
-     * Special: test all Bugzilla* files in just the bugzilla directory.
+     * Special: test all Jira* files in just the jira directory.
      * This does not iterate down directories.
      * This is a specific test driver for testlets that may have 
      * matching foo*.java and foo*.xml/xsl/out
@@ -144,13 +144,13 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
         }
 
         // Now process the list of files found in this dir
-        processFileList(datalets, "Bugzilla tests of: " + dirs[0]);
+        processFileList(datalets, "Jira tests of: " + dirs[0]);
     }
 
 
     /**
-     * Run a list of bugzilla-specific tests.
-     * Bugzilla tests may either be encoded as a .java file that 
+     * Run a list of jira-specific tests.
+     * Jira tests may either be encoded as a .java file that 
      * defines a Testlet, or as a normal .xsl/.xml file pair that 
      * should simply be transformed simply, by a StylesheetTestlet.
      *
@@ -173,15 +173,14 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
         // Now just go through the list and process each set
         int numDatalets = datalets.size();
         reporter.logInfoMsg("processFileList() with " + numDatalets
-                            + " potential Bugzillas");
+                            + " potential Jiras");
         // Iterate over every datalet and test it
         for (int ctr = 0; ctr < numDatalets; ctr++)
         {
-	    // Factor out of try so it's available in catch
-	    Datalet d = (Datalet)datalets.elementAt(ctr);
             try
             {
                 // Depending on the Datalet class, run a different algorithim
+                Datalet d = (Datalet)datalets.elementAt(ctr);
                 if (d instanceof TraxDatalet)
                 {
                     // Assume we the datalet holds the name of a 
@@ -191,7 +190,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
                     //  hardcoded paths to the current dir, must 
                     //  change user.dir each time in worker method
                     Testlet t = getTestlet((TraxDatalet)d);
-                    // Each Bugzilla is it's own testcase
+                    // Each Jira is it's own testcase
                     reporter.testCaseInit(t.getDescription());
                     executeTestletInDir(t, d, inputDir);
                 }
@@ -200,7 +199,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
                     // Create plain Testlet to execute a test with this 
                     //  next datalet - the Testlet will log all info 
                     //  about the test, including calling check*()
-                    // Each Bugzilla is it's own testcase
+                    // Each Jira is it's own testcase
                     reporter.testCaseInit(d.getDescription());
                     getTestlet().execute(d);
                 }
@@ -212,9 +211,9 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
             catch (Throwable t)
             {
                 // Log any exceptions as fails and keep going
-                //@todo further improve the below to output more useful info
-                reporter.checkFail("Datalet num " + ctr + " (" + d.getDescription() + ") threw: " + t.toString());
-                reporter.logThrowable(Logger.ERRORMSG, t, "Datalet "+d.getDescription()+" threw");
+                //@todo improve the below to output more useful info
+                reporter.checkFail("Datalet num " + ctr + " threw: " + t.toString());
+                reporter.logThrowable(Logger.ERRORMSG, t, "Datalet threw");
             }
             reporter.testCaseClose();
         }  // of while...
@@ -223,7 +222,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
     
     /**
      * Transform a vector of individual test names into a Vector 
-     * of filled-in datalets to be tested - Bugzilla-specific.  
+     * of filled-in datalets to be tested - Jira-specific.  
      *
      * This does special processing since we may either have .java 
      * files that should be compiled, or we may have plain .xsl/.xml 
@@ -333,7 +332,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
             d.setDescription(file);
             v.addElement(d);
         }
-        reporter.logTraceMsg("Bugzilla buildDatalets with " + javaCtr 
+        reporter.logTraceMsg("Jira buildDatalets with " + javaCtr 
                 + " .java Testlets, and " + xslCtr + " .xsl files to test");
         return v;
     }
@@ -341,7 +340,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
 
     /**
      * Execute a Testlet with a specific user.dir.
-     * Bugzilla testlets hardcode their input file names, assuming 
+     * Jira testlets hardcode their input file names, assuming 
      * they're in the current directory.  But this automation is 
      * frequently run in another directory, and uses the inputDir 
      * setting to point where the files are.  Hence this worker 
@@ -361,7 +360,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
         {
             // Note: we must actually keep a cloned copy of the 
             //  whole system properties block to replace later 
-            //  in case a Bugzilla testlet changes any other 
+            //  in case a Jira testlet changes any other 
             //  properties during it's execution
             Properties p = System.getProperties();
             Properties cacheProps = (Properties)p.clone();
@@ -396,7 +395,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
 
 
     /**
-     * Convenience method to get a Bugzilla Testlet to use.  
+     * Convenience method to get a Jira Testlet to use.  
      * Take the TraxDatalet given and find the java classname 
      * from it.  Then just load an instance of that Testlet class.
      * 
@@ -434,12 +433,12 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
      * Convenience method to get a default filter for files.  
      * Returns special file filter for our use.
      * 
-     * @return FilenameFilter using BugzillaFileRules(excludes).
+     * @return FilenameFilter using JiraFileRules(excludes).
      */
     public FilenameFilter getFileFilter()
     {
         // Find a Testlet class to use
-        Class clazz = QetestUtils.testClassForName("org.apache.qetest.xsl.BugzillaFileRules", 
+        Class clazz = QetestUtils.testClassForName("org.apache.qetest.xsl.JiraFileRules", 
                                                    QetestUtils.defaultPackages,
                                                    defaultFileFilter);
         try
@@ -470,11 +469,11 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
     /**
      * Convenience method to get a default inputDir when none or
      * a bad one was given.  
-     * @return String pathname of default inputDir "tests\bugzilla".
+     * @return String pathname of default inputDir "tests\jira".
      */
     public String getDefaultInputDir()
     {
-        return "tests" + File.separator + "bugzilla";
+        return "tests" + File.separator + "jira";
     }
 
 
@@ -484,8 +483,8 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
      */
     public String usage()
     {
-        return ("Additional options supported by BugzillaTestletDriver:\n"
-                + "    (Note: assumes inputDir=test/tests/bugzilla)"
+        return ("Additional options supported by JiraTestletDriver:\n"
+                + "    (Note: assumes inputDir=test/tests/jira)"
                 + "    (Note: we do *not* support -embedded)"
                 + super.usage());   // Grab our parent classes usage as well
     }
@@ -497,7 +496,7 @@ public class BugzillaTestletDriver extends StylesheetTestletDriver
      */
     public static void main(String[] args)
     {
-        BugzillaTestletDriver app = new BugzillaTestletDriver();
+        JiraTestletDriver app = new JiraTestletDriver();
         app.doMain(args);
     }
 }

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- jkesselmn May 2023: Output matches gold example; test passes
+     Recommendation: Either adopt as regression test, move into contrib,
+     or discard.
+-->
+
 <xsl:stylesheet version="1.0" 
      xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
      xmlns:fo="http://www.w3.org/1999/XSL/Format">

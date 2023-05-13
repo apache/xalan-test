@@ -16,6 +16,19 @@
  * limitations under the License.
  */
 
+// jkesselm, May 2023: STATUS UNDETERMINED. This seems to be an attempt to use extension functions
+// to directly apply an XPath to an instance of the DTM document model. Many of the imports are
+// in fact unused (and I've commented them out). Some of the test logic was already commented out --
+// for example, DTMIteratorTest() fetches a DTM and then does nothing with it since the attempt to
+// apply an iterator is disabled, apparently because the function signature doesn't match.
+//
+// Note too that this code currently runs only when invoked locally (current directory being
+// xalan-test/tests/bugzilla), which is not how the build driver is currently trying to run it.
+// (I have a Jira Issue open regarding that conceptual mismatch.)
+//
+// We need to figure out what the actual intent of this test was, rewrite it so it actually
+// tests that, determine whether there is actually a bug, and proceed from there. 
+
 // Common Qetest / Xalan testing imports
 import org.apache.qetest.Datalet;
 import org.apache.qetest.Logger;
@@ -29,20 +42,21 @@ import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
-import org.apache.xalan.templates.*;
-import org.apache.xalan.extensions.*;
-import org.apache.xalan.transformer.*;
-import org.apache.xpath.*;
-import org.apache.xpath.objects.*;
+//import org.apache.xalan.templates.*;
+//import org.apache.xalan.extensions.*;
+//import org.apache.xalan.transformer.*;
+//import org.apache.xpath.*;
+//import org.apache.xpath.objects.*;
 
 import org.apache.xml.dtm.*;
-import org.apache.xml.dtm.ref.*;
-import org.apache.xml.dtm.ref.sax2dtm.*;
+//import org.apache.xml.dtm.ref.*;
+//import org.apache.xml.dtm.ref.sax2dtm.*;
 
 import org.apache.xpath.XPathContext.XPathExpressionContext;
 import org.apache.xpath.axes.OneStepIterator;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Testlet for reproducing
@@ -84,8 +98,8 @@ public class Bugzilla2925 extends TestletImpl
       Document doc = db.parse("Bugzilla2925Params.xml");
 
       t.setParameter("stylesheets", doc.getDocumentElement());
-      t.transform(new StreamSource("bugzilla2925.xml"),
-                  new StreamResult("bugzilla2925.xsr")
+      t.transform(new StreamSource("Bugzilla2925.xml"),
+                  new StreamResult("Bugzilla2925.xsr")
                   // new StreamResult(System.err)
                   );
 
@@ -93,9 +107,23 @@ public class Bugzilla2925 extends TestletImpl
       //  the outputFile created
       CheckService fileChecker = new XHTFileCheckService();
 
+      // When run under the test frameword, current directory is usually
+      // xalan-test/, whereas goldfile will be in tests/bugzilla/. Check
+      // both if necessary
+      String[] goldLocations=new String[]{".","tests/bugzilla"};
+      String goldfileName="Bugzilla2925.out";
+      File goldfile=null;
+      for (String location : goldLocations) {
+	  goldfile=new File(location+"/"+goldfileName);
+	  if(goldfile.exists())
+	      break;
+      }
+      if(goldfile==null || !goldfile.exists())
+	  logger.checkFail("Could not find "+goldfileName+" in likely locations "+Arrays.toString(goldLocations));
+
       if (Logger.PASS_RESULT
-              != fileChecker.check(logger, new File("bugzilla2925.xsr"),
-                                   new File("bugzilla2925.out"),
+              != fileChecker.check(logger, new File("Bugzilla2925.xsr"),
+                                   goldfile,
                                    getDescription())){}
     }
     catch (Exception e)

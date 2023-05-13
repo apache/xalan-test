@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+
+<!-- jkesselm May 2023: Output now matches expected sample.
+     Make regression test, move into contrib, or discard?
+-->
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                               xmlns:xalan="http://xml.apache.org/xalan"
                               exclude-result-prefixes="xalan">
