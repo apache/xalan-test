@@ -24,6 +24,7 @@ import org.apache.qetest.TestletImpl;
 import org.apache.qetest.*;
 import org.apache.qetest.trax.*;
 import org.apache.qetest.xsl.*;
+import org.apache.xalan.templates.OutputProperties;
 
 // Import all relevant TRAX packages
 import javax.xml.transform.*;
