@@ -10,6 +10,15 @@
   <!-- Purpose: Use copy-of to attempt to put a node-set in an attribute. -->
   <!-- Invalid nodes (non-text) and their content should be ignored. -->
 
+  <!-- Per XSLT 1.0 section 7.1.5: "The following are all errors:
+       [...]  Creating nodes other than text nodes during the
+       instantiation of the content of the xsl:attribute element;
+       implementations may either signal the error or ignore the
+       offending nodes." Implied by handling of PIs and comments: if
+       nodes are ignored, their content must also be ignored. In other
+       words, simply using string-value of the content is *not*
+       correct. AS OF VERSION 2.7.3, XALAN IS GETTING THIS WRONG. -->
+
 <xsl:output method="xml" indent="no" encoding="UTF-8"/>
 
 <xsl:template match="/">

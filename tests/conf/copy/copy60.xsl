@@ -7,7 +7,15 @@
   <!-- Section: 11.3 Using Values of Variables & Parameters with xsl:copy-of. -->
   <!-- Creator: David Bertoni -->
   <!-- Purpose: Use copy-of to put a node-set and RTF in a PI, where some members are text nodes. -->
-  <!-- Invalid nodes (non-text) and their content should be ignored. -->
+  <!-- Invalid nodes (non-text) and their content should be ignored.-->
+  
+  <!-- Per XSLT 1.0 section 7.3, emphasis mine: "It is an error if
+       instantiating the content of xsl:processing-instruction creates
+       nodes other than text nodes. An XSLT processor may signal the
+       error; if it does not signal the error, it must recover by
+       ignoring the offending nodes TOGETHER WITH THEIR CONTENT." In
+       other words, simply using string-value of the content is *not*
+       correct. AS OF VERSION 2.7.3, XALAN IS GETTING THIS WRONG. -->
 
 <xsl:output method="xml" indent="no" encoding="UTF-8"/>
 
