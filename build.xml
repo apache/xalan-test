@@ -247,7 +247,7 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${tests.extensions.build.dir}" />
         <pathelement location="${tests.bugzilla.build.dir}" />        
         <pathelement location="${tests.jira.build.dir}" />        
-        <!-- Add more pathelements if we add more Java extensions dirs -->        
+        <!-- Add more pathelements if we add more Java extensions dirs -->
     </path>
 
     <!-- Classpath used when build/running xslt20 XPath 2.0 RWAPI tests -->
@@ -1340,6 +1340,11 @@ dependencies - users must manually 'build jar' first.
         description="Alias for alltest">
     </target>
 
+    <!-- ResultScanner was failing when run against the Maven build,
+         apparently due to conflicting TransformerFactory
+         defaults. The simplest solution is to make clear that we want to use
+	 our version of Apache Xalan, by setting the Boot Class Path. 	
+    -->
     <target name="scan"
         description="Run a simple ResultScanner on a tree of test results">
         <property name="scan.outputDir" value="results-alltest" />
@@ -1347,9 +1352,13 @@ dependencies - users must manually 'build jar' first.
         <java classname="org.apache.qetest.xsl.ResultScanner" 
               classpathref="conf.class.path" 
               fork="yes" >
-              <arg line="${scan.outputDir} ${scan.logFile}"/>
+	    <bootclasspath>
+	        <path refid="boot.class.path"/>
+	    </bootclasspath>
+            <arg line="${scan.outputDir} ${scan.logFile}"/>
         </java>	 
     </target>
+
     <!-- ================================================================== -->
     <!-- Build Tests: Compile/jar targets for each 'layer' of testing code  -->
     <!-- ================================================================== -->
