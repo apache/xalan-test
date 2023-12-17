@@ -20,6 +20,7 @@ rem     Name:   build.bat
 rem     Author: shane_curcuru@lotus.com,
 rem             ggregory@apache.org,
 rem             mukulg@apache.org
+rem             jkesselm@apache.org
 rem                
 rem     See:    build.xml
 rem
@@ -41,7 +42,7 @@ if exist "%JAVA_HOME%\lib\tools.jar" (
 set _JAVACMD=%JAVA_HOME%\bin\java
 
 rem On windows grab all arguments at once
-set ANT_CMD_LINE_ARGS=%*
+set _ANT_CMD_LINE_ARGS=%*
 
 rem Default ANT_HOME to the one what user has set
 if not "%ANT_HOME%"=="" set _ANT_HOME=%ANT_HOME%
@@ -57,12 +58,22 @@ if exist "%_ANT_HOME%\tools\ant.jar" (
 
 set _CLASSPATH=%_CLASSPATH%;%_ANT_JARS%
 
-set XALAN_BUILD_DIR_PATH=..\xalan-java\build;..\build
+set _XALAN_BUILD_CLASSPATH=../xalan-java/build/*:../build/*
+set _XERCES_ENDORSED_CLASSPATH=../xalan-java/lib:../lib:../xalan-java/lib/endorsed:../lib/endorsed
+set _XERCES_IMPL_CLASSPATH=../xalan-java/lib/*:../lib/*:../xalan-java/lib/endorsed/*:../lib/endorsed/*
 
-set XERCES_ENDORSED_DIR_PATH=..\xalan-java\lib\endorsed;..\lib\endorsed
+: Override JRE defaults to set our own, preferring the "real" Apache code
+: to the shadowed version that ships with the JRE.
+set _JAXP_USE_APACHE="-Djavax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl -Djavax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl -Djavax.xml.parsers.SAXParserFactory=org.apache.xerces.jaxp.SAXParserFactoryImpl"
+
+: Endorsed should no longer be necessary, given JAXP/TrAX overrides above.
+: Just make sure they're on the classpaths.
+: set _USE_OLD_ENDORSED_DIRS=-Djava.endorsed.dirs=%_XALAN_BUILD_CLASSPATH%;%_XERCES_ENDORSED_CLASSPATH%
+set _USE_OLD_ENDORSED_DIRS=
+set _CLASSPATH=%_XALAN_BUILD_CLASSPATH%;%_XERCES_IMPL_CLASSPATH%;%_CLASSPATH%
 
 @echo on
-"%_JAVACMD%" -mx1024m -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% -classpath "%_CLASSPATH%" org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
+"%_JAVACMD%" -mx1024m %_USE_OLD_ENDORSED_DIRS% -classpath "%_CLASSPATH%" org.apache.tools.ant.Main %_ANT_CMD_LINE_ARGS%
 @echo off
 
 goto end
@@ -73,5 +84,11 @@ echo Warning: JAVA_HOME environment variable is not set
 :end
 set _CLASSPATH=
 set _ANT_HOME=
+set _ANT_CMD_LINE_ARGS=
 set _JAVACMD=
 set _ANT_JARS=
+set _XALAN_BUILD_CLASSPATH=
+set _XERCES_ENDORSED_CLASSPATH=
+set _XERCES_IMPL_CLASSPATH=
+set _JAXP_USE_APACHE=
+set _USE_OLD_ENDORSED_DIRS=
