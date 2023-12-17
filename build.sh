@@ -67,7 +67,6 @@ else
    _ANT_HOME=$ANT_HOME
 fi
 
-
 # Check user's ANT_HOME to make sure it actually has what we need
 if [ -f "$_ANT_HOME/tools/ant.jar" ]; then
     _ANT_JARS=$_ANT_HOME/tools/ant.jar
@@ -84,12 +83,22 @@ CLASSPATH=$CLASSPATH:$_ANT_JARS
 # found those occasionally useful during development, so we left them in the
 # standard scripts. But they aren't strictly needed.
 
-XALAN_BUILD_DIR_PATH=../xalan-java/build:../build
+XALAN_BUILD_CLASSPATH=../xalan-java/build/*:../build/*
+XERCES_ENDORSED_CLASSPATH=../xalan-java/lib:../lib:../xalan-java/lib/endorsed:../lib/endorsed
+XERCES_IMPL_CLASSPATH=../xalan-java/lib/*:../lib/*:../xalan-java/lib/endorsed/*:../lib/endorsed/*
 
-XERCES_ENDORSED_DIR_PATH=../xalan-java/lib/endorsed:../lib/endorsed
+# Override JRE defaults to set our own, preferring the "real" Apache code
+# to the shadowed version that ships with the JRE.
+JAXP_USE_APACHE="-Djavax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl -Djavax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl -Djavax.xml.parsers.SAXParserFactory=org.apache.xerces.jaxp.SAXParserFactoryImpl"
+
+# Endorsed should no longer be necessary, given JAXP/TrAX overrides above.
+# Just make sure they're on the classpaths.
+# USE_OLD_ENDORSED_DIRS=-Djava.endorsed.dirs=$XALAN_BUILD_CLASSPATH:$XERCES_ENDORSED_CLASSPATH
+CLASSPATH=$XALAN_BUILD_CLASSPATH:$XERCES_IMPL_CLASSPATH:$CLASSPATH
 
 # Reminder: Note $* versus $@ distinction
-echo Running: $JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" org.apache.tools.ant.Main "$@"
-$JAVACMD -mx1024m -Djava.endorsed.dirs=$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH -classpath "$CLASSPATH" org.apache.tools.ant.Main "$@"
+# Also note classpath must be quoted to prevent CLI expansion of *
+echo Running: $JAVACMD -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
+$JAVACMD -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
 
 echo "build.sh complete!"

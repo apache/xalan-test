@@ -260,7 +260,7 @@ public class XHTComparator
 
         String value1 = gold.getNodeValue();
         String value2 = test.getNodeValue();
-
+	
         if ((null != value1) && (null != value2) &&!value1.equals(value2))
         {
             reporter.println(MISMATCH_VALUE + nodeTypeString(gold) + "len="
