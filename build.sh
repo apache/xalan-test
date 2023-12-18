@@ -21,7 +21,7 @@
 #		Fresh port from Mukul Gandhi's revised build.bat.
 #		WARNING: This currently does not include the hooks needed
 #		to make the script compatable with cygwin (unix/Linux shell
-#		and commands ported to run under Windows). See 
+#		and commands ported to run under Windows). See
 #		deprecated_build.sh to see how we handled the cygwin
 #		syntax differences back in 2001. These days, Windows users
 #		are more likely to use WSL, which simplifies matters.
@@ -39,7 +39,7 @@ echo
 echo Xalan-J test automation build
 echo -----------------------------
 
-if [ "$1" = "-h" ]; then 
+if [ "$1" = "-h" ]; then
     echo build.sh - executes Xalan Java-based test automation
     echo   Usage:   build [target] [-D options]
     echo   Example: build api -DtestClass=TransformerAPITest -Dqetest.loggingLevel=30
@@ -50,19 +50,19 @@ if [ "$1" = "-h" ]; then
     exit 1
 fi
 
-if [ "$JAVA_HOME" = "" ]; then 
+if [ "$JAVA_HOME" = "" ]; then
     echo Warning: JAVA_HOME environment variable is not exported
     echo You may have meant to set it to /etc/alternatives/java_sdk
     exit 1
 fi
 
 JAVACMD=$JAVA_HOME/bin/java
-    
+
 CLASSPATH=$CLASSPATH:$JAVA_HOME/lib/tools.jar
 
 # Default is to use a copy of ant bundled with xalan-java
-if [ $ANT_HOME = "" ]; then
-   _ANT_HOME=../xalan-java   
+if [ "$ANT_HOME" = "" ]; then
+   _ANT_HOME=../xalan-java
 else
    _ANT_HOME=$ANT_HOME
 fi
@@ -98,7 +98,7 @@ CLASSPATH=$XALAN_BUILD_CLASSPATH:$XERCES_IMPL_CLASSPATH:$CLASSPATH
 
 # Reminder: Note $* versus $@ distinction
 # Also note classpath must be quoted to prevent CLI expansion of *
-echo Running: $JAVACMD -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
-$JAVACMD -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
+echo Running: "$JAVACMD" -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
+"$JAVACMD" -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
 
 echo "build.sh complete!"
