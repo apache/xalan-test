@@ -100,5 +100,4 @@ CLASSPATH=$XALAN_BUILD_CLASSPATH:$XERCES_IMPL_CLASSPATH:$CLASSPATH
 # Also note classpath must be quoted to prevent CLI expansion of *
 echo Running: "$JAVACMD" -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
 "$JAVACMD" -mx1024m $USE_OLD_ENDORSED_DIRS -classpath "$CLASSPATH" $JAXP_USE_APACHE org.apache.tools.ant.Main "$@"
-
 echo "build.sh complete!"
