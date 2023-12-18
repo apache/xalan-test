@@ -58,9 +58,9 @@ if exist "%_ANT_HOME%\tools\ant.jar" (
 
 set _CLASSPATH=%_CLASSPATH%;%_ANT_JARS%
 
-set _XALAN_BUILD_CLASSPATH=..\xalan-java\build\*:..\build\*
-set _XERCES_ENDORSED_CLASSPATH=..\xalan-java\lib:..\lib:..\xalan-java\lib\endorsed:..\lib\endorsed
-set _XERCES_IMPL_CLASSPATH=..\xalan-java\lib\*:..\lib\*:..\xalan-java\lib\endorsed\*:..\lib\endorsed\*
+set _XALAN_BUILD_CLASSPATH=..\xalan-java\build\*;..\build\*
+set _XERCES_ENDORSED_CLASSPATH=..\xalan-java\lib;..\lib;..\xalan-java\lib\endorsed;..\lib\endorsed
+set _XERCES_IMPL_CLASSPATH=..\xalan-java\lib\*;..\lib\*;..\xalan-java\lib\endorsed\*;..\lib\endorsed\*
 
 : Override JRE defaults to set our own, preferring the "real" Apache code
 : to the shadowed version that ships with the JRE.
