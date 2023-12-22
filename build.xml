@@ -19,16 +19,16 @@
 <project name="testxsl" default="jar" basedir=".">
 <description>
 build.xml:$Revision$
-Ant 1.4.1+ build script for compiling and running Xalan-J tests.  
+Ant 1.4.1+ build script for compiling and running Xalan-J tests.
 
-Note that this is a slightly unusual Ant build.xml file, since we 
-support both compiling/packaging the Xalan-J tests themselves, as 
-well as a number of targets designed to execute the tests once 
+Note that this is a slightly unusual Ant build.xml file, since we
+support both compiling/packaging the Xalan-J tests themselves, as
+well as a number of targets designed to execute the tests once
 they're built.
 
-In general the compilation targets (i.e. ones that compile the 
+In general the compilation targets (i.e. ones that compile the
 test classes themselves) do list their dependencies explicitly.
-Targets that serve to execute tests do not normally list any 
+Targets that serve to execute tests do not normally list any
 dependencies - users must manually 'build jar' first.
 
 @author shane_curcuru@lotus.com
@@ -36,12 +36,12 @@ dependencies - users must manually 'build jar' first.
 
 </description>
 
-<!-- Note: A number of property names may seem a little odd.  I've 
-     explicitly tried to reduce property name collisions between 
-     this file and xml-xalan/java/build.xml to try to simplify 
-     maintenance (or at least to separate the dev stuff from the 
-     testing stuff).  Suggestions for improvements (along with 
-     maintenance strategies) accepted. 
+<!-- Note: A number of property names may seem a little odd.  I've
+     explicitly tried to reduce property name collisions between
+     this file and xml-xalan/java/build.xml to try to simplify
+     maintenance (or at least to separate the dev stuff from the
+     testing stuff).  Suggestions for improvements (along with
+     maintenance strategies) accepted.
 -->
 
     <!-- ================================================================== -->
@@ -55,7 +55,7 @@ dependencies - users must manually 'build jar' first.
 
     <property name="smoketest.conf.excludes" value="${smoketest.conf.normal.excludes};${smoketest.conf.supplemental.excludes}"/>
     <property name="smoketest.xsltc.conf.excludes" value="${smoketest.xsltc.conf.normal.excludes};${smoketest.xsltc.conf.supplemental.excludes}"/>
-    <!-- Also provide environment properties with a special prefix which 
+    <!-- Also provide environment properties with a special prefix which
          allows us to detect if JARDIR is set.
    -->
     <property environment="ENV" />
@@ -71,7 +71,7 @@ dependencies - users must manually 'build jar' first.
     <property name="test.src.dir" value="java/src"/>
     <property name="test.root" value="org/apache/qetest/"/>
     <property name="test.dir" value="${test.src.dir}/${test.root}"/>
-    <property name="test.tools.dir" value="./tools"/>    
+    <property name="test.tools.dir" value="./tools"/>
     <property name="test.build.dir" value="java/build"/>
     <property name="test.build.docs" value="${test.build.dir}/docs"/>
     <property name="test.build.apidocs" value="${test.build.docs}/apidocs"/>
@@ -83,30 +83,36 @@ dependencies - users must manually 'build jar' first.
     <property name="tests.extensions.dir" value="${extensions.dir}/java"/>
     <property name="tests.extensions.build.dir" value="${extensions.dir}/java/build"/>
 
-    
+
     <!-- Names/locations of .jar files we build -->
     <property name="testxsl.jar.name" value="testxsl.jar"/>
     <property name="qetest.jar.name" value="qetest.jar"/>
     <property name="testxsl.jar" value="${test.build.dir}/${testxsl.jar.name}"/>
     <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
-        
+
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
-    <property name="xalan.relpath" value="../xalan-java"/>    
-    <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
-    <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
-    <!-- NOTE: We shouldn't be depending on Xalan having fetched the
-         tools or having xdocs/stylebook resources, if we want to claim
-         to be able to run standalone to test other processors.
-         We no longer have to care that much about some file duplication;
-         networks are fast, disks are cheap.
+    <property name="xalan.relpath" value="../xalan-java"/>
+    <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>
+    <property name="xalan.build.dir" value="${xalan.relpath}/build"/>
+    <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>
+
+    <!-- NOTE: Temporary measure: since I "helpfully" renamed xdocs to
+	 stylebook in the mvn version of xalan-java, and expanded the 
+	 site stylesheet tar.gz, we have an incompatability between
+	 Ant and Maven builds of Xalan. For now I've
+	 worked around this by pulling a copy of the tar.gz into
+	 xalan-tests. Better longterm (after ant-build back-compatibility
+	 is not an issue) would be to either reference Xalan-Java's
+	 pre-expanded version, or to make the stylesheet tree a separate
+	 resource depended upon by both. Or to merge test into xalan-java
+	 main build, which is under discussion.
          -->
-    <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
-    <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/>
-    <property name="xalan.generator.styletargz" value="${xalan.xdocs.dir}/xml-site-style.tar.gz"/>
+    <!-- <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/> -->
+    <property name="xalan.generator.styletargz" value="${test.tools.dir}/xml-site-style.tar.gz"/>
 
     <!-- Various names/locations of dependent jars -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
-    <property name="xalan.unbundled.jar" 
+    <property name="xalan.unbundled.jar"
               value="${xalan.build.dir}/xalan-unbundled.jar"/>
     <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
@@ -116,20 +122,20 @@ dependencies - users must manually 'build jar' first.
     <!-- JTidy is used by the XSLTC comparator -->
     <!--<property name="jtidy.jar" value="${test.tools.dir}/Tidy.jar"/>-->
     <property name="jtidy.jar" value="${test.tools.dir}/jtidy-1.0.3.jar"/>
-    
-    <!-- The Mozilla Rhino jar is needed, to run Javascript extensions tests 
+
+    <!-- The Mozilla Rhino jar is needed, to run Javascript extensions tests
          This one can live with Xalan for now, since it's supporting xalan
          function rather than test function.
     -->
     <property name="js.jar" value="${xalan.relpath}/lib/rhino-1.7.14.jar"/>
-    
-    <!-- The Bean Scripting Framework is required for extensions written in languages 
+
+    <!-- The Bean Scripting Framework is required for extensions written in languages
          other than Java. Xalan Java will attempt to use the Jakarta BSF implementation
-         by default (see the "extensions" target). For more information, see the 
+         by default (see the "extensions" target). For more information, see the
          Apache Commons BSF project https://commons.apache.org/proper/commons-bsf/.
-    -->     
+    -->
     <property name="bsf.jar" value="${xalan.relpath}/lib/bsf.jar"/>
-    
+
     <property name="commons-logging.jar" value="${xalan.relpath}/lib/commons-logging-1.2.jar"/>
 
     <!-- Documentation-specific files and locations -->
@@ -150,18 +156,18 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${parserjar}" />
     </path>
 
-    <!-- Note: given that many of the tests interact with xerces and 
-         xalan classes, and that Ant may use these classes (especially parser 
+    <!-- Note: given that many of the tests interact with xerces and
+         xalan classes, and that Ant may use these classes (especially parser
          ones) I've found it's best to fork the tests.
-         Later I'd like to give the user the option to fork or not, since 
-         while forking is slower and problematic on some systems, it is 
-         also a safer testing environment (since the Ant classes and the 
+         Later I'd like to give the user the option to fork or not, since
+         while forking is slower and problematic on some systems, it is
+         also a safer testing environment (since the Ant classes and the
          parser aren't already loaded, etc.)
-    --> 
+    -->
     <property name="fork-tests" value="yes"/>
-    <!-- Property to have the Ant build fail when a test has an 
+    <!-- Property to have the Ant build fail when a test has an
          error (not necessarily a fail).  Needs improvement.
-    --> 
+    -->
     <property name="fail-on-error" value="yes"/>
 
     <!-- ================================================================== -->
@@ -187,7 +193,7 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${jtidy.jar}" />
     </path>
-    
+
     <path id="testxsl.class.path">
        <pathelement location="${testxsl.jar}" />
     </path>
@@ -203,13 +209,13 @@ dependencies - users must manually 'build jar' first.
     </path>
 
     <!-- Boot class path for JDK 1.4+ -->
-    <path id="boot.class.path">                                  
+    <path id="boot.class.path">
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xalan.jar}" />
         <!--<pathelement location="${xsltc.jar}" />-->  <!-- add this so we can test the
-                                                              separate jar distribution -->        
+                                                              separate jar distribution -->
         <pathelement path="${sun.boot.class.path}" />
     </path>
 
@@ -217,7 +223,7 @@ dependencies - users must manually 'build jar' first.
     <path id="boot.class.path.gump">
         <pathelement location="${sun.boot.class.path}" />
     </path>
-    
+
     <!-- Classpath used when running perf or performance tests -->
     <path id="perf.class.path">
         <path refid="conf.class.path" />
@@ -247,15 +253,15 @@ dependencies - users must manually 'build jar' first.
 
     <!-- Classpath used when running extensions tests -->
     <path id="extensions.class.path">
-        <pathelement location="${xalan.jar}" />         
+        <pathelement location="${xalan.jar}" />
         <path refid="testxsl.class.path" />
         <pathelement location="${commons-logging.jar}" />
-        <pathelement location="${bsf.jar}" />        
+        <pathelement location="${bsf.jar}" />
         <pathelement location="${js.jar}" />
         <pathelement location="${jtidy.jar}" />
         <pathelement location="${tests.extensions.build.dir}" />
-        <pathelement location="${tests.bugzilla.build.dir}" />        
-        <pathelement location="${tests.jira.build.dir}" />        
+        <pathelement location="${tests.bugzilla.build.dir}" />
+        <pathelement location="${tests.jira.build.dir}" />
         <!-- Add more pathelements if we add more Java extensions dirs -->
     </path>
 
@@ -270,9 +276,9 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <taskdef name="xalantest" classname="org.apache.qetest.xsl.XSLTestAntTask">
         <classpath>
-            <!-- Needed so this build file can run: this refers to 
-                 a precompiled version of XSLTestAntTask.class that 
-                 is checked in: normally at runtime, it should come 
+            <!-- Needed so this build file can run: this refers to
+                 a precompiled version of XSLTestAntTask.class that
+                 is checked in: normally at runtime, it should come
                  from the testxsl.jar file instead of below.
            -->
             <pathelement location="${test.src.dir}" />
@@ -281,7 +287,7 @@ dependencies - users must manually 'build jar' first.
         </classpath>
     </taskdef>
 
-    <!-- This Ant task checks, the 'api' tests pass or fail status, by inspecting 
+    <!-- This Ant task checks, the 'api' tests pass or fail status, by inspecting
          content within test result XML documents -->
     <taskdef name="apiTestsResultTask" classname="org.apache.qetest.xsl.XSLApiTestsResultTask">
        <classpath>
@@ -307,11 +313,11 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="run.xalantest" depends="run.xalantest.default,run.xalantest.transfact"/>
 
-    <target name="run.xalantest.default" unless="sysprop.transfact" >       
+    <target name="run.xalantest.default" unless="sysprop.transfact" >
         <antcall target="run.xalantest.default.gump"/>
         <antcall target="run.xalantest.default.normal"/>
     </target>
- 
+
     <target name="run.xalantest.default.gump" if="gump" >
         <xalantest test="${testClass}"
             testType="${testType}"
@@ -327,7 +333,7 @@ dependencies - users must manually 'build jar' first.
             classpathref="${xalantest.classpathref}"
             bootclasspathref="boot.class.path"
             fork="${fork-tests}"
-            failonerror="${fail-on-error}" />    
+            failonerror="${fail-on-error}" />
     </target>
 
     <target name="run.xalantest.transfact" if="sysprop.transfact" >
@@ -358,9 +364,9 @@ dependencies - users must manually 'build jar' first.
             <!-- Explicitly set TransformerFactory property to use -->
             <sysproperty key="javax.xml.transform.TransformerFactory"
                          value="${sysprop.transfact}" />
-        </xalantest>    
+        </xalantest>
     </target>
-    
+
     <target name="run.xalan-extension-test" >
         <!--<antcall target="run.xalan-extension-test.gump"/>-->
         <antcall target="run.xalan-extension-test.normal"/>
@@ -387,7 +393,7 @@ dependencies - users must manually 'build jar' first.
             failonerror="${fail-on-error}" >
             <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager"
                          value="${sysprop.BSFManager}" />
-        </xalantest>    
+        </xalantest>
     </target>
 
     <!-- ================================================================== -->
@@ -421,7 +427,7 @@ dependencies - users must manually 'build jar' first.
             </fileset>
         </copy>
     </target>
-         
+
     <target name="init.docs" depends="init.build"
         description="Prepare output tree for documentation">
         <mkdir dir="${test.build.apidocs}" />
@@ -524,7 +530,7 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="accept" description="Run TestletDriver over the accept tree">
         <!--<echo message="Executing Xalan accept test." />-->
-        
+
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Xalan conf test: ${testClass}" />
 
@@ -639,17 +645,17 @@ dependencies - users must manually 'build jar' first.
 
 
     <!-- Run specific named API tests.
-    
+
          What tests this build target runs, are defined within test.properties file
-         (please see the section, 'Various tests, that run for ant build.xml's "apitest" 
+         (please see the section, 'Various tests, that run for ant build.xml's "apitest"
           target' within ./test.properties file).
     -->
     <target name="apitest" description="Run specific API tests" depends="init.test">
         <property name="testClass" value="org.apache.qetest.xsl.XSLTestHarness" />
         <property name="testType" value="api." />
-        
+
         <mkdir dir="results-api"/>
-        
+
         <antcall target="run.xalantest">
             <param name="xalantest.classpathref" value="api.class.path" />
         </antcall>
@@ -661,22 +667,22 @@ dependencies - users must manually 'build jar' first.
                <available file="results-api/Pass-DTMDumpTest.xml" />
                <available file="results-api/Pass-EmbeddedStylesheetTest.xml" />
                <available file="results-api/Pass-ErrorListenerAPITest.xml" />
-               <available file="results-api/Pass-ErrorListenerTest.xml" />               
+               <available file="results-api/Pass-ErrorListenerTest.xml" />
                <available file="results-api/Pass-SAXResultAPITest.xml" />
                <available file="results-api/Pass-SAXSourceAPITest.xml" />
                <available file="results-api/Pass-SAXTransformerFactoryAPITest.xml" />
-               <available file="results-api/Pass-SerializedStylesheetTest.xml" />                              
+               <available file="results-api/Pass-SerializedStylesheetTest.xml" />
                <available file="results-api/Pass-SystemIDResolverAPITest.xml" />
                <available file="results-api/Pass-TemplatesHandlerAPITest.xml" />
                <available file="results-api/Pass-TestDTM.xml" />
                <available file="results-api/Pass-TestDTMIter.xml" />
                <available file="results-api/Pass-TestDTMTrav.xml" />
                <available file="results-api/Pass-TestXPathAPI.xml" />
-               <available file="results-api/Pass-TraceListenerTest.xml" />               
+               <available file="results-api/Pass-TraceListenerTest.xml" />
                <available file="results-api/Pass-TransformerFactoryAPITest.xml" />
                <available file="results-api/Pass-TransformerHandlerAPITest.xml" />
                <available file="results-api/Pass-TransformerHandlerTest.xml" />
-               <available file="results-api/Pass-TransformStateAPITest.xml" />               
+               <available file="results-api/Pass-TransformStateAPITest.xml" />
                <available file="results-api/Pass-URIResolverTest.xml" />
             </and>
         </condition>
@@ -685,7 +691,7 @@ dependencies - users must manually 'build jar' first.
             <!--<param name="scan.outputDir" value="${api.outputDir}"/>-->
             <param name="scan.outputDir" value="results-api"/>
         </antcall>
-        
+
         <antcall target="apitest-pass-file-check"/>
 
         <apiTestsResultTask resultDir="results-api" fileNamePrefix="Pass-"/>
@@ -739,19 +745,19 @@ dependencies - users must manually 'build jar' first.
     <!-- ============================================================== ==== -->
     <!-- Run tests: various extensions tests                                -->
     <!-- ================================================================== -->
-    <target name="extensions" 
-            description="Run extensions tests.  
+    <target name="extensions"
+            description="Run extensions tests.
                          Non-Java extensions will use the Apache BSF implementation."
             depends="init.test">
         <echo message="Executing Xalan extensions tests. Non-Java extensions will use the Apache BSF implementation." />
-        <!-- Set the default conformance test driver, user may 
-             override; note test.properties:extensions.testlet= 
+        <!-- Set the default conformance test driver, user may
+             override; note test.properties:extensions.testlet=
         -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <property name="testType" value="extensions." />
 
         <mkdir dir="results-extensions"/>
-        
+
         <antcall target="run.xalan-extension-test">
             <param name="xalantest.classpathref" value="extensions.class.path" />
             <param name="sysprop.BSFManager" value="org.apache.bsf.BSFManager" />
@@ -761,13 +767,13 @@ dependencies - users must manually 'build jar' first.
         <echo message="If you got ClassNotFound, did you 'build extensions.classes' first?" />
     </target>
 
-    <target name="extensions-with-ibm-bsf" 
-            description="Run extensions tests. 
+    <target name="extensions-with-ibm-bsf"
+            description="Run extensions tests.
                          Non-Java extensions will use the IBM BSF implementation."
             depends="init.test">
         <echo message="Executing Xalan extensions tests.  Non-Java extensions will use the IBM BSF implementation." />
-        <!-- Set the default conformance test driver, user may 
-             override; note test.properties:extensions.testlet= 
+        <!-- Set the default conformance test driver, user may
+             override; note test.properties:extensions.testlet=
         -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <property name="testType" value="extensions.with-ibm-bsf." />
@@ -797,22 +803,22 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <!-- Run tests: Run the Xalan-J 2.x Minitest                            -->
     <!-- ================================================================== -->
-    <!-- This target doesn't actually do anything itself - it merely 
-         depends on other targets, in order, to first run the whole 
-         Minitest, then to log to Ant whether the test didn't pass 
+    <!-- This target doesn't actually do anything itself - it merely
+         depends on other targets, in order, to first run the whole
+         Minitest, then to log to Ant whether the test didn't pass
          (i.e. failed, incomplete, error or ambiguous) or passed.
     -->
-    <target name="minitest" 
+    <target name="minitest"
             description="Run the Xalan-J 2.x Minitest"
             depends="minitest-execute,minitest-notpass,minitest-pass">
     </target>
 
-    <target name="minitest.gump" 
+    <target name="minitest.gump"
             description="Compile and Run the Xalan-J 2.x Minitest"
             depends="jar">
        <antcall target="minitest">
          <param name="gump" value="boot.class.path.gump"/>
-       </antcall>            
+       </antcall>
     </target>
     <target name="minitest-execute">
         <echo message="About to execute the Minitest..." />
@@ -837,54 +843,54 @@ dependencies - users must manually 'build jar' first.
     <!-- Run tests: Run the Xalan-J 2.x Smoketest, including several tests  -->
     <!-- Note: this target is frequently called from outside of this file!  -->
     <!-- ================================================================== -->
-    <!--<target name="smoketest" 
+    <!--<target name="smoketest"
             description="Run the Xalan-J 2.x Smoketest"
             depends="minitest-execute,extensions.classes,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
     </target>-->
-    <target name="smoketest" 
+    <target name="smoketest"
             description="Run the Xalan-J 2.x Smoketest"
             depends="smoketest-execute,smoketest-notpass,smoketest-pass">
     </target>
-    <target name="smoketest.xsltc" 
+    <target name="smoketest.xsltc"
             description="Run the Xalan-J 2.x XSLTC Smoketest"
             depends="jar,smoketest.xsltc-execute,smoketest.xsltc-notpass,smoketest.xsltc-pass">
     </target>
-    
-    <!-- The following compiles the minimum to run the smoketests, runs them, 
-         and creates distros just of the results and existing tree, 
-         without actually running the docs - this is to ensure that 
+
+    <!-- The following compiles the minimum to run the smoketests, runs them,
+         and creates distros just of the results and existing tree,
+         without actually running the docs - this is to ensure that
          doc build errors in the tests won't affect GUMP runs.
     -->
-    <target name="smoketest.dev" 
+    <target name="smoketest.dev"
             description="Run the Xalan-J 2.x Smoketest with dependencies"
-            depends="jar,minitest-execute,extensions.classes,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">        
+            depends="jar,minitest-execute,extensions.classes,smoketest-execute,minitest-notpass,minitest-pass,smoketest-notpass,smoketest-pass">
     </target>
 
-    <target name="smoketest.gump" 
+    <target name="smoketest.gump"
             description="Run the Xalan-J 2.x Smoketest in automated builds with dependencies">
        <antcall target="minitest.gump">
          <param name="gump" value="boot.class.path.gump"/>
-       </antcall>    
-       <antcall target="extensions.classes"/>      
+       </antcall>
+       <antcall target="extensions.classes"/>
        <antcall target="smoketest-execute.gump">
          <param name="gump" value="boot.class.path.gump"/>
-       </antcall>  
-       
-        <!-- This compiles the minimum to run the smoketests, runs them, 
-             and creates distros just of the results and existing tree, 
-             without actually running the docs - this is to ensure that 
+       </antcall>
+
+        <!-- This compiles the minimum to run the smoketests, runs them,
+             and creates distros just of the results and existing tree,
+             without actually running the docs - this is to ensure that
              doc build errors in the tests won't affect GUMP runs.
         -->
     </target>
-    
+
     <!-- This target smoketest-execute.gump is a subtarget which is called
-         from smoketest.gump. 
+         from smoketest.gump.
     -->
-    <target name="smoketest-execute.gump" 
+    <target name="smoketest-execute.gump"
             description="Run the Xalan-J 2.x Smoketest for Gump build "
             depends="smoketest-execute,smoketest-results-dist,dist-nodeps,
             smoketest-notpass,smoketest-pass">
-    </target>    
+    </target>
 
     <target name="smoketest-execute">
         <echo message="About to execute XalanJ2 extensions tests..." />
@@ -906,7 +912,7 @@ dependencies - users must manually 'build jar' first.
             <and>
                <available file="${smoketest.extensions.passFile}" />
                <available file="${smoketest.conf.passFile}" />
-               <available file="${smoketest.accept.passFile}" />              
+               <available file="${smoketest.accept.passFile}" />
             </and>
         </condition>
         <antcall target="scan">
@@ -944,15 +950,15 @@ dependencies - users must manually 'build jar' first.
         <echo message=" [minitest] Please fix any smoketest problems before checking in!" />
         <fail message="Please fix any smoketest problems before checking in!" />
     </target>
-    
+
     <target name="smoketest-pass" if="smoketest-passed">
-        <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />        
+        <echo message=" [minitest] CONGRATULATIONS! The Smoketest passed!" />
         <echo message=" [minitest] Details are in ${smoketest.extensions.logFile}, ${smoketest.conf.logFile}, ${smoketest.accept.logFile}" />
     </target>
 
     <target name="apitest-pass-file-check" unless="apitest-file-check-passed">
        <echo message=" [minitest] ERROR! The api tests failed!" />
-       <fail message="Please fix any api tests problems before checking in!" />       
+       <fail message="Please fix any api tests problems before checking in!" />
     </target>
 
     <target name="smoketest.xsltc-notpass" unless="smoketest.xsltc-passed">
@@ -977,10 +983,10 @@ dependencies - users must manually 'build jar' first.
             <include name="${tarzip-fwdref}/${smoketest.outputDir}/"/>
           </tarfileset>
         </tar>
-        <gzip src="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar" 
+        <gzip src="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar"
               zipfile="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar.gz"/>
         <delete file="${test.build.dir}/xalan-smoketest-${DSTAMP}.tar"/>
-              
+
         <zip zipfile="${test.build.dir}/xalan-smoketest-${DSTAMP}.zip" >
           <zipfileset dir="${tarzip-backref}">
             <include name="${tarzip-fwdref}/${smoketest.outputDir}/"/>
@@ -991,18 +997,18 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <!-- Run tests: A whole bunch of tests - used before posting builds, etc-->
     <!-- ================================================================== -->
-    <target name="alltest" 
+    <target name="alltest"
             description="Run nearly *all* available Xalan-J 2.x tests with defaults"
             depends="all,alltest.other,alltest.conf,alltest.accept,alltest.contrib">
         <!-- Ensure that one last scan gets run of the whole output set
-             (Note that when we call sub-targets, some of our subdirs 
+             (Note that when we call sub-targets, some of our subdirs
              may have had sub-scans done as well) -->
         <antcall target="scan">
             <param name="scan.outputDir" value="results-alltest"/>
         </antcall>
 
     </target>
-    <target name="alltest.features" 
+    <target name="alltest.features"
             description="Re-Run nearly *all* available Xalan-J 2.x tests with setAttribute features set"
             depends="all,alltest.other">
         <property name="alltest.resultDir" value="results-alltest" />
@@ -1106,10 +1112,10 @@ dependencies - users must manually 'build jar' first.
         <property name="alltest.resultDir" value="results-alltest" />
         <property name="alltest.conf.resultDir" value="${alltest.resultDir}/conf" />
         <echo message="About to execute conf tests with all flavors, results into ${alltest.conf.resultDir}/..." />
-        <!-- Run full conf test with each major available flavor into 
-             specific output directories; note any user options will 
+        <!-- Run full conf test with each major available flavor into
+             specific output directories; note any user options will
              override for all test calls.
-             Also exclude the currently failing tests in the 
+             Also exclude the currently failing tests in the
              smoketest if use.excludes is set.
         -->
         <condition property="conf.excludes" value="${smoketest.conf.excludes}">
@@ -1157,9 +1163,9 @@ dependencies - users must manually 'build jar' first.
             <param name="conferr.flavor" value="trax.systemId"/>
             <param name="conferr.outputDir" value="${alltest.conf.resultDir}/conferr"/>
             <param name="conferr.logFile" value="${alltest.conf.resultDir}/conferr/results.xml"/>
-            <!-- Note that conferr doesn't currently use gold files, 
+            <!-- Note that conferr doesn't currently use gold files,
                  but we need to set the goldDir anyway for convenience
-            --> 
+            -->
             <param name="conferr.goldDir" value="${alltest.conf.resultDir}/conferr-gold"/>
         </antcall>
         <!-- To be updated: also use at least one run of ErrorHandlerTestlet -->
@@ -1176,10 +1182,10 @@ dependencies - users must manually 'build jar' first.
         <property name="alltest.resultDir" value="results-alltest" />
         <property name="alltest.accept.resultDir" value="${alltest.resultDir}/accept" />
         <echo message="About to execute accept tests with all flavors, results into ${alltest.accept.resultDir}/..." />
-        <!-- Run full accept test with each major available flavor into 
-             specific output directories; note any user options will 
+        <!-- Run full accept test with each major available flavor into
+             specific output directories; note any user options will
              override for all test calls.
-             Also exclude the currently failing tests in the 
+             Also exclude the currently failing tests in the
              smoketest if use.excludes is set.
         -->
         <condition property="accept.excludes" value="${smoketest.accept.excludes}">
@@ -1229,10 +1235,10 @@ dependencies - users must manually 'build jar' first.
         <property name="alltest.xsltc.resultDir" value="results-alltest.xsltc" />
         <property name="alltest.conf.xsltc.resultDir" value="${alltest.xsltc.resultDir}/conf" />
         <echo message="About to execute xsltc.conf tests with all flavors, results into ${alltest.conf.xsltc.resultDir}/..." />
-        <!-- Run full conf test with each major available flavor into 
-             specific output directories; note any user options will 
+        <!-- Run full conf test with each major available flavor into
+             specific output directories; note any user options will
              override for all test calls.
-             Also exclude the currently failing tests in the 
+             Also exclude the currently failing tests in the
              smoketest if use.excludes is set.
         -->
         <condition property="conf.xsltc.excludes" value="${smoketest.conf.xsltc.excludes}">
@@ -1281,10 +1287,10 @@ dependencies - users must manually 'build jar' first.
         <property name="alltest.xsltc.resultDir" value="results-alltest.xsltc" />
         <property name="alltest.accept.xsltc.resultDir" value="${alltest.xsltc.resultDir}/accept" />
         <echo message="About to execute xsltc.accept tests with all flavors, results into ${alltest.accept.xsltc.resultDir}/..." />
-        <!-- Run full accept test with each major available flavor into 
-             specific output directories; note any user options will 
+        <!-- Run full accept test with each major available flavor into
+             specific output directories; note any user options will
              override for all test calls.
-             Also exclude the currently failing tests in the 
+             Also exclude the currently failing tests in the
              smoketest if use.excludes is set.
         -->
         <condition property="accept.xsltc.excludes" value="${smoketest.accept.xsltc.excludes}">
@@ -1352,20 +1358,20 @@ dependencies - users must manually 'build jar' first.
     <!-- ResultScanner was failing when run against the Maven build,
          apparently due to conflicting TransformerFactory
          defaults. The simplest solution is to make clear that we want to use
-         our version of Apache Xalan, by setting the Boot Class Path.   
+         our version of Apache Xalan, by setting the Boot Class Path.
     -->
     <target name="scan"
         description="Run a simple ResultScanner on a tree of test results">
         <property name="scan.outputDir" value="results-alltest" />
         <property name="scan.logFile" value="${scan.outputDir}/ResultReport" />
-        <java classname="org.apache.qetest.xsl.ResultScanner" 
-              classpathref="conf.class.path" 
+        <java classname="org.apache.qetest.xsl.ResultScanner"
+              classpathref="conf.class.path"
               fork="yes" >
             <bootclasspath>
                 <path refid="boot.class.path"/>
             </bootclasspath>
             <arg line="${scan.outputDir} ${scan.logFile}"/>
-        </java>  
+        </java>
     </target>
 
     <!-- ================================================================== -->
@@ -1373,8 +1379,8 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="compile.qetest" depends="init.build"
         description="Compile base qetest files; no Xalan dependencies">
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}*.java"
                debug="${debug}" nowarn="${compiler.nowarn}"/>
     </target>
@@ -1382,40 +1388,40 @@ dependencies - users must manually 'build jar' first.
 
     <target name="jar.qetest" depends="compile.qetest"
         description="Jar base qetest files; no Xalan dependencies">
-        <jar jarfile="${qetest.jar}" 
-             basedir="${test.build.dir}" 
+        <jar jarfile="${qetest.jar}"
+             basedir="${test.build.dir}"
              includes="${test.root}*.java,${test.root}*.properties"/>
     </target>
 
 
-    <!-- This step should be dependent upon general XML/XSL 
-         functionality like SAX, DOM, JAXP and the like, but 
-         should not directly depend on Xalan 
+    <!-- This step should be dependent upon general XML/XSL
+         functionality like SAX, DOM, JAXP and the like, but
+         should not directly depend on Xalan
    -->
     <target name="compile.xsl" depends="compile.qetest"
         description="Compile TransformWrapper and associated classes">
         <!-- This javac has no dependencies -->
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}xslwrapper/TransformWrapperHelper.java,${test.root}xslwrapper/TransformWrapper.java,${test.root}xslwrapper/TransformWrapperFactory.java"
                debug="${debug}" nowarn="${compiler.nowarn}"/>
         <!-- This javac depends on JAXP, SAX, DOM; hence the specific classpathref -->
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}xsl/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" 
+               classpathref="compiletest.class.path"
                nowarn="${compiler.nowarn}"/>
     </target>
 
     <target name="compile.trax.xslwrappers" depends="compile.xsl"
         description="Compile Trax*Wrapper xslwrappers only">
         <!-- Should only be dependent on JAXP, not Xalan specifically -->
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}xslwrapper/Trax*Wrapper.java,${test.root}xslwrapper/TraxWrapperUtils.java,${test.root}xslwrapper/XalanProcessWrapper.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" 
+               classpathref="compiletest.class.path"
                nowarn="${compiler.nowarn}"/>
     </target>
 
@@ -1423,61 +1429,61 @@ dependencies - users must manually 'build jar' first.
         description="Compile various JAXP-based API tests">
         <!-- Should only be dependent on JAXP, not Xalan specifically -->
         <!-- Separate javac steps to avoid compiler oddities -->
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}trax/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" 
+               classpathref="compiletest.class.path"
                nowarn="${compiler.nowarn}"/>
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}trax/stream/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" 
+               classpathref="compiletest.class.path"
                nowarn="${compiler.nowarn}"/>
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}trax/dom/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" 
+               classpathref="compiletest.class.path"
                nowarn="${compiler.nowarn}"/>
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}trax/sax/*.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" 
+               classpathref="compiletest.class.path"
                nowarn="${compiler.nowarn}"/>
     </target>
 
     <target name="compile" depends="compile.trax">
         <echo message="Compile Xalan-J 2.x specific tests" />
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}xalanj2/*.java,${test.root}dtm/*.java"
                excludes="${test.root}dtm/xsltcDocCode.java"
                debug="${debug}"
-               classpathref="compiletest.class.path" 
+               classpathref="compiletest.class.path"
                nowarn="${compiler.nowarn}"/>
     </target>
 
     <target name="compile.rwapi" depends="compile">
         <echo message="Compile xslt20 / XPath2.0 RWAPI tests" />
-        <javac srcdir="${test.src.dir}" 
-               destdir="${test.build.dir}" 
+        <javac srcdir="${test.src.dir}"
+               destdir="${test.build.dir}"
                includes="${test.root}rwapi/*.*"
                debug="${debug}"
-               classpathref="rwapitest.class.path" 
+               classpathref="rwapitest.class.path"
                nowarn="${compiler.nowarn}"/>
     </target>
 
-    <!-- Note that this target must *not* depend on any XSLTC tests, 
-         which have to be compiled separately; otherwise the 
+    <!-- Note that this target must *not* depend on any XSLTC tests,
+         which have to be compiled separately; otherwise the
          smoketest will fail.
     -->
     <target name="jar" depends="compile"
         description="Build testxsl.jar with all available tests">
-        <jar jarfile="${testxsl.jar}" 
-             basedir="${test.build.dir}" 
+        <jar jarfile="${testxsl.jar}"
+             basedir="${test.build.dir}"
              includes="**/*.class,**/*.properties" />
     </target>
 
@@ -1485,37 +1491,37 @@ dependencies - users must manually 'build jar' first.
     <target name="bugzilla.classes" depends="jar"
         description="Compile any bugzilla testlet classes">
         <mkdir dir="${tests.bugzilla.build.dir}" />
-        <javac srcdir="${tests.bugzilla.dir}" 
-               destdir="${tests.bugzilla.build.dir}" 
+        <javac srcdir="${tests.bugzilla.dir}"
+               destdir="${tests.bugzilla.build.dir}"
                debug="${debug}"
                excludes="Bugzilla1288.java"
-               classpath="${xalan.jar}:${testxsl.jar}" 
+               classpath="${xalan.jar}:${testxsl.jar}"
                nowarn="${compiler.nowarn}"/>
     </target>
 
     <target name="jira.classes" depends="jar"
         description="Compile any jira testlet classes">
         <mkdir dir="${tests.jira.build.dir}" />
-        <javac srcdir="${tests.jira.dir}" 
-               destdir="${tests.jira.build.dir}" 
+        <javac srcdir="${tests.jira.dir}"
+               destdir="${tests.jira.build.dir}"
                debug="${debug}"
-               classpath="${xalan.jar}:${testxsl.jar}" 
+               classpath="${xalan.jar}:${testxsl.jar}"
                nowarn="${compiler.nowarn}"/>
     </target>
 
     <target name="extensions.classes" depends="jar"
         description="Compile any extensions test classes">
         <mkdir dir="${tests.extensions.build.dir}" />
-        <javac srcdir="${tests.extensions.dir}" 
-               destdir="${tests.extensions.build.dir}" 
+        <javac srcdir="${tests.extensions.dir}"
+               destdir="${tests.extensions.build.dir}"
                debug="${debug}"
-               classpathref="extensions.class.path" 
+               classpathref="extensions.class.path"
                nowarn="${compiler.nowarn}"/>
-        <!-- Add more javac calls if we add more Java extensions dirs -->        
+        <!-- Add more javac calls if we add more Java extensions dirs -->
     </target>
 
-    <!-- This target compiles both the main tests and test drivers 
-         in testxsl.jar from the java/ directory, as well as 
+    <!-- This target compiles both the main tests and test drivers
+         in testxsl.jar from the java/ directory, as well as
          various other classes in subdirs under tests/
     -->
     <target name="all" description="Build testxsl.jar *and* compile .java under tests/"
@@ -1555,11 +1561,11 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="docs" depends="init.docs"
         description="Build the framework/overview docs for tests">
-        <java fork="yes" 
-            classname="${doc.generator}" 
+        <java fork="yes"
+            classname="${doc.generator}"
             classpathref="test.docs.class.path" >
             <arg line="targetDirectory=${test.build.docs} ${test.xdocs.book} ${test.xdocs.style}"/>
-        </java>  
+        </java>
     </target>
 
     <!-- ================================================================== -->
@@ -1567,9 +1573,9 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="javadocs" depends="init.docs"
         description="Build the Javadocs for tests">
-            
-        <!-- Ant 1.2 ignores destdir arg if doclet is set, so must send to doclet in doclet subelement dleslie-->    
-        <!-- But: Ant 1.3 fails if you *don't* provide destdir attr... curcuru-->    
+
+        <!-- Ant 1.2 ignores destdir arg if doclet is set, so must send to doclet in doclet subelement dleslie-->
+        <!-- But: Ant 1.3 fails if you *don't* provide destdir attr... curcuru-->
         <javadoc
              sourcepath="${test.src.dir}"
              packagenames="org.apache.qetest,org.apache.qetest.xslwrapper,org.apache.qetest.xsl,org.apache.qetest.trax,org.apache.qetest.trax.dom,org.apache.qetest.trax.sax,org.apache.qetest.trax.stream,org.apache.qetest.xalanj2"
@@ -1577,7 +1583,7 @@ dependencies - users must manually 'build jar' first.
              author="true"
              version="true"
              use="true"
-             windowtitle="Xalan Testing Framework" 
+             windowtitle="Xalan Testing Framework"
              doctitle="Xalan Testing Framework"
              bottom="Copyright &#169; ${year} The Apache Software Foundation.  All rights reserved."
              destdir="${test.build.apidocs}">
@@ -1608,22 +1614,22 @@ dependencies - users must manually 'build jar' first.
         <echo message="Create .zip/.tar/gz in ${test.build.dir}" />
 
         <!-- Build .tars, then .gzs, then cleanup .tars before doing .zips -->
-        <!-- Note ../.. paths to ensure archives start with 
+        <!-- Note ../.. paths to ensure archives start with
              top-level xml-xalan/test/blah directories
         -->
         <property name="tarzip-backref" value="../.."/>
         <property name="tarzip-fwdref" value="xml-xalan/test"/>
-        
+
         <!-- tar.gz just the xml/xsl/out test files -->
         <tar tarfile="${test.build.dir}/xalan-tests-${DSTAMP}.tar">
           <tarfileset dir="${tarzip-backref}">
             <include name="${tarzip-fwdref}/tests/"/>
           </tarfileset>
         </tar>
-        <gzip src="${test.build.dir}/xalan-tests-${DSTAMP}.tar" 
+        <gzip src="${test.build.dir}/xalan-tests-${DSTAMP}.tar"
               zipfile="${test.build.dir}/xalan-tests-${DSTAMP}.tar.gz"/>
         <delete file="${test.build.dir}/xalan-tests-${DSTAMP}.tar"/>
-              
+
         <!-- tar.gz the automation and batch files, etc. -->
         <tar tarfile="${test.build.dir}/xalan-automation-${DSTAMP}.tar">
           <tarfileset dir="${tarzip-backref}">
@@ -1637,7 +1643,7 @@ dependencies - users must manually 'build jar' first.
             <include name="${tarzip-fwdref}/bin/"/>
           </tarfileset>
         </tar>
-        <gzip src="${test.build.dir}/xalan-automation-${DSTAMP}.tar" 
+        <gzip src="${test.build.dir}/xalan-automation-${DSTAMP}.tar"
               zipfile="${test.build.dir}/xalan-automation-${DSTAMP}.tar.gz"/>
         <delete file="${test.build.dir}/xalan-automation-${DSTAMP}.tar"/>
 
@@ -1660,7 +1666,7 @@ dependencies - users must manually 'build jar' first.
             <include name="${tarzip-fwdref}/bin/"/>
           </zipfileset>
         </zip>
-          
+
         <!-- tar.gz just the documentation for potential posting to the website -->
         <tar tarfile="${test.build.dir}/xalan-docs-${DSTAMP}.tar">
           <tarfileset dir="..">
@@ -1669,7 +1675,7 @@ dependencies - users must manually 'build jar' first.
             <include name="test/README.html"/>
           </tarfileset>
         </tar>
-        <gzip src="${test.build.dir}/xalan-docs-${DSTAMP}.tar" 
+        <gzip src="${test.build.dir}/xalan-docs-${DSTAMP}.tar"
               zipfile="${test.build.dir}/xalan-docs-${DSTAMP}.tar.gz"/>
         <delete file="${test.build.dir}/xalan-docs-${DSTAMP}.tar"/>
         <zip zipfile="${test.build.dir}/xalan-docs-${DSTAMP}.zip" >
@@ -1693,28 +1699,28 @@ dependencies - users must manually 'build jar' first.
             <exclude name="src/${test.root}qetesttest/"/>
           </zipfileset>
         </zip>
-          
+
     </target>
 
     <!-- ================================================================== -->
     <!-- Special: Targets specific to XSLTC which requires extra .jars      -->
     <!-- This section will be updated as xsltc integrates more with xalan   -->
     <!-- ================================================================== -->
-    <!-- Actually, I'd like to figure out some sneaky Ant trick to 
-         allow swapping of parts of classpaths (i.e. swap in xsltc.jar 
-         and related files instead of xalan.jar; likewise replace 
-         xercesImpl.jar with the PARSER_JAR defined outside) to clean 
-         this section up.  But for the time being I'm planning on 
+    <!-- Actually, I'd like to figure out some sneaky Ant trick to
+         allow swapping of parts of classpaths (i.e. swap in xsltc.jar
+         and related files instead of xalan.jar; likewise replace
+         xercesImpl.jar with the PARSER_JAR defined outside) to clean
+         this section up.  But for the time being I'm planning on
          simply maintaining separate-but-equal targets.xsltc
     -->
 
     <path id="xsltc.runtime.class.path">
         <pathelement location="${xalan.build.dir}/xalan.jar" />
-        
+
         <!-- add xsltc.jar so we can test the separate jar distribution -->
         <pathelement location="${xalan.build.dir}/xsltc.jar" />
         <pathelement location="${ser.jar}" />
-         
+
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
@@ -1722,16 +1728,16 @@ dependencies - users must manually 'build jar' first.
     </path>
     <path id="xsltc.compile.class.path">
         <pathelement location="${xalan.build.dir}/xalan.jar" />
-        
+
         <!-- add xsltc.jar so we can test the separate jar distribution -->
         <pathelement location="${xalan.build.dir}/xsltc.jar" />
-        
+
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${jtidy.jar}" />
-        <!-- Note addition of . to the classpath to enable loading 
-             of translets; this needs more work and coordination 
+        <!-- Note addition of . to the classpath to enable loading
+             of translets; this needs more work and coordination
              with tests and translet output dirs.
         -->
         <pathelement location="." />
@@ -1756,17 +1762,17 @@ dependencies - users must manually 'build jar' first.
         <antcall target="scan" />
 
         <mkdir dir="results-xsltc-compile-verification-tests"/>
-        
-        <xsltcTestsTask inputDir="tests/xsltc/attribset" 
-                        resultDir="results-xsltc-compile-verification-tests" 
+
+        <xsltcTestsTask inputDir="tests/xsltc/attribset"
+                        resultDir="results-xsltc-compile-verification-tests"
                         bootclasspathref="boot.class.path"/>
 
         <echo message=""/>
         <echo message=" [minitest] Completed, running the 'xsltc compilation error verification' tests, and these have passed" />
         <echo message=" [minitest] See details of the 'xsltc compilation error verification' test results, at results-xsltc-compile-verification-tests/actual_test_results.xml" />
-        
+
         <echo message=""/>
-        
+
         <echo message=" [minitest] CONGRATULATIONS! The conf.xsltc tests passed!" />
 
     </target>
