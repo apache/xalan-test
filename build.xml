@@ -97,15 +97,15 @@ dependencies - users must manually 'build jar' first.
     <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>
 
     <!-- NOTE: Temporary measure: since I "helpfully" renamed xdocs to
-	 stylebook in the mvn version of xalan-java, and expanded the 
-	 site stylesheet tar.gz, we have an incompatability between
-	 Ant and Maven builds of Xalan. For now I've
-	 worked around this by pulling a copy of the tar.gz into
-	 xalan-tests. Better longterm (after ant-build back-compatibility
-	 is not an issue) would be to either reference Xalan-Java's
-	 pre-expanded version, or to make the stylesheet tree a separate
-	 resource depended upon by both. Or to merge test into xalan-java
-	 main build, which is under discussion.
+         stylebook in the mvn version of xalan-java, and expanded the 
+         site stylesheet tar.gz, we have an incompatability between
+         Ant and Maven builds of Xalan. For now I've
+         worked around this by pulling a copy of the tar.gz into
+         xalan-tests. Better longterm (after ant-build back-compatibility
+         is not an issue) would be to either reference Xalan-Java's
+         pre-expanded version, or to make the stylesheet tree a separate
+         resource depended upon by both. Or to merge test into xalan-java
+         main build, which is under discussion.
          -->
     <!-- <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/> -->
     <property name="xalan.generator.styletargz" value="${test.tools.dir}/xml-site-style.tar.gz"/>
