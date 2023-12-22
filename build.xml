@@ -61,6 +61,7 @@ dependencies - users must manually 'build jar' first.
     <property environment="ENV" />
 
     <property name="year" value="2000-2023"/>
+
     <!-- Properties related to compiling the tests -->
     <property name="build.compiler" value="classic"/>
     <property name="compiler" value="${build.compiler}"/>
@@ -90,7 +91,13 @@ dependencies - users must manually 'build jar' first.
     <property name="testxsl.jar" value="${test.build.dir}/${testxsl.jar.name}"/>
     <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
 
-    <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
+    <!-- Specific locations related to Xalan code, which should
+         normally be in a sister tree to us. There was/is some
+         provision to have xalan-test be in a subdirectory of
+         xalan-java, mostly for formal smoketest convenience; I have
+         tried not to break it but I'm honestly not sure how that
+         worked (preset xalan.relpath?) or if it still works (should
+         test...) -->
     <property name="xalan.relpath" value="../xalan-java"/>
     <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/>
@@ -104,8 +111,10 @@ dependencies - users must manually 'build jar' first.
          xalan-tests. Better longterm (after ant-build back-compatibility
          is not an issue) would be to either reference Xalan-Java's
          pre-expanded version, or to make the stylesheet tree a separate
-         resource depended upon by both. Or to merge test into xalan-java
-         main build, which is under discussion.
+         resource depended upon by both. Or go back to decompressing the
+         jarfile during xalan-java build. Or merge test into xalan-java
+         main build, which is under discussion, at which point they just
+         share the stylesheet directory.
          -->
     <!-- <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/> -->
     <property name="xalan.generator.styletargz" value="${test.tools.dir}/xml-site-style.tar.gz"/>
@@ -114,13 +123,12 @@ dependencies - users must manually 'build jar' first.
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
     <property name="xalan.unbundled.jar"
               value="${xalan.build.dir}/xalan-unbundled.jar"/>
-    <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>
+    <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>  <!-- obsolete, separate jar build -->
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
     <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
     <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
 
     <!-- JTidy is used by the XSLTC comparator -->
-    <!--<property name="jtidy.jar" value="${test.tools.dir}/Tidy.jar"/>-->
     <property name="jtidy.jar" value="${test.tools.dir}/jtidy-1.0.3.jar"/>
 
     <!-- The Mozilla Rhino jar is needed, to run Javascript extensions tests
@@ -176,8 +184,7 @@ dependencies - users must manually 'build jar' first.
     <!-- Classpath used when compiling tests -->
     <path id="compiletest.class.path">
         <pathelement location="${xalan.jar}" />
-        <pathelement location="${xsltc.jar}" />  <!-- add this so we can test the
-                                                      separate jar distribution -->
+        <pathelement location="${xsltc.jar}" /> <!-- obsolete, separate jar build -->
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
         <pathelement location="${parserjar}" />
@@ -214,8 +221,7 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${parserjar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xalan.jar}" />
-        <!--<pathelement location="${xsltc.jar}" />-->  <!-- add this so we can test the
-                                                              separate jar distribution -->
+        <pathelement location="${xsltc.jar}" />  <!-- obsolete, separate jar build -->
         <pathelement path="${sun.boot.class.path}" />
     </path>
 
@@ -1716,9 +1722,7 @@ dependencies - users must manually 'build jar' first.
 
     <path id="xsltc.runtime.class.path">
         <pathelement location="${xalan.build.dir}/xalan.jar" />
-
-        <!-- add xsltc.jar so we can test the separate jar distribution -->
-        <pathelement location="${xalan.build.dir}/xsltc.jar" />
+        <pathelement location="${xalan.build.dir}/xsltc.jar" />   <!-- obsolete, separate jar build -->
         <pathelement location="${ser.jar}" />
 
         <pathelement location="${testxsl.jar}" />
@@ -1728,9 +1732,7 @@ dependencies - users must manually 'build jar' first.
     </path>
     <path id="xsltc.compile.class.path">
         <pathelement location="${xalan.build.dir}/xalan.jar" />
-
-        <!-- add xsltc.jar so we can test the separate jar distribution -->
-        <pathelement location="${xalan.build.dir}/xsltc.jar" />
+        <pathelement location="${xalan.build.dir}/xsltc.jar" />  <!-- obsolete, separate jar build -->
 
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${parserjar}" />
