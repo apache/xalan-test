@@ -89,12 +89,18 @@ dependencies - users must manually 'build jar' first.
     <property name="qetest.jar.name" value="qetest.jar"/>
     <property name="testxsl.jar" value="${test.build.dir}/${testxsl.jar.name}"/>
     <property name="qetest.jar" value="${test.build.dir}/${qetest.jar.name}"/>
-	
+        
     <!-- Specific locations related to Xalan code, which should be in a sister tree to us -->
     <property name="xalan.relpath" value="../xalan-java"/>    
     <property name="xalan.lib.dir" value="${xalan.relpath}/lib"/>  
-    <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.build.dir" value="${xalan.relpath}/build"/> 
+    <!-- NOTE: We shouldn't be depending on Xalan having fetched the
+         tools or having xdocs/stylebook resources, if we want to claim
+         to be able to run standalone to test other processors.
+         We no longer have to care that much about some file duplication;
+         networks are fast, disks are cheap.
+         -->
+    <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>       
     <property name="xalan.xdocs.dir" value="${xalan.relpath}/xdocs"/>
     <property name="xalan.generator.styletargz" value="${xalan.xdocs.dir}/xml-site-style.tar.gz"/>
 
@@ -111,7 +117,10 @@ dependencies - users must manually 'build jar' first.
     <!--<property name="jtidy.jar" value="${test.tools.dir}/Tidy.jar"/>-->
     <property name="jtidy.jar" value="${test.tools.dir}/jtidy-1.0.3.jar"/>
     
-    <!-- The Mozilla Rhino jar is needed, to run Javascript extensions tests -->
+    <!-- The Mozilla Rhino jar is needed, to run Javascript extensions tests 
+         This one can live with Xalan for now, since it's supporting xalan
+         function rather than test function.
+    -->
     <property name="js.jar" value="${xalan.relpath}/lib/rhino-1.7.14.jar"/>
     
     <!-- The Bean Scripting Framework is required for extensions written in languages 
@@ -124,8 +133,8 @@ dependencies - users must manually 'build jar' first.
     <property name="commons-logging.jar" value="${xalan.relpath}/lib/commons-logging-1.2.jar"/>
 
     <!-- Documentation-specific files and locations -->
-    <property name="stylebook.jar" value="${xalan.tools.dir}/stylebook-1.0-b3_xalan-2.jar"/>
-    <property name="doclet.jar" value="${xalan.tools.dir}/xalan2jdoc.jar"/>
+    <property name="stylebook.jar" value="${test.tools.dir}/stylebook-1.0-b3_xalan-2.jar"/>
+    <property name="doclet.jar" value="${test.tools.dir}/xalan2jdoc.jar"/>
     <property name="test.xdocs.dir" value="java/xdocs"/>
     <property name="test.generator.styletar" value="${test.xdocs.dir}/xml-site-style.tar"/>
     <property name="test.xdocs.book" value="${test.xdocs.dir}/sources/xalantest.xml"/>
@@ -537,7 +546,7 @@ dependencies - users must manually 'build jar' first.
         <property name="testType" value="accept.xsltc." />
         <property name="qetest.summaryFile" value="Accept.xml" />
         <property name="scan.outputDir" value="${accept.xsltc.outputDir}"/>
-	    <property name="use-processor" value="${accept.xsltc.processor}"/>
+            <property name="use-processor" value="${accept.xsltc.processor}"/>
         <antcall target="conf.xsltc" />
     </target>-->
 
@@ -711,7 +720,7 @@ dependencies - users must manually 'build jar' first.
         <antcall target="run.xalantest">
             <param name="xalantest.classpathref" value="bugzilla.class.path" />
         </antcall>
-	<!-- Why isn't classes a dependency? -->
+        <!-- Why isn't classes a dependency? -->
         <echo message="If you got ClassNotFound, did you 'build bugzilla.classes' first?" />
     </target>
 
@@ -723,7 +732,7 @@ dependencies - users must manually 'build jar' first.
         <antcall target="run.xalantest">
             <param name="xalantest.classpathref" value="jira.class.path" />
         </antcall>
-	<!-- Why isn't classes a dependency? -->
+        <!-- Why isn't classes a dependency? -->
         <echo message="If you got ClassNotFound, did you 'build jira.classes' first?" />
     </target>
 
@@ -1047,7 +1056,7 @@ dependencies - users must manually 'build jar' first.
         <!-- Run the perf tests just with streams, which gives best perf data -->
         <antcall target="perf">
             <param name="perf.flavor" value="trax.stream"/>
-			<param name="perf.fileList" value="perf.filelist"/>
+                        <param name="perf.fileList" value="perf.filelist"/>
             <param name="perf.outputDir" value="${alltest.resultDir}/perf"/>
             <param name="perf.logFile" value="${alltest.resultDir}/perf/results.xml"/>
         </antcall>
@@ -1343,7 +1352,7 @@ dependencies - users must manually 'build jar' first.
     <!-- ResultScanner was failing when run against the Maven build,
          apparently due to conflicting TransformerFactory
          defaults. The simplest solution is to make clear that we want to use
-	 our version of Apache Xalan, by setting the Boot Class Path. 	
+         our version of Apache Xalan, by setting the Boot Class Path.   
     -->
     <target name="scan"
         description="Run a simple ResultScanner on a tree of test results">
@@ -1352,11 +1361,11 @@ dependencies - users must manually 'build jar' first.
         <java classname="org.apache.qetest.xsl.ResultScanner" 
               classpathref="conf.class.path" 
               fork="yes" >
-	    <bootclasspath>
-	        <path refid="boot.class.path"/>
-	    </bootclasspath>
+            <bootclasspath>
+                <path refid="boot.class.path"/>
+            </bootclasspath>
             <arg line="${scan.outputDir} ${scan.logFile}"/>
-        </java>	 
+        </java>  
     </target>
 
     <!-- ================================================================== -->
@@ -1550,7 +1559,7 @@ dependencies - users must manually 'build jar' first.
             classname="${doc.generator}" 
             classpathref="test.docs.class.path" >
             <arg line="targetDirectory=${test.build.docs} ${test.xdocs.book} ${test.xdocs.style}"/>
-        </java>	 
+        </java>  
     </target>
 
     <!-- ================================================================== -->
@@ -1734,8 +1743,8 @@ dependencies - users must manually 'build jar' first.
         <echo message="Executing Xalan-xsltc conf test: ${testClass}" />
         <!-- Special: allow explicit test.properties overrides for inputDir, etc for xsltc -->
         <property name="testType" value="conf.xsltc." />
-	    <!-- Set indent-number to 0 to match Xalan's default indentation -->
-	    <property name="${testType}Processor.setAttribute.indent-number" value="0"/>
+            <!-- Set indent-number to 0 to match Xalan's default indentation -->
+            <property name="${testType}Processor.setAttribute.indent-number" value="0"/>
         <antcall target="run.xalantest">
             <param name="xalantest.classpathref"
                    value="xsltc.runtime.class.path" />
@@ -1782,7 +1791,7 @@ dependencies - users must manually 'build jar' first.
 
 
     <target name="perf.saxon" description="Run TestletDriver over the perf tree using Saxon">
-		<!-- New addition,  NOT TESTED -->
+                <!-- New addition,  NOT TESTED -->
         <!-- Set the default conformance test driver, user may override -->
         <property name="testClass" value="org.apache.qetest.xsl.StylesheetTestletDriver" />
         <echo message="Executing Saxon perf test: ${testClass}" />
