@@ -104,9 +104,9 @@ dependencies - users must manually 'build jar' first.
     <property name="xalan.tools.dir" value="${xalan.relpath}/tools"/>
 
     <!-- NOTE: Temporary measure: since I "helpfully" renamed xdocs to
-         stylebook in the mvn version of xalan-java, and expanded the 
+         stylebook in the mvn version of xalan-java, and expanded the
          site stylesheet tar.gz, we have an incompatability between
-         Ant and Maven builds of Xalan. For now I've
+         Ant and Maven build processes of Xalan. For now I've
          worked around this by pulling a copy of the tar.gz into
          xalan-tests. Better longterm (after ant-build back-compatibility
          is not an issue) would be to either reference Xalan-Java's
@@ -128,7 +128,11 @@ dependencies - users must manually 'build jar' first.
     <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
     <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
 
-    <!-- JTidy is used by the XSLTC comparator -->
+    <!-- JTidy is (ab)used by the test comparator as a lightweight
+         HTML parser.  If there's a better one available under
+         Apache-compatible license, we might investigate switching
+         over.
+    -->
     <property name="jtidy.jar" value="${test.tools.dir}/jtidy-1.0.3.jar"/>
 
     <!-- The Mozilla Rhino jar is needed, to run Javascript extensions tests
