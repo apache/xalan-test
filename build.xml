@@ -120,13 +120,20 @@ dependencies - users must manually 'build jar' first.
     <property name="xalan.generator.styletargz" value="${test.tools.dir}/xml-site-style.tar.gz"/>
 
     <!-- Various names/locations of dependent jars -->
+    <!-- NOTE: Need to code version numbers into some jarfile names under
+	 mvn that we didn't under ant. See xxx.versioned.jar 
+	 Better fix might be to just use the one wildcard classpaths
+	 support, ${xalan.build.dir}/*
+    -->
     <property name="xalan.jar" value="${xalan.build.dir}/xalan.jar"/>
     <property name="xalan.unbundled.jar"
               value="${xalan.build.dir}/xalan-unbundled.jar"/>
     <property name="xsltc.jar" value="${xalan.build.dir}/xsltc.jar"/>  <!-- obsolete, separate jar build -->
     <property name="ser.jar" value="${xalan.build.dir}/serializer.jar"/>
     <property name="xml-apis.jar" value="${xalan.lib.dir}/xml-apis.jar"/>
-    <property name="parserjar" value="${xalan.lib.dir}/xercesImpl.jar"/>
+    <property name="xml-apis.versioned.jar" value="${xalan.lib.dir}/xml-apis-1.4.01.jar"/>
+    <property name="parser.jar" value="${xalan.lib.dir}/xercesImpl.jar"/>
+    <property name="parser.versioned.jar" value="${xalan.lib.dir}/xercesImpl-2.12.2.jar"/>
 
     <!-- JTidy is (ab)used by the test comparator as a lightweight
          HTML parser.  If there's a better one available under
@@ -139,16 +146,17 @@ dependencies - users must manually 'build jar' first.
          This one can live with Xalan for now, since it's supporting xalan
          function rather than test function.
     -->
-    <property name="js.jar" value="${xalan.relpath}/lib/rhino-1.7.14.jar"/>
+    <property name="js.jar" value="${xalan.lib.dir}/rhino-1.7.14.jar"/>
 
     <!-- The Bean Scripting Framework is required for extensions written in languages
          other than Java. Xalan Java will attempt to use the Jakarta BSF implementation
          by default (see the "extensions" target). For more information, see the
          Apache Commons BSF project https://commons.apache.org/proper/commons-bsf/.
     -->
-    <property name="bsf.jar" value="${xalan.relpath}/lib/bsf.jar"/>
+    <property name="bsf.jar" value="${xalan.lib.dir}/bsf.jar"/>
+    <property name="bsf.versioned.jar" value="${xalan.lib.dir}/bsf-api-3.1.jar"/>
 
-    <property name="commons-logging.jar" value="${xalan.relpath}/lib/commons-logging-1.2.jar"/>
+    <property name="commons-logging.jar" value="${xalan.lib.dir}/commons-logging-1.2.jar"/>
 
     <!-- Documentation-specific files and locations -->
     <property name="stylebook.jar" value="${test.tools.dir}/stylebook-1.0-b3_xalan-2.jar"/>
@@ -165,7 +173,9 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${xalan.jar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${xml-apis.versioned.jar}" />
+        <pathelement location="${parser.jar}" />
+        <pathelement location="${parser.versioned.jar}" />
     </path>
 
     <!-- Note: given that many of the tests interact with xerces and
@@ -191,7 +201,9 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${xsltc.jar}" /> <!-- obsolete, separate jar build -->
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${xml-apis.versioned.jar}" />
+        <pathelement location="${parser.jar}" />
+        <pathelement location="${parser.versioned.jar}" />
         <pathelement location="${jtidy.jar}" />
     </path>
 
@@ -200,7 +212,9 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${xalan.jar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${xml-apis.versioned.jar}" />
+        <pathelement location="${parser.jar}" />
+        <pathelement location="${parser.versioned.jar}" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${jtidy.jar}" />
     </path>
@@ -214,7 +228,9 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${xalan.jar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${xml-apis.versioned.jar}" />
+        <pathelement location="${parser.jar}" />
+        <pathelement location="${parser.versioned.jar}" />
         <pathelement location="${testxsl.jar}" />
         <pathelement location="${jtidy.jar}" />
     </path>
@@ -222,7 +238,9 @@ dependencies - users must manually 'build jar' first.
     <!-- Boot class path for JDK 1.4+ -->
     <path id="boot.class.path">
         <pathelement location="${xml-apis.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${xml-apis.versioned.jar}" />
+        <pathelement location="${parser.jar}" />
+        <pathelement location="${parser.versioned.jar}" />
         <pathelement location="${ser.jar}" />
         <pathelement location="${xalan.jar}" />
         <pathelement location="${xsltc.jar}" />  <!-- obsolete, separate jar build -->
@@ -267,6 +285,7 @@ dependencies - users must manually 'build jar' first.
         <path refid="testxsl.class.path" />
         <pathelement location="${commons-logging.jar}" />
         <pathelement location="${bsf.jar}" />
+        <pathelement location="${bsf.versioned.jar}" />
         <pathelement location="${js.jar}" />
         <pathelement location="${jtidy.jar}" />
         <pathelement location="${tests.extensions.build.dir}" />
@@ -411,7 +430,7 @@ dependencies - users must manually 'build jar' first.
     <!-- ================================================================== -->
     <target name="init.test"
         description="Prepare timestamp, echo version for debugging">
-        <echo message="Using parserjar ${parserjar}" />
+        <echo message="Using parser: one of ${parser.jar} or ${parser.versioned.jar}" />
         <tstamp />
     </target>
 
@@ -1730,8 +1749,10 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${ser.jar}" />
 
         <pathelement location="${testxsl.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${parser.jar}" />
+        <pathelement location="${parser.versioned.jar}" />
         <pathelement location="${xml-apis.jar}" />
+        <pathelement location="${xml-apis.versioned.jar}" />
         <pathelement location="${jtidy.jar}" />
     </path>
     <path id="xsltc.compile.class.path">
@@ -1739,8 +1760,10 @@ dependencies - users must manually 'build jar' first.
         <pathelement location="${xalan.build.dir}/xsltc.jar" />  <!-- obsolete, separate jar build -->
 
         <pathelement location="${testxsl.jar}" />
-        <pathelement location="${parserjar}" />
+        <pathelement location="${parser.jar}" />
+        <pathelement location="${parser.versioned.jar}" />
         <pathelement location="${xml-apis.jar}" />
+        <pathelement location="${xml-apis.versioned.jar}" />
         <pathelement location="${jtidy.jar}" />
         <!-- Note addition of . to the classpath to enable loading
              of translets; this needs more work and coordination
