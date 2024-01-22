@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+  <p>ASCII chars: a b c</p>
+  <p>ISO-8859-1 chars: æ ø å</p>
+  <p>BMP chars: 伐 侃 麥 鼫 </p>
+  <p>Astral char: &#100023;</p>
+  <p title="Policeman 👮">Call the 👮 Police </p>
+</html>

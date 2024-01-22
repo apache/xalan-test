@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><html>
+  <p>ASCII chars: a b c</p>
+  <p>ISO-8859-1 chars: æ ø å</p>
+  <p>BMP chars: &#20240; &#20355; &#40613; &#40747; </p>
+  <p>Astral char: &#100023;</p>
+  <p title="Policeman &#x1F46E;">Call the &#x1F46E; Police </p>
+</html>
