@@ -50,6 +50,7 @@ import org.apache.xml.utils.DefaultErrorHandler;
 import org.apache.qetest.FileBasedTest;
 import org.apache.qetest.OutputNameManager;
 import org.apache.qetest.Reporter;
+import org.apache.qetest.TestfileInfo;
 import org.apache.qetest.xsl.XHTFileCheckService;
 import org.apache.qetest.xsl.XSLTestfileInfo;
 
@@ -58,6 +59,7 @@ import org.apache.qetest.xsl.XSLTestfileInfo;
 /**
  * API Coverage test for the StreamResult class of TRAX..
  * @author shane_curcuru@lotus.com
+ * @author jesper@selskabet.org
  * @version $Id$
  */
 public class StreamResultAPITest extends FileBasedTest
@@ -75,6 +77,15 @@ public class StreamResultAPITest extends FileBasedTest
     /** StreamOutputFormat for testing types of output streams.  */
     protected XSLTestfileInfo outputFileInfo = new XSLTestfileInfo();
 
+    /** StreamEncodingASCII for testing types of encoding.  */
+    protected XSLTestfileInfo encodingAsciiInfo = new XSLTestfileInfo();
+
+    /** StreamEncodingISO8859-1 for testing types of encoding.  */
+    protected XSLTestfileInfo encodingIso8859_1Info = new XSLTestfileInfo();
+
+    /** StreamEncodingUTF8 for testing types of encoding.  */
+    protected XSLTestfileInfo encodingUtf8Info = new XSLTestfileInfo();
+    
     /** Subdirectory under test\tests\api for our xsl/xml files.  */
     public static final String TRAX_STREAM_SUBDIR = "trax" + File.separator + "stream";
 
@@ -82,7 +93,7 @@ public class StreamResultAPITest extends FileBasedTest
     /** Just initialize test name, comment, numTestCases. */
     public StreamResultAPITest()
     {
-        numTestCases = 2;  // REPLACE_num
+        numTestCases = 5;  // REPLACE_num
         testName = "StreamResultAPITest";
         testComment = "API Coverage test for the StreamResult class of TRAX.";
     }
@@ -121,6 +132,20 @@ public class StreamResultAPITest extends FileBasedTest
         outputFileInfo.inputName = testBasePath + "StreamOutputFormat.xsl";
         outputFileInfo.xmlName = testBasePath + "StreamOutputFormat.xml";
         outputFileInfo.goldName = goldBasePath + "StreamOutputFormat.out";
+        
+        encodingAsciiInfo.inputName = testBasePath + "StreamEncoding_US-ASCII.xsl";
+        encodingAsciiInfo.xmlName = testBasePath + "StreamEncoding.xml";
+        encodingAsciiInfo.goldName = goldBasePath + "StreamEncoding_US-ASCII.out";
+
+        encodingIso8859_1Info.inputName = testBasePath + "StreamEncoding_ISO-8859-1.xsl";
+        encodingIso8859_1Info.xmlName = testBasePath + "StreamEncoding.xml";
+        encodingIso8859_1Info.goldName = goldBasePath + "StreamEncoding_ISO-8859-1.out";
+        
+        encodingUtf8Info.inputName = testBasePath + "StreamEncoding_UTF-8.xsl";
+        encodingUtf8Info.xmlName = testBasePath + "StreamEncoding.xml";
+        encodingUtf8Info.goldName = goldBasePath + "StreamEncoding_UTF-8.out";
+
+        
         try
         {
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -190,24 +215,204 @@ public class StreamResultAPITest extends FileBasedTest
 
 
     /**
-     * Basic functionality of StreamResults.
+	 * Basic functionality of StreamResults.
+	 *
+	 * @return false if we should abort the test; true otherwise
+	 */
+	public boolean testCase2()
+	{
+	    reporter.testCaseInit("Basic functionality of StreamResults");
+	
+	    TransformerFactory factory = null;
+	    Source xslSource = null;
+	    Source xmlSource = null;
+	    Templates templates = null;
+	    try
+	    {
+	        factory = TransformerFactory.newInstance();
+	        factory.setErrorListener(new DefaultErrorHandler());
+	        // Create re-useable sources
+	        xslSource = new StreamSource(new FileInputStream(outputFileInfo.inputName));
+	        reporter.logTraceMsg("Create stream sources, templates");
+	        templates = factory.newTemplates(xslSource);
+	    }
+	    catch (Throwable t)
+	    {
+	        reporter.checkFail("Problem creating factory; can't continue testcase");
+	        reporter.logThrowable(reporter.ERRORMSG, t,
+	                              "Problem creating factory; can't continue testcase");
+	        return true;
+	    }
+	
+	    try
+	    {
+	        // Test some OutputStreams
+	        // Simple FileOutputStream is tested in numerous other tests
+	        Transformer transformer = templates.newTransformer();
+	        transformer.setErrorListener(new DefaultErrorHandler());
+	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	        Result result1 = new StreamResult(baos);
+	        reporter.logTraceMsg("About to Transform into ByteArrayOutputStream");
+	
+	        // Note: must get a new xmlSource for each transform
+	        //  Should this really be necessary? I suppose 
+	        //  FileInputStreams don't just get 'reset' for you, 
+	        //  but it would be nice to reuse the StreamSources
+	        xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+	        transformer.transform(xmlSource, result1);
+	        reporter.logTraceMsg("baos.size() is: " + baos.size());
+	
+	        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+	        PrintStream ps = new PrintStream(baos2);
+	        Result result2 = new StreamResult(ps);
+	        reporter.logTraceMsg("About to Transform into PrintStream");
+	
+	        xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+	        transformer.transform(xmlSource, result2);
+	        reporter.logTraceMsg("ps(baos2).size() is: " + baos2.size());
+	
+	        if (!reporter.checkString(baos.toString(), baos2.toString(), "BAOS and PS output comparison"))
+	        {
+	            reporter.logArbitrary(reporter.TRACEMSG, "baos was: " + baos.toString());
+	            reporter.logArbitrary(reporter.TRACEMSG, "ps(baos2) was: " + baos2.toString());
+	        }
+	        writeFileAndValidate(baos.toString("UTF-8"), outputFileInfo.goldName);
+	    }
+	    catch (Throwable t)
+	    {
+	        reporter.checkFail("Problem with transform-streams(1)");
+	        reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(1)");
+	    }
+	
+	    try
+	    {
+	        // Test some Writers
+	        Transformer transformer = templates.newTransformer();
+	        transformer.setErrorListener(new DefaultErrorHandler());
+	        StringWriter sw = new StringWriter();
+	        Result result1 = new StreamResult(sw);
+	        reporter.logTraceMsg("About to Transform into StringWriter");
+	        xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+	        transformer.transform(xmlSource, result1);
+	
+	        CharArrayWriter cw = new CharArrayWriter();
+	        Result result2 = new StreamResult(cw);
+	        reporter.logTraceMsg("About to Transform into CharArrayWriter");
+	        xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+	        transformer.transform(xmlSource, result2);
+	
+	        if (!reporter.checkString(sw.toString(), cw.toString(), "SW and CW output comparison"))
+	        {
+	            reporter.logArbitrary(reporter.TRACEMSG, "sw was: " + sw.toString());
+	            reporter.logArbitrary(reporter.TRACEMSG, "cw was: " + cw.toString());
+	        }
+	        writeFileAndValidate(sw.toString(), outputFileInfo.goldName, "UTF-8");
+	    }
+	    catch (Throwable t)
+	    {
+	        reporter.checkFail("Problem with transform-streams(2)");
+	        reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(2)");
+	    }
+	
+	    try
+	    {
+	        // Test with systemId set
+	        // Note: may be affected by user.dir property; if we're 
+	        //  already in the correct place, this won't be different
+	        try
+	        {
+	            reporter.logTraceMsg("System.getProperty(user.dir) = " + System.getProperty("user.dir"));
+	        }
+	        catch (SecurityException e) // in case of Applet context
+	        {
+	            reporter.logTraceMsg("System.getProperty(user.dir) threw SecurityException");
+	        }
+	        Transformer transformer = templates.newTransformer();
+	        transformer.setErrorListener(new DefaultErrorHandler());
+	        StringWriter sw1 = new StringWriter();
+	        Result result1 = new StreamResult(sw1);
+	        reporter.logTraceMsg("About to Transform into StringWriter w/out systemId set");
+	        xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+	        transformer.transform(xmlSource, result1);
+	
+	        StringWriter sw2 = new StringWriter();
+	        Result result2 = new StreamResult(sw2);
+	        result2.setSystemId("random-system-id");
+	        reporter.logTraceMsg("About to Transform into StringWriter w/ systemId set");
+	        xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+	        transformer.transform(xmlSource, result2);
+	        reporter.check(result2.getSystemId(), "random-system-id", "systemId remains set after transform");
+	
+	        if (!reporter.checkString(sw1.toString(), sw2.toString(), "Output comparison, with/without systemId"))
+	        {
+	            reporter.logArbitrary(reporter.TRACEMSG, "sw1 w/out systemId was: " + sw1.toString());
+	            reporter.logArbitrary(reporter.TRACEMSG, "sw2 w/ systemId was: " + sw2.toString());
+	        }
+	        writeFileAndValidate(sw1.toString(), outputFileInfo.goldName, "UTF-8");
+	        reporter.logInfoMsg("@todo we should update XHTComparator for bogus systemId's like we have in this test");
+	        // @todo we should update XHTComparator for bogus systemId's like we have in this test
+	        // Note that using XHTFileCheckService, it always compares our 
+	        //  outputs using [text] since the XML parser usually throws:
+	        //  warning;org.xml.sax.SAXParseException: File "file:/E:/builds/xml-xalan/test/tests/api-gold/trax/stream/this-is-doctype-system" not found.
+	        if (reporter.getLoggingLevel() >= Reporter.TRACEMSG)
+	        {
+	            reporter.logArbitrary(reporter.TRACEMSG, fileChecker.getExtendedInfo());
+	        }
+	    }
+	    catch (Throwable t)
+	    {
+	        reporter.checkFail("Problem with transform-streams(3)");
+	        reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(3)");
+	    }
+	
+	    reporter.testCaseClose();
+	    return true;
+	}
+
+
+	/**
+     * Encoding of StreamResults - US-ASCII.
      *
      * @return false if we should abort the test; true otherwise
      */
-    public boolean testCase2()
+    public boolean testCase3()
     {
-        reporter.testCaseInit("Basic functionality of StreamResults");
+        return runTransformerOnTestFile(encodingAsciiInfo, "US-ASCII");
+    }
 
-        TransformerFactory factory = null;
+	/**
+     * Encoding of StreamResults - ISO-8859-1.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase4()
+    {
+    	return runTransformerOnTestFile(encodingIso8859_1Info, "ISO-8859-1");
+    }
+	/**
+     * Encoding of StreamResults -UTF-8.
+     *
+     * @return false if we should abort the test; true otherwise
+     */
+    public boolean testCase5()
+    {
+        return runTransformerOnTestFile(encodingUtf8Info, "UTF-8");
+    }
+    
+	private boolean runTransformerOnTestFile(XSLTestfileInfo testfileInfo, String encodingName) {
+		TransformerFactory factory = null;
         Source xslSource = null;
         Source xmlSource = null;
         Templates templates = null;
+
+        reporter.testCaseInit("Encoding functionality of StreamResults - " + encodingName);
+
         try
         {
             factory = TransformerFactory.newInstance();
             factory.setErrorListener(new DefaultErrorHandler());
             // Create re-useable sources
-            xslSource = new StreamSource(new FileInputStream(outputFileInfo.inputName));
+            xslSource = new StreamSource(new FileInputStream(testfileInfo.inputName));
             reporter.logTraceMsg("Create stream sources, templates");
             templates = factory.newTemplates(xslSource);
         }
@@ -233,16 +438,16 @@ public class StreamResultAPITest extends FileBasedTest
             //  Should this really be necessary? I suppose 
             //  FileInputStreams don't just get 'reset' for you, 
             //  but it would be nice to reuse the StreamSources
-            xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+            xmlSource = new StreamSource(new FileInputStream(testfileInfo.xmlName));
             transformer.transform(xmlSource, result1);
             reporter.logTraceMsg("baos.size() is: " + baos.size());
 
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(baos2);
+            PrintStream ps = new PrintStream(baos2, false, encodingName);
             Result result2 = new StreamResult(ps);
             reporter.logTraceMsg("About to Transform into PrintStream");
 
-            xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+            xmlSource = new StreamSource(new FileInputStream(testfileInfo.xmlName));
             transformer.transform(xmlSource, result2);
             reporter.logTraceMsg("ps(baos2).size() is: " + baos2.size());
 
@@ -251,7 +456,7 @@ public class StreamResultAPITest extends FileBasedTest
                 reporter.logArbitrary(reporter.TRACEMSG, "baos was: " + baos.toString());
                 reporter.logArbitrary(reporter.TRACEMSG, "ps(baos2) was: " + baos2.toString());
             }
-            writeFileAndValidate(baos.toString("UTF-8"), outputFileInfo.goldName);
+            writeFileAndValidate(baos.toString(encodingName), testfileInfo.goldName, encodingName);
         }
         catch (Throwable t)
         {
@@ -267,13 +472,13 @@ public class StreamResultAPITest extends FileBasedTest
             StringWriter sw = new StringWriter();
             Result result1 = new StreamResult(sw);
             reporter.logTraceMsg("About to Transform into StringWriter");
-            xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+            xmlSource = new StreamSource(new FileInputStream(testfileInfo.xmlName));
             transformer.transform(xmlSource, result1);
 
             CharArrayWriter cw = new CharArrayWriter();
             Result result2 = new StreamResult(cw);
             reporter.logTraceMsg("About to Transform into CharArrayWriter");
-            xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
+            xmlSource = new StreamSource(new FileInputStream(testfileInfo.xmlName));
             transformer.transform(xmlSource, result2);
 
             if (!reporter.checkString(sw.toString(), cw.toString(), "SW and CW output comparison"))
@@ -281,80 +486,39 @@ public class StreamResultAPITest extends FileBasedTest
                 reporter.logArbitrary(reporter.TRACEMSG, "sw was: " + sw.toString());
                 reporter.logArbitrary(reporter.TRACEMSG, "cw was: " + cw.toString());
             }
-            writeFileAndValidate(sw.toString(), outputFileInfo.goldName);
+            writeFileAndValidate(sw.toString(), testfileInfo.goldName, encodingName);
         }
         catch (Throwable t)
         {
             reporter.checkFail("Problem with transform-streams(2)");
             reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(2)");
         }
-
-        try
-        {
-            // Test with systemId set
-            // Note: may be affected by user.dir property; if we're 
-            //  already in the correct place, this won't be different
-            try
-            {
-                reporter.logTraceMsg("System.getProperty(user.dir) = " + System.getProperty("user.dir"));
-            }
-            catch (SecurityException e) // in case of Applet context
-            {
-                reporter.logTraceMsg("System.getProperty(user.dir) threw SecurityException");
-            }
-            Transformer transformer = templates.newTransformer();
-            transformer.setErrorListener(new DefaultErrorHandler());
-            StringWriter sw1 = new StringWriter();
-            Result result1 = new StreamResult(sw1);
-            reporter.logTraceMsg("About to Transform into StringWriter w/out systemId set");
-            xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
-            transformer.transform(xmlSource, result1);
-
-            StringWriter sw2 = new StringWriter();
-            Result result2 = new StreamResult(sw2);
-            result2.setSystemId("random-system-id");
-            reporter.logTraceMsg("About to Transform into StringWriter w/ systemId set");
-            xmlSource = new StreamSource(new FileInputStream(outputFileInfo.xmlName));
-            transformer.transform(xmlSource, result2);
-            reporter.check(result2.getSystemId(), "random-system-id", "systemId remains set after transform");
-
-            if (!reporter.checkString(sw1.toString(), sw2.toString(), "Output comparison, with/without systemId"))
-            {
-                reporter.logArbitrary(reporter.TRACEMSG, "sw1 w/out systemId was: " + sw1.toString());
-                reporter.logArbitrary(reporter.TRACEMSG, "sw2 w/ systemId was: " + sw2.toString());
-            }
-            writeFileAndValidate(sw1.toString(), outputFileInfo.goldName);
-            reporter.logInfoMsg("@todo we should update XHTComparator for bogus systemId's like we have in this test");
-            // @todo we should update XHTComparator for bogus systemId's like we have in this test
-            // Note that using XHTFileCheckService, it always compares our 
-            //  outputs using [text] since the XML parser usually throws:
-            //  warning;org.xml.sax.SAXParseException: File "file:/E:/builds/xml-xalan/test/tests/api-gold/trax/stream/this-is-doctype-system" not found.
-            if (reporter.getLoggingLevel() >= Reporter.TRACEMSG)
-            {
-                reporter.logArbitrary(reporter.TRACEMSG, fileChecker.getExtendedInfo());
-            }
-        }
-        catch (Throwable t)
-        {
-            reporter.checkFail("Problem with transform-streams(3)");
-            reporter.logThrowable(reporter.ERRORMSG, t, "Problem with transform-streams(3)");
-        }
-
         reporter.testCaseClose();
         return true;
-    }
+	}
 
 
     /**
+	 * Worker method to dump a string to a file and validate it.  
+	 * @return true if OK, false otherwise
+	 */
+	public void writeFileAndValidate(String data, String goldFile)
+	{
+		writeFileAndValidate(data, goldFile, "UTF-8");
+	}
+
+
+	/**
      * Worker method to dump a string to a file and validate it.  
+     * @param encoding TODO
      * @return true if OK, false otherwise
      */
-    public void writeFileAndValidate(String data, String goldFile)
+    public void writeFileAndValidate(String data, String goldFile, String encoding)
     {
         try
         {
             FileOutputStream fos = new FileOutputStream(outNames.nextName());
-            OutputStreamWriter fw = new OutputStreamWriter(fos, "UTF-8");
+            OutputStreamWriter fw = new OutputStreamWriter(fos, encoding);
             fw.write(data);
             fw.close();
             // Explicitly ask that Validation be turned off, since 

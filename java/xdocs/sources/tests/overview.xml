@@ -180,6 +180,8 @@ javax.xml.transform API to process stylesheets.</item>
 <item>Functionality test of error listeners when using illegal stylesheets</item>
 <label>OutputPropertiesTest.java</label>
 <item>Various tests of programmatic access and changing of output properties</item>
+<label>ToStreamTest.java</label>
+<item>Testing tricky Unicode encoding issues</item>
 <label>SystemIdImpInclTest.java</label>
 <item>Testing various forms of URLs in setSystemID with imported and included stylesheets</item>
 <label>SystemIdTest.java</label>
