@@ -701,17 +701,20 @@ dependencies - users must manually 'build jar' first.
                <available file="results-api/Pass-SAXSourceAPITest.xml" />
                <available file="results-api/Pass-SAXTransformerFactoryAPITest.xml" />
                <available file="results-api/Pass-SerializedStylesheetTest.xml" />
+               <available file="results-api/Pass-StreamResultAPITest.xml" />
                <available file="results-api/Pass-SystemIDResolverAPITest.xml" />
                <available file="results-api/Pass-TemplatesHandlerAPITest.xml" />
                <available file="results-api/Pass-TestDTM.xml" />
                <available file="results-api/Pass-TestDTMIter.xml" />
                <available file="results-api/Pass-TestDTMTrav.xml" />
                <available file="results-api/Pass-TestXPathAPI.xml" />
+               <available file="results-api/Pass-ToHTMLStreamTest.xml" />
+               <available file="results-api/Pass-ToXMLStreamTest.xml" />
                <available file="results-api/Pass-TraceListenerTest.xml" />
+               <available file="results-api/Pass-TransformStateAPITest.xml" />
                <available file="results-api/Pass-TransformerFactoryAPITest.xml" />
                <available file="results-api/Pass-TransformerHandlerAPITest.xml" />
                <available file="results-api/Pass-TransformerHandlerTest.xml" />
-               <available file="results-api/Pass-TransformStateAPITest.xml" />
                <available file="results-api/Pass-URIResolverTest.xml" />
             </and>
         </condition>
