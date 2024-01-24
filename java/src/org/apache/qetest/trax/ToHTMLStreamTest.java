@@ -72,7 +72,7 @@ public class ToHTMLStreamTest extends ToStreamTest
      */
     public boolean testCase1() throws SAXException, IOException
     {
-    	reporter.testCaseInit("Verify UTF-9 encoding in HTMLStream");
+    	reporter.testCaseInit("Verify UTF-8 encoding in HTMLStream");
 
     	String actual1 = outputCharacters(makeStream("UTF-8"), "abc");
 		reporter.check(actual1, "abc", "Simple characters should come out unscathed");
