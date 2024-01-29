@@ -105,7 +105,7 @@ public class ToXMLStreamTest extends ToStreamTest
      */
     public boolean testCase2() throws SAXException, IOException
     {
-    	reporter.testCaseInit("Verify setting output properties individually or whole blocks.");
+    	reporter.testCaseInit("Verify handling of ISO-8859-1 encoding in ToStream");
 
 		String actual1 = outputCharacters(makeStream("ISO-8859-1"), "abc");
 		reporter.check(actual1, "abc", "Simple characters should come out unscathed");
@@ -144,7 +144,7 @@ public class ToXMLStreamTest extends ToStreamTest
      */
     public boolean testCase3() throws SAXException, IOException
     {
-    	reporter.testCaseInit("Verify setting output properties individually or whole blocks.");
+    	reporter.testCaseInit("Verify handling of ASCII encoding in ToStream");
 
     	String actual1 = outputCharacters(makeStream("ASCII"), "abc");
 		reporter.check(actual1, "abc", "Simple characters should come out unscathed");
