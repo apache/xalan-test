@@ -88,6 +88,8 @@ public class ToXMLStreamTest extends ToStreamTest
 		
 		String actual4 = outputCharacters(makeStream("UTF-8"), utf16String);
 		reporter.check(actual4, utf16String, "Astral characters should come out unscathed");
+		String actual4b = outputCharacters(makeStream("UTF-8"), utf16String, utf16String.length() - 1);
+		reporter.check(actual4b, utf16String, "Astral characters should come out unscathed (in split buffer)");
 		String actual4a = outputAttrValue(makeStream("UTF-8"), utf16String);
 		reporter.check(actual4a, utf16String, "Astral characters should come out unscathed (as attribute value)");
 		
