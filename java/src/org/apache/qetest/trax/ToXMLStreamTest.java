@@ -88,6 +88,8 @@ public class ToXMLStreamTest extends ToStreamTest
 		
 		String actual4 = outputCharacters(makeStream("UTF-8"), utf16String);
 		reporter.check(actual4, utf16String, "Astral characters should come out unscathed");
+		String actual4b = outputCharacters(makeStream("UTF-8"), utf16String, utf16String.length() - 1);
+		reporter.check(actual4b, utf16String, "Astral characters should come out unscathed (in split buffer)");
 		String actual4a = outputAttrValue(makeStream("UTF-8"), utf16String);
 		reporter.check(actual4a, utf16String, "Astral characters should come out unscathed (as attribute value)");
 		
@@ -103,7 +105,7 @@ public class ToXMLStreamTest extends ToStreamTest
      */
     public boolean testCase2() throws SAXException, IOException
     {
-    	reporter.testCaseInit("Verify setting output properties individually or whole blocks.");
+    	reporter.testCaseInit("Verify handling of ISO-8859-1 encoding in ToStream");
 
 		String actual1 = outputCharacters(makeStream("ISO-8859-1"), "abc");
 		reporter.check(actual1, "abc", "Simple characters should come out unscathed");
@@ -142,7 +144,7 @@ public class ToXMLStreamTest extends ToStreamTest
      */
     public boolean testCase3() throws SAXException, IOException
     {
-    	reporter.testCaseInit("Verify setting output properties individually or whole blocks.");
+    	reporter.testCaseInit("Verify handling of ASCII encoding in ToStream");
 
     	String actual1 = outputCharacters(makeStream("ASCII"), "abc");
 		reporter.check(actual1, "abc", "Simple characters should come out unscathed");

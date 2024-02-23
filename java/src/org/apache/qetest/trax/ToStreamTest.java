@@ -90,6 +90,20 @@ public abstract class ToStreamTest extends FileBasedTest
 		return writer.getBuffer().toString();
 	}
 
+	protected String outputCharacters(ToStream stream, String input, final int bufLength) throws SAXException {
+		StringWriter writer = new StringWriter();
+		stream.setOmitXMLDeclaration(true);
+		stream.setWriter(writer);
+		char[] chars = new char[bufLength];
+		for(int i = 0; i < input.length(); i+=bufLength) {
+			int length = ( i + bufLength > input.length() ? input.length() - i : bufLength );
+			input.getChars(i, i + length, chars, 0);
+			stream.characters(chars, 0, length);
+		}
+		stream.flushPending();
+		return writer.getBuffer().toString();
+	}
+
 	protected String outputAttrValue(ToStream stream, String input) throws SAXException, IOException {
 		StringWriter writer = new StringWriter();
 		stream.setOmitXMLDeclaration(true);
