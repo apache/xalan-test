@@ -93,7 +93,5 @@ echo Running: "$JAVACMD" -mx1024m -Djava.endorsed.dirs="$XALAN_BUILD_DIR_PATH:$X
 "$JAVACMD" -mx1024m -Djava.endorsed.dirs="$XALAN_BUILD_DIR_PATH:$XERCES_ENDORSED_DIR_PATH" -classpath "$CLASSPATH" org.apache.tools.ant.Main "$@"
 
 ant_rc=$?
-echo ANT RETURN CODE: $ant_rc
-
-echo "build.sh complete!"
+echo "build.sh complete with return code" $ant_rc
 exit $ant_rc
