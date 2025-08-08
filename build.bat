@@ -28,6 +28,9 @@ rem        1) You must set JAVA_HOME
 rem
 rem        2) You can set ANT_HOME if you use your own Ant install
 
+rem Upon exit, revert any environment variable changes
+setlocal
+
 echo.
 echo Xalan-J test automation build
 echo -----------------------------
@@ -64,14 +67,13 @@ set XERCES_ENDORSED_DIR_PATH=..\xalan-java\lib\endorsed;..\lib\endorsed
 @echo on
 "%_JAVACMD%" -mx1024m -Djava.endorsed.dirs=%XALAN_BUILD_DIR_PATH%;%XERCES_ENDORSED_DIR_PATH% -classpath "%_CLASSPATH%" org.apache.tools.ant.Main %ANT_CMD_LINE_ARGS%
 @echo off
+set _RC=%ERRORLEVEL%
 
 goto end
 
 :noJavaHome
 echo Warning: JAVA_HOME environment variable is not set
+set _RC=-1
 
 :end
-set _CLASSPATH=
-set _ANT_HOME=
-set _JAVACMD=
-set _ANT_JARS=
+exit /b %_RC%
