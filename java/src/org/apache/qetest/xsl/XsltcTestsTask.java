@@ -43,6 +43,8 @@ public class XsltcTestsTask extends Task {
 
     private String resultDir;
 
+    private String baseDir=".";
+
     private static final String XSLT_FILE_EXT = ".xsl";
 
     private static final String expectedTestResultsDoc = "expected_test_results.xml";
@@ -61,13 +63,13 @@ public class XsltcTestsTask extends Task {
     public void execute() throws BuildException {
 
         System.setProperty("javax.xml.transform.TransformerFactory", 
-		                        "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
+                                        "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
 
         Document expectedTestResultsDocument = getExpectedTestResultsDocument();
         
         Map<String, Boolean> testResults = new HashMap<String, Boolean>();
 
-        File dirObj = new File(this.inputDir);
+        File dirObj = new File(this.baseDir,this.inputDir);
         File[] fileList = dirObj.listFiles();
         
         boolean isXsltcTestsPassed = true;
@@ -111,6 +113,10 @@ public class XsltcTestsTask extends Task {
 
     public void setResultDir(String resultDir) {
         this.resultDir = resultDir;
+    }
+
+    public void setBaseDir(String baseDir) {
+        this.baseDir = baseDir;
     }
 
     /**
@@ -169,7 +175,9 @@ public class XsltcTestsTask extends Task {
        try {
           DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
           DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-          xmlResultDocument = docBuilder.parse(this.inputDir + "/" + expectedTestResultsDoc);
+          File sourceDir=new File(this.baseDir,this.inputDir);
+          File expectedTestResultsDocFile=new File(sourceDir, this.expectedTestResultsDoc);
+          xmlResultDocument = docBuilder.parse(expectedTestResultsDocFile);
        }
        catch (Exception ex) {
           throw new BuildException(ex.getMessage(), location);

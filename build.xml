@@ -726,7 +726,7 @@ dependencies - users must manually 'build jar' first.
 
         <antcall target="apitest-pass-file-check"/>
 
-        <apiTestsResultTask resultDir="results-api" fileNamePrefix="Pass-"/>
+        <apiTestsResultTask resultDir="results-api" fileNamePrefix="Pass-" baseDir="${basedir}"/>
 
         <echo message=" [minitest] CONGRATULATIONS! The api tests passed!" />
     </target>
@@ -1797,7 +1797,8 @@ dependencies - users must manually 'build jar' first.
 
         <xsltcTestsTask inputDir="tests/xsltc/attribset"
                         resultDir="results-xsltc-compile-verification-tests"
-                        bootclasspathref="boot.class.path"/>
+                        bootclasspathref="boot.class.path"
+			baseDir="${basedir}"/>
 
         <echo message=""/>
         <echo message=" [minitest] Completed, running the 'xsltc compilation error verification' tests, and these have passed" />

@@ -19,18 +19,21 @@ import org.w3c.dom.Document;
    XML documents.
 
    @author <a href="mailto:mukulg@apache.org">Mukul Gandhi</a>
+   @author <a href="mailto:jkesselm@apache.org">Joe Kesselman</a>
 */
 public class XSLApiTestsResultTask extends Task {
     
     private String resultDir;
 
-    private String fileNamePrefix;    
+    private String fileNamePrefix;
+
+    private String baseDir=".";
 
     private static final String PASS = "Pass";
 
     // method to run this, ant build task
     public void execute() throws BuildException {
-        File dirObj = new File(this.resultDir);
+        File dirObj = new File(this.baseDir,this.resultDir);
         File[] fileList = dirObj.listFiles();
         for (int idx = 0; idx < fileList.length; idx++) {
            String fileName = fileList[idx].getName();
@@ -48,6 +51,10 @@ public class XSLApiTestsResultTask extends Task {
         }
     }
 
+    public void setBaseDir(String baseDir) {
+        this.baseDir=baseDir;
+    }
+
     public void setResultDir(String resultDir) {
         this.resultDir = resultDir;
     }
@@ -62,7 +69,7 @@ public class XSLApiTestsResultTask extends Task {
     private String getTestResultFilePassStatus(String testResultFilePath) {
        String resultStr = "";
        
-       try {	   
+       try {       
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
             Document xmlDocument = docBuilder.parse(testResultFilePath);
@@ -79,6 +86,6 @@ public class XSLApiTestsResultTask extends Task {
        }
 
        return resultStr;
-	}
+        }
 
 }
